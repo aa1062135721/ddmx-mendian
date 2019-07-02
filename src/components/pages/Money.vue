@@ -156,7 +156,24 @@
                 </ul>
               </div>
               <div class="queren-xinxi">
-
+                <ul>
+                  <li>
+                    <span>服务人员</span>
+                    <!--<span>张三[婴儿游泳]</span>el-icon-arrow-down-->
+                    <el-select   placeholder="请选择" value="张三[婴儿游泳]">
+                      <el-option
+                        key="1"
+                        label="张三"
+                        value="张三">
+                      </el-option>
+                      <el-option
+                        key="2"
+                        label="李四"
+                        value="李四">
+                      </el-option>
+                    </el-select>
+                  </li>
+                </ul>
               </div>
             </div>
           </el-col>
