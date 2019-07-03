@@ -1,7 +1,7 @@
 <template>
     <div class="bg">
       <v-head></v-head>
-      <div style="padding: 20px 20px;">
+      <div style="padding: 10px 20px;">
         <el-row :gutter="20">
           <el-col :span="14">
             <div class="grid-content all-goods">
@@ -15,8 +15,8 @@
                 <el-button class="fenlei-button" type="primary">奶瓶</el-button>
                 <el-button class="page-fenlei-button" icon="el-icon-arrow-right"></el-button>
               </div>
-              <div>
-                <div class="flex-goods">
+              <div class="flex-goods">
+                  <v-good class="goods"></v-good>
                   <v-good class="goods"></v-good>
                   <v-good class="goods"></v-good>
                   <v-good class="goods"></v-good>
@@ -32,8 +32,7 @@
                   <v-good class="goods"></v-good>
                   <v-good class="goods"></v-good>
                 </div>
-              </div>
-              <div class="page-buttons">
+                <div class="page-buttons">
                 <button class="page-button">上一页</button>
                 <button class="page-button">下一页</button>
               </div>
@@ -195,7 +194,7 @@
                 </ul>
                 <div class="buttons">
                   <button class="my-btn">选择会员</button>
-                  <button class="my-btn">结账</button>
+                  <button @click="jiezhang = true"  class="my-btn">结账</button>
                 </div>
               </div>
             </div>
@@ -277,13 +276,80 @@
         </div>
       </el-dialog>
       <!--会员等级说明弹框-->
-      <el-dialog class="huiyuandengjishuoming" title="会员等级说明" :visible.sync="huiyuandengjishuoming" width="372px" :center="true">
+      <el-dialog class="huiyuandengjishuoming-tanchuan" title="会员等级说明" :visible.sync="huiyuandengjishuoming" width="372px" :center="true">
         <div class="content">
           <span>三星会员：充值200</span>
           <span>四星会员：充值200</span>
           <span>五星会员：充值200</span>
           <span>六星会员：充值200</span>
           <span>七星会员：充值200</span>
+        </div>
+      </el-dialog>
+      <!--结账弹框-->
+      <el-dialog class="jiezhang-tanchuan" title="结账" :visible.sync="jiezhang" width="824px" :center="true">
+        <div class="clear-both box">
+          <div class="float-left my-left">
+            <ul>
+              <li class="clear-both">
+                <span class="float-left">应收</span>
+                <span class="float-right font-red">¥ 600</span>
+              </li>
+              <li class="clear-both">
+                <span class="float-left">代金券</span>
+                <span class="float-right">¥ 20</span>
+              </li>
+              <li class="clear-both">
+                <span class="float-left">改价</span>
+                <span class="float-right">¥ 10</span>
+              </li>
+              <li class="clear-both">
+                <span class="float-left"><span>会员</span> <span class="font-blue">李四</span></span>
+                <span class="float-right">余额：¥ 300</span>
+              </li>
+              <li class="clear-both">
+                <span class="float-left"><span>服务人员</span> <span class="font-blue">张三</span></span>
+                <span class="float-right"></span>
+              </li>
+            </ul>
+            <div class="div">
+              <button>取消</button>
+              <button>确认结账</button>
+            </div>
+          </div>
+          <div class="float-right my-right">
+            <span>
+              <img src="../../assets/icon/checkout-huiyuanka.png" alt="">
+              会员卡
+            </span>
+            <span>
+              <img src="../../assets/icon/checkout-xianjing.png" alt="">
+              现金
+            </span>
+            <span>
+              <img src="../../assets/icon/checkout-weixin.png" alt="">
+              微信
+            </span>
+            <span>
+              <img src="../../assets/icon/checkout-zhifubao.png" alt="">
+              支付宝
+            </span>
+            <span>
+              <img src="../../assets/icon/checkout-yinhangka.png" alt="">
+              银行卡
+            </span>
+            <span>
+              <img src="../../assets/icon/checkout-meituan.png" alt="">
+              美团
+            </span>
+            <span>
+              <img src="../../assets/icon/checkout-zengpin-sel.png" alt="">
+              赠送
+            </span>
+            <span>
+              <img src="../../assets/icon/checkout-mendian.png" alt="">
+              门店自用
+            </span>
+          </div>
         </div>
       </el-dialog>
     </div>
@@ -301,6 +367,7 @@
               xiugaishuliang:false,//修改数量弹窗显示与否
               chongzhi:false,//充值弹窗显示与否
               huiyuandengjishuoming:false,//会员等级说明弹框
+              jiezhang:false,//结账对话框显示与否
             }
         },
         components:{
@@ -361,6 +428,7 @@
     flex-wrap:wrap;
     flex-direction:column;
     .goods-type{
+      height: 54px;
       width: 100%;
       display: flex;
       align-items: center;
@@ -394,6 +462,9 @@
     }
     .flex-goods{
       height: 700px;
+      /*height: 100%;*/
+      min-height: 700px;
+      max-height: 885px;
       overflow-y: scroll;
       width: 100%;
       display: flex;
@@ -406,6 +477,8 @@
     }
     .page-buttons{
       text-align: center;
+      width: 100%;
+      height: 32px;
       .page-button{
         width:84px;
         height:32px;
@@ -420,12 +493,9 @@
         margin-right: 20px;
       }
       .page-button:active{
-        width:84px;
-        height:32px;
-        border: 0;
+        border: none;
         background:rgba(0,0,0,1)!important;
         color:rgba(255,255,255,1)!important;
-        border-radius:4px;
       }
     }
   }
@@ -462,6 +532,7 @@
     flex-direction:column;
     .search{
       display: flex;
+      background: none;
       border:1px solid rgba(229,229,229,1);
       border-radius:10px;
       .goods-search{
@@ -682,7 +753,7 @@
 
   }
   /*会员等级说明弹框样式*/
-  .huiyuandengjishuoming{
+  .huiyuandengjishuoming-tanchuan{
     .content{
       width: 332px;
       display: flex;
@@ -701,6 +772,69 @@
         font-family:SourceHanSansCN-Regular;
         font-weight:400;
         color:rgba(128,128,128,1);
+      }
+    }
+  }
+  /*结账弹框样式*/
+  .jiezhang-tanchuan{
+    .box{
+      height: 300px;
+      .my-left{
+        width: 320px;
+        height: 100%;
+        ul{
+          list-style-type: none;
+          width: 100%;
+          border-radius:8px;
+          padding: 34px 12px;
+          li{
+            clear: both;
+            min-height: 20px;
+            font-size:16px;
+            width: 100%;
+            font-family:SourceHanSansCN-Regular;
+            font-weight:400;
+            color:rgba(128,128,128,1);
+            line-height:20px;
+            margin-bottom: 16px;
+            &:first-child{
+              color: #000;
+            }
+          }
+        }
+        .div {
+          text-align: center;
+          button{
+            width:148px;
+            height:44px;
+            background:rgba(255,255,255,1);
+            color: #2ECAF1;
+            font-size:20px;
+            border:1px solid rgba(46,202,241,1);
+            border-radius:8px;
+            &:active{
+              border:none;
+              background:rgba(45,194,243,1);
+              color:rgba(255,255,255,1);
+            }
+          }
+        }
+      }
+      .my-right{
+        width: 320px;
+        height: 100%;
+        span{
+          width:176px;
+          height:56px;
+          background:rgba(255,255,255,1);
+          border:1px solid rgba(210,210,210,1);
+          border-radius:10px;
+          font-size:20px;
+          font-family:SourceHanSansCN-Regular;
+          font-weight:400;
+          color:rgba(26,26,26,1);
+        }
+
       }
     }
   }
