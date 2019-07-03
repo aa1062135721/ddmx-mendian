@@ -51,7 +51,7 @@
               <br><br>
               <el-button class="caozuo-button" type="primary">删除</el-button>
               <br><br>
-              <el-button class="caozuo-button" type="primary">充值</el-button>
+              <el-button @click="chongzhi = true" class="caozuo-button" type="primary">充值</el-button>
               <br><br>
               <el-button class="caozuo-button" type="primary">会员</el-button>
               <br><br>
@@ -231,6 +231,61 @@
           </div>
         </div>
       </el-dialog>
+      <!--充值按钮弹框-->
+      <el-dialog class="chongzhi-tanchuan" title="充值" :visible.sync="chongzhi" width="750px" :center="true">
+        <div class="clear-both both">
+          <div class="float-left left">
+            <div class="one">
+              <el-input class="" placeholder="请输入会员手机号" clearable></el-input>
+            </div>
+            <div class="two">
+              <ul>
+                <li>
+                  <span class="float-left">会员</span>
+                  <span class="float-right font-blue">张三</span>
+                </li>
+                <li>
+                  <span class="float-left">累积充值</span>
+                  <span class="float-right">¥ 100</span>
+                </li>
+                <li>
+                  <span class="float-left">余额</span>
+                  <span class="float-right font-red">¥ 600</span>
+                </li>
+                <li>
+                  <span class="float-left">会员等级</span>
+                  <span class="float-right">三星会员&nbsp;<i class="el-icon-question font-blue" @click="huiyuandengjishuoming=true"></i></span>
+                </li>
+              </ul>
+            </div>
+            <div class="three">
+              <el-radio-group>
+                <el-radio :label="3">现价</el-radio>
+                <el-radio :label="6">微信</el-radio>
+                <el-radio :label="9">支付宝</el-radio>
+                <el-radio :label="9">银行卡</el-radio>
+              </el-radio-group>
+            </div>
+            <div class="four">
+              <el-input class="" placeholder="请输入充值金额" clearable></el-input>
+            </div>
+          </div>
+          <div class="float-right right">
+            <v-keyboard></v-keyboard>
+            <el-button class="queding-chongzhi">确定充值</el-button>
+          </div>
+        </div>
+      </el-dialog>
+      <!--会员等级说明弹框-->
+      <el-dialog class="huiyuandengjishuoming" title="会员等级说明" :visible.sync="huiyuandengjishuoming" width="372px" :center="true">
+        <div class="content">
+          <span>三星会员：充值200</span>
+          <span>四星会员：充值200</span>
+          <span>五星会员：充值200</span>
+          <span>六星会员：充值200</span>
+          <span>七星会员：充值200</span>
+        </div>
+      </el-dialog>
     </div>
 </template>
 
@@ -244,6 +299,8 @@
             return {
               xiugaijiage: false,//修改价格弹窗显示与否
               xiugaishuliang:false,//修改数量弹窗显示与否
+              chongzhi:false,//充值弹窗显示与否
+              huiyuandengjishuoming:false,//会员等级说明弹框
             }
         },
         components:{
@@ -554,6 +611,96 @@
       color:rgba(239,239,239,1);
       &:active{
         border: none;
+      }
+    }
+  }
+  /*充值弹窗样式*/
+  .chongzhi-tanchuan{
+    border-radius:10px;
+    .both{
+      width: 700px;
+      height: 368px;
+      .left{
+        width: 394px;
+        height: 368px;
+        display: flex;
+        flex-direction:column;
+        justify-content:space-between;
+        .one{
+
+        }
+        .two{
+          width:368px;
+          height:122px;
+          border:1px solid rgba(210,210,210,1);
+          border-radius:8px;
+          padding: 27px 12px;
+          ul{
+            list-style-type: none;
+            width: 100%;
+            li{
+              clear: both;
+              min-height: 20px;
+              font-size:16px;
+              width: 100%;
+              font-family:SourceHanSansCN-Regular;
+              font-weight:400;
+              color:rgba(128,128,128,1);
+              line-height:20px;
+              margin-bottom: 16px;
+            }
+          }
+        }
+        .three{
+          .el-radio-group{
+            width: 100%;
+            display: flex;
+            flex-wrap: nowrap;
+            flex-direction:row;
+            justify-content:space-between;
+          }
+        }
+      }
+      .right{
+        height: 368px;
+        width: 292px;
+        display: flex;
+        flex-direction:column;
+        justify-content:space-between;
+        .queding-chongzhi{
+          width:292px;
+          height:62px;
+          background:rgba(45,194,243,1);
+          border-radius:10px;;
+          font-size:24px;
+          font-family:SourceHanSansCN-Regular;
+          font-weight:400;
+          color:rgba(239,239,239,1);
+        }
+      }
+    }
+
+  }
+  /*会员等级说明弹框样式*/
+  .huiyuandengjishuoming{
+    .content{
+      width: 332px;
+      display: flex;
+      flex-direction:row;
+      flex-wrap: wrap;
+      justify-content:flex-start;
+      span{
+        width:150px;
+        height:20px;
+        overflow: hidden;
+        line-height: 20px;
+        font-size:16px;
+        margin-bottom: 18px;
+        margin-left: 8px;
+        margin-right: 8px;
+        font-family:SourceHanSansCN-Regular;
+        font-weight:400;
+        color:rgba(128,128,128,1);
       }
     }
   }
