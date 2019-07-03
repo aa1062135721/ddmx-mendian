@@ -45,13 +45,15 @@
                   this.msg = '请输入用户名或密码'
                   return
                 }
-              this.$router.push('/money')
-              return;
                 let data = {username:this.username, password:this.password}
+                let that = this
                 postLogin(data).then((res) => {
                   if (res.code === 200) {
-                    console.log(res)
                     setStore('token', res.data.data.token)
+                    that.$router.push({
+                      path: '/money',
+                      query: {}
+                    })
                   } else {
 
                   }

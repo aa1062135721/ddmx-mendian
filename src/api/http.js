@@ -6,40 +6,41 @@
  */
 
 import axios from 'axios'
-// import router from '../main'
 import Vue from 'vue'
+import Router from '../router'
 import { getStore } from '../utils'
 
 axios.defaults.timeout = 10000
-// axios.defaults.baseURL = 'http://ddxmtp5.com/index'  //配置了代理跨域
-axios.defaults.baseURL = '/api/'
+// axios.defaults.baseURL = 'http://ddxmtp5.com/index'  //配置了代理跨域 项目根目录中，config/index.js  proxyTable
+axios.defaults.baseURL = '/api/index/'
 
 // http request 拦截器
-// axios.interceptors.request.use(
-//   config => {
-//     // 引入cookie 存储token 有的接口需要认证
-//     const token = getStore('token')
-//     config.data = config.data
-//     if (config.data && config.data.form) {
-//       config.headers = {
-//         'Content-Type': 'multipart/form-data'
-//       }
-//       delete config.data.form
-//       config.data = config.data['form-data']
-//     } else {
-//       config.headers = {
-//         'Content-Type': 'application/json'
-//       }
-//     }
-//     if (token) {
-//       config.headers.Authorization = token
-//     }
-//     return config
-//   },
-//   error => {
-//     return Promise.reject(error)
-//   }
-// )
+axios.interceptors.request.use(
+  config => {
+    console.log(config)
+    // 引入cookie 存储token 有的接口需要认证
+    const token = getStore('token')
+    // config.data = config.data
+    if (config.data && config.data.form) {
+      config.headers = {
+        'Content-Type': 'multipart/form-data'
+      }
+      delete config.data.form
+      config.data = config.data['form-data']
+    } else {
+      config.headers = {
+        'Content-Type': 'application/json'
+      }
+    }
+    if (token) {
+      config.headers['XX-Token'] = token
+    }
+    return config
+  },
+  error => {
+    return Promise.reject(error)
+  }
+)
 
 // http reponse 拦截器
 axios.interceptors.response.use(
@@ -47,10 +48,11 @@ axios.interceptors.response.use(
     /***
      * 处理需要登录的错误代码
      */
-    if (response.data.code === 405) {
-      router.replace({
+    if (response.data.code !== "200") {
+      alert(response.data.msg)
+      Router.push({
         path: '/login',
-        query: {redirect: router.currentRoute.fullPath}
+        query: {}
       })
     }
     return response
@@ -76,15 +78,13 @@ axios.interceptors.response.use(
  */
 export function fetch (url, params = {}) {
   return new Promise((resolve, reject) => {
-    axios.get(url, {
-      params: params
-    })
-    .then(response => {
-      resolve(response.data)
-    })
-    .catch(err => {
-      reject(err)
-    })
+    axios.get(url, {params: params})
+      .then(response => {
+        resolve(response.data)
+      })
+      .catch(err => {
+        reject(err)
+      })
   })
 }
 

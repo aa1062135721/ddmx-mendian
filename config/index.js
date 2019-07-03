@@ -11,10 +11,12 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/api/*': {
-        // target: 'http://testfrontend.ddxm661.com',  // 本地测试
-        target: 'http://ddxmtp5.com/index',  // 本地测试
-        changeOrigin: true
+      '/api': {
+        target: 'http://testmd.ddxm661.com',  // 本地测试
+        changeOrigin: true,//是否允许跨越
+        pathRewrite: {
+          '^/api': '',//重写,
+        }
       }
     },
 
