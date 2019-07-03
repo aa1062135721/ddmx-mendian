@@ -48,8 +48,8 @@
                 let data = {username:this.username, password:this.password}
                 let that = this
                 postLogin(data).then((res) => {
-                  if (res.code === 200) {
-                    setStore('token', res.data.data.token)
+                  if (res.code === '200') {
+                    setStore('token', res.data.token)
                     that.$router.push({
                       path: '/money',
                       query: {}
