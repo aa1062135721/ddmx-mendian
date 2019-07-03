@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import {getStore} from '../utils'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -63,6 +64,7 @@ export default new Router({
   ],
   // 定义页面跳转滚动
   scrollBehavior (to, from, savedPosition) {
+    console.log(' 定义页面跳转滚动')
     if (savedPosition) {
       return savedPosition
     } else {
@@ -73,3 +75,28 @@ export default new Router({
     }
   }
 })
+
+// router.beforeEach((to, from, next) => {
+//   console.log('全局路由守卫beforeEach')
+//   if (to.meta.requireAuth) {
+//     if (getStore('token')) {
+//       next()
+//     } else {
+//       // next({
+//       //   path: '/login'
+//       // })
+//     }
+//   } else {
+//     if (getStore('token')) {
+//       next({
+//         path: '/money'
+//       })
+//     } else {
+//       // next({
+//       //   path: '/login'
+//       // })
+//     }
+//   }
+// })
+
+export default router
