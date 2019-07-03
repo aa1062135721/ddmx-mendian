@@ -45,9 +45,9 @@
               <br><br>
               <el-button class="caozuo-button" type="primary">&nbsp;&nbsp;-&nbsp;&nbsp;</el-button>
               <br><br>
-              <el-button class="caozuo-button" type="primary">数量</el-button>
+              <el-button @click="xiugaishuliang = true" class="caozuo-button" type="primary">数量</el-button>
               <br><br>
-              <el-button class="caozuo-button" type="primary">改价</el-button>
+              <el-button @click="xiugaijiage = true" class="caozuo-button" type="primary">改价</el-button>
               <br><br>
               <el-button class="caozuo-button" type="primary">删除</el-button>
               <br><br>
@@ -158,41 +158,96 @@
               <div class="queren-xinxi">
                 <ul>
                   <li>
-                    <span>服务人员</span>
-                    <!--<span>张三[婴儿游泳]</span>el-icon-arrow-down-->
-                    <el-select   placeholder="请选择" value="张三[婴儿游泳]">
-                      <el-option
-                        key="1"
-                        label="张三"
-                        value="张三">
-                      </el-option>
-                      <el-option
-                        key="2"
-                        label="李四"
-                        value="李四">
-                      </el-option>
-                    </el-select>
+                    <span class="float-left">服务人员</span>
+                    <span class="float-right select" >
+                      <el-dropdown class="user-name" trigger="click">
+                        <span class="el-dropdown-link">
+                          <span class="font-blue">张三</span> [婴儿游泳]<i class="el-icon-arrow-down"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                          <el-dropdown-item><span class="font-blue">张三</span> [关于作者]</el-dropdown-item>
+                          <el-dropdown-item><span class="font-blue">张三</span> [项目仓库]</el-dropdown-item>
+                          <el-dropdown-item><span class="font-blue">张三</span> [退出登录]</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </el-dropdown>
+                    </span>
+                  </li>
+                  <li>
+                    <span class="float-left">会员&nbsp;<span class="font-blue">李四</span></span>
+                    <span class="float-right">余额￥866.00</span>
+                  </li>
+                  <li>
+                    <span class="float-left">合计</span>
+                    <span  class="float-right">￥600.00</span>
+                  </li>
+                  <li>
+                    <span class="float-left">折扣</span>
+                    <span  class="float-right">100%</span>
+                  </li>
+                  <li>
+                    <span class="float-left">优惠</span>
+                    <span  class="float-right font-blue">-￥5.00</span>
+                  </li>
+                  <li>
+                    <span class="float-left">结算</span>
+                    <span class="float-right">￥600.00</span>
                   </li>
                 </ul>
+                <div class="buttons">
+                  <button class="my-btn">选择会员</button>
+                  <button class="my-btn">结账</button>
+                </div>
               </div>
             </div>
           </el-col>
         </el-row>
       </div>
+
+      <!--修改价格弹框-->
+      <el-dialog class="gaijia-tanchuan" title="修改价格" :visible.sync="xiugaijiage" width="434px" :center="true">
+        <div>
+          <el-input class="gaijia-input" placeholder="请输入内容" clearable></el-input>
+          <div class="clear-both" style="height: 290px;">
+            <div class="float-left">
+              <v-keyboard></v-keyboard>
+            </div>
+            <div class="float-right">
+              <el-button class="gaijia-queding-btn">确定</el-button>
+            </div>
+          </div>
+        </div>
+      </el-dialog>
+      <!--修改数量弹框-->
+      <el-dialog class="gaijia-tanchuan" title="修改数量" :visible.sync="xiugaishuliang" width="434px" :center="true">
+        <div>
+          <el-input class="gaijia-input" placeholder="请输入内容" clearable></el-input>
+          <div class="clear-both" style="height: 290px;">
+            <div class="float-left">
+              <v-keyboard></v-keyboard>
+            </div>
+            <div class="float-right">
+              <el-button class="gaijia-queding-btn">确定</el-button>
+            </div>
+          </div>
+        </div>
+      </el-dialog>
     </div>
 </template>
 
 <script>
     import vHead from '../common/Header.vue';
     import vGood from '../common/Good.vue';
+    import vKeyboard from '../common/Keyboard.vue';
     export default {
         name: 'Money',
         data() {
             return {
+              xiugaijiage: false,//修改价格弹窗显示与否
+              xiugaishuliang:false,//修改数量弹窗显示与否
             }
         },
         components:{
-          vHead,vGood
+          vHead,vGood,vKeyboard
         },
         beforeMount() {
         },
@@ -223,14 +278,14 @@
     border-radius: 4px;
   }
   .bg-purple-dark {
-    background: #99a9bf;
+    /*background: #99a9bf;*/
   }
   .bg-purple {
-    background: #d3dce6;
+    /*background: #d3dce6;*/
     height: 100%;
   }
   .bg-purple-light {
-    background: #e5e9f2;
+    /*background: #e5e9f2;*/
   }
   .grid-content {
     border-radius: 4px;
@@ -238,7 +293,7 @@
   }
   .row-bg {
     padding: 10px 0;
-    background-color: #f9fafc;
+    /*background-color: #f9fafc;*/
   }
   .all-goods{
     height: calc(100vh - 110px);
@@ -350,7 +405,6 @@
     flex-direction:column;
     .search{
       display: flex;
-      background:rgba(255,255,255,1);
       border:1px solid rgba(229,229,229,1);
       border-radius:10px;
       .goods-search{
@@ -415,13 +469,63 @@
       }
     }
     .queren-xinxi{
-      width:100%;
-      height:280px;
+      width: calc(100% - 30px);
+      height:260px;
       background:rgba(255,255,255,1);
       border:1px solid rgba(229,229,229,1);
       border-radius:10px;
-
+      padding: 15px;
+      overflow: hidden;
+      ul{
+        list-style-type: none;
+        width: 100%;
+        li{
+          clear: both;
+          min-height: 20px;
+          font-size:16px;
+          width: 100%;
+          font-family:SourceHanSansCN-Regular;
+          font-weight:400;
+          color:rgba(128,128,128,1);
+          line-height:20px;
+          margin-bottom: 16px;
+          &:last-child {
+            margin-bottom: 15px;
+            font-size:22px;
+            font-weight:400;
+            color:rgba(248,61,61,1);
+            line-height:22px;
+          }
+        }
+      }
+      .buttons{
+        text-align: center;
+        .my-btn{
+          width:210px;
+          height:44px;
+          background:rgba(255,255,255,1);
+          border:1px solid rgba(46,202,241,1);
+          border-radius:4px;
+          font-size:24px;
+          font-family:SourceHanSansCN-Regular;
+          font-weight:400;
+          margin-left: 5px;
+          margin-right: 5px;
+          color:rgba(46,202,241,1);
+          &:active{
+            border: 0;
+            background:rgba(45,194,243,1);
+            color:rgba(255,255,255,1);
+          }
+        }
+      }
     }
+  }
+  .font-red{
+    color: #F83D3D;
+  }
+  .font-blue{
+    color:rgba(46,202,241,1);
   }
   .float-left{
     float: left;
@@ -433,4 +537,24 @@
     clear:both;
   }
 
+  /*改价,改数量，弹出窗口样式*/
+  .gaijia-tanchuan{
+    .gaijia-input{
+      margin-bottom: 10px;
+    }
+    .gaijia-queding-btn{
+      width:80px;
+      height:290px;
+      background:rgba(9,183,240,1);
+      border-radius:10px;
+      border: 0;
+      font-size:24px;
+      font-family:SourceHanSansCN-Regular;
+      font-weight:400;
+      color:rgba(239,239,239,1);
+      &:active{
+        border: none;
+      }
+    }
+  }
 </style>
