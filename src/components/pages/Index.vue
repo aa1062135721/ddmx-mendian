@@ -5,27 +5,27 @@
 </template>
 
 <script>
-    export default {
-        name: 'Index',
-        data() {
-            return {
-                // TODO
-            }
-        },
-        components: {},
-        beforeMount() {
-        },
-        mounted() {
-            // TODO
-        },
-        computed: {},
-        methods: {
-            // TODO
-        },
-        watch: {},
-        beforeDestroy() {
-        }
+export default {
+  name: 'Index',
+  data () {
+    return {
+      // TODO
     }
+  },
+  components: {},
+  beforeMount () {
+  },
+  mounted () {
+    // TODO
+  },
+  computed: {},
+  methods: {
+    // TODO
+  },
+  watch: {},
+  beforeDestroy () {
+  }
+}
 </script>
 
 <style scoped>

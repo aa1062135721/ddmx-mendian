@@ -23,24 +23,24 @@
 </template>
 
 <script>
-    export default {
-        name: 'Keyboard',
-        data() {
-            return {
-            }
-        },
-        components: {},
-        beforeMount() {
-        },
-        mounted() {
-        },
-        computed: {},
-        methods: {
-        },
-        watch: {},
-        beforeDestroy() {
-        }
+export default {
+  name: 'Keyboard',
+  data () {
+    return {
     }
+  },
+  components: {},
+  beforeMount () {
+  },
+  mounted () {
+  },
+  computed: {},
+  methods: {
+  },
+  watch: {},
+  beforeDestroy () {
+  }
+}
 </script>
 
 <style lang="less" scoped>

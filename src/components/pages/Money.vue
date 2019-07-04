@@ -44,7 +44,7 @@
           <el-col :span="8">
             <div class="grid-content bg-purple jiesuan-goods" >
               <div class="search">
-                <el-input class="goods-search" @enter="sousuoshangping = true" placeholder="商品名称/条形码"  v-model="searchGoods.title">
+                <el-input class="goods-search"  @keyup.enter.native="sousuoshangping = true" placeholder="商品名称/条形码"  v-model="searchGoods.title">
                   <el-button @click="sousuoshangping = true" slot="append" icon="el-icon-search"></el-button>
                 </el-input>
               </div>
@@ -331,185 +331,182 @@
 </template>
 
 <script>
-    import vHead from '../common/Header.vue';
-    import vGood from '../common/Good.vue';
-    import vKeyboard from '../common/Keyboard.vue';
-    import vKeyboardWithoutPoint from '../common/Keyboard-without-point.vue';
-    import { postTwotype,postGoods,postServiceItemList,postWaiter } from '../../api/getData';
+import vHead from '../common/Header.vue'
+import vGood from '../common/Good.vue'
+import vKeyboard from '../common/Keyboard.vue'
+import vKeyboardWithoutPoint from '../common/Keyboard-without-point.vue'
+import { postTwotype, postGoods, postServiceItemList, postWaiter } from '../../api/getData'
 
-    export default {
-        name: 'Money',
-        data() {
-            return {
-              //服务商品
-              requestFuwuGoodData:{
-                isChooeseFuwuGood:false,//是否选择服务商品
-                page:1,//当前页码
-                num:15,//每页的数据
-              },
-              typeNameList:[],//分类列表
-              goodsList:[],//选中当前分类商品列表
-              chooeseGoods:[],//结账中的商品
-              //普通商品
-              requestGoodData:{//请求商品列表中的页数，页码服务器数据
-                isChooeseFenleiGood:false,//是否选择分类商品
-                page:1,//当前页码
-                num:15,//每页的数据
-                type:0,
-                type_category:0,
-              },
-              //当前选中的会员信息
-              memberVip:{
-                id: 5110,     //会员id
-                mobile: "13637765376",    //会员电话
-                shop_code: "A00036",  //所属门店的门店编号
-                level_id: 6,  //会员等级id
-                nickname: "荣柱", //姓名
-                level_name: "七星会员",    //会员等级名称
-                money: "0.00",    //余额
-                amount: "0.05",   //累积充值
-                regtime: "1970-01-01 08:33:37"    //加入时间
-              },
-              //服务人员列表
-              waiter:[
-                {
-                  id: 0,    //服务员id  当服务员的id为0师表示为当前登录的店长
-                  name: "管理员",   //服务员名称
-                  type: "店长"  //服务类型
-                },
-              ],
-              //商品搜索,弹框
-              searchGoods:{
-                title:'',
-                callBackGoodsData:[]
-              },
-              xiugaijiage: false,//修改价格弹窗显示与否
-              xiugaishuliang:false,//修改数量弹窗显示与否
-              chongzhi:false,//充值弹窗显示与否
-              huiyuandengjishuoming:false,//会员等级说明弹框
-              jiezhang:false,//结账对话框显示与否
-              sousuoshangping:false,//搜索商品弹窗显示与否
-              xuanzehuiyuan:false,//选择会员弹框是否显示
-            }
-        },
-        components:{
-          vHead,vGood,vKeyboard,vKeyboardWithoutPoint
-        },
-        mounted(){
-          this.getGoodsType();
-          this.getGoods();
-        },
-        methods: {
-           //获取分类
-          getGoodsType() {
-            postTwotype().then((res) => {
-              this.typeNameList = res.data
-            }).catch((err) => {
-              alert('分类列表获取失败')
-            });
-          },
-          //获取商品列表
-          getGoods() {
-            console.log('goods')
-            let data = {};
-            data.page = `${this.requestGoodData.page},${this.requestGoodData.num}`
-            if(this.requestGoodData.type){
-              data.type = this.requestGoodData.type
-            }
-            if(this.requestGoodData.title){
-              data.title = this.requestGoodData.title
-            }
-            if(this.requestGoodData.type_category){
-              data.type_category = this.requestGoodData.type_category
-            }
-            postGoods(data).then((res) => {
-              if(res.data.length===0){
-                  if(this.requestGoodData.page===1){
-                    this.goodsList = res.data
-                  } else {
-                    this.requestGoodData.page-=1
-                  }
-              } else {
-                this.goodsList = res.data
-              }
-            }).catch((err) => {
-              alert('商品获取失败')
-            })
-          },
-          //获取服务商品
-          getServiceItemList() {
-            console.log('fuwugoods')
-            let data = {};
-            data.page = `${this.requestFuwuGoodData.page},${this.requestFuwuGoodData.num}`
-            data.vip_rank = this.memberVip.level_id
-            postServiceItemList(data).then((res) => {
-              if(res.data.length===0){
-                  if(this.requestFuwuGoodData.page!==1){
-                    this.requestFuwuGoodData.page-=1
-                  }
-              } else {
-                this.goodsList = res.data
-              }
-
-            }).catch((err) => {
-              alert('服务商品获取失败')
-            })
-          },
-          //是否选择服务商品
-          clickFuwuGood(){
-            this.requestGoodData.isChooeseFenleiGood = false
-            this.requestFuwuGoodData.isChooeseFuwuGood = true
-            this.requestFuwuGoodData.page = 1
-            this.getServiceItemList();
-          },
-          //点击了分类商品按钮
-          clickFenleiBtn(type){
-            this.requestGoodData.page = 1
-            this.requestGoodData.type = type
-            this.requestGoodData.type_category = 1
-            this.requestFuwuGoodData.isChooeseFuwuGood = false
-            this.requestGoodData.isChooeseFenleiGood = true
-            this.getGoods();
-          },
-          //点击了上一页
-          clickPrePageBtn(){
-           //服务商品
-           if(this.requestFuwuGoodData.isChooeseFuwuGood){
-             if(this.requestFuwuGoodData.page>1){
-               this.requestFuwuGoodData.page=this.requestFuwuGoodData.page-1;
-               this.getServiceItemList();
-             }
-           } else {
-             if(this.requestGoodData.page>1){
-               this.requestGoodData.page=this.requestGoodData.page-1;
-               this.getGoods();
-             }
-           }
-          },
-          //点击了下一页
-          clickNextPageBtn(){
-           //服务商品
-           if(this.requestFuwuGoodData.isChooeseFuwuGood){
-               this.requestFuwuGoodData.page=this.requestFuwuGoodData.page+1;
-               this.getServiceItemList();
-           } else {
-              this.requestGoodData.page=this.requestGoodData.page+1;
-              this.getGoods();
-           }
-          },
-          //选择服务人员
-          getWaiterList(){
-            postWaiter().then((res) => {
-             this.waiter = res.data
-            }).catch((err) => {
-              alert('服务人员获取失败')
-            })
-          },
-          clickWaiter(e){
-            console.log(e)
-          },
-        },
+export default {
+  name: 'Money',
+  data () {
+    return {
+      // 服务商品
+      requestFuwuGoodData: {
+        isChooeseFuwuGood: true, // 是否选择服务商品
+        page: 1, // 当前页码
+        num: 15// 每页的数据
+      },
+      typeNameList: [], // 分类列表
+      goodsList: [], // 选中当前分类商品列表
+      chooeseGoods: [], // 结账中的商品
+      // 普通商品
+      requestGoodData: {// 请求商品列表中的页数，页码服务器数据
+        isChooeseFenleiGood: false, // 是否选择分类商品
+        page: 1, // 当前页码
+        num: 15, // 每页的数据
+        type: 0,
+        type_category: 0
+      },
+      // 当前选中的会员信息
+      memberVip: {
+        id: 5110, // 会员id
+        mobile: '13637765376', // 会员电话
+        shop_code: 'A00036', // 所属门店的门店编号
+        level_id: 6, // 会员等级id
+        nickname: '荣柱', // 姓名
+        level_name: '七星会员', // 会员等级名称
+        money: '0.00', // 余额
+        amount: '0.05', // 累积充值
+        regtime: '1970-01-01 08:33:37' // 加入时间
+      },
+      // 服务人员列表
+      waiter: [
+        {
+          id: 0, // 服务员id  当服务员的id为0师表示为当前登录的店长
+          name: '管理员', // 服务员名称
+          type: '店长' // 服务类型
+        }
+      ],
+      // 商品搜索,弹框
+      searchGoods: {
+        title: '',
+        callBackGoodsData: []
+      },
+      xiugaijiage: false, // 修改价格弹窗显示与否
+      xiugaishuliang: false, // 修改数量弹窗显示与否
+      chongzhi: false, // 充值弹窗显示与否
+      huiyuandengjishuoming: false, // 会员等级说明弹框
+      jiezhang: false, // 结账对话框显示与否
+      sousuoshangping: false, // 搜索商品弹窗显示与否
+      xuanzehuiyuan: false// 选择会员弹框是否显示
     }
+  },
+  components: {
+    vHead, vGood, vKeyboard, vKeyboardWithoutPoint
+  },
+  mounted () {
+    this.getGoodsType()
+    this.getServiceItemList()
+  },
+  methods: {
+    // 获取分类
+    getGoodsType () {
+      postTwotype().then((res) => {
+        this.typeNameList = res.data
+      }).catch((err) => {
+        console.log(err, '分类列表获取失败')
+      })
+    },
+    // 获取商品列表
+    getGoods () {
+      let data = {}
+      data.page = `${this.requestGoodData.page},${this.requestGoodData.num}`
+      if (this.requestGoodData.type) {
+        data.type = this.requestGoodData.type
+      }
+      if (this.requestGoodData.title) {
+        data.title = this.requestGoodData.title
+      }
+      if (this.requestGoodData.type_category) {
+        data.type_category = this.requestGoodData.type_category
+      }
+      postGoods(data).then((res) => {
+        if (res.data.length === 0) {
+          if (this.requestGoodData.page === 1) {
+            this.goodsList = res.data
+          } else {
+            this.requestGoodData.page -= 1
+          }
+        } else {
+          this.goodsList = res.data
+        }
+      }).catch((err) => {
+        console.log(err, '商品获取失败')
+      })
+    },
+    // 获取服务商品
+    getServiceItemList () {
+      let data = {}
+      data.page = `${this.requestFuwuGoodData.page},${this.requestFuwuGoodData.num}`
+      data.vip_rank = this.memberVip.level_id
+      postServiceItemList(data).then((res) => {
+        if (res.data.length === 0) {
+          if (this.requestFuwuGoodData.page !== 1) {
+            this.requestFuwuGoodData.page -= 1
+          }
+        } else {
+          this.goodsList = res.data
+        }
+      }).catch((err) => {
+        console.log(err, '服务商品获取失败')
+      })
+    },
+    // 是否选择服务商品
+    clickFuwuGood () {
+      this.requestGoodData.isChooeseFenleiGood = false
+      this.requestFuwuGoodData.isChooeseFuwuGood = true
+      this.requestFuwuGoodData.page = 1
+      this.getServiceItemList()
+    },
+    // 点击了分类商品按钮
+    clickFenleiBtn (type) {
+      this.requestGoodData.page = 1
+      this.requestGoodData.type = type
+      this.requestGoodData.type_category = 1
+      this.requestFuwuGoodData.isChooeseFuwuGood = false
+      this.requestGoodData.isChooeseFenleiGood = true
+      this.getGoods()
+    },
+    // 点击了上一页
+    clickPrePageBtn () {
+      // 服务商品
+      if (this.requestFuwuGoodData.isChooeseFuwuGood) {
+        if (this.requestFuwuGoodData.page > 1) {
+          this.requestFuwuGoodData.page = this.requestFuwuGoodData.page - 1
+          this.getServiceItemList()
+        }
+      } else {
+        if (this.requestGoodData.page > 1) {
+          this.requestGoodData.page = this.requestGoodData.page - 1
+          this.getGoods()
+        }
+      }
+    },
+    // 点击了下一页
+    clickNextPageBtn () {
+      // 服务商品
+      if (this.requestFuwuGoodData.isChooeseFuwuGood) {
+        this.requestFuwuGoodData.page = this.requestFuwuGoodData.page + 1
+        this.getServiceItemList()
+      } else {
+        this.requestGoodData.page = this.requestGoodData.page + 1
+        this.getGoods()
+      }
+    },
+    // 选择服务人员
+    getWaiterList () {
+      postWaiter().then((res) => {
+        this.waiter = res.data
+      }).catch((err) => {
+        console.log(err, '服务人员获取失败')
+      })
+    },
+    clickWaiter (e) {
+      console.log(e)
+    }
+  }
+}
 </script>
 
 <style lang="less">
@@ -665,7 +662,6 @@
     .search{
       display: flex;
       background: none;
-      border:1px solid rgba(229,229,229,1);
       border-radius:10px;
       .goods-search{
         font-size:22px;

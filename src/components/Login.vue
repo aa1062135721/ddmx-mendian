@@ -22,45 +22,44 @@
                     <el-button type="primary" @click="submitForm()">登录</el-button>
                 </div>
 
-
             </el-form>
         </div>
     </div>
 </template>
 
 <script>
-  import {postLogin} from '../api/getData'
-  import {setStore} from '../utils'
-    export default {
-        data: function(){
-            return {
-              msg: '',
-              username: 'lizhanghong',
-              password: 'ddxm123'
-            }
-        },
-        methods: {
-            submitForm() {
-                if (this.username=='' || this.password == '') {
-                  this.msg = '请输入用户名或密码'
-                  return
-                }
-                let data = {username:this.username, password:this.password}
-                let that = this
-                postLogin(data).then((res) => {
-                  if (res.code === '200') {
-                    setStore('token', res.data.token)
-                    that.$router.push({
-                      path: '/money',
-                      query: {}
-                    })
-                  } else {
-
-                  }
-                })
-            }
-        }
+import {postLogin} from '../api/getData'
+import {setStore} from '../utils'
+export default {
+  data: function () {
+    return {
+      msg: '',
+      username: 'lizhanghong',
+      password: 'ddxm123'
     }
+  },
+  methods: {
+    submitForm () {
+      if (this.username === '' || this.password === '') {
+        this.msg = '请输入用户名或密码'
+        return
+      }
+      let data = {username: this.username, password: this.password}
+      let that = this
+      postLogin(data).then((res) => {
+        if (res.code === '200') {
+          setStore('token', res.data.token)
+          that.$router.push({
+            path: '/money',
+            query: {}
+          })
+        } else {
+
+        }
+      })
+    }
+  }
+}
 </script>
 
 <style>

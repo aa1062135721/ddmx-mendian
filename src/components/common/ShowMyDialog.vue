@@ -12,38 +12,38 @@
 </template>
 
 <script>
-    export default {
-        name: 'ShowMyDialog',
-        props: {
-          title: {//对话框标题
-            type: String,
-            default: ''
-          },
-          dialogTableVisible: {//对话框显示与否
-            type: Boolean,
-            default: false
-          },
-          content:{
-            type: String,
-            default: ''
-          }
-        },
-        data() {
-            return {
-            }
-        },
-        components: {},
-        beforeMount() {
-        },
-        mounted() {
-        },
-        computed: {},
-        methods: {
-        },
-        watch: {},
-        beforeDestroy() {
-        }
+export default {
+  name: 'ShowMyDialog',
+  props: {
+    title: {// 对话框标题
+      type: String,
+      default: ''
+    },
+    dialogTableVisible: {// 对话框显示与否
+      type: Boolean,
+      default: false
+    },
+    content: {
+      type: String,
+      default: ''
     }
+  },
+  data () {
+    return {
+    }
+  },
+  components: {},
+  beforeMount () {
+  },
+  mounted () {
+  },
+  computed: {},
+  methods: {
+  },
+  watch: {},
+  beforeDestroy () {
+  }
+}
 </script>
 
 <style lang="less" scoped>

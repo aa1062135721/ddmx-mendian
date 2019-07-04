@@ -64,7 +64,7 @@ const router = new Router({
   ],
   // 定义页面跳转滚动
   scrollBehavior (to, from, savedPosition) {
-    console.log(' 定义页面跳转滚动')
+    // console.log(' 定义页面跳转滚动')
     if (savedPosition) {
       return savedPosition
     } else {
@@ -76,27 +76,23 @@ const router = new Router({
   }
 })
 
-// router.beforeEach((to, from, next) => {
-//   console.log('全局路由守卫beforeEach')
-//   if (to.meta.requireAuth) {
-//     if (getStore('token')) {
-//       next()
-//     } else {
-//       // next({
-//       //   path: '/login'
-//       // })
-//     }
-//   } else {
-//     if (getStore('token')) {
-//       next({
-//         path: '/money'
-//       })
-//     } else {
-//       // next({
-//       //   path: '/login'
-//       // })
-//     }
-//   }
-// })
+router.beforeEach((to, from, next) => {
+  // console.log('全局路由守卫beforeEach', to)
+  let isLogin = getStore('token')
+  if (to.matched.length === 0) {
+    // 没有匹配到当前路由
+    next('/')
+  } else if (!isLogin && to.path !== '/login' && to.path !== '/' && to.path !== '/password') {
+    // 如果没有登录，跳转到登录页面
+    next('/login')
+  } else {
+    if ((to.path === '/login' || to.path === '/register' || to.path === '/password' || to.path === '/error') && isLogin) {
+      // 如果已经登录，却尝试访问登录页面或者错误页面，将继续保持原本的页面
+      next(from.path)
+    } else {
+      next()
+    }
+  }
+})
 
 export default router

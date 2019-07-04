@@ -23,13 +23,13 @@
 </template>
 
 <script>
-    export default {
-        name: 'Keyboard-without-point',
-        data() {
-            return {
-            }
-        }
+export default {
+  name: 'Keyboard-without-point',
+  data () {
+    return {
     }
+  }
+}
 </script>
 
 <style lang="less" scoped>

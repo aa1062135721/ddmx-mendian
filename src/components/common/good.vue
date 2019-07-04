@@ -15,7 +15,7 @@
         </div>
         <div>
           <p class="yuanjia">
-          
+
             <!-- 原价: ¥ {{ogood.price}} -->
           </p>
         </div>
@@ -32,27 +32,19 @@
 </template>
 
 <script>
-    export default {
-        name: 'good',
-        props:{
-          ogood:{
-            type: Object,
-            default: {
-              "id": 1730,     //商品id
-              "title": "美杰紫色毛巾",    //商品名称
-              "price": "7.00",    //商品的原价，现价
-              "bar_code": "2300201800208",    //商品条形码
-              "pics": "9a47a20190318164340290",   //商品的图片；例如：http://picture.ddxm661.com/9a47a20190318164340290
-              "stock": 10     //商品的库存
-            }
-          }
-        },
-        data() {
-            return {
-            }
-        },
-
+export default {
+  name: 'good',
+  props: {
+    ogood: {
+      type: Object
     }
+  },
+  data () {
+    return {
+    }
+  }
+
+}
 </script>
 
 <style  scoped>
