@@ -1,29 +1,29 @@
 <template>
     <div class="bg">
       <div class="left">
-        <img src="../../assets/images/logo.png" alt="">
+        <img :src="ogood.pics" alt="商品封面">
       </div>
       <div class="middle">
       </div>
       <div class="right">
         <div class="div">
           <p class="title">
-            贝亲奶瓶自然实感宽口psu塑料奶瓶配L号贝亲奶瓶自然实感宽口psu塑料奶瓶配L号贝亲奶瓶自然实感宽口psu塑料奶瓶配L号贝亲奶瓶自然实感宽口psu塑料奶瓶配L号贝亲奶瓶自然实感宽口psu塑料奶瓶配L号
+            {{ogood.title}}
           </p>
         </div>
         <div class="div">
         </div>
         <div>
           <p class="yuanjia">
-            原价: ¥ 198.00
+            原价: ¥ {{ogood.price}}
           </p>
         </div>
         <div>
           <span class="xianjia">
-            现价: ¥ 198.00
+            现价: ¥ {{ogood.price}}
           </span>
           <span class="kucun">
-            <img src="../../assets/icon/kucun.png" alt="库存"> 99+
+            <img src="../../assets/icon/kucun.png" alt="库存"> {{ogood.stock}}
           </span>
         </div>
       </div>
@@ -33,24 +33,24 @@
 <script>
     export default {
         name: 'good',
+        props:{
+          ogood:{
+            type: Object,
+            default: {
+              "id": 1730,     //商品id
+              "title": "美杰紫色毛巾",    //商品名称
+              "price": "7.00",    //商品的原价，现价
+              "bar_code": "2300201800208",    //商品条形码
+              "pics": "9a47a20190318164340290",   //商品的图片；例如：http://picture.ddxm661.com/9a47a20190318164340290
+              "stock": 10     //商品的库存
+            }
+          }
+        },
         data() {
             return {
-                // TODO
             }
         },
-        components: {},
-        beforeMount() {
-        },
-        mounted() {
-            // TODO
-        },
-        computed: {},
-        methods: {
-            // TODO
-        },
-        watch: {},
-        beforeDestroy() {
-        }
+
     }
 </script>
 

@@ -6,35 +6,19 @@
           <el-col :span="14">
             <div class="grid-content all-goods">
               <div class="goods-type">
-                <el-button class="fuwu-fenlei-button">服务项目</el-button>
-                <el-button class="page-fenlei-button" icon="el-icon-arrow-left"></el-button>
-                <el-button class="fenlei-button" type="primary">宝马用品</el-button>
-                <el-button class="fenlei-button" type="primary">服装服饰</el-button>
-                <el-button class="fenlei-button" type="primary">奶瓶</el-button>
-                <el-button class="fenlei-button" type="primary">尿不湿</el-button>
-                <el-button class="fenlei-button" type="primary">奶瓶</el-button>
-                <el-button class="page-fenlei-button" icon="el-icon-arrow-right"></el-button>
+                <el-button class="fenlei-button float-left" :class="{'fuwu-fenlei-button':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button>
+                <el-button class="page-fenlei-button float-left" icon="el-icon-arrow-left"></el-button>
+                <div class='type-btn'>
+                  <el-button v-for="(item) in typeNameList"  :key="item.id" class="fenlei-button" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>
+                </div>
+                <el-button class="page-fenlei-button float-right" icon="el-icon-arrow-right"></el-button>
               </div>
               <div class="flex-goods">
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
-                  <v-good class="goods"></v-good>
+                  <v-good v-for="(item) in goodsList" :key="item.id" :ogood="item" class="goods"></v-good>
                 </div>
                 <div class="page-buttons">
-                <button class="page-button">上一页</button>
-                <button class="page-button">下一页</button>
+                <button class="page-button" @click="clickPrePageBtn">上一页</button>
+                <button class="page-button"  @click="clickNextPageBtn">下一页</button>
               </div>
             </div>
           </el-col>
@@ -78,81 +62,7 @@
                     <span class="huiyuanjia">会员价￥216.50</span>
                   </li>
                 </ul>
-                <ul>
-                  <li class="title clear-both">
-                    <span class="float-left">衡欣牌新姿态粉 原蛋白益生菌</span>
-                    <span class="float-right">数量 1</span>
-                  </li>
-                  <li class="title code clear-both">
-                    <span class="float-left">1234567890123431373</span>
-                    <span class="float-right red">￥300.00</span>
-                  </li>
-                  <li class="title">
-                    <span class="red danjia">￥300.00</span>
-                    <span class="yuanjia">原价￥600.00</span>
-                    <span class="huiyuanjia">会员价￥216.50</span>
-                  </li>
-                </ul>
-                <ul>
-                  <li class="title clear-both">
-                    <span class="float-left">衡欣牌新姿态粉 原蛋白益生菌</span>
-                    <span class="float-right">数量 1</span>
-                  </li>
-                  <li class="title code clear-both">
-                    <span class="float-left">1234567890123431373</span>
-                    <span class="float-right red">￥300.00</span>
-                  </li>
-                  <li class="title">
-                    <span class="red danjia">￥300.00</span>
-                    <span class="yuanjia">原价￥600.00</span>
-                    <span class="huiyuanjia">会员价￥216.50</span>
-                  </li>
-                </ul>
-                <ul>
-                  <li class="title clear-both">
-                    <span class="float-left">衡欣牌新姿态粉 原蛋白益生菌</span>
-                    <span class="float-right">数量 1</span>
-                  </li>
-                  <li class="title code clear-both">
-                    <span class="float-left">1234567890123431373</span>
-                    <span class="float-right red">￥300.00</span>
-                  </li>
-                  <li class="title">
-                    <span class="red danjia">￥300.00</span>
-                    <span class="yuanjia">原价￥600.00</span>
-                    <span class="huiyuanjia">会员价￥216.50</span>
-                  </li>
-                </ul>
-                <ul>
-                  <li class="title clear-both">
-                    <span class="float-left">衡欣牌新姿态粉 原蛋白益生菌</span>
-                    <span class="float-right">数量 1</span>
-                  </li>
-                  <li class="title code clear-both">
-                    <span class="float-left">1234567890123431373</span>
-                    <span class="float-right red">￥300.00</span>
-                  </li>
-                  <li class="title">
-                    <span class="red danjia">￥300.00</span>
-                    <span class="yuanjia">原价￥600.00</span>
-                    <span class="huiyuanjia">会员价￥216.50</span>
-                  </li>
-                </ul>
-                <ul>
-                  <li class="title clear-both">
-                    <span class="float-left">衡欣牌新姿态粉 原蛋白益生菌</span>
-                    <span class="float-right">数量 1</span>
-                  </li>
-                  <li class="title code clear-both">
-                    <span class="float-left">1234567890123431373</span>
-                    <span class="float-right red">￥300.00</span>
-                  </li>
-                  <li class="title">
-                    <span class="red danjia">￥300.00</span>
-                    <span class="yuanjia">原价￥600.00</span>
-                    <span class="huiyuanjia">会员价￥216.50</span>
-                  </li>
-                </ul>
+               
               </div>
               <div class="queren-xinxi">
                 <ul>
@@ -359,10 +269,40 @@
     import vHead from '../common/Header.vue';
     import vGood from '../common/Good.vue';
     import vKeyboard from '../common/Keyboard.vue';
+    import { postTwotype,postGoods,postServiceItemList } from '../../api/getData';
+
     export default {
         name: 'Money',
         data() {
             return {
+  
+              requestFuwuGoodData:{
+                isChooeseFuwuGood:false,//是否选择服务商品
+                page:1,//当前页码
+                num:15,//每页的数据
+              },
+              typeNameList:[],//分类列表
+              goodsList:[],//选中当前分类商品列表
+              chooeseGoods:[],//结账中的商品
+              
+              requestGoodData:{//请求商品列表中的页数，页码服务器数据
+                page:1,//当前页码
+                num:15,//每页的数据
+                type:0,
+                type_category:0,
+              },
+              //当前选中的会员信息
+              memberVip:{
+                id: 5110,     //会员id
+                mobile: "13637765376",    //会员电话
+                shop_code: "A00036",  //所属门店的门店编号
+                level_id: 6,  //会员等级id
+                nickname: "荣柱", //姓名
+                level_name: "七星会员",    //会员等级名称
+                money: "0.00",    //余额
+                amount: "0.05",   //累积充值
+                regtime: "1970-01-01 08:33:37"    //加入时间
+              },
               xiugaijiage: false,//修改价格弹窗显示与否
               xiugaishuliang:false,//修改数量弹窗显示与否
               chongzhi:false,//充值弹窗显示与否
@@ -373,16 +313,99 @@
         components:{
           vHead,vGood,vKeyboard
         },
-        beforeMount() {
+        mounted(){
+          this.getGoodsType();
+          this.getGoods();
         },
-        mounted() {
-        },
-        computed: {},
         methods: {
+           //获取分类
+          getGoodsType() {
+            postTwotype().then((res) => {
+              this.typeNameList = res.data
+            }).catch((err) => {
+              alert('分类列表获取失败')
+            });
+          },
+          //获取商品列表
+          getGoods() {
+            console.log('goods')
+            let data = {};
+            data.page = `${this.requestGoodData.page},${this.requestGoodData.num}`
+            if(this.requestGoodData.type){
+              data.type = this.requestGoodData.type
+            }
+            if(this.requestGoodData.title){
+              data.title = this.requestGoodData.title
+            }
+            if(this.requestGoodData.type_category){
+              data.type_category = this.requestGoodData.type_category
+            }
+            postGoods(data).then((res) => {
+              this.goodsList = res.data
+            }).catch((err) => {
+              alert('商品获取失败')
+            })
+          },
+          //获取服务商品
+          getServiceItemList() {
+            console.log('fuwugoods')
+            let data = {};
+            data.page = `${this.requestFuwuGoodData.page},${this.requestFuwuGoodData.num}`
+            data.vip_rank = this.memberVip.level_id
+            postServiceItemList(data).then((res) => {
+              if(res.data.length===0){
+                  if(this.requestFuwuGoodData.page!==1){
+                    this.requestFuwuGoodData.page-=1
+                  }
+              } else {
+                this.goodsList = res.data
+              }
+            }).catch((err) => {
+              alert('服务商品获取失败')
+            })
+          },
+          //是否选择服务商品
+          clickFuwuGood(){
+            this.requestFuwuGoodData.isChooeseFuwuGood = !this.requestFuwuGoodData.isChooeseFuwuGood
+            this.requestFuwuGoodData.page = 1
+            this.getServiceItemList();
+          },
+          //点击了分类商品按钮
+          clickFenleiBtn(type){
+            this.requestGoodData.page = 1
+            this.requestGoodData.type = type
+            this.requestGoodData.type_category = 1
+            this.getGoods();
+          },
+          //点击了上一页
+          clickPrePageBtn(){
+        
+           //服务商品
+           if(this.requestFuwuGoodData.isChooeseFuwuGood){
+             if(this.requestFuwuGoodData.page>1){
+               this.requestFuwuGoodData.page=this.requestFuwuGoodData.page-1;
+               this.getServiceItemList();
+             }
+           } else {
+             if(this.requestGoodData.page>1){
+               this.requestGoodData.page=this.requestGoodData.page-1;
+               this.getGoods();
+             }
+           }
+          },
+          //点击了下一页
+          clickNextPageBtn(){
+           
+           //服务商品
+           if(this.requestFuwuGoodData.isChooeseFuwuGood){
+               this.requestFuwuGoodData.page=this.requestFuwuGoodData.page+1;
+               this.getServiceItemList();
+           } else {
+              this.requestGoodData.page=this.requestGoodData.page+1;
+              this.getGoods();
+           }
+          },
         },
-        watch: {},
-        beforeDestroy() {
-        }
     }
 </script>
 
@@ -432,15 +455,14 @@
       width: 100%;
       display: flex;
       align-items: center;
+      flex-wrap: nowrap;
       justify-content: space-between;
-      .fuwu-fenlei-button{
-        height:54px;
-        background:rgba(245,86,86,1);
-        border-radius:10px;border: 0;
-        font-size:20px;
-        font-family:SourceHanSansCN-Regular;
-        font-weight:400;
-        color:rgba(255,255,255,1);
+      .type-btn{
+        width:800px;
+        overflow: hidden;
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
       }
       .fenlei-button{
         font-size:20px!important;
@@ -451,6 +473,15 @@
         border-radius:10px;
         color:rgba(26,26,26,1)!important;
         font-family:SourceHanSansCN-Regular;
+      }
+      .fuwu-fenlei-button{
+        height:54px;
+        background:rgba(245,86,86,1)!important;
+        border-radius:10px;border: 0;
+        font-size:20px;
+        font-family:SourceHanSansCN-Regular;
+        font-weight:400;
+        color:rgba(255,255,255,1);
       }
       .page-fenlei-button{
         width:58px;
@@ -470,7 +501,9 @@
       display: flex;
       align-items: center;
       flex-wrap:wrap;
+      align-items:flex-start;
       justify-content: space-between;
+      align-content:flex-start;
       .goods{
         margin-bottom: 16px;
       }

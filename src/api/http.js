@@ -48,7 +48,7 @@ axios.interceptors.response.use(
     /***
      * 处理需要登录的错误代码
      */
-    if (response.data.code !== "200") {
+    if (response.data.code === "-2") {
       alert(response.data.msg)
       Router.push({
         path: '/login',
