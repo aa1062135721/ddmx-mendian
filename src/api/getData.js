@@ -4,7 +4,7 @@ import Vue from 'vue'
  * 登录接口
  * @returns {Promise|*}
  */
-export const postLogin = (data) => {
+export const postLogin = (data = null) => {
   return Vue.prototype.$post('login/doLogin', data)
 }
 
@@ -33,4 +33,13 @@ export const postGoods = (data = null) => {
  */
 export const postServiceItemList = (data = null) => {
   return Vue.prototype.$post('/index/serviceItemList', data)
+}
+
+/**
+ * 收银大屏-服务人员列表
+ * @param data
+ * @returns {*}
+ */
+export const postWaiter = (data = null) => {
+  return Vue.prototype.$post('/index/waiter', data)
 }

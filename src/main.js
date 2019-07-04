@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import VueLazyload from 'vue-lazyload'
 
 // 导入 http请求 定义全局变量·
 import {fetch, post, patch, put} from './api/http'
@@ -13,9 +14,15 @@ Vue.prototype.$post = post
 Vue.prototype.$patch = patch
 Vue.prototype.$put = put
 
-Vue.config.productionTip = false
-
 Vue.use(ElementUI)
+Vue.use(VueLazyload, {
+  preLoad: 1.3,
+  error: 'static/images/mendian-admin-error.png',
+  loading: 'static/images/mendian-admin-loading.png',
+  attempt: 1
+})
+
+Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({

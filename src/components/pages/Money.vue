@@ -6,10 +6,10 @@
           <el-col :span="14">
             <div class="grid-content all-goods">
               <div class="goods-type">
-                <el-button class="fenlei-button float-left" :class="{'fuwu-fenlei-button':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button>
+                <el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button>
                 <el-button class="page-fenlei-button float-left" icon="el-icon-arrow-left"></el-button>
                 <div class='type-btn'>
-                  <el-button v-for="(item) in typeNameList"  :key="item.id" class="fenlei-button" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>
+                  <el-button v-for="(item) in typeNameList"  :key="item.id" class="fenlei-button" :class="{'fenlei-button-active':(requestGoodData.isChooeseFenleiGood && requestGoodData.type==item.id)}" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>
                 </div>
                 <el-button class="page-fenlei-button float-right" icon="el-icon-arrow-right"></el-button>
               </div>
@@ -68,15 +68,20 @@
                 <ul>
                   <li>
                     <span class="float-left">服务人员</span>
-                    <span class="float-right select" >
-                      <el-dropdown class="user-name" trigger="click">
-                        <span class="el-dropdown-link">
-                          <span class="font-blue">张三</span> [婴儿游泳]<i class="el-icon-arrow-down"></i>
+                    <span class="float-right select">
+                      <el-dropdown class="user-name" trigger="click" @command="clickWaiter()">
+                        <span class="el-dropdown-link"  @click="getWaiterList()">
+                          <span class="font-blue">张三</span> [婴儿游泳]  <i class="el-icon-arrow-down"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                          <el-dropdown-item><span class="font-blue">张三</span> [关于作者]</el-dropdown-item>
-                          <el-dropdown-item><span class="font-blue">张三</span> [项目仓库]</el-dropdown-item>
-                          <el-dropdown-item><span class="font-blue">张三</span> [退出登录]</el-dropdown-item>
+                          <el-dropdown-item v-for="(item) in waiter" :key="item.id" @command="item">
+                            <span class="font-blue">{{item.name}}</span>
+                            [{{item.type}}]
+                          </el-dropdown-item>
+                          <el-dropdown-item command="sssss">
+                            <span class="font-blue">ssfasd</span>
+                            [sdfasdfa]
+                          </el-dropdown-item>
                         </el-dropdown-menu>
                       </el-dropdown>
                     </span>
@@ -269,7 +274,7 @@
     import vHead from '../common/Header.vue';
     import vGood from '../common/Good.vue';
     import vKeyboard from '../common/Keyboard.vue';
-    import { postTwotype,postGoods,postServiceItemList } from '../../api/getData';
+    import { postTwotype,postGoods,postServiceItemList,postWaiter } from '../../api/getData';
 
     export default {
         name: 'Money',
@@ -286,6 +291,7 @@
               chooeseGoods:[],//结账中的商品
               
               requestGoodData:{//请求商品列表中的页数，页码服务器数据
+                isChooeseFenleiGood:false,//是否选择分类商品
                 page:1,//当前页码
                 num:15,//每页的数据
                 type:0,
@@ -303,6 +309,14 @@
                 amount: "0.05",   //累积充值
                 regtime: "1970-01-01 08:33:37"    //加入时间
               },
+              //服务人员列表
+              waiter:[
+                {
+                  id: 0,    //服务员id  当服务员的id为0师表示为当前登录的店长
+                  name: "管理员",   //服务员名称
+                  type: "店长"  //服务类型
+                },
+              ],
               xiugaijiage: false,//修改价格弹窗显示与否
               xiugaishuliang:false,//修改数量弹窗显示与否
               chongzhi:false,//充值弹窗显示与否
@@ -341,7 +355,15 @@
               data.type_category = this.requestGoodData.type_category
             }
             postGoods(data).then((res) => {
-              this.goodsList = res.data
+              if(res.data.length===0){
+                  if(this.requestGoodData.page===1){
+                    this.goodsList = res.data
+                  } else {
+                    this.requestGoodData.page-=1
+                  }
+              } else {
+                this.goodsList = res.data
+              }
             }).catch((err) => {
               alert('商品获取失败')
             })
@@ -360,13 +382,15 @@
               } else {
                 this.goodsList = res.data
               }
+              
             }).catch((err) => {
               alert('服务商品获取失败')
             })
           },
           //是否选择服务商品
           clickFuwuGood(){
-            this.requestFuwuGoodData.isChooeseFuwuGood = !this.requestFuwuGoodData.isChooeseFuwuGood
+            this.requestGoodData.isChooeseFenleiGood = false
+            this.requestFuwuGoodData.isChooeseFuwuGood = true
             this.requestFuwuGoodData.page = 1
             this.getServiceItemList();
           },
@@ -375,11 +399,12 @@
             this.requestGoodData.page = 1
             this.requestGoodData.type = type
             this.requestGoodData.type_category = 1
+            this.requestFuwuGoodData.isChooeseFuwuGood = false
+            this.requestGoodData.isChooeseFenleiGood = true
             this.getGoods();
           },
           //点击了上一页
           clickPrePageBtn(){
-        
            //服务商品
            if(this.requestFuwuGoodData.isChooeseFuwuGood){
              if(this.requestFuwuGoodData.page>1){
@@ -395,7 +420,6 @@
           },
           //点击了下一页
           clickNextPageBtn(){
-           
            //服务商品
            if(this.requestFuwuGoodData.isChooeseFuwuGood){
                this.requestFuwuGoodData.page=this.requestFuwuGoodData.page+1;
@@ -404,6 +428,17 @@
               this.requestGoodData.page=this.requestGoodData.page+1;
               this.getGoods();
            }
+          },
+          //选择服务人员
+          getWaiterList(){
+            postWaiter().then((res) => {
+             this.waiter = res.data
+            }).catch((err) => {
+              alert('服务人员获取失败')
+            })
+          },
+          clickWaiter(e){
+            console.log(e)
           },
         },
     }
@@ -473,15 +508,11 @@
         border-radius:10px;
         color:rgba(26,26,26,1)!important;
         font-family:SourceHanSansCN-Regular;
-      }
-      .fuwu-fenlei-button{
-        height:54px;
-        background:rgba(245,86,86,1)!important;
-        border-radius:10px;border: 0;
         font-size:20px;
-        font-family:SourceHanSansCN-Regular;
-        font-weight:400;
-        color:rgba(255,255,255,1);
+      }
+      .fenlei-button-active{
+        background:rgba(245,86,86,1)!important;
+        color:rgba(255,255,255,1)!important;
       }
       .page-fenlei-button{
         width:58px;

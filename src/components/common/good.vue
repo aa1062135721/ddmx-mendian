@@ -1,7 +1,7 @@
 <template>
     <div class="bg">
       <div class="left">
-        <img :src="ogood.pics" alt="商品封面">
+        <img  v-lazy="ogood.pics" alt="商品封面">
       </div>
       <div class="middle">
       </div>
