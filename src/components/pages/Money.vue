@@ -44,7 +44,9 @@
           <el-col :span="8">
             <div class="grid-content bg-purple jiesuan-goods" >
               <div class="search">
-                <el-input class="goods-search" placeholder="商品名称/条形码" suffix-icon="el-icon-search"></el-input>
+                <el-input class="goods-search" @enter="sousuoshangping = true" placeholder="商品名称/条形码"  v-model="searchGoods.title">
+                  <el-button @click="sousuoshangping = true" slot="append" icon="el-icon-search"></el-button>
+                </el-input>
               </div>
               <div class="pay-goods-box">
                 <ul>
@@ -108,7 +110,7 @@
                   </li>
                 </ul>
                 <div class="buttons">
-                  <button class="my-btn">选择会员</button>
+                  <button @click="xuanzehuiyuan = true" class="my-btn">选择会员</button>
                   <button @click="jiezhang = true"  class="my-btn">结账</button>
                 </div>
               </div>
@@ -272,7 +274,7 @@
         <div class="content">
           <div class="clear-both" style="width:100%;height:52px;margin-bottom: 20px;">
             <div class="float-left" style="width: 75%;">
-              <el-input  placeholder="请输入您需要查询的商品名字"></el-input>
+              <el-input  placeholder="请输入您需要查询的商品名字" v-model="searchGoods.title"></el-input>
             </div>
             <div class="float-right"  style="width: 20%;text-align: right;">
               <el-button type="primary" plain>搜索</el-button>
@@ -290,28 +292,40 @@
         </div>
       </el-dialog>
       <!-- 选择会员弹框 -->
-      <el-dialog class="sousuoshangping-tanchuan" title="选择会员" :visible.sync="xuanzehuiyuan" width="810px" :center="true">
-        <div class="content">
-          <div class="clear-both" style="width:100%;height:52px;margin-bottom: 20px;">
-            <div class="float-left" style="width: 420px;">
-              <div>
-                <el-input  placeholder="请输入您需要查询的商品名字"></el-input>
+      <el-dialog class="xuanzehuiyuan-tanchuan" title="选择会员" :visible.sync="xuanzehuiyuan" width="810px" :center="true">
+        <div class="clear-both div">
+            <div class="float-left left">
+              <div class="search">
+                <el-input  placeholder="请输入会员手机号"></el-input>
               </div>
-              <div>
+              <div class="content">
                 <ul>
-                  <li><span>会员</span><span>张三</span></li>
-                  <li><span>余额</span><span>￥600</span></li>
-                  <li><span>会员等级</span><span>三星会员</span></li>
-                  <li><span>服务卡</span><span><el-button type="primary">查看</el-button></span></li>
-                  <li><span>代金卷</span><span><el-button type="primary">查看</el-button></span></li>
+                  <li><span class="float-left">会员</span><span class="float-right font-blue">张三</span></li>
+                  <li><span class="float-left">余额</span><span class="float-right font-red">￥600</span></li>
+                  <li><span class="float-left">会员等级</span><span class="float-right">三星会员</span></li>
+                  <li>
+                    <span class="float-left">服务卡</span>
+                    <span class="float-right">
+                      <el-badge value="3" class="item">
+                        <el-button size="mini" style="background: #2DC2F3;color: #fff;">查看</el-button>
+                      </el-badge>
+                    </span>
+                  </li>
+                  <li style="margin-top: 20px;">
+                    <span class="float-left">代金卷</span>
+                    <span class="float-right">
+                      <el-badge value="无" class="item">
+                        <el-button size="mini">查看</el-button>
+                      </el-badge>
+                    </span>
+                  </li>
                 </ul>
               </div>
             </div>
-            <div class="float-right"  style="width: 20%;text-align: right;">
+            <div class="float-right right">
               <v-keyboard-without-point></v-keyboard-without-point>
             </div>
           </div>
-        </div>
       </el-dialog>
     </div>
 </template>
@@ -327,7 +341,7 @@
         name: 'Money',
         data() {
             return {
-
+              //服务商品
               requestFuwuGoodData:{
                 isChooeseFuwuGood:false,//是否选择服务商品
                 page:1,//当前页码
@@ -336,7 +350,7 @@
               typeNameList:[],//分类列表
               goodsList:[],//选中当前分类商品列表
               chooeseGoods:[],//结账中的商品
-
+              //普通商品
               requestGoodData:{//请求商品列表中的页数，页码服务器数据
                 isChooeseFenleiGood:false,//是否选择分类商品
                 page:1,//当前页码
@@ -364,13 +378,18 @@
                   type: "店长"  //服务类型
                 },
               ],
+              //商品搜索,弹框
+              searchGoods:{
+                title:'',
+                callBackGoodsData:[]
+              },
               xiugaijiage: false,//修改价格弹窗显示与否
               xiugaishuliang:false,//修改数量弹窗显示与否
               chongzhi:false,//充值弹窗显示与否
               huiyuandengjishuoming:false,//会员等级说明弹框
               jiezhang:false,//结账对话框显示与否
               sousuoshangping:false,//搜索商品弹窗显示与否
-              xuanzehuiyuan:true,//选择会员弹框是否显示
+              xuanzehuiyuan:false,//选择会员弹框是否显示
             }
         },
         components:{
@@ -948,6 +967,44 @@
           color:rgba(26,26,26,1);
         }
 
+      }
+    }
+  }
+  /*选择会员弹框样式*/
+  .xuanzehuiyuan-tanchuan{
+    .div{
+      width:100%;
+      height:300px;
+      margin-bottom: 20px;
+      .left{
+        width: 50%;
+        .search{
+          margin-bottom: 20px;
+        }
+        .content{
+          height:160px;
+          padding: 34px 20px;
+          background:rgba(255,255,255,1);
+          border:1px solid rgba(210,210,210,1);
+          border-radius:8px;
+          ul{
+            list-style-type: none;
+            li{
+              clear:both;
+              min-height: 20px;
+              font-size:16px;
+              width: 100%;
+              font-family:SourceHanSansCN-Regular;
+              font-weight:400;
+              color:rgba(128,128,128,1);
+              line-height:20px;
+              margin-bottom: 16px;
+            }
+          }
+        }
+      }
+      .right{
+       width: 45%;
       }
     }
   }

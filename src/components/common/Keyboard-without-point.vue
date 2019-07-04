@@ -17,7 +17,7 @@
       </div>
      <div>
        <el-button class="btn" style="width: 190px;">0</el-button>
-       <el-button class="btn" type="primary">确定</el-button>
+       <el-button class="btn" type="primary" style="color: #fff;font-size:24px;background:rgba(45,194,243,1);">确定</el-button>
      </div>
     </div>
 </template>
