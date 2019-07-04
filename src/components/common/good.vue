@@ -15,14 +15,15 @@
         </div>
         <div>
           <p class="yuanjia">
-            原价: ¥ {{ogood.price}}
+          
+            <!-- 原价: ¥ {{ogood.price}} -->
           </p>
         </div>
         <div>
           <span class="xianjia">
             现价: ¥ {{ogood.price}}
           </span>
-          <span class="kucun">
+          <span class="kucun" v-if="ogood.stock">
             <img src="../../assets/icon/kucun.png" alt="库存"> {{ogood.stock}}
           </span>
         </div>

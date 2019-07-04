@@ -17,7 +17,6 @@ axios.defaults.baseURL = '/api/index/'
 // http request 拦截器
 axios.interceptors.request.use(
   config => {
-    console.log(config)
     // 引入cookie 存储token 有的接口需要认证
     const token = getStore('token')
     // config.data = config.data

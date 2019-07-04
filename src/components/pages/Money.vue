@@ -62,7 +62,7 @@
                     <span class="huiyuanjia">会员价￥216.50</span>
                   </li>
                 </ul>
-               
+
               </div>
               <div class="queren-xinxi">
                 <ul>
@@ -267,6 +267,52 @@
           </div>
         </div>
       </el-dialog>
+      <!-- 搜索商品弹框 -->
+       <el-dialog class="sousuoshangping-tanchuan" title="搜索商品" :visible.sync="sousuoshangping" width="660px" :center="true">
+        <div class="content">
+          <div class="clear-both" style="width:100%;height:52px;margin-bottom: 20px;">
+            <div class="float-left" style="width: 75%;">
+              <el-input  placeholder="请输入您需要查询的商品名字"></el-input>
+            </div>
+            <div class="float-right"  style="width: 20%;text-align: right;">
+              <el-button type="primary" plain>搜索</el-button>
+            </div>
+          </div>
+          <div>
+            <el-table :data="goodsList" height="250" border style="width: 100%">
+              <el-table-column prop="title" label="名称" width="180"></el-table-column>
+              <el-table-column prop="stock" label="库存"></el-table-column>
+              <el-table-column prop="price" label="单价"></el-table-column>
+              <el-table-column prop="price" label="会员价"></el-table-column>
+              <el-table-column label="操作"><el-button type="primary">确定</el-button></el-table-column>
+          </el-table>
+          </div>
+        </div>
+      </el-dialog>
+      <!-- 选择会员弹框 -->
+      <el-dialog class="sousuoshangping-tanchuan" title="选择会员" :visible.sync="xuanzehuiyuan" width="810px" :center="true">
+        <div class="content">
+          <div class="clear-both" style="width:100%;height:52px;margin-bottom: 20px;">
+            <div class="float-left" style="width: 420px;">
+              <div>
+                <el-input  placeholder="请输入您需要查询的商品名字"></el-input>
+              </div>
+              <div>
+                <ul>
+                  <li><span>会员</span><span>张三</span></li>
+                  <li><span>余额</span><span>￥600</span></li>
+                  <li><span>会员等级</span><span>三星会员</span></li>
+                  <li><span>服务卡</span><span><el-button type="primary">查看</el-button></span></li>
+                  <li><span>代金卷</span><span><el-button type="primary">查看</el-button></span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="float-right"  style="width: 20%;text-align: right;">
+              <v-keyboard-without-point></v-keyboard-without-point>
+            </div>
+          </div>
+        </div>
+      </el-dialog>
     </div>
 </template>
 
@@ -274,13 +320,14 @@
     import vHead from '../common/Header.vue';
     import vGood from '../common/Good.vue';
     import vKeyboard from '../common/Keyboard.vue';
+    import vKeyboardWithoutPoint from '../common/Keyboard-without-point.vue';
     import { postTwotype,postGoods,postServiceItemList,postWaiter } from '../../api/getData';
 
     export default {
         name: 'Money',
         data() {
             return {
-  
+
               requestFuwuGoodData:{
                 isChooeseFuwuGood:false,//是否选择服务商品
                 page:1,//当前页码
@@ -289,7 +336,7 @@
               typeNameList:[],//分类列表
               goodsList:[],//选中当前分类商品列表
               chooeseGoods:[],//结账中的商品
-              
+
               requestGoodData:{//请求商品列表中的页数，页码服务器数据
                 isChooeseFenleiGood:false,//是否选择分类商品
                 page:1,//当前页码
@@ -322,10 +369,12 @@
               chongzhi:false,//充值弹窗显示与否
               huiyuandengjishuoming:false,//会员等级说明弹框
               jiezhang:false,//结账对话框显示与否
+              sousuoshangping:false,//搜索商品弹窗显示与否
+              xuanzehuiyuan:true,//选择会员弹框是否显示
             }
         },
         components:{
-          vHead,vGood,vKeyboard
+          vHead,vGood,vKeyboard,vKeyboardWithoutPoint
         },
         mounted(){
           this.getGoodsType();
@@ -382,7 +431,7 @@
               } else {
                 this.goodsList = res.data
               }
-              
+
             }).catch((err) => {
               alert('服务商品获取失败')
             })
