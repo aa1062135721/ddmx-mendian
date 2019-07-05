@@ -472,7 +472,6 @@ export default {
           }
         ] // 按标题搜索商品后得到的结果
       },
-      // 单击会员按钮后的弹窗
       // 单击会员按钮后的弹窗所需要的数据
       huiyuanDialog: {
         isShow: false, // 是否显示会员查询对话框
@@ -579,7 +578,6 @@ export default {
           regtime: '1970-01-01 08:33:37'// 加入时间
         }
       }
-
     }
   },
   components: {
