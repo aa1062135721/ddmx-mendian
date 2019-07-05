@@ -34,7 +34,7 @@
               <br><br>
               <el-button class="caozuo-button" type="primary">删除</el-button>
               <br><br>
-              <el-button @click="chongzhi = true" class="caozuo-button" type="primary">充值</el-button>
+              <el-button @click="chongzhiDialog.isShow = true" class="caozuo-button" type="primary">充值</el-button>
               <br><br>
               <el-button @click="huiyuanDialog.isShow = true" class="caozuo-button" type="primary">会员</el-button>
               <br><br>
@@ -44,8 +44,8 @@
           <el-col :span="8">
             <div class="grid-content bg-purple jiesuan-goods" >
               <div class="search">
-                <el-input class="goods-search"  @keyup.enter.native="sousuoshangping = true" placeholder="商品名称/条形码"  v-model="searchGoods.title">
-                  <el-button @click="sousuoshangping = true" slot="append" icon="el-icon-search"></el-button>
+                <el-input class="goods-search"  @keyup.enter.native="getGoodByCondition" placeholder="商品名称/条形码"  v-model="sousuoshangpingDialog.title">
+                  <el-button slot="append" icon="el-icon-search" @click="getGoodByCondition"></el-button>
                 </el-input>
               </div>
               <div class="pay-goods-box">
@@ -76,13 +76,10 @@
                           <span class="font-blue">张三</span> [婴儿游泳]  <i class="el-icon-arrow-down"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                          <el-dropdown-item v-for="(item) in waiter" :key="item.id" @command="item">
+                          <!--todo-->
+                          <el-dropdown-item v-for="(item) in waiter" :key="item.id" :command="item">
                             <span class="font-blue">{{item.name}}</span>
                             [{{item.type}}]
-                          </el-dropdown-item>
-                          <el-dropdown-item command="sssss">
-                            <span class="font-blue">ssfasd</span>
-                            [sdfasdfa]
                           </el-dropdown-item>
                         </el-dropdown-menu>
                       </el-dropdown>
@@ -110,7 +107,7 @@
                   </li>
                 </ul>
                 <div class="buttons">
-                  <button @click="xuanzehuiyuan = true" class="my-btn">选择会员</button>
+                  <button @click="xuanzehuiyuanDialog.isShow = true" class="my-btn">选择会员</button>
                   <button @click="jiezhang = true"  class="my-btn">结账</button>
                 </div>
               </div>
@@ -148,42 +145,42 @@
         </div>
       </el-dialog>
       <!--充值按钮弹框-->
-      <el-dialog class="chongzhi-tanchuan" title="充值" :visible.sync="chongzhi" width="750px" :center="true">
+      <el-dialog class="chongzhi-tanchuan" title="充值" :visible.sync="chongzhiDialog.isShow" width="750px" :center="true">
         <div class="clear-both both">
           <div class="float-left left">
             <div class="one">
-              <el-input class="" placeholder="请输入会员手机号" clearable></el-input>
+              <el-input v-model="chongzhiDialog.mobile" placeholder="请输入会员手机号" clearable maxlength="11"></el-input>
             </div>
             <div class="two">
               <ul>
                 <li>
                   <span class="float-left">会员</span>
-                  <span class="float-right font-blue">张三</span>
+                  <span class="float-right font-blue">{{ chongzhiDialog.huiyuanInfo.nickname }}</span>
                 </li>
                 <li>
                   <span class="float-left">累积充值</span>
-                  <span class="float-right">¥ 100</span>
+                  <span class="float-right">¥ {{ chongzhiDialog.huiyuanInfo.amount }}</span>
                 </li>
                 <li>
                   <span class="float-left">余额</span>
-                  <span class="float-right font-red">¥ 600</span>
+                  <span class="float-right font-red">¥ {{ chongzhiDialog.huiyuanInfo.money }}</span>
                 </li>
                 <li>
                   <span class="float-left">会员等级</span>
-                  <span class="float-right">三星会员&nbsp;<i class="el-icon-question font-blue" @click="huiyuandengjishuoming=true"></i></span>
+                  <span class="float-right">三星会员&nbsp;<i class="el-icon-question font-blue" @click="chongzhiDialog.isShowHuiyuanDengjiDialog = true"></i></span>
                 </li>
               </ul>
             </div>
             <div class="three">
-              <el-radio-group>
-                <el-radio :label="3">现价</el-radio>
-                <el-radio :label="6">微信</el-radio>
-                <el-radio :label="9">支付宝</el-radio>
-                <el-radio :label="9">银行卡</el-radio>
+              <el-radio-group v-model="chongzhiDialog.payType">
+                <el-radio label="现金">现价</el-radio>
+                <el-radio label="微信">微信</el-radio>
+                <el-radio label="支付宝">支付宝</el-radio>
+                <el-radio label="银行卡">银行卡</el-radio>
               </el-radio-group>
             </div>
             <div class="four">
-              <el-input class="" placeholder="请输入充值金额" clearable></el-input>
+              <el-input v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额" clearable></el-input>
             </div>
           </div>
           <div class="float-right right">
@@ -193,7 +190,7 @@
         </div>
       </el-dialog>
       <!--会员等级说明弹框-->
-      <el-dialog class="huiyuandengjishuoming-tanchuan" title="会员等级说明" :visible.sync="huiyuandengjishuoming" width="372px" :center="true">
+      <el-dialog class="huiyuandengjishuoming-tanchuan" title="会员等级说明" :visible.sync="chongzhiDialog.isShowHuiyuanDengjiDialog" width="372px" :center="true">
         <div class="content">
           <span>三星会员：充值200</span>
           <span>四星会员：充值200</span>
@@ -274,18 +271,18 @@
         </div>
       </el-dialog>
       <!-- 搜索商品弹框 -->
-       <el-dialog class="sousuoshangping-tanchuan" title="搜索商品" :visible.sync="sousuoshangping" width="660px" :center="true">
+       <el-dialog class="sousuoshangping-tanchuan" title="搜索商品" :visible.sync="sousuoshangpingDialog.isShow" width="660px" :center="true">
         <div class="content">
           <div class="clear-both" style="width:100%;height:52px;margin-bottom: 20px;">
             <div class="float-left" style="width: 75%;">
-              <el-input  placeholder="请输入您需要查询的商品名字" v-model="searchGoods.title"></el-input>
+              <el-input  placeholder="请输入您需要查询的商品名字" v-model="sousuoshangpingDialog.title"></el-input>
             </div>
             <div class="float-right"  style="width: 20%;text-align: right;">
-              <el-button type="primary" plain>搜索</el-button>
+              <el-button type="primary" plain @click="getGoodByCondition">搜索</el-button>
             </div>
           </div>
           <div>
-            <el-table :data="goodsList" height="250" border style="width: 100%">
+            <el-table :data="sousuoshangpingDialog.goodsList" height="250" border style="width: 100%">
               <el-table-column prop="title" label="名称" width="180"></el-table-column>
               <el-table-column prop="stock" label="库存"></el-table-column>
               <el-table-column prop="price" label="单价"></el-table-column>
@@ -296,29 +293,29 @@
         </div>
       </el-dialog>
       <!-- 选择会员弹框 -->
-      <el-dialog class="xuanzehuiyuan-tanchuan" title="选择会员" :visible.sync="xuanzehuiyuan" width="810px" :center="true">
+      <el-dialog class="xuanzehuiyuan-tanchuan" title="选择会员" :visible.sync="xuanzehuiyuanDialog.isShow" width="810px" :center="true">
         <div class="clear-both div">
             <div class="float-left left">
               <div class="search">
-                <el-input  placeholder="请输入会员手机号"></el-input>
+                <el-input v-model="xuanzehuiyuanDialog.mobile" placeholder="请输入会员手机号" maxlength="11"></el-input>
               </div>
               <div class="content">
                 <ul>
-                  <li><span class="float-left">会员</span><span class="float-right font-blue">张三</span></li>
-                  <li><span class="float-left">余额</span><span class="float-right font-red">￥600</span></li>
-                  <li><span class="float-left">会员等级</span><span class="float-right">三星会员</span></li>
+                  <li><span class="float-left">会员</span><span class="float-right font-blue">{{xuanzehuiyuanDialog.huiyuanInfo.nickname}}</span></li>
+                  <li><span class="float-left">余额</span><span class="float-right font-red">￥{{xuanzehuiyuanDialog.huiyuanInfo.money}}</span></li>
+                  <li><span class="float-left">会员等级</span><span class="float-right">{{xuanzehuiyuanDialog.huiyuanInfo.level_name}}</span></li>
                   <li>
                     <span class="float-left">服务卡</span>
                     <span class="float-right">
-                      <el-badge value="3" class="item">
-                        <el-button size="mini" style="background: #2DC2F3;color: #fff;">查看</el-button>
+                      <el-badge value="3">
+                        <el-button size="mini">查看</el-button>
                       </el-badge>
                     </span>
                   </li>
                   <li style="margin-top: 20px;">
                     <span class="float-left">代金卷</span>
                     <span class="float-right">
-                      <el-badge value="无" class="item">
+                      <el-badge value="无">
                         <el-button size="mini">查看</el-button>
                       </el-badge>
                     </span>
@@ -355,8 +352,8 @@
                 </table>
               </div>
               <div class="tab-btns">
-                <el-button :class="{'active':huiyuanDialog.showFuwuTable}">充值记录</el-button>
-                <el-button :class="{'active':!huiyuanDialog.showFuwuTable}">服务卡</el-button>
+                <el-button :class="{'active':!huiyuanDialog.showFuwuTable}" @click="huiyuanDialog.showFuwuTable = false">充值记录</el-button>
+                <el-button :class="{'active':huiyuanDialog.showFuwuTable}" @click="huiyuanDialog.showFuwuTable = true">服务卡</el-button>
               </div>
             </div>
             <div class="float-right right">
@@ -395,7 +392,7 @@
         <div class="clear-both" style="height: 290px;">
           <div class="float-left left" style="width: 50%;">
               <div style="margin-bottom: 48px;">
-                <el-input v-model="huiyuanDialog.addHuiyuanDialog.mobile" placeholder="请输入会员手机号码"></el-input>
+                <el-input v-model="huiyuanDialog.addHuiyuanDialog.mobile" placeholder="请输入会员手机号码" maxlength="11"></el-input>
               </div>
               <div>
                 <el-input v-model="huiyuanDialog.addHuiyuanDialog.nickname"  placeholder="请输入会员昵称"></el-input>
@@ -415,7 +412,7 @@ import vGood from '../common/Good.vue'
 import vKeyboard from '../common/Keyboard.vue'
 import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-ok'
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
-import { postTwotype, postGoods, postServiceItemList, postWaiter } from '../../api/getData'
+import { postTwotype, postGoods,postGoodsByCode, postServiceItemList, postWaiter } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -458,20 +455,25 @@ export default {
           type: '店长' // 服务类型
         }
       ],
-      // 商品搜索,弹框
-      searchGoods: {
-        title: '',
-        callBackGoodsData: []
-      },
       xiugaijiage: false, // 修改价格弹窗显示与否
       xiugaishuliang: false, // 修改数量弹窗显示与否
-      chongzhi: false, // 充值弹窗显示与否
-      huiyuandengjishuoming: false, // 会员等级说明弹框
       jiezhang: false, // 结账对话框显示与否
-      sousuoshangping: false, // 搜索商品弹窗显示与否
-      xuanzehuiyuan: false, // 选择会员弹框是否显示
-      huiyuanchaxun: false, // 会员查询弹框显示与否
+      sousuoshangpingDialog: {
+        isShow: false, // 搜索商品弹窗显示与否
+        title: '', // 搜索商品标题，这里是标题，不是条形码，如果是条形码，点击按钮直接添加到购物车
+        goodsList: [
+          {
+            id: 1730, // 商品id
+            title: '美杰紫色毛巾', // 商品名称
+            price: '7.00', // 商品的原价，现价
+            bar_code: '2300201800208', // 商品条形码
+            pics: 'http://picture.ddxm661.com/9a47a20190318164340290', // 商品的图片
+            stock: 10// 商品的库存
+          }
+        ] // 按标题搜索商品后得到的结果
+      },
       // 单击会员按钮后的弹窗
+      // 单击会员按钮后的弹窗所需要的数据
       huiyuanDialog: {
         isShow: false, // 是否显示会员查询对话框
         mobile: '', // 要查询的会员手机号码
@@ -494,7 +496,7 @@ export default {
           nickname: ''
         },
         // 展示服务卡购买记录
-        showFuwuTable: true,
+        showFuwuTable: false,
         // 会员查询弹框里的表格-数据为 服务卡购买记录
         fuwukaList: [
           {
@@ -541,7 +543,43 @@ export default {
             xianzhiyaoqiu: '无限制'
           }
         ]
+      },
+      // 单击充值按钮后的弹窗所需要的数据
+      chongzhiDialog: {
+        isShow: false, // 充值弹窗显示与否
+        mobile: '',
+        huiyuanInfo: {
+          id: 5110, // 会员id
+          mobile: '13637765376', // 会员电话
+          shop_code: 'A00036', // 所属门店的门店编号
+          level_id: 6, // 会员等级id
+          nickname: '荣柱', // 姓名
+          level_name: '七星会员', // 会员等级名称
+          money: '0.00', // 余额
+          amount: '0.05', // 累积充值
+          regtime: '1970-01-01 08:33:37'// 加入时间
+        },
+        isShowHuiyuanDengjiDialog: false, // 等级说明弹框显示与否
+        payType: '', // 充值方式
+        payMoney: 0 // 充值金额
+      },
+      // 选择会员弹框是否显示
+      xuanzehuiyuanDialog: {
+        isShow: false,
+        mobile: '',
+        huiyuanInfo: {
+          id: 5110, // 会员id
+          mobile: '13637765376', // 会员电话
+          shop_code: 'A00036', // 所属门店的门店编号
+          level_id: 6, // 会员等级id
+          nickname: '荣柱', // 姓名
+          level_name: '七星会员', // 会员等级名称
+          money: '0.00', // 余额
+          amount: '0.05', // 累积充值
+          regtime: '1970-01-01 08:33:37'// 加入时间
+        }
       }
+
     }
   },
   components: {
@@ -656,6 +694,41 @@ export default {
     },
     clickWaiter (e) {
       console.log(e)
+    },
+    // 按搜索商品(商品标题和条形码)
+    getGoodByCondition (str) {
+      if (this.sousuoshangpingDialog.title.length === 0) {
+        alert('请输入内容')
+        return
+      }
+      if (/^[0-9]+$/.test(this.sousuoshangpingDialog.title)) {
+        // alert('全部是数字')
+        this.searchGoodsByGoodCode()
+      } else {
+        this.sousuoshangpingDialog.isShow = true
+        // alert('非纯数字')
+        this.searchGoodsByGoodName()
+      }
+    },
+    // 搜索商品按商品名
+    searchGoodsByGoodName () {
+      let data = {}
+      data.title = `${this.sousuoshangpingDialog.title}`
+      postGoods(data).then((res) => {
+        this.sousuoshangpingDialog.goodsList = res.data
+      }).catch((err) => {
+        console.log(err, '搜索商品失败')
+      })
+    },
+    // 搜索商品按商品条形码
+    searchGoodsByGoodCode () {
+      let data = {}
+      data.bar_code = `${this.sousuoshangpingDialog.title}`
+      postGoodsByCode(data).then((res) => {
+        console.log(res)
+      }).catch((err) => {
+        console.log(err, '按条形码搜索商品失败')
+      })
     }
   }
 }
@@ -1178,6 +1251,11 @@ export default {
               color:rgba(128,128,128,1);
               line-height:20px;
               margin-bottom: 16px;
+              button{
+                &:active{
+                  background: #2DC2F3;color: #fff;
+                }
+              }
             }
           }
         }

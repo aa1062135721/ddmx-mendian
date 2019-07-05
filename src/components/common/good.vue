@@ -23,7 +23,7 @@
           <span class="xianjia">
             现价: ¥ {{ogood.price}}
           </span>
-          <span class="kucun" v-if="ogood.stock">
+          <span class="kucun" v-if="ogood.stock || ogood.stock >= 0">
             <img src="../../assets/icon/kucun.png" alt="库存"> {{ogood.stock}}
           </span>
         </div>

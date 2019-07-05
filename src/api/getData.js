@@ -27,6 +27,15 @@ export const postGoods = (data = null) => {
 }
 
 /**
+ * 收银大屏-获取商品（根据商品条形码）
+ * @param data
+ * @returns {*}
+ */
+export const postGoodsByCode = (data = null) => {
+  return Vue.prototype.$post('/index/search_code_item', data)
+}
+
+/**
  * 收银大屏-服务商品
  * @param data
  * @returns {*}
