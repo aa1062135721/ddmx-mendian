@@ -16,14 +16,15 @@
         <el-button class="btn">9</el-button>
       </div>
      <div>
-       <el-button class="btn" style="width: 288px;">0</el-button>
+       <el-button class="btn" style="width: 190px;">0</el-button>
+       <el-button class="btn" type="primary" style="color: #fff;font-size:24px;background:rgba(45,194,243,1);">确定</el-button>
      </div>
     </div>
 </template>
 
 <script>
 export default {
-  name: 'Keyboard-without-point',
+  name: 'Keyboard-without-point-with-ok',
   data () {
     return {
     }

@@ -36,7 +36,7 @@
               <br><br>
               <el-button @click="chongzhi = true" class="caozuo-button" type="primary">充值</el-button>
               <br><br>
-              <el-button class="caozuo-button" type="primary">会员</el-button>
+              <el-button @click="huiyuanchaxun = true" class="caozuo-button" type="primary">会员</el-button>
               <br><br>
               <el-button class="caozuo-button" type="primary">购卡</el-button>
             </div>
@@ -203,7 +203,7 @@
         </div>
       </el-dialog>
       <!--结账弹框-->
-      <el-dialog class="jiezhang-tanchuan" title="结账" :visible.sync="jiezhang" width="824px" :center="true">
+      <el-dialog class="jiezhang-tanchuan" title="结账" :visible.sync="jiezhang" width="780px" :center="true">
         <div class="clear-both box">
           <div class="float-left my-left">
             <ul>
@@ -234,38 +234,42 @@
             </div>
           </div>
           <div class="float-right my-right">
-            <span>
-              <img src="../../assets/icon/checkout-huiyuanka.png" alt="">
-              会员卡
-            </span>
-            <span>
-              <img src="../../assets/icon/checkout-xianjing.png" alt="">
-              现金
-            </span>
-            <span>
-              <img src="../../assets/icon/checkout-weixin.png" alt="">
-              微信
-            </span>
-            <span>
-              <img src="../../assets/icon/checkout-zhifubao.png" alt="">
-              支付宝
-            </span>
-            <span>
-              <img src="../../assets/icon/checkout-yinhangka.png" alt="">
-              银行卡
-            </span>
-            <span>
-              <img src="../../assets/icon/checkout-meituan.png" alt="">
-              美团
-            </span>
-            <span>
-              <img src="../../assets/icon/checkout-zengpin-sel.png" alt="">
-              赠送
-            </span>
-            <span>
-              <img src="../../assets/icon/checkout-mendian.png" alt="">
-              门店自用
-            </span>
+            <div class="div">
+              <span class="span-btn">
+                <img src="../../assets/icon/checkout-huiyuanka.png" alt="">
+                <span>会员卡</span>
+              </span>
+              <span class="span-btn closed">
+                <img src="../../assets/icon/checkout-xianjing.png" alt="">
+                <span>现金</span>
+              </span>
+            </div>
+            <div class="div">
+              <span class="span-btn active">
+                <img src="../../assets/icon/checkout-weixin.png" alt="">
+                <span>微信</span>
+              </span>
+              <span class="span-btn">
+                <img src="../../assets/icon/checkout-zhifubao.png" alt="">
+                <span>支付宝</span>
+              </span>
+            </div>
+             <div class="div">
+               <span class="span-btn">
+                <img src="../../assets/icon/checkout-yinhangka.png" alt=""><span>银行卡</span>
+               </span>
+               <span class="span-btn">
+                <img src="../../assets/icon/checkout-meituan.png" alt=""><span>美团</span>
+              </span>
+             </div>
+             <div class="div">
+               <span class="span-btn">
+                <img src="../../assets/icon/checkout-zengpin-sel.png" alt=""><span>赠送</span>
+               </span>
+               <span class="span-btn">
+                <img src="../../assets/icon/checkout-mendian.png" alt=""><span>门店自用</span>
+               </span>
+             </div>
           </div>
         </div>
       </el-dialog>
@@ -287,7 +291,7 @@
               <el-table-column prop="price" label="单价"></el-table-column>
               <el-table-column prop="price" label="会员价"></el-table-column>
               <el-table-column label="操作"><el-button type="primary">确定</el-button></el-table-column>
-          </el-table>
+            </el-table>
           </div>
         </div>
       </el-dialog>
@@ -323,9 +327,60 @@
               </div>
             </div>
             <div class="float-right right">
+              <v-keyboard-without-point-with-ok></v-keyboard-without-point-with-ok>
+            </div>
+          </div>
+      </el-dialog>
+      <!--  会员按钮弹框-->
+      <el-dialog class="huiyuanchaxun-tanchuan" title="会员查询" :visible.sync="huiyuanchaxun" width="960px" :center="true">
+        <div>
+          <div class="clear-both div" style="margin-bottom: 8px;height: 290px;">
+            <div class="float-left left">
+              <div style="width: 584px;display: flex;justify-content: space-between;margin-bottom: 16px;">
+                <el-button type="primary" style="width:84px;">新增会员</el-button>
+                <el-input style="width:392px;"  placeholder="请输入您需要查询的会员手机号码"></el-input>
+                <el-button   style="width:84px;" plain>搜索</el-button>
+              </div>
+              <div  class="el-table--border" style="margin-bottom: 16px;width: 584px;text-align: center;">
+                <table class="el-table el-table__body" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td colspan="3" style="height: 32px;">手机号：18723333333</td>
+                    <td colspan="2" style="height: 32px;">姓名：张三</td>
+                    <td colspan="2" style="height: 32px;">会员等级：三级会员</td>
+                  </tr>
+                  <tr>
+                    <td colspan="4">累计充值：200 余额：¥ 100</td>
+                    <td  colspan="3">加入时间：2018-12-16 15:30</td>
+                  </tr>
+                </table>
+              </div>
+              <div>
+                <el-button  style="background:#6BD2F4;color: #000;">充值记录</el-button>
+                <el-button  style="width:84px;background:#F55656;color: #ffffff;">服务卡</el-button>
+              </div>
+            </div>
+            <div class="float-right right">
               <v-keyboard-without-point></v-keyboard-without-point>
             </div>
           </div>
+          <div class="my-table">
+            <el-table :data="fuwukaList" height="216" border style="width: 100%">
+              <el-table-column prop="card_name" label="服务卡名称" width="180"></el-table-column>
+              <el-table-column prop="real_price" label="购买金额"></el-table-column>
+              <el-table-column prop="price" label="项目服务"></el-table-column>
+              <el-table-column prop="type_card" label="类型">
+<!--                <template slot-scope="type">-->
+<!--                 {{ type === '1' ? '次卡' : type === '2' ? '月卡' : type === '4' ? '次卡': '' }}-->
+<!--                </template>-->
+              </el-table-column>
+              <el-table-column prop="create_time" label="购买时间"></el-table-column>
+              <el-table-column prop="start_time" label="激活时间"></el-table-column>
+              <el-table-column prop="end_time" label="过期时间"></el-table-column>
+              <el-table-column prop="status" label="状态"></el-table-column>
+              <el-table-column prop="status_name" label="操作"></el-table-column>
+            </el-table>
+          </div>
+        </div>
       </el-dialog>
     </div>
 </template>
@@ -334,7 +389,8 @@
 import vHead from '../common/Header.vue'
 import vGood from '../common/Good.vue'
 import vKeyboard from '../common/Keyboard.vue'
-import vKeyboardWithoutPoint from '../common/Keyboard-without-point.vue'
+import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-ok'
+import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import { postTwotype, postGoods, postServiceItemList, postWaiter } from '../../api/getData'
 
 export default {
@@ -389,11 +445,60 @@ export default {
       huiyuandengjishuoming: false, // 会员等级说明弹框
       jiezhang: false, // 结账对话框显示与否
       sousuoshangping: false, // 搜索商品弹窗显示与否
-      xuanzehuiyuan: false// 选择会员弹框是否显示
+      xuanzehuiyuan: false, // 选择会员弹框是否显示
+      huiyuanchaxun: false, // 会员查询弹框显示与否
+      // 会员查询弹框里的表格-数据为 服务卡购买记录
+      fuwukaList: [
+        {
+          id: 1,
+          card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
+          type: 1,
+          real_price: 100.00,
+          month: 2,
+          year: 2019,
+          create_time: '2019-07-03 11:47:15',
+          start_time: '未激活',
+          end_time: '2019-07-13 11:47:15',
+          over_time: 1562989635,
+          status: 0,
+          type_card: '次卡',
+          status_name: '未激活'
+        },
+        {
+          id: 1,
+          card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
+          type: 1,
+          real_price: 100.00,
+          month: 2,
+          year: 2019,
+          create_time: '2019-07-03 11:47:15',
+          start_time: '未激活',
+          end_time: '2019-07-13 11:47:15',
+          over_time: 1562989635,
+          status: 0,
+          type_card: '次卡',
+          status_name: '未激活'
+        },
+        {
+          id: 1,
+          card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
+          type: 1,
+          real_price: 100.00,
+          month: 2,
+          year: 2019,
+          create_time: '2019-07-03 11:47:15',
+          start_time: '未激活',
+          end_time: '2019-07-13 11:47:15',
+          over_time: 1562989635,
+          status: 0,
+          type_card: '次卡',
+          status_name: '未激活'
+        }
+      ]
     }
   },
   components: {
-    vHead, vGood, vKeyboard, vKeyboardWithoutPoint
+    vHead, vGood, vKeyboard, vKeyboardWithoutPointWithOk, vKeyboardWithoutPoint
   },
   mounted () {
     this.getGoodsType()
@@ -949,20 +1054,51 @@ export default {
         }
       }
       .my-right{
-        width: 320px;
+        width: 370px;
         height: 100%;
-        span{
-          width:176px;
+        display: flex;
+        flex-direction: column;
+        .div{
+          width: 100%;
           height:56px;
-          background:rgba(255,255,255,1);
-          border:1px solid rgba(210,210,210,1);
-          border-radius:10px;
-          font-size:20px;
-          font-family:SourceHanSansCN-Regular;
-          font-weight:400;
-          color:rgba(26,26,26,1);
+          margin-bottom: 16px;
+          display: flex;
+          justify-content: space-between;
+          .span-btn{
+            position: relative;
+            width:176px;
+            height:56px;
+            background:rgba(255,255,255,1);
+            border:1px solid rgba(210,210,210,1);
+            border-radius:5px;
+            font-size:20px;
+            font-family:SourceHanSansCN-Regular;
+            font-weight:400;
+            line-height: 56px;
+            color:rgba(26,26,26,1);
+            img{
+              height: 40px;
+              width: 40px;
+              position: absolute;
+              top: 8px;
+              left: 26px;
+            }
+            span{
+              line-height: 56px;
+              position: absolute;
+              top: 0px;
+              left: 68px;
+            }
+          }
+          .active{
+            background:#BEE7F6;
+            border:none;
+          }
+          .closed{
+            background:#D2D2D2;
+            border:none;
+          }
         }
-
       }
     }
   }
@@ -1001,6 +1137,17 @@ export default {
       }
       .right{
        width: 45%;
+      }
+    }
+  }
+  /*会员查询弹框样式*/
+  .huiyuanchaxun-tanchuan{
+    .my-table{
+      .el-table__body tr{
+        height:24px;
+        td{
+          padding: 0;
+        }
       }
     }
   }
