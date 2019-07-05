@@ -36,7 +36,7 @@
               <br><br>
               <el-button @click="chongzhi = true" class="caozuo-button" type="primary">充值</el-button>
               <br><br>
-              <el-button @click="huiyuanchaxun = true" class="caozuo-button" type="primary">会员</el-button>
+              <el-button @click="huiyuanDialog.isShow = true" class="caozuo-button" type="primary">会员</el-button>
               <br><br>
               <el-button class="caozuo-button" type="primary">购卡</el-button>
             </div>
@@ -332,31 +332,31 @@
           </div>
       </el-dialog>
       <!--  会员按钮弹框-->
-      <el-dialog class="huiyuanchaxun-tanchuan" title="会员查询" :visible.sync="huiyuanchaxun" width="960px" :center="true">
-        <div>
-          <div class="clear-both div" style="margin-bottom: 8px;height: 290px;">
+      <el-dialog class="huiyuanchaxun-tanchuan" title="会员查询" :visible.sync="huiyuanDialog.isShow" width="960px" :center="true">
+        <div class="content">
+          <div class="clear-both header">
             <div class="float-left left">
-              <div style="width: 584px;display: flex;justify-content: space-between;margin-bottom: 16px;">
-                <el-button type="primary" style="width:84px;">新增会员</el-button>
-                <el-input style="width:392px;"  placeholder="请输入您需要查询的会员手机号码"></el-input>
-                <el-button   style="width:84px;" plain>搜索</el-button>
+              <div class="search-btns">
+                <el-button type="primary" @click="huiyuanDialog.addHuiyuanDialog.isShow = true">新增会员</el-button>
+                <el-input style="width:392px;" v-model="huiyuanDialog.mobile" placeholder="请输入您需要查询的会员手机号码"></el-input>
+                <el-button  plain>搜索</el-button>
               </div>
-              <div  class="el-table--border" style="margin-bottom: 16px;width: 584px;text-align: center;">
+              <div class="user-info el-table--border">
                 <table class="el-table el-table__body" cellspacing="0" cellpadding="0" border="0">
                   <tr>
-                    <td colspan="3" style="height: 32px;">手机号：18723333333</td>
-                    <td colspan="2" style="height: 32px;">姓名：张三</td>
-                    <td colspan="2" style="height: 32px;">会员等级：三级会员</td>
+                    <td colspan="3">手机号：{{ huiyuanDialog.huiyuanInfo.mobile }}</td>
+                    <td colspan="2">姓名：<span class="font-blue">{{ huiyuanDialog.huiyuanInfo.nickname }}</span></td>
+                    <td colspan="2">会员等级：{{ huiyuanDialog.huiyuanInfo.level_name }}</td>
                   </tr>
                   <tr>
-                    <td colspan="4">累计充值：200 余额：¥ 100</td>
-                    <td  colspan="3">加入时间：2018-12-16 15:30</td>
+                    <td colspan="4">累计充值：{{ huiyuanDialog.huiyuanInfo.amount }} 余额：<span class="font-red">¥ {{ huiyuanDialog.huiyuanInfo.money }}</span></td>
+                    <td  colspan="3">加入时间：{{ huiyuanDialog.huiyuanInfo.regtime }}</td>
                   </tr>
                 </table>
               </div>
-              <div>
-                <el-button  style="background:#6BD2F4;color: #000;">充值记录</el-button>
-                <el-button  style="width:84px;background:#F55656;color: #ffffff;">服务卡</el-button>
+              <div class="tab-btns">
+                <el-button :class="{'active':huiyuanDialog.showFuwuTable}">充值记录</el-button>
+                <el-button :class="{'active':!huiyuanDialog.showFuwuTable}">服务卡</el-button>
               </div>
             </div>
             <div class="float-right right">
@@ -364,14 +364,12 @@
             </div>
           </div>
           <div class="my-table">
-            <el-table :data="fuwukaList" height="216" border style="width: 100%">
+            <!-- 服务卡 -->
+            <el-table v-show="huiyuanDialog.showFuwuTable" :data="huiyuanDialog.fuwukaList" min-height="216" border style="width: 100%">
               <el-table-column prop="card_name" label="服务卡名称" width="180"></el-table-column>
               <el-table-column prop="real_price" label="购买金额"></el-table-column>
               <el-table-column prop="price" label="项目服务"></el-table-column>
               <el-table-column prop="type_card" label="类型">
-<!--                <template slot-scope="type">-->
-<!--                 {{ type === '1' ? '次卡' : type === '2' ? '月卡' : type === '4' ? '次卡': '' }}-->
-<!--                </template>-->
               </el-table-column>
               <el-table-column prop="create_time" label="购买时间"></el-table-column>
               <el-table-column prop="start_time" label="激活时间"></el-table-column>
@@ -379,6 +377,32 @@
               <el-table-column prop="status" label="状态"></el-table-column>
               <el-table-column prop="status_name" label="操作"></el-table-column>
             </el-table>
+            <!-- 充值记录 -->
+            <el-table v-show="!huiyuanDialog.showFuwuTable" :data="huiyuanDialog.chongzhijiluList" min-height="216" border style="width: 100%">
+              <el-table-column prop="nickname" label="会员" width="180"></el-table-column>
+              <el-table-column prop="chongzhijine" label="充值金额"></el-table-column>
+              <el-table-column prop="daozhangjine" label="到账金额"></el-table-column>
+              <el-table-column prop="xianzhiyaoqiu" label="限制要求"></el-table-column>
+              <el-table-column prop="fuwurenyuan" label="服务人员"></el-table-column>
+              <el-table-column prop="status" label="状态"></el-table-column>
+              <el-table-column prop="create_time" label="充值时间"></el-table-column>
+            </el-table>
+          </div>
+        </div>
+      </el-dialog>
+      <!--  在会员按钮弹窗里面单击新增会员-->
+      <el-dialog title="新增会员" :visible.sync="huiyuanDialog.addHuiyuanDialog.isShow" width="688px" :center="true">
+        <div class="clear-both" style="height: 290px;">
+          <div class="float-left left" style="width: 50%;">
+              <div style="margin-bottom: 48px;">
+                <el-input v-model="huiyuanDialog.addHuiyuanDialog.mobile" placeholder="请输入会员手机号码"></el-input>
+              </div>
+              <div>
+                <el-input v-model="huiyuanDialog.addHuiyuanDialog.nickname"  placeholder="请输入会员昵称"></el-input>
+              </div>
+          </div>
+          <div class="float-right right" style="width: 45%;">
+            <v-keyboard-without-point-with-ok></v-keyboard-without-point-with-ok>
           </div>
         </div>
       </el-dialog>
@@ -447,54 +471,77 @@ export default {
       sousuoshangping: false, // 搜索商品弹窗显示与否
       xuanzehuiyuan: false, // 选择会员弹框是否显示
       huiyuanchaxun: false, // 会员查询弹框显示与否
-      // 会员查询弹框里的表格-数据为 服务卡购买记录
-      fuwukaList: [
-        {
-          id: 1,
-          card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
-          type: 1,
-          real_price: 100.00,
-          month: 2,
-          year: 2019,
-          create_time: '2019-07-03 11:47:15',
-          start_time: '未激活',
-          end_time: '2019-07-13 11:47:15',
-          over_time: 1562989635,
-          status: 0,
-          type_card: '次卡',
-          status_name: '未激活'
+      // 单击会员按钮后的弹窗
+      huiyuanDialog: {
+        isShow: false, // 是否显示会员查询对话框
+        mobile: '', // 要查询的会员手机号码
+        // 会员信息
+        huiyuanInfo: {
+          id: 5110, // 会员id
+          mobile: '13637765376', // 会员电话
+          shop_code: 'A00036', // 所属门店的门店编号
+          level_id: 6, // 会员等级id
+          nickname: '荣柱', // 姓名
+          level_name: '七星会员', // 会员等级名称
+          money: '0.00', // 余额
+          amount: '0.05', // 累积充值
+          regtime: '1970-01-01 08:33:37'// 加入时间
         },
-        {
-          id: 1,
-          card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
-          type: 1,
-          real_price: 100.00,
-          month: 2,
-          year: 2019,
-          create_time: '2019-07-03 11:47:15',
-          start_time: '未激活',
-          end_time: '2019-07-13 11:47:15',
-          over_time: 1562989635,
-          status: 0,
-          type_card: '次卡',
-          status_name: '未激活'
+        // 新增会员对话框
+        addHuiyuanDialog: {
+          isShow: false, // 新增会员对话框是否显示
+          mobile: '',
+          nickname: ''
         },
-        {
-          id: 1,
-          card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
-          type: 1,
-          real_price: 100.00,
-          month: 2,
-          year: 2019,
-          create_time: '2019-07-03 11:47:15',
-          start_time: '未激活',
-          end_time: '2019-07-13 11:47:15',
-          over_time: 1562989635,
-          status: 0,
-          type_card: '次卡',
-          status_name: '未激活'
-        }
-      ]
+        // 展示服务卡购买记录
+        showFuwuTable: true,
+        // 会员查询弹框里的表格-数据为 服务卡购买记录
+        fuwukaList: [
+          {
+            id: 1,
+            card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
+            type: 1,
+            real_price: 100.00,
+            month: 2,
+            year: 2019,
+            create_time: '2019-07-03 11:47:15',
+            start_time: '未激活',
+            end_time: '2019-07-13 11:47:15',
+            over_time: 1562989635,
+            status: 0,
+            type_card: '次卡',
+            status_name: '未激活'
+          },
+          {
+            id: 1,
+            card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
+            type: 1,
+            real_price: 100.00,
+            month: 2,
+            year: 2019,
+            create_time: '2019-07-03 11:47:15',
+            start_time: '未激活',
+            end_time: '2019-07-13 11:47:15',
+            over_time: 1562989635,
+            status: 0,
+            type_card: '次卡',
+            status_name: '未激活'
+          }
+        ],
+        // 会员充值记录
+        chongzhijiluList: [
+          {
+            id: 1,
+            nickname: '会员名',
+            create_time: '2019-07-03 11:47:15',
+            status: '成功',
+            fuwurenyuan: '张三',
+            chongzhijine: 300,
+            daozhangjine: 300,
+            xianzhiyaoqiu: '无限制'
+          }
+        ]
+      }
     }
   },
   components: {
@@ -1142,13 +1189,51 @@ export default {
   }
   /*会员查询弹框样式*/
   .huiyuanchaxun-tanchuan{
-    .my-table{
-      .el-table__body tr{
-        height:24px;
-        td{
-          padding: 0;
+    .content{
+      .header{
+        margin-bottom: 8px;
+        height: 290px;
+        .left{
+          .search-btns{
+            width: 584px;display: flex;justify-content: space-between;margin-bottom: 16px;
+            button{
+             &:first-child{
+               background: #2DC2F3;
+             }
+              &:last-child{
+                width: 84px;
+              }
+            }
+          }
+          .user-info{
+            margin-bottom: 16px;
+            width: 584px;
+            text-align: center;
+            td{
+              height: 32px;
+              text-align: center;
+              color: #000000;
+            }
+          }
+          .tab-btns{
+            button{
+             background:#6BD2F4;color: #000;
+            }
+            .active{
+              background:#F55656;color: #ffffff;
+            }
+          }
+        }
+      }
+      .my-table{
+        .el-table__body tr{
+          height:24px!important;
+          td{
+            padding: 0!important;
+          }
         }
       }
     }
+
   }
 </style>
