@@ -1,3 +1,4 @@
+<!--suppress ALL -->
 <template>
     <div class="bg">
       <v-head></v-head>
@@ -5,13 +6,13 @@
         <el-row :gutter="20">
           <el-col :span="14">
             <div class="grid-content all-goods">
-              <div class="goods-type">
+              <div class="goods-type clear-both">
                 <el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button>
-                <el-button class="page-fenlei-button float-left" icon="el-icon-arrow-left"></el-button>
-                <div class='type-btn'>
-                  <el-button v-for="(item) in typeNameList"  :key="item.id" class="fenlei-button" :class="{'fenlei-button-active':(requestGoodData.isChooeseFenleiGood && requestGoodData.type==item.id)}" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>
-                </div>
-                <el-button class="page-fenlei-button float-right" icon="el-icon-arrow-right"></el-button>
+                <el-button class="page-fenlei-button float-left" icon="el-icon-arrow-left" @click="clickFenleiBtnPre"></el-button>
+                <!--<div class='type-btn'>-->
+                  <el-button v-for="(item) in requestGoodData.typeNameList"  :key="item.id" class="fenlei-button" :class="{'fenlei-button-active':(requestGoodData.isChooeseFenleiGood && requestGoodData.who === item.id)}" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>
+                <!--</div>-->
+                <el-button class="page-fenlei-button float-right" icon="el-icon-arrow-right" @click="clickFenleiBtnNext"></el-button>
               </div>
               <div class="flex-goods">
                   <v-good v-for="(item) in goodsList" :key="item.id" :ogood="item" class="goods"></v-good>
@@ -412,7 +413,7 @@ import vGood from '../common/Good.vue'
 import vKeyboard from '../common/Keyboard.vue'
 import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-ok'
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
-import { postTwotype, postGoods,postGoodsByCode, postServiceItemList, postWaiter } from '../../api/getData'
+import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -424,15 +425,15 @@ export default {
         page: 1, // 当前页码
         num: 15// 每页的数据
       },
-      typeNameList: [], // 分类列表
-      goodsList: [], // 选中当前分类商品列表
+      goodsList: [], // 收银大屏展示的商品列表（普通商品和服务商品）
       chooeseGoods: [], // 结账中的商品
       // 普通商品
       requestGoodData: {// 请求商品列表中的页数，页码服务器数据
+        typeNameList: [], // 分类列表
         isChooeseFenleiGood: false, // 是否选择分类商品
         page: 1, // 当前页码
         num: 15, // 每页的数据
-        type: 0,
+        who: 0, // 当前选中的分类名id
         type_category: 0
       },
       // 当前选中的会员信息
@@ -591,7 +592,7 @@ export default {
     // 获取分类
     getGoodsType () {
       postTwotype().then((res) => {
-        this.typeNameList = res.data
+        this.requestGoodData.typeNameList = res.data
       }).catch((err) => {
         console.log(err, '分类列表获取失败')
       })
@@ -600,8 +601,8 @@ export default {
     getGoods () {
       let data = {}
       data.page = `${this.requestGoodData.page},${this.requestGoodData.num}`
-      if (this.requestGoodData.type) {
-        data.type = this.requestGoodData.type
+      if (this.requestGoodData.who) {
+        data.type = this.requestGoodData.who
       }
       if (this.requestGoodData.title) {
         data.title = this.requestGoodData.title
@@ -648,13 +649,41 @@ export default {
       this.getServiceItemList()
     },
     // 点击了分类商品按钮
-    clickFenleiBtn (type) {
+    clickFenleiBtn (id) {
       this.requestGoodData.page = 1
-      this.requestGoodData.type = type
+      this.requestGoodData.who = id
       this.requestGoodData.type_category = 1
       this.requestFuwuGoodData.isChooeseFuwuGood = false
       this.requestGoodData.isChooeseFenleiGood = true
       this.getGoods()
+    },
+    // 点击了分类按钮中的上一个
+    clickFenleiBtnPre () {
+      for (let i = 0; i < this.requestGoodData.typeNameList.length; i++) {
+        if (this.requestGoodData.typeNameList[i].id === this.requestGoodData.who) {
+          if (i === 0) {
+            this.requestGoodData.who = this.requestGoodData.typeNameList[this.requestGoodData.typeNameList.length - 1].id
+          } else {
+            this.requestGoodData.who = this.requestGoodData.typeNameList[i - 1].id
+          }
+          this.clickFenleiBtn (this.requestGoodData.who)
+          break
+        }
+      }
+    },
+    // 点击了分类按钮中的下一个
+    clickFenleiBtnNext () {
+      for (let i = 0; i < this.requestGoodData.typeNameList.length; i++) {
+        if (this.requestGoodData.typeNameList[i].id === this.requestGoodData.who) {
+          if (i === this.requestGoodData.typeNameList.length - 1) {
+            this.requestGoodData.who = this.requestGoodData.typeNameList[0].id
+          } else {
+            this.requestGoodData.who = this.requestGoodData.typeNameList[i + 1].id
+          }
+          this.clickFenleiBtn (this.requestGoodData.who)
+          break
+        }
+      }
     },
     // 点击了上一页
     clickPrePageBtn () {
