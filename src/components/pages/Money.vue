@@ -29,9 +29,9 @@
               <br><br>
               <el-button @click="clickSubNumShoppingCarGood" class="caozuo-button" type="primary">&nbsp;&nbsp;-&nbsp;&nbsp;</el-button>
               <br><br>
-              <el-button @click="xiugaishuliang = true" class="caozuo-button" type="primary">数量</el-button>
+              <el-button @click="clickBtnXiugaishuliangShoppingCarGood" class="caozuo-button" type="primary">数量</el-button>
               <br><br>
-              <el-button @click="xiugaijiage = true" class="caozuo-button" type="primary">改价</el-button>
+              <el-button @click="clickBtnXiugaijiageShoppingCarGood" class="caozuo-button" type="primary">改价</el-button>
               <br><br>
               <el-button @click="clickDelShoppingCarGood" class="caozuo-button" type="primary">删除</el-button>
               <br><br>
@@ -60,8 +60,9 @@
                     <span class="float-right red">￥{{good.price * good.num}}</span>
                   </li>
                   <li class="title">
-                    <span class="red danjia">￥{{good.price}}</span>
-                    <span class="yuanjia">原价￥{{good.price}}</span>
+                    <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
+                    <span class="red danjia" v-else>￥{{good.price}}</span>
+                    <span class="yuanjia" v-if="good.is_edit">原价￥{{good.price}}</span>
                     <span class="huiyuanjia">会员价￥{{good.price}}</span>
                   </li>
                 </ul>
@@ -117,29 +118,29 @@
       </div>
 
       <!--修改价格弹框-->
-      <el-dialog class="gaijia-tanchuan" title="修改价格" :visible.sync="xiugaijiage" width="434px" :center="true">
+      <el-dialog class="gaijia-tanchuan" title="修改价格" :visible.sync="xiugaijiageDialog.isShow" width="434px" :center="true">
         <div>
-          <el-input class="gaijia-input" placeholder="请输入内容" clearable></el-input>
+          <el-input class="gaijia-input" placeholder="请输入内容" clearable v-model="xiugaijiageDialog.inputValue"></el-input>
           <div class="clear-both" style="height: 290px;">
             <div class="float-left">
-              <v-keyboard></v-keyboard>
+              <v-keyboard @getNumber="clickChangejiageShoppingCarGood"></v-keyboard>
             </div>
             <div class="float-right">
-              <el-button class="gaijia-queding-btn">确定</el-button>
+              <el-button @click="clickChangejiageShoppingCarGoodOk" class="gaijia-queding-btn">确定</el-button>
             </div>
           </div>
         </div>
       </el-dialog>
       <!--修改数量弹框-->
-      <el-dialog class="gaijia-tanchuan" title="修改数量" :visible.sync="xiugaishuliang" width="434px" :center="true">
+      <el-dialog class="gaijia-tanchuan" title="修改数量" :visible.sync="xiugaishuliangDialog.isShow" width="434px" :center="true">
         <div>
-          <el-input class="gaijia-input" placeholder="请输入内容" clearable></el-input>
+          <el-input class="gaijia-input" placeholder="请输入内容" clearable v-model="xiugaishuliangDialog.inputValue"></el-input>
           <div class="clear-both" style="height: 290px;">
             <div class="float-left">
-              <v-keyboard></v-keyboard>
+              <v-keyboard @getNumber="clickChangeNumShoppingCarGood"></v-keyboard>
             </div>
             <div class="float-right">
-              <el-button class="gaijia-queding-btn">确定</el-button>
+              <el-button @click="clickChangeNumShoppingCarGoodOk" class="gaijia-queding-btn">确定</el-button>
             </div>
           </div>
         </div>
@@ -567,8 +568,17 @@ export default {
         name: '管理员', // 服务员名称
         type: '店长' // 服务类型
       },
-      xiugaijiage: false, // 修改价格弹窗显示与否
-      xiugaishuliang: false, // 修改数量弹窗显示与否
+      // 修改价格弹窗显示与否
+      xiugaijiageDialog: {
+        isShow: false,
+        inputValue: ''
+      },
+
+      // 购物车 修改商品数量弹窗
+      xiugaishuliangDialog: {
+        isShow: false,// 修改数量弹窗显示与否
+        inputValue: '' // 修改数量的值
+      },
       jiezhang: false, // 结账对话框显示与否
       sousuoshangpingDialog: {
         isShow: false, // 搜索商品弹窗显示与否
@@ -815,7 +825,89 @@ export default {
       }
       this.$forceUpdate()
     },
+    // 选中购物车里的商品，后点修改数量
+    clickBtnXiugaishuliangShoppingCarGood () {
+      // 显示弹窗
+      let key = 'undefined'
+      this.chooeseGoods.goods.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
+        }
+      })
+      if (key !== 'undefined') {
+        this.xiugaishuliangDialog.inputValue = this.chooeseGoods.goods[key].num
+        this.xiugaishuliangDialog.isShow = true
+      } else {
+        alert('请购物车选择要修改数量的商品');
+      }
+    },
+    clickChangeNumShoppingCarGood (code){
+      let n = this.xiugaishuliangDialog.inputValue.toString()
+      n += code
+      if(/^\+?[1-9][0-9]*$/.test(n)) {
+        this.xiugaishuliangDialog.inputValue += code
+      }
+    },
+    clickChangeNumShoppingCarGoodOk (){
+      let key = 'undefined'
+      this.chooeseGoods.goods.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
+        }
+      })
+      if (key !== 'undefined') {
+        if ((parseFloat(this.xiugaishuliangDialog.inputValue) <= parseFloat(this.chooeseGoods.goods[key].stock)) && (parseFloat(this.xiugaishuliangDialog.inputValue) >= 1)) {
+          this.chooeseGoods.goods[key].num = this.xiugaishuliangDialog.inputValue
+          this.xiugaishuliangDialog.inputValue = ''
+          this.xiugaishuliangDialog.isShow = false
+        }
+      }
+      this.$forceUpdate()
+    },
 
+    // 选中购物车里的商品，后点击改价按钮
+    clickBtnXiugaijiageShoppingCarGood () {
+      // 显示弹窗
+      let key = 'undefined'
+      this.chooeseGoods.goods.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
+        }
+      })
+      if (key !== 'undefined') {
+        // this.xiugaijiageDialog.inputValue = this.chooeseGoods.goods[key].price
+        this.xiugaijiageDialog.isShow = true
+      } else {
+        alert('请在购物车选择要修改价格的商品');
+      }
+    },
+    clickChangejiageShoppingCarGood (code){
+      let n = this.xiugaijiageDialog.inputValue
+      if(code !== '.')
+        n += code
+      else
+        n += code + '0'
+      if(/^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/.test(n)) {
+        this.xiugaijiageDialog.inputValue += code
+      }
+    },
+    clickChangejiageShoppingCarGoodOk (){
+      let key = 'undefined'
+      this.chooeseGoods.goods.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
+        }
+      })
+      if (key !== 'undefined') {
+        if ((parseFloat(this.xiugaijiageDialog.inputValue) < parseFloat(this.chooeseGoods.goods[key].price)) && (parseFloat(this.xiugaijiageDialog.inputValue) > 0)) {
+          this.chooeseGoods.goods[key].is_edit = 1
+          this.chooeseGoods.goods[key].edit_price = this.xiugaijiageDialog.inputValue
+          this.xiugaijiageDialog.inputValue = ''
+          this.xiugaijiageDialog.isShow = false
+        }
+      }
+      this.$forceUpdate()
+    },
 
     // 获取分类
     getGoodsType () {
