@@ -39,7 +39,7 @@
               <br><br>
               <el-button @click="huiyuanDialog.isShow = true" class="caozuo-button" type="primary">会员</el-button>
               <br><br>
-              <el-button class="caozuo-button" type="primary">购卡</el-button>
+              <el-button @click="goukaDialog.isShow = true" class="caozuo-button" type="primary">购卡</el-button>
             </div>
           </el-col>
           <el-col :span="8">
@@ -442,6 +442,38 @@
           </el-table>
         </div>
       </el-dialog>
+
+      <!-- 点击购卡按钮弹窗-购卡项目 -->
+      <el-dialog class="goukaxiangmu-tanchuan" title="购卡项目" :visible.sync="goukaDialog.isShow" width="886px" :center="true">
+       <div class="content">
+         <div class="search">
+           <el-input class="goods-search"   placeholder="搜索服务卡名称"  v-model="goukaDialog.title">
+             <el-button slot="append" icon="el-icon-search" @click=""></el-button>
+           </el-input>
+         </div>
+         <div class="tab-btns">
+           <el-button class="btn active">次卡</el-button>
+           <el-button class="btn">月卡</el-button>
+           <el-button class="btn">年卡</el-button>
+         </div>
+         <div class="bodys">
+           <div class="card active">
+             <v-card ></v-card>
+             <img class="ischeck" src="../../assets/icon/is-chooese.png" alt="">
+           </div>
+           <div class="card">
+             <v-card ></v-card>
+           </div>
+           <div class="card">
+             <v-card ></v-card>
+           </div>
+         </div>
+         <div class="footer">
+           <el-button class="btn">取消</el-button>
+           <el-button class="btn">立即购买</el-button>
+         </div>
+       </div>
+      </el-dialog>
     </div>
 </template>
 
@@ -451,6 +483,7 @@ import vGood from '../common/Good.vue'
 import vKeyboard from '../common/Keyboard.vue'
 import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-ok'
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
+import vCard from '../common/card.vue'
 import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter } from '../../api/getData'
 
 export default {
@@ -648,11 +681,17 @@ export default {
           amount: '0.05', // 累积充值
           regtime: '1970-01-01 08:33:37'// 加入时间
         }
+      },
+
+      //购卡弹窗
+      goukaDialog: {
+        isShow: false,
+        title: '',// 请输入购卡名称
       }
     }
   },
   components: {
-    vHead, vGood, vKeyboard, vKeyboardWithoutPointWithOk, vKeyboardWithoutPoint
+    vHead, vGood, vKeyboard, vKeyboardWithoutPointWithOk, vKeyboardWithoutPoint, vCard
   },
   mounted () {
     this.getGoodsType()
@@ -1410,5 +1449,84 @@ export default {
       }
     }
 
+  }
+  /*购卡项目弹窗*/
+  .goukaxiangmu-tanchuan{
+    .content{
+      .search{
+        width: 100%;
+        margin-bottom: 24px;
+      }
+      .tab-btns{
+        width: 100%;
+        margin-bottom: 40px;
+        display: flex;
+        align-items: center;
+        flex-wrap:wrap;
+        justify-content: space-between;
+        align-content:flex-start;
+        .btn{
+          width:228px;
+          height:48px;
+          background:#6BD2F4;
+          font-size:24px;
+          font-family:SourceHanSansCN-Regular;
+          font-weight:400;
+          color:rgba(26,26,26,1);
+          &:active{
+            color: #ffffff;
+            background: #F55656;
+          }
+        }
+        .active{
+          color: #ffffff;
+          background: #F55656;
+        }
+      }
+      .bodys{
+        width: 100%;
+        margin-bottom:28px;
+        display: flex;
+        align-items: center;
+        flex-wrap:wrap;
+        align-items:flex-start;
+        justify-content: space-between;
+        align-content:flex-start;
+        .card{
+          margin-bottom:28px;
+          border-radius:10px;
+          position: relative;
+          overflow: hidden;
+          box-shadow:0px 0px 11px 1px rgba(33,33,33,0.19);
+          .ischeck{
+            position: absolute;
+            right: 0;
+            top: 0;
+          }
+        }
+        .active{
+          border: 1px solid red;
+        }
+      }
+      .footer{
+        width: 100%;
+        text-align: center;
+        .btn{
+          width:168px;
+          height:44px;
+          background:rgba(255,255,255,1);
+          border:1px solid rgba(46,202,241,1);
+          border-radius:8px;
+          color: #2ECAF1;
+          font-size:20px;
+          font-family:SourceHanSansCN-Regular;
+          font-weight:400;
+          &:active{
+            color: #ffffff;
+            background: #2DC2F3;
+          }
+        }
+      }
+    }
   }
 </style>
