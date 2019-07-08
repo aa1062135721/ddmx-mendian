@@ -9,9 +9,9 @@
               <div class="goods-type clear-both">
                 <el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button>
                 <el-button class="page-fenlei-button float-left" icon="el-icon-arrow-left" @click="clickFenleiBtnPre"></el-button>
-                <!--<div class='type-btn'>-->
+                <div class='type-btn'>
                   <el-button v-for="(item) in requestGoodData.typeNameList"  :key="item.id" class="fenlei-button" :class="{'fenlei-button-active':(requestGoodData.isChooeseFenleiGood && requestGoodData.who === item.id)}" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>
-                <!--</div>-->
+                </div>
                 <el-button class="page-fenlei-button float-right" icon="el-icon-arrow-right" @click="clickFenleiBtnNext"></el-button>
               </div>
               <div class="flex-goods">
@@ -329,7 +329,7 @@
             </div>
           </div>
       </el-dialog>
-      <!--  会员按钮弹框-->
+      <!--  会员按钮弹框-会员查询 -->
       <el-dialog class="huiyuanchaxun-tanchuan" title="会员查询" :visible.sync="huiyuanDialog.isShow" width="960px" :center="true">
         <div class="content">
           <div class="clear-both header">
@@ -348,7 +348,7 @@
                   </tr>
                   <tr>
                     <td colspan="4">累计充值：{{ huiyuanDialog.huiyuanInfo.amount }} 余额：<span class="font-red">¥ {{ huiyuanDialog.huiyuanInfo.money }}</span></td>
-                    <td  colspan="3">加入时间：{{ huiyuanDialog.huiyuanInfo.regtime }}</td>
+                    <td colspan="3">加入时间：{{ huiyuanDialog.huiyuanInfo.regtime }}</td>
                   </tr>
                 </table>
               </div>
@@ -367,13 +367,17 @@
               <el-table-column prop="card_name" label="服务卡名称" width="180"></el-table-column>
               <el-table-column prop="real_price" label="购买金额"></el-table-column>
               <el-table-column prop="price" label="项目服务"></el-table-column>
-              <el-table-column prop="type_card" label="类型">
-              </el-table-column>
+              <el-table-column prop="type_card" label="类型"></el-table-column>
               <el-table-column prop="create_time" label="购买时间"></el-table-column>
               <el-table-column prop="start_time" label="激活时间"></el-table-column>
               <el-table-column prop="end_time" label="过期时间"></el-table-column>
               <el-table-column prop="status" label="状态"></el-table-column>
-              <el-table-column prop="status_name" label="操作"></el-table-column>
+              <el-table-column label="操作">
+                <el-button size="mini" @click="huiyuanDialog.haokaDialog.isShow = true">耗卡</el-button>
+                <el-button size="mini" @click="huiyuanDialog.shiyongjiluDialog.isShow = true">使用记录</el-button>
+                <el-button size="mini">激活</el-button>
+                <el-button size="mini" @click="huiyuanDialog.tuikaDialog.isShow = true">退卡详情</el-button>
+              </el-table-column>
             </el-table>
             <!-- 充值记录 -->
             <el-table v-show="!huiyuanDialog.showFuwuTable" :data="huiyuanDialog.chongzhijiluList" min-height="216" border style="width: 100%">
@@ -388,7 +392,7 @@
           </div>
         </div>
       </el-dialog>
-      <!--  在会员按钮弹窗里面单击新增会员-->
+      <!-- 会员查询-新增会员-->
       <el-dialog title="新增会员" :visible.sync="huiyuanDialog.addHuiyuanDialog.isShow" width="688px" :center="true">
         <div class="clear-both" style="height: 290px;">
           <div class="float-left left" style="width: 50%;">
@@ -402,6 +406,40 @@
           <div class="float-right right" style="width: 45%;">
             <v-keyboard-without-point-with-ok></v-keyboard-without-point-with-ok>
           </div>
+        </div>
+      </el-dialog>
+      <!-- 会员查询-耗卡  -->
+      <el-dialog title="耗卡" :visible.sync="huiyuanDialog.haokaDialog.isShow" width="648px" :center="true">
+        <div style="height: 240px;">
+          <el-table :data="huiyuanDialog.haokaDialog.tableData" border  style="height: 240px;">
+            <el-table-column prop="name" label="服务项目" width="180"></el-table-column>
+            <el-table-column prop="haveTimes" label="次数" width="180"></el-table-column>
+            <el-table-column prop="haisheng" label="剩余次数" width="180"></el-table-column>
+            <el-table-column prop="caozuo" label="操作" width="180"></el-table-column>
+          </el-table>
+        </div>
+      </el-dialog>
+      <!-- 会员查询-使用记录  -->
+      <el-dialog title="使用记录" :visible.sync="huiyuanDialog.shiyongjiluDialog.isShow" width="648px" :center="true">
+        <div style="height: 240px;">
+          <el-table :data="huiyuanDialog.shiyongjiluDialog.tableData" border  style="height: 240px;">
+            <el-table-column prop="name" label="服务项目"></el-table-column>
+            <el-table-column prop="time" label="使用时间"></el-table-column>
+            <el-table-column prop="who" label="服务人员"></el-table-column>
+          </el-table>
+        </div>
+      </el-dialog>
+      <!-- 会员查询-退卡详情   -->
+      <el-dialog title="退卡详情" :visible.sync="huiyuanDialog.tuikaDialog.isShow" width="976px" :center="true">
+        <div style="height: 240px;">
+          <el-table :data="huiyuanDialog.tuikaDialog.tableData" border>
+            <el-table-column prop="name" label="服务卡名"></el-table-column>
+            <el-table-column prop="time" label="退卡时间"></el-table-column>
+            <el-table-column prop="money" label="退卡金额"></el-table-column>
+            <el-table-column prop="why" label="退卡原因"></el-table-column>
+            <el-table-column prop="reg" label="备注"></el-table-column>
+            <el-table-column prop="who" label="操作人员"></el-table-column>
+          </el-table>
         </div>
       </el-dialog>
     </div>
@@ -542,7 +580,39 @@ export default {
             daozhangjine: 300,
             xianzhiyaoqiu: '无限制'
           }
-        ]
+        ],
+        // 耗卡弹窗
+        haokaDialog: {
+          isShow: false,
+          tableData: [
+            {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
+            {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
+            {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
+            {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
+            {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
+          ]
+        },
+        // 使用记录弹窗
+        shiyongjiluDialog: {
+          isShow: false,
+          tableData: [
+            {name: '水育', time: '2018-09-20 14:12:20', who: 5},
+            {name: '水域', time: '2018-09-20 14:12:20', who: 5},
+            {name: '水域', time: '2018-09-20 14:12:20', who: 5},
+            {name: '水域', time: '2018-09-20 14:12:20', who: 5},
+            {name: '水域', time: '2018-09-20 14:12:20', who: 5},
+          ]
+        },
+        // 退卡详情
+        tuikaDialog: {
+          isShow: false,
+          tableData: [
+            {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了',reg: '无'},
+            {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了',reg: '无'},
+            {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了',reg: '无'},
+            {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了',reg: '无'}
+          ]
+        }
       },
       // 单击充值按钮后的弹窗所需要的数据
       chongzhiDialog: {
