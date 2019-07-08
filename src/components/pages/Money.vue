@@ -15,7 +15,7 @@
                 <el-button class="page-fenlei-button float-right" icon="el-icon-arrow-right" @click="clickFenleiBtnNext"></el-button>
               </div>
               <div class="flex-goods">
-                  <v-good v-for="(item) in goodsList" :key="item.id" :ogood="item" class="goods"></v-good>
+                  <v-good v-for="(item) in goodsList" :key="item.id" :ogood="item" class="goods" @click.native="addShoppingCar(item)"></v-good>
                 </div>
                 <div class="page-buttons">
                 <button class="page-button" @click="clickPrePageBtn">上一页</button>
@@ -25,15 +25,15 @@
           </el-col>
           <el-col :span="2">
             <div class="grid-content caozuo-buttons">
-              <el-button class="caozuo-button" type="primary" style="font-size: 45px;">&nbsp;&nbsp;+&nbsp;&nbsp;</el-button>
+              <el-button @click="clickAddNumShoppingCarGood" class="caozuo-button" type="primary" style="font-size: 45px;">&nbsp;&nbsp;+&nbsp;&nbsp;</el-button>
               <br><br>
-              <el-button class="caozuo-button" type="primary">&nbsp;&nbsp;-&nbsp;&nbsp;</el-button>
+              <el-button @click="clickSubNumShoppingCarGood" class="caozuo-button" type="primary">&nbsp;&nbsp;-&nbsp;&nbsp;</el-button>
               <br><br>
               <el-button @click="xiugaishuliang = true" class="caozuo-button" type="primary">数量</el-button>
               <br><br>
               <el-button @click="xiugaijiage = true" class="caozuo-button" type="primary">改价</el-button>
               <br><br>
-              <el-button class="caozuo-button" type="primary">删除</el-button>
+              <el-button @click="clickDelShoppingCarGood" class="caozuo-button" type="primary">删除</el-button>
               <br><br>
               <el-button @click="chongzhiDialog.isShow = true" class="caozuo-button" type="primary">充值</el-button>
               <br><br>
@@ -50,19 +50,19 @@
                 </el-input>
               </div>
               <div class="pay-goods-box">
-                <ul>
+                <ul v-for="(good, key) in chooeseGoods.goods" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
                   <li class="title clear-both">
-                    <span class="float-left">衡欣牌新姿态粉 原蛋白益生菌</span>
-                    <span class="float-right">数量 1</span>
+                    <span class="float-left">{{good.title}}</span>
+                    <span class="float-right">数量 {{good.num}}</span>
                   </li>
                   <li class="title code clear-both">
-                    <span class="float-left">1234567890123431373</span>
-                    <span class="float-right red">￥300.00</span>
+                    <span class="float-left">{{good.bar_code}}</span>
+                    <span class="float-right red">￥{{good.price * good.num}}</span>
                   </li>
                   <li class="title">
-                    <span class="red danjia">￥300.00</span>
-                    <span class="yuanjia">原价￥600.00</span>
-                    <span class="huiyuanjia">会员价￥216.50</span>
+                    <span class="red danjia">￥{{good.price}}</span>
+                    <span class="yuanjia">原价￥{{good.price}}</span>
+                    <span class="huiyuanjia">会员价￥{{good.price}}</span>
                   </li>
                 </ul>
 
@@ -72,12 +72,11 @@
                   <li>
                     <span class="float-left">服务人员</span>
                     <span class="float-right select">
-                      <el-dropdown class="user-name" trigger="click" @command="clickWaiter()">
+                      <el-dropdown class="user-name" trigger="click" @command="clickWaiter">
                         <span class="el-dropdown-link"  @click="getWaiterList()">
-                          <span class="font-blue">张三</span> [婴儿游泳]  <i class="el-icon-arrow-down"></i>
+                          <span class="font-blue">{{nowWaiter.name}}</span> [{{nowWaiter.type}}]  <i class="el-icon-arrow-down"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                          <!--todo-->
                           <el-dropdown-item v-for="(item) in waiter" :key="item.id" :command="item">
                             <span class="font-blue">{{item.name}}</span>
                             [{{item.type}}]
@@ -497,7 +496,6 @@ export default {
         num: 15// 每页的数据
       },
       goodsList: [], // 收银大屏展示的商品列表（普通商品和服务商品）
-      chooeseGoods: [], // 结账中的商品
       // 普通商品
       requestGoodData: {// 请求商品列表中的页数，页码服务器数据
         typeNameList: [], // 分类列表
@@ -507,6 +505,42 @@ export default {
         who: 0, // 当前选中的分类名id
         type_category: 0
       },
+
+      // 结账中的商品
+      chooeseGoods: {
+        //选择的普通商品
+        goods:[
+            {
+              bar_code: "4897097930084",
+              id: 1617,
+              is_service_goods: "0",
+              pics: "http://picture.ddxm661.com/9a47a20190318164340290",
+              price: "198.00",
+              stock: 8,
+              title: "芮欧轻奢婴儿纸尿裤NB68片",
+              is_checked: false,//是否被选中
+              num: 3,         //商品数量
+              is_edit: "1",     //此商品是否修改了单价：1是，0否
+              edit_price: "10.00"   //修改的单价，如果edit_price=1，则必填此参数
+            }
+        ],
+        //选择的服务商品
+        fuwuGoods:[
+          {
+              bar_code: "4897097930084",
+              id: 1617,
+              is_service_goods: "1",
+              pics: "http://picture.ddxm661.com/9a47a20190318164340290",
+              price: "198.00",
+              stock: 8,
+              title: "芮欧轻奢婴儿纸尿裤NB68片",
+              num: 3,         //商品数量
+              is_edit: "1",     //此商品是否修改了单价：1是，0否
+              edit_price: "10.00"   //修改的单价，如果edit_price=1，则必填此参数
+          }
+        ]
+      },
+
       // 当前选中的会员信息
       memberVip: {
         id: 5110, // 会员id
@@ -527,6 +561,12 @@ export default {
           type: '店长' // 服务类型
         }
       ],
+      // 当前选中的服务人员
+      nowWaiter: {
+        id: 0, // 服务员id  当服务员的id为0师表示为当前登录的店长
+        name: '管理员', // 服务员名称
+        type: '店长' // 服务类型
+      },
       xiugaijiage: false, // 修改价格弹窗显示与否
       xiugaishuliang: false, // 修改数量弹窗显示与否
       jiezhang: false, // 结账对话框显示与否
@@ -698,6 +738,85 @@ export default {
     this.getServiceItemList()
   },
   methods: {
+    // 将商品加入购物车
+    addShoppingCar (good){
+      console.log(good)
+      //服务商品
+      if (good.is_service_goods === '1') {
+      }
+      //普通商品
+      if (good.is_service_goods === '0') {
+        //检查库存是否为0
+        if (good.stock > 0){
+          good.num = 1
+          good.is_checked = false
+          good.is_edit = 0
+          good.edit_price = good.price
+        } else {
+          alert('该商品的库存不足')
+          return
+        }
+        for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
+          if (this.chooeseGoods.goods[i].id === good.id) {
+            alert('该商品已经存在购物车了')
+            return
+          }
+        }
+        this.chooeseGoods.goods.push(good)
+        this.$forceUpdate()
+      }
+    },
+    // 购物车里的商品被单击，然后进行修改
+    clickShoppingCarGood (key) {
+      this.chooeseGoods.goods.map((good, index) => {
+        good.is_checked = false
+      })
+      this.chooeseGoods.goods[key].is_checked = true
+      this.$forceUpdate()
+    },
+    // 购物车里的商品被删除
+    clickDelShoppingCarGood () {
+      let key = 'undefined'
+      this.chooeseGoods.goods.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
+        }
+      })
+      if (key !== 'undefined') {
+        this.chooeseGoods.goods.splice(key, 1);
+      }
+      this.$forceUpdate()
+    },
+    // 购物车里的商品增加数量
+    clickAddNumShoppingCarGood () {
+      let key = 'undefined'
+      this.chooeseGoods.goods.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
+        }
+      })
+      if (key !== 'undefined') {
+        if (this.chooeseGoods.goods[key].num < this.chooeseGoods.goods[key].stock)
+          this.chooeseGoods.goods[key].num ++
+      }
+      this.$forceUpdate()
+    },
+    // 购物车里的商品减少数量
+    clickSubNumShoppingCarGood () {
+      let key = 'undefined'
+      this.chooeseGoods.goods.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
+        }
+      })
+      if (key !== 'undefined') {
+        if (this.chooeseGoods.goods[key].num > 1)
+          this.chooeseGoods.goods[key].num --
+      }
+      this.$forceUpdate()
+    },
+
+
     // 获取分类
     getGoodsType () {
       postTwotype().then((res) => {
@@ -829,7 +948,7 @@ export default {
       })
     },
     clickWaiter (e) {
-      console.log(e)
+      this.nowWaiter = e
     },
     // 按搜索商品(商品标题和条形码)
     getGoodByCondition (str) {
@@ -865,7 +984,7 @@ export default {
       }).catch((err) => {
         console.log(err, '按条形码搜索商品失败')
       })
-    }
+    },
   }
 }
 </script>
@@ -1081,7 +1200,7 @@ export default {
 
         }
       }
-      ul:active{
+      .active{
         background:rgba(190,231,246,1);
       }
     }
