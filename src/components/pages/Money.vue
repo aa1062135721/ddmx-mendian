@@ -50,23 +50,38 @@
                 </el-input>
               </div>
               <div class="pay-goods-box">
-                <ul v-for="(good, key) in chooeseGoods.goods" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
+                <ul v-if="chooeseGoods.goods.length" v-for="(good, key) in chooeseGoods.goods" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
                   <li class="title clear-both">
                     <span class="float-left">{{good.title}}</span>
                     <span class="float-right">数量 {{good.num}}</span>
                   </li>
                   <li class="title code clear-both">
                     <span class="float-left">{{good.bar_code}}</span>
-                    <span class="float-right red">￥{{good.price * good.num}}</span>
+                    <span class="float-right red">￥{{good.is_edit ? good.edit_price * good.num : good.price * good.num}}</span>
                   </li>
                   <li class="title">
                     <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
                     <span class="red danjia" v-else>￥{{good.price}}</span>
                     <span class="yuanjia" v-if="good.is_edit">原价￥{{good.price}}</span>
-                    <span class="huiyuanjia">会员价￥{{good.price}}</span>
+<!--                    <span class="huiyuanjia">会员价￥{{good.price}}</span>-->
                   </li>
                 </ul>
-
+                <ul v-if="chooeseGoods.fuwuGoods.length" v-for="(good, key) in chooeseGoods.fuwuGoods" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
+                  <li class="title clear-both">
+                    <span class="float-left">{{good.title}}</span>
+                    <span class="float-right">数量 {{good.num}}</span>
+                  </li>
+                  <li class="title code clear-both">
+                    <span class="float-left"></span>
+                    <span class="float-right red">￥{{good.is_edit ? good.edit_price * good.num : good.price * good.num}}</span>
+                  </li>
+                  <li class="title">
+                    <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
+                    <span class="red danjia" v-else>￥{{good.price}}</span>
+                    <span class="yuanjia" v-if="good.is_edit">原价￥{{good.price}}</span>
+                    <!--                    <span class="huiyuanjia">会员价￥{{good.price}}</span>-->
+                  </li>
+                </ul>
               </div>
               <div class="queren-xinxi">
                 <ul>
@@ -511,34 +526,34 @@ export default {
       chooeseGoods: {
         //选择的普通商品
         goods:[
-            {
-              bar_code: "4897097930084",
-              id: 1617,
-              is_service_goods: "0",
-              pics: "http://picture.ddxm661.com/9a47a20190318164340290",
-              price: "198.00",
-              stock: 8,
-              title: "芮欧轻奢婴儿纸尿裤NB68片",
-              is_checked: false,//是否被选中
-              num: 3,         //商品数量
-              is_edit: "1",     //此商品是否修改了单价：1是，0否
-              edit_price: "10.00"   //修改的单价，如果edit_price=1，则必填此参数
-            }
+            // {
+            //   bar_code: "4897097930084",
+            //   id: 1617,
+            //   is_service_goods: "0",
+            //   pics: "http://picture.ddxm661.com/9a47a20190318164340290",
+            //   price: "198.00",
+            //   stock: 8,
+            //   title: "芮欧轻奢婴儿纸尿裤NB68片",
+            //   is_checked: false,//是否被选中
+            //   num: 3,         //商品数量
+            //   is_edit: "1",     //此商品是否修改了单价：1是，0否
+            //   edit_price: "10.00"   //修改的单价，如果edit_price=1，则必填此参数
+            // }
         ],
         //选择的服务商品
         fuwuGoods:[
-          {
-              bar_code: "4897097930084",
-              id: 1617,
-              is_service_goods: "1",
-              pics: "http://picture.ddxm661.com/9a47a20190318164340290",
-              price: "198.00",
-              stock: 8,
-              title: "芮欧轻奢婴儿纸尿裤NB68片",
-              num: 3,         //商品数量
-              is_edit: "1",     //此商品是否修改了单价：1是，0否
-              edit_price: "10.00"   //修改的单价，如果edit_price=1，则必填此参数
-          }
+          // {
+          //     bar_code: "4897097930084",
+          //     id: 1617,
+          //     is_service_goods: "1",
+          //     pics: "http://picture.ddxm661.com/9a47a20190318164340290",
+          //     price: "198.00",
+          //     stock: 8,
+          //     title: "芮欧轻奢婴儿纸尿裤NB68片",
+          //     num: 3,         //商品数量
+          //     is_edit: "1",     //此商品是否修改了单价：1是，0否
+          //     edit_price: "10.00"   //修改的单价，如果edit_price=1，则必填此参数
+          // }
         ]
       },
 
@@ -753,6 +768,18 @@ export default {
       console.log(good)
       //服务商品
       if (good.is_service_goods === '1') {
+        good.num = 1
+        good.is_checked = false
+        good.is_edit = 0
+        good.edit_price = good.price
+        for (let i = 0; i < this.chooeseGoods.fuwuGoods.length; i++) {
+          if (this.chooeseGoods.fuwuGoods[i].id === good.id) {
+            alert('该服务商品已经存在购物车了')
+            return
+          }
+        }
+        this.chooeseGoods.goods = []
+        this.chooeseGoods.fuwuGoods.push(good)
       }
       //普通商品
       if (good.is_service_goods === '0') {
@@ -772,73 +799,139 @@ export default {
             return
           }
         }
+        this.chooeseGoods.fuwuGoods = []
         this.chooeseGoods.goods.push(good)
-        this.$forceUpdate()
       }
+      this.$forceUpdate()
     },
-    // 购物车里的商品被单击，然后进行修改
+    // 购物车里的商品被单击后处于选中状态，然后进行修改操作，比如加数量、减数量、修改价格、删除
     clickShoppingCarGood (key) {
-      this.chooeseGoods.goods.map((good, index) => {
-        good.is_checked = false
-      })
-      this.chooeseGoods.goods[key].is_checked = true
+      if (this.chooeseGoods.goods.length) {
+        this.chooeseGoods.goods.map((good, index) => {
+          good.is_checked = false
+        })
+        this.chooeseGoods.goods[key].is_checked = true
+      }
+      if (this.chooeseGoods.fuwuGoods.length) {
+        this.chooeseGoods.fuwuGoods.map((good, index) => {
+          good.is_checked = false
+        })
+        this.chooeseGoods.fuwuGoods[key].is_checked = true
+      }
       this.$forceUpdate()
     },
     // 购物车里的商品被删除
     clickDelShoppingCarGood () {
-      let key = 'undefined'
-      this.chooeseGoods.goods.map((good, index) => {
-        if (good.is_checked === true) {
-          key = index
+      if (this.chooeseGoods.goods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          this.chooeseGoods.goods.splice(key, 1);
         }
-      })
-      if (key !== 'undefined') {
-        this.chooeseGoods.goods.splice(key, 1);
+      }
+      if (this.chooeseGoods.fuwuGoods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.fuwuGoods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          this.chooeseGoods.fuwuGoods.splice(key, 1);
+        }
       }
       this.$forceUpdate()
     },
     // 购物车里的商品增加数量
     clickAddNumShoppingCarGood () {
-      let key = 'undefined'
-      this.chooeseGoods.goods.map((good, index) => {
-        if (good.is_checked === true) {
-          key = index
+      if (this.chooeseGoods.goods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (this.chooeseGoods.goods[key].num < this.chooeseGoods.goods[key].stock)
+            this.chooeseGoods.goods[key].num++
         }
-      })
-      if (key !== 'undefined') {
-        if (this.chooeseGoods.goods[key].num < this.chooeseGoods.goods[key].stock)
-          this.chooeseGoods.goods[key].num ++
+      }
+      if (this.chooeseGoods.fuwuGoods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.fuwuGoods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          this.chooeseGoods.fuwuGoods[key].num++
+        }
       }
       this.$forceUpdate()
     },
     // 购物车里的商品减少数量
     clickSubNumShoppingCarGood () {
-      let key = 'undefined'
-      this.chooeseGoods.goods.map((good, index) => {
-        if (good.is_checked === true) {
-          key = index
+      if (this.chooeseGoods.goods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (this.chooeseGoods.goods[key].num > 1)
+            this.chooeseGoods.goods[key].num --
         }
-      })
-      if (key !== 'undefined') {
-        if (this.chooeseGoods.goods[key].num > 1)
-          this.chooeseGoods.goods[key].num --
+      }
+      if (this.chooeseGoods.fuwuGoods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.fuwuGoods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (this.chooeseGoods.fuwuGoods[key].num > 1)
+            this.chooeseGoods.fuwuGoods[key].num --
+        }
       }
       this.$forceUpdate()
     },
     // 选中购物车里的商品，后点修改数量
     clickBtnXiugaishuliangShoppingCarGood () {
-      // 显示弹窗
-      let key = 'undefined'
-      this.chooeseGoods.goods.map((good, index) => {
-        if (good.is_checked === true) {
-          key = index
+      if (this.chooeseGoods.goods.length) {
+        // 显示弹窗
+        let key = 'undefined'
+        this.chooeseGoods.goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          this.xiugaishuliangDialog.inputValue = this.chooeseGoods.goods[key].num
+          this.xiugaishuliangDialog.isShow = true
+        } else {
+          alert('请购物车选择要修改数量的商品');
         }
-      })
-      if (key !== 'undefined') {
-        this.xiugaishuliangDialog.inputValue = this.chooeseGoods.goods[key].num
-        this.xiugaishuliangDialog.isShow = true
-      } else {
-        alert('请购物车选择要修改数量的商品');
+      }
+      if (this.chooeseGoods.fuwuGoods.length) {
+        // 显示弹窗
+        let key = 'undefined'
+        this.chooeseGoods.fuwuGoods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          this.xiugaishuliangDialog.inputValue = this.chooeseGoods.fuwuGoods[key].num
+          this.xiugaishuliangDialog.isShow = true
+        } else {
+          alert('请购物车选择要修改数量的服务商品');
+        }
       }
     },
     clickChangeNumShoppingCarGood (code){
@@ -849,17 +942,34 @@ export default {
       }
     },
     clickChangeNumShoppingCarGoodOk (){
-      let key = 'undefined'
-      this.chooeseGoods.goods.map((good, index) => {
-        if (good.is_checked === true) {
-          key = index
+      if (this.chooeseGoods.goods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if ((parseFloat(this.xiugaishuliangDialog.inputValue) <= parseFloat(this.chooeseGoods.goods[key].stock)) && (parseFloat(this.xiugaishuliangDialog.inputValue) >= 1)) {
+            this.chooeseGoods.goods[key].num = this.xiugaishuliangDialog.inputValue
+            this.xiugaishuliangDialog.inputValue = ''
+            this.xiugaishuliangDialog.isShow = false
+          }
         }
-      })
-      if (key !== 'undefined') {
-        if ((parseFloat(this.xiugaishuliangDialog.inputValue) <= parseFloat(this.chooeseGoods.goods[key].stock)) && (parseFloat(this.xiugaishuliangDialog.inputValue) >= 1)) {
-          this.chooeseGoods.goods[key].num = this.xiugaishuliangDialog.inputValue
-          this.xiugaishuliangDialog.inputValue = ''
-          this.xiugaishuliangDialog.isShow = false
+      }
+      if (this.chooeseGoods.fuwuGoods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.fuwuGoods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (parseFloat(this.xiugaishuliangDialog.inputValue) >= 1) {
+            this.chooeseGoods.fuwuGoods[key].num = this.xiugaishuliangDialog.inputValue
+            this.xiugaishuliangDialog.inputValue = ''
+            this.xiugaishuliangDialog.isShow = false
+          }
         }
       }
       this.$forceUpdate()
@@ -867,18 +977,43 @@ export default {
 
     // 选中购物车里的商品，后点击改价按钮
     clickBtnXiugaijiageShoppingCarGood () {
-      // 显示弹窗
-      let key = 'undefined'
-      this.chooeseGoods.goods.map((good, index) => {
-        if (good.is_checked === true) {
-          key = index
+      if (this.chooeseGoods.goods.length) {
+        // 显示弹窗
+        let key = 'undefined'
+        this.chooeseGoods.goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (this.chooeseGoods.goods[key].is_edit === 1) {
+            this.xiugaijiageDialog.inputValue = this.chooeseGoods.goods[key].edit_price
+          } else {
+            this.xiugaijiageDialog.inputValue = this.chooeseGoods.goods[key].price
+          }
+          this.xiugaijiageDialog.isShow = true
+        } else {
+          alert('请在购物车选择要修改价格的商品');
         }
-      })
-      if (key !== 'undefined') {
-        // this.xiugaijiageDialog.inputValue = this.chooeseGoods.goods[key].price
-        this.xiugaijiageDialog.isShow = true
-      } else {
-        alert('请在购物车选择要修改价格的商品');
+      }
+      if (this.chooeseGoods.fuwuGoods.length) {
+        // 显示弹窗
+        let key = 'undefined'
+        this.chooeseGoods.fuwuGoods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (this.chooeseGoods.fuwuGoods[key].is_edit === 1) {
+            this.xiugaijiageDialog.inputValue = this.chooeseGoods.fuwuGoods[key].edit_price
+          } else {
+            this.xiugaijiageDialog.inputValue = this.chooeseGoods.fuwuGoods[key].price
+          }
+          this.xiugaijiageDialog.isShow = true
+        } else {
+          alert('请在购物车选择要修改价格的服务商品');
+        }
       }
     },
     clickChangejiageShoppingCarGood (code){
@@ -892,18 +1027,36 @@ export default {
       }
     },
     clickChangejiageShoppingCarGoodOk (){
-      let key = 'undefined'
-      this.chooeseGoods.goods.map((good, index) => {
-        if (good.is_checked === true) {
-          key = index
+      if (this.chooeseGoods.goods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if ((parseFloat(this.xiugaijiageDialog.inputValue) < parseFloat(this.chooeseGoods.goods[key].price)) && (parseFloat(this.xiugaijiageDialog.inputValue) > 0)) {
+            this.chooeseGoods.goods[key].is_edit = 1
+            this.chooeseGoods.goods[key].edit_price = this.xiugaijiageDialog.inputValue
+            this.xiugaijiageDialog.inputValue = ''
+            this.xiugaijiageDialog.isShow = false
+          }
         }
-      })
-      if (key !== 'undefined') {
-        if ((parseFloat(this.xiugaijiageDialog.inputValue) < parseFloat(this.chooeseGoods.goods[key].price)) && (parseFloat(this.xiugaijiageDialog.inputValue) > 0)) {
-          this.chooeseGoods.goods[key].is_edit = 1
-          this.chooeseGoods.goods[key].edit_price = this.xiugaijiageDialog.inputValue
-          this.xiugaijiageDialog.inputValue = ''
-          this.xiugaijiageDialog.isShow = false
+      }
+      if (this.chooeseGoods.fuwuGoods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.fuwuGoods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if ((parseFloat(this.xiugaijiageDialog.inputValue) < parseFloat(this.chooeseGoods.fuwuGoods[key].price)) && (parseFloat(this.xiugaijiageDialog.inputValue) > 0)) {
+            this.chooeseGoods.fuwuGoods[key].is_edit = 1
+            this.chooeseGoods.fuwuGoods[key].edit_price = this.xiugaijiageDialog.inputValue
+            this.xiugaijiageDialog.inputValue = ''
+            this.xiugaijiageDialog.isShow = false
+          }
         }
       }
       this.$forceUpdate()
