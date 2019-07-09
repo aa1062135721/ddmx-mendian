@@ -291,10 +291,10 @@
         <div class="content">
           <div class="clear-both" style="width:100%;height:52px;margin-bottom: 20px;">
             <div class="float-left" style="width: 75%;">
-              <el-input  placeholder="请输入您需要查询的商品名字" v-model="sousuoshangpingDialog.title"></el-input>
+              <el-input  placeholder="请输入您需要查询的商品名字" v-model="sousuoshangpingDialog.title" @keyup.enter.native="searchGoodsByGoodName" ></el-input>
             </div>
             <div class="float-right"  style="width: 20%;text-align: right;">
-              <el-button type="primary" plain @click="getGoodByCondition">搜索</el-button>
+              <el-button type="primary" plain @click="searchGoodsByGoodName">搜索</el-button>
             </div>
           </div>
           <div>
@@ -303,7 +303,11 @@
               <el-table-column prop="stock" label="库存"></el-table-column>
               <el-table-column prop="price" label="单价"></el-table-column>
               <el-table-column prop="price" label="会员价"></el-table-column>
-              <el-table-column label="操作"><el-button type="primary">确定</el-button></el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope">
+                  <el-button type="primary" @click="addShoppingCar(scope.row)">确定</el-button>
+                </template>
+              </el-table-column>
             </el-table>
           </div>
         </div>
@@ -1225,7 +1229,25 @@ export default {
       let data = {}
       data.bar_code = `${this.sousuoshangpingDialog.title}`
       postGoodsByCode(data).then((res) => {
-        console.log(res)
+        if (res.data instanceof Object && !(res.data instanceof Array)) {
+          console.log(res.data)
+          let good = res.data
+          good.num = 1
+          good.is_checked = false
+          good.is_edit = 0
+          good.edit_price = good.price
+          for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
+            if (this.chooeseGoods.goods[i].id === good.id) {
+              alert('该商品已经存在购物车了')
+              return
+            }
+          }
+          this.chooeseGoods.goods.push(good)
+          this.chooeseGoods.fuwuGoods = []
+        } else {
+          alert('没有找到该条形码的商品')
+        }
+
       }).catch((err) => {
         console.log(err, '按条形码搜索商品失败')
       })
