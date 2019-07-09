@@ -62,12 +62,12 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
     .login-wrap{
         position: relative;
         width:100%;
         height:100%;
-        background-image: url(../assets/images/login-bg.png);
+        background-image: url('../assets/images/login-bg.png');
         background-size: cover;
         font-size:14px;
     }

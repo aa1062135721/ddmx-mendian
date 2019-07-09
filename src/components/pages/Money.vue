@@ -1546,21 +1546,6 @@ export default {
       }
     }
   }
-  .font-red{
-    color: #F83D3D;
-  }
-  .font-blue{
-    color:rgba(46,202,241,1);
-  }
-  .float-left{
-    float: left;
-  }
-  .float-right{
-    float: right;
-  }
-  .clear-both{
-    clear:both;
-  }
 
   /*改价,改数量，弹出窗口样式*/
   .gaijia-tanchuan{

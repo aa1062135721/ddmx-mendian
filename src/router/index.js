@@ -56,7 +56,15 @@ const router = new Router({
         }
       ]
     },
-    // 找不到页面跳转到登录页面
+    {
+      path: '/help',
+      name: 'Help',
+      meta: {
+        title: '帮助中心',
+        requireAuth: true// 需要登录
+      },
+      component: resolve => require(['@/components/pages/Help'], resolve)
+    },
     {
       path: '*',
       redirect: '/login'

@@ -1,68 +1,68 @@
 <template>
-    <div class="header">
-        <div class="logo">
-          <img src="../../assets/images/logo.png" alt=""> <p style="color: #fff;">鲁能星城店</p>
-        </div>
-        <div class="header-right">
-            <div class="header-user-con">
-                <!-- 全屏显示 -->
-                <div class="btn-fullscreen" @click="handleFullScreen">
-                    <el-tooltip effect="dark" :content="fullscreen?`取消全屏`:`全屏`" placement="bottom">
-                        <i class="el-icon-rank"></i>
-                    </el-tooltip>
-                </div>
-               <!-- 消息中心 -->
-                <div class="btn-bell">
-                    <el-tooltip effect="dark" :content="message?`有${message}条未读消息`:`消息中心`" placement="bottom">
-                        <router-link to="/tabs">
-                            <i class="el-icon-bell"></i>
-                        </router-link>
-                    </el-tooltip>
-                    <span class="btn-bell-badge" v-if="message"></span>
-                </div>
-                <!-- 用户头像 -->
-                <div class="user-avator"><img src="static/img/img.jpg"></div>
-                 <!--用户名下拉菜单 -->
-                <el-dropdown class="user-name" trigger="click" @command="handleCommand">
-                    <span class="el-dropdown-link">
-                        {{username}} <i class="el-icon-caret-bottom"></i>
-                    </span>
-                    <el-dropdown-menu slot="dropdown">
-                        <a href="http://blog.gdfengshuo.com/about/" target="_blank">
-                            <el-dropdown-item>关于作者</el-dropdown-item>
-                        </a>
-                        <a href="https://github.com/lin-xin/vue-manage-system" target="_blank">
-                            <el-dropdown-item>项目仓库</el-dropdown-item>
-                        </a>
-                        <el-dropdown-item divided  command="loginout">退出登录</el-dropdown-item>
-                    </el-dropdown-menu>
-                </el-dropdown>
-            </div>
-        </div>
+    <div class="header clear-both">
+      <div class="logo float-left">
+        <img class="img" src="../../assets/images/logo.png" alt="logo">
+        <span class="title">鲁能星城店</span>
+      </div>
+      <div class="tabs float-right">
+          <ul>
+            <li class="active">前台收银</li>
+            <li @click="goToUrl('/help')"><i class="el-icon-question"></i> 帮助中心</li>
+            <li @click="handleFullScreen"><i class="el-icon-rank"></i> 全屏</li>
+            <li>{{userInfo.user_nickname ? userInfo.user_nickname : '超级管理员'}}</li>
+            <li @click="handleCommand"><i class="el-icon-switch-button"></i></li>
+          </ul>
+      </div>
     </div>
 </template>
 <script>
+import { removeStore } from '../../utils'
+import { postUserInfo } from '../../api/getData'
 export default {
   data () {
     return {
-      fullscreen: false,
-      name: 'linxin',
-      message: 2
+      userInfo: {
+        id: 1, // 用户id
+        user_type: 1, //
+        sex: 1,
+        birthday: 1699200,
+        last_login_time: 1560496211,
+        score: 0,
+        coin: 0,
+        create_time: 1510561182,
+        user_status: 1,
+        user_login: 'admin', // 账号
+        user_pass: '###7f4613cc5b4b2a6d99069dbeca8335d9',
+        user_nickname: '超级管理员', // 名称
+        user_email: '465497241@qq.com', // 邮箱
+        user_url: '',
+        avatar: '',
+        signature: '',
+        last_login_ip: '127.0.0.1',
+        user_activation_key: '',
+        mobile: '',
+        more: '',
+        shop_id: '18', // 用户的商铺id
+        balance: 89000000 // 余额
+      }
     }
   },
-  computed: {
-    username () {
-      let username = localStorage.getItem('ms_username')
-      return username || this.name
-    }
+  beforeCreate () {
+    postUserInfo().then((res) => {
+      this.userInfo = res.data
+    }).catch((err) => {
+      console.log('获取登录信息失败', err)
+    })
   },
   methods: {
-    // 用户名下拉菜单选择事件
-    handleCommand (command) {
-      if (command === 'loginout') {
-        localStorage.removeItem('ms_username')
-        this.$router.push('/login')
-      }
+    // 跳转到页面
+    goToUrl (url) {
+      this.$router.push(url)
+    },
+    // 退出登录
+    handleCommand () {
+      removeStore('token')
+      this.$router.push('/login')
     },
     // 全屏事件
     handleFullScreen () {
@@ -94,7 +94,7 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style lang="less" scoped>
     .header {
         position: relative;
         box-sizing: border-box;
@@ -102,66 +102,58 @@ export default {
         height: 68px;
         font-size: 22px;
         color: #fff;
-        background: #000;
+        background:linear-gradient(90deg,rgba(61,181,219,1) 0%,rgba(48,156,228,1) 100%);
         overflow: hidden;
-    }
-    .header .logo{
-        float: left;
-        width:250px;
-        line-height: 70px;
-    }
-    .header-right{
-        float: right;
-        padding-right: 50px;
-    }
-    .header-user-con{
-        display: flex;
-        height: 70px;
-        align-items: center;
-    }
-    .btn-fullscreen{
-        transform: rotate(45deg);
-        margin-right: 5px;
-        font-size: 24px;
-    }
-    .btn-bell, .btn-fullscreen{
-        position: relative;
-        width: 30px;
-        height: 30px;
-        text-align: center;
-        border-radius: 15px;
-        cursor: pointer;
-    }
-    .btn-bell-badge{
-        position: absolute;
-        right: 0;
-        top: -2px;
-        width: 8px;
-        height: 8px;
-        border-radius: 4px;
-        background: #f56c6c;
-        color: #fff;
-    }
-    .btn-bell .el-icon-bell{
-        color: #fff;
-    }
-    .user-name{
-        margin-left: 10px;
-    }
-    .user-avator{
-        margin-left: 20px;
-    }
-    .user-avator img{
-        display: block;
-        width:40px;
-        height:40px;
-        border-radius: 50%;
-    }
-    .el-dropdown-link{
-        color: #fff;
-        cursor: pointer;
-    }
-    .el-dropdown-menu__item{
-        text-align: center;
+        padding: 0 0 0 90px;
+        .logo{
+          height: 68px;
+          line-height: 68px;
+          display: flex;
+          flex-direction:row;
+          flex-wrap:nowrap;
+          justify-content:flex-start;
+          align-items:center;
+          .img{
+            height: 40px;
+            margin-right: 125px;
+          }
+          .title{
+            font-size:24px;
+            font-family:SourceHanSansCN-Bold;
+            font-weight:bold;
+            color:rgba(255,255,255,1);
+            height: 68px;
+            width: auto;
+            line-height: 68px;
+          }
+        }
+        .tabs{
+          height: 68px;
+          line-height: 68px;
+          ul{
+            list-style-type: none;
+            height: 68px;
+            display: flex;
+            flex-direction:row;
+            flex-wrap:nowrap;
+            justify-content:flex-end;
+            align-items:center;
+            li{
+              height: 68px;
+              line-height: 68px;
+              font-size:16px;
+              font-family:SourceHanSansCN-Regular;
+              font-weight:400;
+              color: #ffffff;
+              padding: 0 36px;
+              &:hover{
+                cursor:pointer;
+              }
+            }
+            .active{
+              background: #2b8fda;
+            }
+          }
+        }
     }
 </style>

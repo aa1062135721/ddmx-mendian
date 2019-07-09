@@ -5,7 +5,15 @@ import Vue from 'vue'
  * @returns {Promise|*}
  */
 export const postLogin = (data = null) => {
-  return Vue.prototype.$post('login/doLogin', data)
+  return Vue.prototype.$post('/login/doLogin', data)
+}
+
+/**
+ * 登录接口
+ * @returns {Promise|*}
+ */
+export const postUserInfo = (data = null) => {
+  return Vue.prototype.$post('/user/userInfo', data)
 }
 
 /**
@@ -14,7 +22,7 @@ export const postLogin = (data = null) => {
  * @returns {*}
  */
 export const postTwotype = (data = null) => {
-  return Vue.prototype.$post('index/getTwotype', data)
+  return Vue.prototype.$post('/index/getTwotype', data)
 }
 
 /**
