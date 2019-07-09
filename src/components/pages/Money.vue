@@ -90,10 +90,10 @@
                     <span class="float-right select">
                       <el-dropdown class="user-name" trigger="click" @command="clickWaiter">
                         <span class="el-dropdown-link"  @click="getWaiterList()">
-                          <span class="font-blue">{{nowWaiter.name}}</span> [{{nowWaiter.type}}]  <i class="el-icon-arrow-down"></i>
+                          <span class="font-blue">{{jiezhangDialog.nowWaiter.name}}</span> [{{jiezhangDialog.nowWaiter.type}}]  <i class="el-icon-arrow-down"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                          <el-dropdown-item v-for="(item) in waiter" :key="item.id" :command="item">
+                          <el-dropdown-item v-for="(item) in jiezhangDialog.waiter" :key="item.id" :command="item">
                             <span class="font-blue">{{item.name}}</span>
                             [{{item.type}}]
                           </el-dropdown-item>
@@ -102,12 +102,12 @@
                     </span>
                   </li>
                   <li>
-                    <span class="float-left">会员&nbsp;<span class="font-blue">李四</span></span>
-                    <span class="float-right">余额￥866.00</span>
+                    <span class="float-left">会员&nbsp;<span class="font-blue">{{jiezhangDialog.memberVip.nickname}}</span></span>
+                    <span class="float-right">余额￥{{jiezhangDialog.memberVip.money}}</span>
                   </li>
                   <li>
                     <span class="float-left">合计</span>
-                    <span  class="float-right">￥600.00</span>
+                    <span  class="float-right">￥{{jiezhangDialog.sumMoney}}</span>
                   </li>
                   <li>
                     <span class="float-left">折扣</span>
@@ -119,12 +119,12 @@
                   </li>
                   <li>
                     <span class="float-left">结算</span>
-                    <span class="float-right">￥600.00</span>
+                    <span class="float-right">￥600</span>
                   </li>
                 </ul>
                 <div class="buttons">
                   <button @click="xuanzehuiyuanDialog.isShow = true" class="my-btn">选择会员</button>
-                  <button @click="jiezhang = true"  class="my-btn">结账</button>
+                  <button @click="jiezhangDialog.isShow = true"  class="my-btn">结账</button>
                 </div>
               </div>
             </div>
@@ -216,13 +216,13 @@
         </div>
       </el-dialog>
       <!--结账弹框-->
-      <el-dialog class="jiezhang-tanchuan" title="结账" :visible.sync="jiezhang" width="780px" :center="true">
+      <el-dialog class="jiezhang-tanchuan" title="结账" :visible.sync="jiezhangDialog.isShow" width="780px" :center="true">
         <div class="clear-both box">
           <div class="float-left my-left">
             <ul>
               <li class="clear-both">
                 <span class="float-left">应收</span>
-                <span class="float-right font-red">¥ 600</span>
+                <span class="float-right font-red">¥ {{jiezhangDialog.sumMoney}}</span>
               </li>
               <li class="clear-both">
                 <span class="float-left">代金券</span>
@@ -233,11 +233,11 @@
                 <span class="float-right">¥ 10</span>
               </li>
               <li class="clear-both">
-                <span class="float-left"><span>会员</span> <span class="font-blue">李四</span></span>
-                <span class="float-right">余额：¥ 300</span>
+                <span class="float-left"><span>会员</span> <span class="font-blue">{{jiezhangDialog.memberVip.nickname}}</span></span>
+                <span class="float-right">余额：¥ {{jiezhangDialog.memberVip.money}}</span>
               </li>
               <li class="clear-both">
-                <span class="float-left"><span>服务人员</span> <span class="font-blue">张三</span></span>
+                <span class="float-left"><span>服务人员</span> <span class="font-blue">{{jiezhangDialog.nowWaiter.name}}</span></span>
                 <span class="float-right"></span>
               </li>
             </ul>
@@ -321,9 +321,9 @@
               </div>
               <div class="content">
                 <ul>
-                  <li><span class="float-left">会员</span><span class="float-right font-blue">{{xuanzehuiyuanDialog.huiyuanInfo.nickname}}</span></li>
-                  <li><span class="float-left">余额</span><span class="float-right font-red">￥{{xuanzehuiyuanDialog.huiyuanInfo.money}}</span></li>
-                  <li><span class="float-left">会员等级</span><span class="float-right">{{xuanzehuiyuanDialog.huiyuanInfo.level_name}}</span></li>
+                  <li><span class="float-left">会员</span><span class="float-right font-blue">{{jiezhangDialog.memberVip.nickname}}</span></li>
+                  <li><span class="float-left">余额</span><span class="float-right font-red">￥{{jiezhangDialog.memberVip.money}}</span></li>
+                  <li><span class="float-left">会员等级</span><span class="float-right">{{jiezhangDialog.memberVip.level_name}}</span></li>
                   <li>
                     <span class="float-left">服务卡</span>
                     <span class="float-right">
@@ -503,7 +503,7 @@ import vKeyboard from '../common/Keyboard.vue'
 import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-ok'
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
-import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter } from '../../api/getData'
+import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -560,33 +560,6 @@ export default {
           // }
         ]
       },
-
-      // 当前选中的会员信息
-      memberVip: {
-        id: 5110, // 会员id
-        mobile: '13637765376', // 会员电话
-        shop_code: 'A00036', // 所属门店的门店编号
-        level_id: 6, // 会员等级id
-        nickname: '荣柱', // 姓名
-        level_name: '七星会员', // 会员等级名称
-        money: '0.00', // 余额
-        amount: '0.05', // 累积充值
-        regtime: '1970-01-01 08:33:37' // 加入时间
-      },
-      // 服务人员列表
-      waiter: [
-        {
-          id: 0, // 服务员id  当服务员的id为0师表示为当前登录的店长
-          name: '管理员', // 服务员名称
-          type: '店长' // 服务类型
-        }
-      ],
-      // 当前选中的服务人员
-      nowWaiter: {
-        id: 0, // 服务员id  当服务员的id为0师表示为当前登录的店长
-        name: '管理员', // 服务员名称
-        type: '店长' // 服务类型
-      },
       // 修改价格弹窗显示与否
       xiugaijiageDialog: {
         isShow: false,
@@ -598,7 +571,7 @@ export default {
         isShow: false,// 修改数量弹窗显示与否
         inputValue: '' // 修改数量的值
       },
-      jiezhang: false, // 结账对话框显示与否
+      // 搜索商品弹窗
       sousuoshangpingDialog: {
         isShow: false, // 搜索商品弹窗显示与否
         title: '', // 搜索商品标题，这里是标题，不是条形码，如果是条形码，点击按钮直接添加到购物车
@@ -738,8 +711,19 @@ export default {
       // 选择会员弹框是否显示
       xuanzehuiyuanDialog: {
         isShow: false,
-        mobile: '',
-        huiyuanInfo: {
+        mobile: ''
+      },
+
+      //购卡弹窗
+      goukaDialog: {
+        isShow: false,
+        title: '',// 请输入购卡名称
+      },
+      // 结账弹窗所需要的数据
+      jiezhangDialog:{
+        isShow: false, // 结账对话框显示与否
+        // 当前选中的会员信息
+        memberVip: {
           id: 5110, // 会员id
           mobile: '13637765376', // 会员电话
           shop_code: 'A00036', // 所属门店的门店编号
@@ -748,14 +732,23 @@ export default {
           level_name: '七星会员', // 会员等级名称
           money: '0.00', // 余额
           amount: '0.05', // 累积充值
-          regtime: '1970-01-01 08:33:37'// 加入时间
-        }
-      },
-
-      //购卡弹窗
-      goukaDialog: {
-        isShow: false,
-        title: '',// 请输入购卡名称
+          regtime: '1970-01-01 08:33:37' // 加入时间
+        },
+        // 服务人员列表
+        waiter: [
+          // {
+          //   id: 0, // 服务员id  当服务员的id为0师表示为当前登录的店长
+          //   name: '管理员', // 服务员名称
+          //   type: '店长' // 服务类型
+          // }
+        ],
+        // 当前选中的服务人员
+        nowWaiter: {
+          id: 0, // 服务员id  当服务员的id为0师表示为当前登录的店长
+          name: '管理员', // 服务员名称
+          type: '店长' // 服务类型
+        },
+        sumMoney: 0.00,//所购商品的合计
       }
     }
   },
@@ -769,7 +762,7 @@ export default {
   methods: {
     // 将商品加入购物车
     addShoppingCar (good){
-      console.log(good)
+      // console.log(good)
       //服务商品
       if (good.is_service_goods === '1') {
         good.num = 1
@@ -806,6 +799,7 @@ export default {
         this.chooeseGoods.fuwuGoods = []
         this.chooeseGoods.goods.push(good)
       }
+      this.sumChooseGoodsMoney()
       this.$forceUpdate()
     },
     // 购物车里的商品被单击后处于选中状态，然后进行修改操作，比如加数量、减数量、修改价格、删除
@@ -848,6 +842,7 @@ export default {
           this.chooeseGoods.fuwuGoods.splice(key, 1);
         }
       }
+      this.sumChooseGoodsMoney()
       this.$forceUpdate()
     },
     // 购物车里的商品增加数量
@@ -875,6 +870,7 @@ export default {
           this.chooeseGoods.fuwuGoods[key].num++
         }
       }
+      this.sumChooseGoodsMoney()
       this.$forceUpdate()
     },
     // 购物车里的商品减少数量
@@ -903,6 +899,7 @@ export default {
             this.chooeseGoods.fuwuGoods[key].num --
         }
       }
+      this.sumChooseGoodsMoney()
       this.$forceUpdate()
     },
     // 选中购物车里的商品，后点修改数量
@@ -976,6 +973,7 @@ export default {
           }
         }
       }
+      this.sumChooseGoodsMoney()
       this.$forceUpdate()
     },
 
@@ -1063,6 +1061,7 @@ export default {
           }
         }
       }
+      this.sumChooseGoodsMoney()
       this.$forceUpdate()
     },
 
@@ -1105,7 +1104,7 @@ export default {
     getServiceItemList () {
       let data = {}
       data.page = `${this.requestFuwuGoodData.page},${this.requestFuwuGoodData.num}`
-      data.vip_rank = this.memberVip.level_id
+      data.vip_rank = this.jiezhangDialog.memberVip.level_id
       postServiceItemList(data).then((res) => {
         if (res.data.length === 0) {
           if (this.requestFuwuGoodData.page !== 1) {
@@ -1191,13 +1190,13 @@ export default {
     // 选择服务人员
     getWaiterList () {
       postWaiter().then((res) => {
-        this.waiter = res.data
+        this.jiezhangDialog.waiter = res.data
       }).catch((err) => {
         console.log(err, '服务人员获取失败')
       })
     },
     clickWaiter (e) {
-      this.nowWaiter = e
+      this.jiezhangDialog.nowWaiter = e
     },
     // 按搜索商品(商品标题和条形码)
     getGoodByCondition (str) {
@@ -1252,6 +1251,29 @@ export default {
         console.log(err, '按条形码搜索商品失败')
       })
     },
+    //计算结算总价
+    sumChooseGoodsMoney(){
+      let sumMoney = 0
+      if (this.chooeseGoods.goods.length) {
+        for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
+          if (this.chooeseGoods.goods[i].is_edit === 1) {
+            sumMoney += this.chooeseGoods.goods[i].num * this.chooeseGoods.goods[i].edit_price
+          } else {
+            sumMoney += this.chooeseGoods.goods[i].num * this.chooeseGoods.goods[i].price
+          }
+        }
+      }
+      if (this.chooeseGoods.fuwuGoods.length) {
+        for (let i = 0; i < this.chooeseGoods.fuwuGoods.length; i++) {
+          if (this.chooeseGoods.fuwuGoods[i].is_edit === 1) {
+            sumMoney += this.chooeseGoods.fuwuGoods[i].num * this.chooeseGoods.fuwuGoods[i].edit_price
+          } else {
+            sumMoney += this.chooeseGoods.fuwuGoods[i].num * this.chooeseGoods.fuwuGoods[i].price
+          }
+        }
+      }
+      this.jiezhangDialog.sumMoney = sumMoney
+    }
   }
 }
 </script>

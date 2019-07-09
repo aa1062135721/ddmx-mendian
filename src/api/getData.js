@@ -52,3 +52,12 @@ export const postServiceItemList = (data = null) => {
 export const postWaiter = (data = null) => {
   return Vue.prototype.$post('/index/waiter', data)
 }
+
+/**
+ * 收银大屏-根据手机号码搜索会员
+ * @param data
+ * @returns {*}
+ */
+export const postSearchVip = (data = null) => {
+  return Vue.prototype.$post('/index/search_vip', data)
+}
