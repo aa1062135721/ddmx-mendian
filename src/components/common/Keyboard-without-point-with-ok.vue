@@ -1,23 +1,23 @@
 <template>
     <div class="btns">
       <div>
-        <el-button class="btn">1</el-button>
-        <el-button class="btn">2</el-button>
-        <el-button class="btn">3</el-button>
+        <el-button class="btn" @click="sendMsg('1')">1</el-button>
+        <el-button class="btn" @click="sendMsg('2')">2</el-button>
+        <el-button class="btn" @click="sendMsg('3')">3</el-button>
       </div>
       <div>
-        <el-button class="btn">4</el-button>
-        <el-button class="btn">5</el-button>
-        <el-button class="btn">6</el-button>
+        <el-button class="btn" @click="sendMsg('4')">4</el-button>
+        <el-button class="btn" @click="sendMsg('5')">5</el-button>
+        <el-button class="btn" @click="sendMsg('6')">6</el-button>
       </div>
       <div>
-        <el-button class="btn">7</el-button>
-        <el-button class="btn">8</el-button>
-        <el-button class="btn">9</el-button>
+        <el-button class="btn" @click="sendMsg('7')">7</el-button>
+        <el-button class="btn" @click="sendMsg('8')">8</el-button>
+        <el-button class="btn" @click="sendMsg('9')">9</el-button>
       </div>
      <div>
-       <el-button class="btn" style="width: 190px;">0</el-button>
-       <el-button class="btn" type="primary" style="color: #fff;font-size:24px;background:rgba(45,194,243,1);">确定</el-button>
+       <el-button class="btn" @click="sendMsg('0')" style="width: 190px;">0</el-button>
+       <el-button class="btn" @click="sendMsg('ok')" type="primary" style="color: #fff;font-size:24px;background:rgba(45,194,243,1);">确定</el-button>
      </div>
     </div>
 </template>
@@ -27,6 +27,11 @@ export default {
   name: 'Keyboard-without-point-with-ok',
   data () {
     return {
+    }
+  },
+  methods: {
+    sendMsg (num) {
+      this.$emit('getNumber', num) // 第一个参数是父组件中v-on绑定的自定义回调方法，第二个参数为传递的参数
     }
   }
 }

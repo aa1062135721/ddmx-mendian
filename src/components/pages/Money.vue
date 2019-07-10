@@ -317,7 +317,7 @@
         <div class="clear-both div">
             <div class="float-left left">
               <div class="search">
-                <el-input v-model="xuanzehuiyuanDialog.mobile" placeholder="请输入会员手机号" maxlength="11"></el-input>
+                <el-input @keyup.enter.native="clickChoosesMemberByKeyboard('ok')" v-model="xuanzehuiyuanDialog.mobile" placeholder="请输入会员手机号" maxlength="11"></el-input>
               </div>
               <div class="content">
                 <ul>
@@ -344,7 +344,7 @@
               </div>
             </div>
             <div class="float-right right">
-              <v-keyboard-without-point-with-ok></v-keyboard-without-point-with-ok>
+              <v-keyboard-without-point-with-ok @getNumber="clickChoosesMemberByKeyboard"></v-keyboard-without-point-with-ok>
             </div>
           </div>
       </el-dialog>
@@ -1273,7 +1273,26 @@ export default {
         }
       }
       this.jiezhangDialog.sumMoney = sumMoney
-    }
+    },
+    // 选择会员
+    clickChoosesMemberByKeyboard (code) {
+      if (code === 'ok') {
+        if (/^[1][3,4,5,7,8][0-9]{9}$/.test(this.xuanzehuiyuanDialog.mobile)) {
+          let requestData = {mobile: this.xuanzehuiyuanDialog.mobile}
+          postSearchVip(requestData).then(res => {
+            if (res.data) {
+              this.jiezhangDialog.memberVip = res.data
+            }
+          }).catch(err => {
+            console.log(err)
+          })
+        } else {
+          alert('请输入正确的手机号')
+        }
+      } else {
+        this.xuanzehuiyuanDialog.mobile += code
+      }
+    },
   }
 }
 </script>
