@@ -78,3 +78,12 @@ export const postSearchVip = (data = null) => {
 export const postMemberVipRecharge = (data = null) => {
   return Vue.prototype.$post('/Recharge/index', data)
 }
+
+/**
+ * 收银大屏-新增会员
+ * @param data
+ * @returns {*}
+ */
+export const postAddMemberVip = (data = null) => {
+  return Vue.prototype.$post('/index/addVip', data)
+}

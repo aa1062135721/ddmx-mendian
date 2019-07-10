@@ -356,8 +356,8 @@
             <div class="float-left left">
               <div class="search-btns">
                 <el-button type="primary" @click="huiyuanDialog.addHuiyuanDialog.isShow = true">新增会员</el-button>
-                <el-input style="width:392px;" v-model="huiyuanDialog.mobile" placeholder="请输入您需要查询的会员手机号码"></el-input>
-                <el-button  plain>搜索</el-button>
+                <el-input style="width:392px;" @keyup.enter.native="huiyuanDialogSearcgMemberVip" v-model="huiyuanDialog.mobile" placeholder="请输入您需要查询的会员手机号码"></el-input>
+                <el-button  plain @click="huiyuanDialogSearcgMemberVip">搜索</el-button>
               </div>
               <div class="user-info el-table--border">
                 <table class="el-table el-table__body" cellspacing="0" cellpadding="0" border="0">
@@ -367,7 +367,7 @@
                     <td colspan="2">会员等级：{{ huiyuanDialog.huiyuanInfo.level_name }}</td>
                   </tr>
                   <tr>
-                    <td colspan="4">累计充值：{{ huiyuanDialog.huiyuanInfo.amount }} 余额：<span class="font-red">¥ {{ huiyuanDialog.huiyuanInfo.money }}</span></td>
+                    <td colspan="4">累计充值：{{ huiyuanDialog.huiyuanInfo.amount }} &nbsp;&nbsp;&nbsp;余额：<span class="font-red">{{ huiyuanDialog.huiyuanInfo.money ? `¥  ${huiyuanDialog.huiyuanInfo.money}` : '' }}</span></td>
                     <td colspan="3">加入时间：{{ huiyuanDialog.huiyuanInfo.regtime }}</td>
                   </tr>
                 </table>
@@ -378,7 +378,7 @@
               </div>
             </div>
             <div class="float-right right">
-              <v-keyboard-without-point></v-keyboard-without-point>
+              <v-keyboard-without-point @getNumber="huiyuanDialogGetCode"></v-keyboard-without-point>
             </div>
           </div>
           <div class="my-table">
@@ -417,14 +417,14 @@
         <div class="clear-both" style="height: 290px;">
           <div class="float-left left" style="width: 50%;">
               <div style="margin-bottom: 48px;">
-                <el-input v-model="huiyuanDialog.addHuiyuanDialog.mobile" placeholder="请输入会员手机号码" maxlength="11"></el-input>
+                <el-input @keyup.enter.native="huiyuanDialogAddMemberVip" v-model="huiyuanDialog.addHuiyuanDialog.mobile" placeholder="请输入会员手机号码" maxlength="11"></el-input>
               </div>
               <div>
-                <el-input v-model="huiyuanDialog.addHuiyuanDialog.nickname"  placeholder="请输入会员昵称"></el-input>
+                <el-input @keyup.enter.native="huiyuanDialogAddMemberVip" v-model="huiyuanDialog.addHuiyuanDialog.nickname"  placeholder="请输入会员昵称"></el-input>
               </div>
           </div>
           <div class="float-right right" style="width: 45%;">
-            <v-keyboard-without-point-with-ok></v-keyboard-without-point-with-ok>
+            <v-keyboard-without-point-with-ok @getNumber="huiyuanDialogAddMemberGetCode"></v-keyboard-without-point-with-ok>
           </div>
         </div>
       </el-dialog>
@@ -504,7 +504,7 @@ import vKeyboard from '../common/Keyboard.vue'
 import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-ok'
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
-import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge } from '../../api/getData'
+import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -587,21 +587,21 @@ export default {
           }
         ] // 按标题搜索商品后得到的结果
       },
-      // 单击会员按钮后的弹窗所需要的数据
+      //  会员查询 - 单击会员按钮后的弹窗所需要的数据
       huiyuanDialog: {
         isShow: false, // 是否显示会员查询对话框
         mobile: '', // 要查询的会员手机号码
         // 会员信息
         huiyuanInfo: {
-          id: 5110, // 会员id
-          mobile: '13637765376', // 会员电话
-          shop_code: 'A00036', // 所属门店的门店编号
-          level_id: 6, // 会员等级id
-          nickname: '荣柱', // 姓名
-          level_name: '七星会员', // 会员等级名称
-          money: '0.00', // 余额
-          amount: '0.05', // 累积充值
-          regtime: '1970-01-01 08:33:37'// 加入时间
+          // id: 5110, // 会员id
+          // mobile: '13637765376', // 会员电话
+          // shop_code: 'A00036', // 所属门店的门店编号
+          // level_id: 6, // 会员等级id
+          // nickname: '荣柱', // 姓名
+          // level_name: '七星会员', // 会员等级名称
+          // money: '0.00', // 余额
+          // amount: '0.05', // 累积充值
+          // regtime: '1970-01-01 08:33:37'// 加入时间
         },
         // 新增会员对话框
         addHuiyuanDialog: {
@@ -1354,7 +1354,51 @@ export default {
       }).catch(err => {
         console.log('充值失败', err)
       })
-    }
+    },
+    //会员查询弹框中的事件
+    huiyuanDialogGetCode (code) {
+      this.huiyuanDialog.mobile += `${code}`
+    },
+    huiyuanDialogSearcgMemberVip () {
+      if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.huiyuanDialog.mobile)) {
+        alert('请输入正确的手机号')
+        return
+      }
+      let requestData = {mobile: this.huiyuanDialog.mobile}
+      postSearchVip(requestData).then(res => {
+        if (res.data) {
+          this.huiyuanDialog.huiyuanInfo = res.data
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    huiyuanDialogAddMemberGetCode (code) {
+      if (code === 'ok') {
+        this.huiyuanDialogAddMemberVip()
+      } else {
+        this.huiyuanDialog.addHuiyuanDialog.mobile += `${code}`
+      }
+    },
+    huiyuanDialogAddMemberVip () {
+      let requestData = {
+        mobile: this.huiyuanDialog.addHuiyuanDialog.mobile,
+        nickname: this.huiyuanDialog.addHuiyuanDialog.nickname
+      }
+      if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(requestData.mobile)) {
+        alert('请输入正确的手机号')
+        return
+      }
+      if (!/^[\u4e00-\u9fa5]+$/.test(requestData.nickname)) {
+        alert('请输入正确的会员昵称')
+        return
+      }
+      postAddMemberVip(requestData).then(res => {
+        alert(res.msg)
+      }).catch(err => {
+        console.log('新增会员失败', err)
+      })
+    },
   }
 }
 </script>
