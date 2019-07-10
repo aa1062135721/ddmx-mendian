@@ -165,7 +165,7 @@
         <div class="clear-both both">
           <div class="float-left left">
             <div class="one">
-              <el-input v-model="chongzhiDialog.mobile" placeholder="请输入会员手机号" clearable maxlength="11"></el-input>
+              <el-input @keyup.13.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')" v-model="chongzhiDialog.mobile" placeholder="请输入会员手机号" clearable></el-input>
             </div>
             <div class="two">
               <ul>
@@ -175,33 +175,34 @@
                 </li>
                 <li>
                   <span class="float-left">累积充值</span>
-                  <span class="float-right">¥ {{ chongzhiDialog.huiyuanInfo.amount }}</span>
+                  <span class="float-right">{{ chongzhiDialog.huiyuanInfo.amount ? `¥ ${chongzhiDialog.huiyuanInfo.amount}` : ''}}</span>
                 </li>
                 <li>
                   <span class="float-left">余额</span>
-                  <span class="float-right font-red">¥ {{ chongzhiDialog.huiyuanInfo.money }}</span>
+                  <span class="float-right font-red">{{ chongzhiDialog.huiyuanInfo.money ? `¥ ${chongzhiDialog.huiyuanInfo.money}` : ''}}</span>
                 </li>
                 <li>
                   <span class="float-left">会员等级</span>
-                  <span class="float-right">三星会员&nbsp;<i class="el-icon-question font-blue" @click="chongzhiDialog.isShowHuiyuanDengjiDialog = true"></i></span>
+                  <span class="float-right">{{ chongzhiDialog.huiyuanInfo.level_name }}&nbsp;<i class="el-icon-question font-blue" @click="chongzhiDialog.isShowHuiyuanDengjiDialog = true"></i></span>
                 </li>
               </ul>
             </div>
             <div class="three">
               <el-radio-group v-model="chongzhiDialog.payType">
-                <el-radio label="现金">现价</el-radio>
-                <el-radio label="微信">微信</el-radio>
-                <el-radio label="支付宝">支付宝</el-radio>
-                <el-radio label="银行卡">银行卡</el-radio>
+<!--                //支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
+                <el-radio label="5">现价</el-radio>
+                <el-radio label="1">微信</el-radio>
+                <el-radio label="2">支付宝</el-radio>
+                <el-radio label="4">银行卡</el-radio>
               </el-radio-group>
             </div>
             <div class="four">
-              <el-input v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额" clearable></el-input>
+              <el-input @focus="chongzhiDialogInputFocus('money')" v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额" clearable></el-input>
             </div>
           </div>
           <div class="float-right right">
-            <v-keyboard></v-keyboard>
-            <el-button class="queding-chongzhi">确定充值</el-button>
+            <v-keyboard @getNumber="chongzhiDialogGetCode"></v-keyboard>
+            <el-button @click="chongzhiDialogBtnOk" class="queding-chongzhi">确定充值</el-button>
           </div>
         </div>
       </el-dialog>
@@ -503,7 +504,7 @@ import vKeyboard from '../common/Keyboard.vue'
 import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-ok'
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
-import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip } from '../../api/getData'
+import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -693,20 +694,21 @@ export default {
       chongzhiDialog: {
         isShow: false, // 充值弹窗显示与否
         mobile: '',
+        chooeseWho: 'mobile',
         huiyuanInfo: {
-          id: 5110, // 会员id
-          mobile: '13637765376', // 会员电话
-          shop_code: 'A00036', // 所属门店的门店编号
-          level_id: 6, // 会员等级id
-          nickname: '荣柱', // 姓名
-          level_name: '七星会员', // 会员等级名称
-          money: '0.00', // 余额
-          amount: '0.05', // 累积充值
-          regtime: '1970-01-01 08:33:37'// 加入时间
+          // id: 5110, // 会员id
+          // mobile: '13637765376', // 会员电话
+          // shop_code: 'A00036', // 所属门店的门店编号
+          // level_id: 6, // 会员等级id
+          // nickname: '荣柱', // 姓名
+          // level_name: '七星会员', // 会员等级名称
+          // money: '0.00', // 余额
+          // amount: '0.05', // 累积充值
+          // regtime: '1970-01-01 08:33:37'// 加入时间
         },
         isShowHuiyuanDengjiDialog: false, // 等级说明弹框显示与否
-        payType: '', // 充值方式
-        payMoney: 0 // 充值金额
+        payType: '5', // 充值方式
+        payMoney: '' // 充值金额
       },
       // 选择会员弹框是否显示
       xuanzehuiyuanDialog: {
@@ -1293,6 +1295,66 @@ export default {
         this.xuanzehuiyuanDialog.mobile += code
       }
     },
+    // 充值弹框
+    chongzhiDialogInputFocus (str) {
+      this.chongzhiDialog.chooeseWho = str
+    },
+    chongzhiDialogGetCode(code) {
+      if (this.chongzhiDialog.chooeseWho === 'mobile') {
+        this.chongzhiDialog.mobile += `${code}`
+      }
+      if (this.chongzhiDialog.chooeseWho === 'money') {
+        this.chongzhiDialog.payMoney += `${code}`
+      }
+    },
+    chongzhiDialogSearchMemberVip () {
+      if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
+        alert('请输入正确的手机号')
+        return
+      }
+      let requestData = {mobile: this.chongzhiDialog.mobile}
+      postSearchVip(requestData).then(res => {
+        if (res.data) {
+          this.chongzhiDialog.huiyuanInfo = res.data
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    chongzhiDialogBtnOk () {
+      if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
+        alert('请输入正确的手机号')
+        return
+      }
+      if(!/^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/.test(this.chongzhiDialog.payMoney)) {
+        alert('请输入正确的充值金额')
+        return
+      }
+      if(!this.chongzhiDialog.payType){
+        alert('请选择支付方式')
+        return
+      }
+      if (!this.chongzhiDialog.huiyuanInfo.id) {
+        alert('请选择要充值的会员')
+        return
+      }
+      let requestData = {
+        member_id: this.chongzhiDialog.huiyuanInfo.id,
+        price: this.chongzhiDialog.payMoney,
+        pay_way: this.chongzhiDialog.payType,
+      }
+      postMemberVipRecharge(requestData).then(res => {
+        if (res.data) {
+          this.$message({
+            message: '恭喜你，这是一条成功消息',
+            type: 'success'
+          })
+          this.chongzhiDialogSearchMemberVip()
+        }
+      }).catch(err => {
+        console.log('充值失败', err)
+      })
+    }
   }
 }
 </script>

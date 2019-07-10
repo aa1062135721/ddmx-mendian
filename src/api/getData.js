@@ -69,3 +69,12 @@ export const postWaiter = (data = null) => {
 export const postSearchVip = (data = null) => {
   return Vue.prototype.$post('/index/search_vip', data)
 }
+
+/**
+ * 收银大屏-会员充值
+ * @param data
+ * @returns {*}
+ */
+export const postMemberVipRecharge = (data = null) => {
+  return Vue.prototype.$post('/Recharge/index', data)
+}
