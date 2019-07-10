@@ -356,8 +356,8 @@
             <div class="float-left left">
               <div class="search-btns">
                 <el-button type="primary" @click="huiyuanDialog.addHuiyuanDialog.isShow = true">新增会员</el-button>
-                <el-input style="width:392px;" @keyup.enter.native="huiyuanDialogSearcgMemberVip" v-model="huiyuanDialog.mobile" placeholder="请输入您需要查询的会员手机号码"></el-input>
-                <el-button  plain @click="huiyuanDialogSearcgMemberVip">搜索</el-button>
+                <el-input style="width:392px;" @keyup.enter.native="huiyuanDialogSearchMemberVip" v-model="huiyuanDialog.mobile" placeholder="请输入您需要查询的会员手机号码"></el-input>
+                <el-button  plain @click="huiyuanDialogSearchMemberVip">搜索</el-button>
               </div>
               <div class="user-info el-table--border">
                 <table class="el-table el-table__body" cellspacing="0" cellpadding="0" border="0">
@@ -367,7 +367,7 @@
                     <td colspan="2">会员等级：{{ huiyuanDialog.huiyuanInfo.level_name }}</td>
                   </tr>
                   <tr>
-                    <td colspan="4">累计充值：{{ huiyuanDialog.huiyuanInfo.amount }} &nbsp;&nbsp;&nbsp;余额：<span class="font-red">{{ huiyuanDialog.huiyuanInfo.money ? `¥  ${huiyuanDialog.huiyuanInfo.money}` : '' }}</span></td>
+                    <td colspan="4">累计充值：￥ {{ huiyuanDialog.huiyuanInfo.amount }} &nbsp;&nbsp;&nbsp;余额：<span class="font-red">￥ {{ huiyuanDialog.huiyuanInfo.money }}</span></td>
                     <td colspan="3">加入时间：{{ huiyuanDialog.huiyuanInfo.regtime }}</td>
                   </tr>
                 </table>
@@ -386,17 +386,19 @@
             <el-table v-show="huiyuanDialog.showFuwuTable" :data="huiyuanDialog.fuwukaList" min-height="216" border style="width: 100%">
               <el-table-column prop="card_name" label="服务卡名称" width="180"></el-table-column>
               <el-table-column prop="real_price" label="购买金额"></el-table-column>
-              <el-table-column prop="price" label="项目服务"></el-table-column>
+              <el-table-column prop="" label="项目服务"></el-table-column>
               <el-table-column prop="type_card" label="类型"></el-table-column>
               <el-table-column prop="create_time" label="购买时间"></el-table-column>
               <el-table-column prop="start_time" label="激活时间"></el-table-column>
               <el-table-column prop="end_time" label="过期时间"></el-table-column>
-              <el-table-column prop="status" label="状态"></el-table-column>
+              <el-table-column prop="status_name" label="状态"></el-table-column>
               <el-table-column label="操作">
-                <el-button size="mini" @click="huiyuanDialog.haokaDialog.isShow = true">耗卡</el-button>
-                <el-button size="mini" @click="huiyuanDialog.shiyongjiluDialog.isShow = true">使用记录</el-button>
-                <el-button size="mini">激活</el-button>
-                <el-button size="mini" @click="huiyuanDialog.tuikaDialog.isShow = true">退卡详情</el-button>
+                <template slot-scope="scope">
+                  <el-button v-if="scope.row.type === '0'" size="mini">激活</el-button>
+                  <el-button v-if="scope.row.type === '1'" size="mini" @click="huiyuanDialog.haokaDialog.isShow = true">耗卡</el-button>
+                  <el-button v-if="scope.row.type === '2'" size="mini" @click="huiyuanDialog.shiyongjiluDialog.isShow = true">使用记录</el-button>
+                  <el-button v-if="scope.row.type === '4'" size="mini" @click="huiyuanDialog.tuikaDialog.isShow = true">退卡详情</el-button>
+                </template>
               </el-table-column>
             </el-table>
             <!-- 充值记录 -->
@@ -462,7 +464,6 @@
           </el-table>
         </div>
       </el-dialog>
-
       <!-- 点击购卡按钮弹窗-购卡项目 -->
       <el-dialog class="goukaxiangmu-tanchuan" title="购卡项目" :visible.sync="goukaDialog.isShow" width="886px" :center="true">
        <div class="content">
@@ -477,16 +478,7 @@
            <el-button class="btn">年卡</el-button>
          </div>
          <div class="bodys">
-           <div class="card active">
-             <v-card ></v-card>
-             <img class="ischeck" src="../../assets/icon/is-chooese.png" alt="">
-           </div>
-           <div class="card">
-             <v-card ></v-card>
-           </div>
-           <div class="card">
-             <v-card ></v-card>
-           </div>
+             <v-card v-for="(item) in goukaDialog.cardsList" :key="item.id" :ocard="item"></v-card>
          </div>
          <div class="footer">
            <el-button class="btn">取消</el-button>
@@ -504,7 +496,7 @@ import vKeyboard from '../common/Keyboard.vue'
 import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-ok'
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
-import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip } from '../../api/getData'
+import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -613,49 +605,34 @@ export default {
         showFuwuTable: false,
         // 会员查询弹框里的表格-数据为 服务卡购买记录
         fuwukaList: [
-          {
-            id: 1,
-            card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
-            type: 1,
-            real_price: 100.00,
-            month: 2,
-            year: 2019,
-            create_time: '2019-07-03 11:47:15',
-            start_time: '未激活',
-            end_time: '2019-07-13 11:47:15',
-            over_time: 1562989635,
-            status: 0,
-            type_card: '次卡',
-            status_name: '未激活'
-          },
-          {
-            id: 1,
-            card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
-            type: 1,
-            real_price: 100.00,
-            month: 2,
-            year: 2019,
-            create_time: '2019-07-03 11:47:15',
-            start_time: '未激活',
-            end_time: '2019-07-13 11:47:15',
-            over_time: 1562989635,
-            status: 0,
-            type_card: '次卡',
-            status_name: '未激活'
-          }
+          // {
+          //   id: 1,
+          //   card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
+          //   type: '1',
+          //   real_price: 100.00,
+          //   month: 2,
+          //   year: 2019,
+          //   create_time: '2019-07-03 11:47:15',
+          //   start_time: '未激活',
+          //   end_time: '2019-07-13 11:47:15',
+          //   over_time: 1562989635,
+          //   status: 0,
+          //   type_card: '次卡',
+          //   status_name: '未激活'
+          // }
         ],
         // 会员充值记录
         chongzhijiluList: [
-          {
-            id: 1,
-            nickname: '会员名',
-            create_time: '2019-07-03 11:47:15',
-            status: '成功',
-            fuwurenyuan: '张三',
-            chongzhijine: 300,
-            daozhangjine: 300,
-            xianzhiyaoqiu: '无限制'
-          }
+          // {
+          //   id: 1,
+          //   nickname: '会员名',
+          //   create_time: '2019-07-03 11:47:15',
+          //   status: '成功',
+          //   fuwurenyuan: '张三',
+          //   chongzhijine: 300,
+          //   daozhangjine: 300,
+          //   xianzhiyaoqiu: '无限制'
+          // }
         ],
         // 耗卡弹窗
         haokaDialog: {
@@ -720,6 +697,37 @@ export default {
       goukaDialog: {
         isShow: false,
         title: '',// 请输入购卡名称
+        cardsList:[// 服务卡列表
+          {
+            is_checked: true,
+            id: 3,
+            card_id: null,
+            shop_id: 27,
+            shop_name: "江与城店",
+            card_name: "艾灸推拿",
+            cover: "",
+            critulation: 100,
+            exchange_num: 100,
+            restrict_num: 2,
+            start_time: 1561478400,
+            end_time: 1565823999,
+            integral_price: 0,
+            create_time: 1561533639,
+            status: "1",
+            del: "1",
+            creator_id: 1,
+            update_time: null,
+            modifier: null,
+            type: "2",
+            term_of_validity: null,
+            all_shop: "1",
+            give: "0",
+            day: 10,
+            use_day: 30,
+            month: 0,
+            year: 0
+          },
+        ]
       },
       // 结账弹窗所需要的数据
       jiezhangDialog:{
@@ -1359,7 +1367,7 @@ export default {
     huiyuanDialogGetCode (code) {
       this.huiyuanDialog.mobile += `${code}`
     },
-    huiyuanDialogSearcgMemberVip () {
+    huiyuanDialogSearchMemberVip () {
       if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.huiyuanDialog.mobile)) {
         alert('请输入正确的手机号')
         return
@@ -1368,6 +1376,7 @@ export default {
       postSearchVip(requestData).then(res => {
         if (res.data) {
           this.huiyuanDialog.huiyuanInfo = res.data
+          this.huiyuanDialogSearchServiceCardList()
         }
       }).catch(err => {
         console.log(err)
@@ -1399,6 +1408,24 @@ export default {
         console.log('新增会员失败', err)
       })
     },
+    huiyuanDialogSearchRechargeLog () {
+      let requestData = {member_id: this.huiyuanDialog.huiyuanInfo.id}
+      postMemberServiceCards(requestData).then(res => {
+        this.huiyuanDialog.chongzhijiluList = res.data
+      })
+    },
+    huiyuanDialogSearchServiceCardList () {
+      let requestData = {member_id: this.huiyuanDialog.huiyuanInfo.id}
+      postMemberServiceCards(requestData).then(res => {
+        if (res.data) {
+          this.huiyuanDialog.fuwukaList = res.data
+        } else {
+          this.huiyuanDialog.fuwukaList = []
+        }
+      }).catch(err => {
+
+      })
+    }
   }
 }
 </script>
@@ -2010,21 +2037,6 @@ export default {
         align-items:flex-start;
         justify-content: space-between;
         align-content:flex-start;
-        .card{
-          margin-bottom:28px;
-          border-radius:10px;
-          position: relative;
-          overflow: hidden;
-          box-shadow:0px 0px 11px 1px rgba(33,33,33,0.19);
-          .ischeck{
-            position: absolute;
-            right: 0;
-            top: 0;
-          }
-        }
-        .active{
-          border: 1px solid red;
-        }
       }
       .footer{
         width: 100%;

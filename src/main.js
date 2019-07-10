@@ -6,6 +6,7 @@ import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import VueLazyload from 'vue-lazyload'
+import * as filters from './filter/index'
 
 // 导入 http请求 定义全局变量·
 import {fetch, post, patch, put} from './api/http'
@@ -20,6 +21,9 @@ Vue.use(VueLazyload, {
   error: 'static/images/mendian-admin-error.png',
   loading: 'static/images/mendian-admin-loading.png',
   attempt: 1
+})
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
 })
 
 Vue.config.productionTip = false

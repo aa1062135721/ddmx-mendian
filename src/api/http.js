@@ -69,6 +69,19 @@ axios.interceptors.response.use(
       router.push('/login')
       return
     }
+    if (response.data.code === '500') {
+      Vue.prototype.$message({
+        message: response.data.msg,
+        type: 'error'
+      })
+      return
+    }
+    if (response.data.code !== '200') {
+      Vue.prototype.$message({
+        message: response.data.msg,
+        type: 'info'
+      })
+    }
     return response
   },
   error => {

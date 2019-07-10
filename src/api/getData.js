@@ -67,7 +67,7 @@ export const postWaiter = (data = null) => {
  * @returns {*}
  */
 export const postSearchVip = (data = null) => {
-  return Vue.prototype.$post('/index/search_vip', data)
+  return Vue.prototype.$post('/index/findMember', data)
 }
 
 /**
@@ -86,4 +86,14 @@ export const postMemberVipRecharge = (data = null) => {
  */
 export const postAddMemberVip = (data = null) => {
   return Vue.prototype.$post('/index/addVip', data)
+}
+
+/**
+ * 收银大屏-获取会员的服务卡列表
+ * @param data
+ * @returns {*}
+ */
+export const postMemberServiceCards = (data = null) => {
+  return Vue.prototype.$post('/ticket/ticket_buy_list', data)
+
 }
