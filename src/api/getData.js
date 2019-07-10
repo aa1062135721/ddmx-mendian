@@ -95,5 +95,13 @@ export const postAddMemberVip = (data = null) => {
  */
 export const postMemberServiceCards = (data = null) => {
   return Vue.prototype.$post('/ticket/ticket_buy_list', data)
+}
 
+/**
+ * 收银大屏-购买服务卡-服务卡列表
+ * @param data
+ * @returns {*}
+ */
+export const postBuyServiceCards = (data = null) => {
+  return Vue.prototype.$post('/ticket/ticket_list', data)
 }

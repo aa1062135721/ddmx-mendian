@@ -468,19 +468,21 @@
       <el-dialog class="goukaxiangmu-tanchuan" title="购卡项目" :visible.sync="goukaDialog.isShow" width="886px" :center="true">
        <div class="content">
          <div class="search">
-           <el-input class="goods-search"   placeholder="搜索服务卡名称"  v-model="goukaDialog.title">
-             <el-button slot="append" icon="el-icon-search" @click=""></el-button>
+           <el-input class="goods-search" @keyup.enter.native="goukaDialogSearch"   placeholder="搜索服务卡名称"  v-model="goukaDialog.title">
+             <el-button slot="append" icon="el-icon-search" @click="goukaDialogSearch"></el-button>
            </el-input>
          </div>
          <div class="tab-btns">
-           <el-button class="btn active">次卡</el-button>
-           <el-button class="btn">月卡</el-button>
-           <el-button class="btn">年卡</el-button>
+           <el-button @click="goukaDialogChoosesCardType(1)" class="btn" :class="{'active': (!goukaDialog.title && goukaDialog.requestData.type === 1)}">次卡</el-button>
+           <el-button @click="goukaDialogChoosesCardType(2)" class="btn" :class="{'active': (!goukaDialog.title && goukaDialog.requestData.type === 2)}">月卡</el-button>
+           <el-button @click="goukaDialogChoosesCardType(4)" class="btn" :class="{'active': (!goukaDialog.title && goukaDialog.requestData.type === 4)}">年卡</el-button>
          </div>
          <div class="bodys">
-             <v-card v-for="(item) in goukaDialog.cardsList" :key="item.id" :ocard="item"></v-card>
+             <v-card v-for="(item, index) in goukaDialog.cardsList" :key="item.id" :ocard="item" @click.native="goukaDialogClickChoosesCard(index)"></v-card>
          </div>
          <div class="footer">
+           <el-button @click="goukaDialogSearchCardsPre" class="btn">上一页</el-button>
+           <el-button @click="goukaDialogSearchCardsNext" class="btn">下一页</el-button>
            <el-button class="btn">取消</el-button>
            <el-button class="btn">立即购买</el-button>
          </div>
@@ -496,7 +498,7 @@ import vKeyboard from '../common/Keyboard.vue'
 import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-ok'
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
-import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards } from '../../api/getData'
+import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -699,7 +701,7 @@ export default {
         title: '',// 请输入购卡名称
         cardsList:[// 服务卡列表
           {
-            is_checked: true,
+            is_checked: false,
             id: 3,
             card_id: null,
             shop_id: 27,
@@ -727,7 +729,13 @@ export default {
             month: 0,
             year: 0
           },
-        ]
+        ],
+        requestData: {
+          total:0,
+          page: 1,
+          limit: 4,
+          type: 1,// 卡卷类型 1为次卡 2为月卡  3为季卡  4为年卡
+        }
       },
       // 结账弹窗所需要的数据
       jiezhangDialog:{
@@ -1425,6 +1433,51 @@ export default {
       }).catch(err => {
 
       })
+    },
+
+    //购卡弹框
+    goukaDialogChoosesCardType (type) {
+      this.goukaDialog.title = ''
+      this.goukaDialog.requestData.type = type
+      this.goukaDialog.requestData.page = 1
+      this.goukaDialogSearch()
+    },
+    goukaDialogSearch () {
+      let requestData = {
+        search: this.goukaDialog.title,
+        type: this.goukaDialog.type,
+        page: this.goukaDialog.page,
+        limit: this.goukaDialog.limit,
+      }
+      postBuyServiceCards(requestData).then(res => {
+        if (res.data) {
+          this.goukaDialog.requestData.total = res.total
+          res.data.map(item => {
+            item.is_checked = false
+          })
+          this.goukaDialog.cardsList  = res.data
+        }
+      }).catch(err => {
+
+      })
+    },
+    goukaDialogSearchCardsNext () {
+      if (this.goukaDialog.requestData.page < (this.goukaDialog.requestData.total / this.goukaDialog.requestData.limit)) {
+        this.goukaDialog.requestData.page ++
+        this.goukaDialogSearch()
+      }
+    },
+    goukaDialogSearchCardsPre () {
+      if (this.goukaDialog.requestData.page > 1) {
+        this.goukaDialog.requestData.page --
+        this.goukaDialogSearch()
+      }
+    },
+    goukaDialogClickChoosesCard(key) {
+      this.goukaDialog.cardsList.map(res => {
+        res.is_checked = false
+      })
+      this.goukaDialog.cardsList[key].is_checked = true
     }
   }
 }
@@ -2030,6 +2083,7 @@ export default {
       }
       .bodys{
         width: 100%;
+        height: 410px;
         margin-bottom:28px;
         display: flex;
         align-items: center;
