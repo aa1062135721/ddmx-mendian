@@ -4,7 +4,7 @@
       <v-head></v-head>
       <div style="padding: 10px 20px;">
         <el-row :gutter="20">
-          <el-col :span="14">
+          <el-col :span="13">
             <div class="grid-content all-goods">
               <div class="goods-type clear-both">
                 <el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button>
@@ -23,22 +23,15 @@
               </div>
             </div>
           </el-col>
-          <el-col :span="2">
+          <el-col :span="3">
             <div class="grid-content caozuo-buttons">
               <el-button @click="clickAddNumShoppingCarGood" class="caozuo-button" type="primary" style="font-size: 45px;">&nbsp;&nbsp;+&nbsp;&nbsp;</el-button>
-              <br><br>
               <el-button @click="clickSubNumShoppingCarGood" class="caozuo-button" type="primary">&nbsp;&nbsp;-&nbsp;&nbsp;</el-button>
-              <br><br>
               <el-button @click="clickBtnXiugaishuliangShoppingCarGood" class="caozuo-button" type="primary">数量</el-button>
-              <br><br>
               <el-button @click="clickBtnXiugaijiageShoppingCarGood" class="caozuo-button" type="primary">改价</el-button>
-              <br><br>
               <el-button @click="clickDelShoppingCarGood" class="caozuo-button" type="primary">删除</el-button>
-              <br><br>
               <el-button @click="chongzhiDialog.isShow = true" class="caozuo-button" type="primary">充值</el-button>
-              <br><br>
               <el-button @click="huiyuanDialog.isShow = true" class="caozuo-button" type="primary">会员</el-button>
-              <br><br>
               <el-button @click="goukaDialogShow" class="caozuo-button" type="primary">购卡</el-button>
             </div>
           </el-col>
@@ -69,6 +62,22 @@
                 <ul v-if="chooeseGoods.fuwuGoods.length" v-for="(good, key) in chooeseGoods.fuwuGoods" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
                   <li class="title clear-both">
                     <span class="float-left">{{good.title}}</span>
+                    <span class="float-right">数量 {{good.num}}</span>
+                  </li>
+                  <li class="title code clear-both">
+                    <span class="float-left"></span>
+                    <span class="float-right red">￥{{good.is_edit ? good.edit_price * good.num : good.price * good.num}}</span>
+                  </li>
+                  <li class="title">
+                    <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
+                    <span class="red danjia" v-else>￥{{good.price}}</span>
+                    <span class="yuanjia" v-if="good.is_edit">原价￥{{good.price}}</span>
+                    <span class="huiyuanjia">会员价￥{{good.price}}</span>
+                  </li>
+                </ul>
+                <ul v-if="chooeseGoods.cardList.length" v-for="(good, key) in chooeseGoods.cardList" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
+                  <li class="title clear-both">
+                    <span class="float-left">{{good.card_name}}</span>
                     <span class="float-right">数量 {{good.num}}</span>
                   </li>
                   <li class="title code clear-both">
@@ -110,16 +119,20 @@
                     <span  class="float-right">￥{{jiezhangDialog.sumMoney}}</span>
                   </li>
                   <li>
-                    <span class="float-left">折扣</span>
-                    <span  class="float-right">100%</span>
+                    <span class="float-left">改价</span>
+                    <span  class="float-right">￥{{jiezhangDialog.modifyMoney - jiezhangDialog.sumMoney}}</span>
                   </li>
-                  <li>
-                    <span class="float-left">优惠</span>
-                    <span  class="float-right font-blue">-￥5.00</span>
-                  </li>
+<!--                  <li>-->
+<!--                    <span class="float-left">折扣</span>-->
+<!--                    <span  class="float-right">100%</span>-->
+<!--                  </li>-->
+<!--                  <li>-->
+<!--                    <span class="float-left">优惠</span>-->
+<!--                    <span  class="float-right font-blue">-￥5.00</span>-->
+<!--                  </li>-->
                   <li>
                     <span class="float-left">结算</span>
-                    <span class="float-right">￥600</span>
+                    <span class="float-right">￥{{jiezhangDialog.modifyMoney}}</span>
                   </li>
                 </ul>
                 <div class="buttons">
@@ -175,11 +188,11 @@
                 </li>
                 <li>
                   <span class="float-left">累积充值</span>
-                  <span class="float-right">{{ chongzhiDialog.huiyuanInfo.amount ? `¥ ${chongzhiDialog.huiyuanInfo.amount}` : ''}}</span>
+                  <span class="float-right">￥{{chongzhiDialog.huiyuanInfo.amount}}</span>
                 </li>
                 <li>
                   <span class="float-left">余额</span>
-                  <span class="float-right font-red">{{ chongzhiDialog.huiyuanInfo.money ? `¥ ${chongzhiDialog.huiyuanInfo.money}` : ''}}</span>
+                  <span class="float-right font-red">￥{{ chongzhiDialog.huiyuanInfo.money }}</span>
                 </li>
                 <li>
                   <span class="float-left">会员等级</span>
@@ -559,7 +572,9 @@ export default {
           //     is_edit: "1",     //此商品是否修改了单价：1是，0否
           //     edit_price: "10.00"   //修改的单价，如果edit_price=1，则必填此参数
           // }
-        ]
+        ],
+        //购卡弹窗选择的卡片列表
+        cardList: []
       },
       // 修改价格弹窗显示与否
       xiugaijiageDialog: {
@@ -774,15 +789,15 @@ export default {
         isShow: false, // 结账对话框显示与否
         // 当前选中的会员信息
         memberVip: {
-          id: 5110, // 会员id
-          mobile: '13637765376', // 会员电话
-          shop_code: 'A00036', // 所属门店的门店编号
-          level_id: 6, // 会员等级id
-          nickname: '荣柱', // 姓名
-          level_name: '七星会员', // 会员等级名称
-          money: '0.00', // 余额
-          amount: '0.05', // 累积充值
-          regtime: '1970-01-01 08:33:37' // 加入时间
+          // id: 5110, // 会员id
+          // mobile: '13637765376', // 会员电话
+          // shop_code: 'A00036', // 所属门店的门店编号
+          // level_id: 6, // 会员等级id
+          // nickname: '荣柱', // 姓名
+          // level_name: '七星会员', // 会员等级名称
+          // money: '0.00', // 余额
+          // amount: '0.05', // 累积充值
+          // regtime: '1970-01-01 08:33:37' // 加入时间
         },
         // 服务人员列表
         waiter: [
@@ -795,10 +810,11 @@ export default {
         // 当前选中的服务人员
         nowWaiter: {
           id: 0, // 服务员id  当服务员的id为0师表示为当前登录的店长
-          name: '管理员', // 服务员名称
-          type: '店长' // 服务类型
+          name: '请选择服务员', // 服务员名称
+          type: '未知' // 服务类型
         },
         sumMoney: 0.00,//所购商品的合计
+        modifyMoney: 0.00,//改价参数
       }
     }
   },
@@ -826,6 +842,7 @@ export default {
           }
         }
         this.chooeseGoods.goods = []
+        this.chooeseGoods.cardList = []
         this.chooeseGoods.fuwuGoods.push(good)
       }
       //普通商品
@@ -847,6 +864,7 @@ export default {
           }
         }
         this.chooeseGoods.fuwuGoods = []
+        this.chooeseGoods.cardList = []
         this.chooeseGoods.goods.push(good)
       }
       this.sumChooseGoodsMoney()
@@ -865,6 +883,12 @@ export default {
           good.is_checked = false
         })
         this.chooeseGoods.fuwuGoods[key].is_checked = true
+      }
+      if (this.chooeseGoods.cardList.length) {
+        this.chooeseGoods.cardList.map((good, index) => {
+          good.is_checked = false
+        })
+        this.chooeseGoods.cardList[key].is_checked = true
       }
       this.$forceUpdate()
     },
@@ -890,6 +914,17 @@ export default {
         })
         if (key !== 'undefined') {
           this.chooeseGoods.fuwuGoods.splice(key, 1);
+        }
+      }
+      if (this.chooeseGoods.cardList.length) {
+        let key = 'undefined'
+        this.chooeseGoods.cardList.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          this.chooeseGoods.cardList.splice(key, 1);
         }
       }
       this.sumChooseGoodsMoney()
@@ -918,6 +953,17 @@ export default {
         })
         if (key !== 'undefined') {
           this.chooeseGoods.fuwuGoods[key].num++
+        }
+      }
+      if (this.chooeseGoods.cardList.length) {
+        let key = 'undefined'
+        this.chooeseGoods.cardList.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          this.chooeseGoods.cardList[key].num++
         }
       }
       this.sumChooseGoodsMoney()
@@ -949,13 +995,24 @@ export default {
             this.chooeseGoods.fuwuGoods[key].num --
         }
       }
+      if (this.chooeseGoods.cardList.length) {
+        let key = 'undefined'
+        this.chooeseGoods.cardList.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (this.chooeseGoods.cardList[key].num > 1)
+            this.chooeseGoods.cardList[key].num --
+        }
+      }
       this.sumChooseGoodsMoney()
       this.$forceUpdate()
     },
     // 选中购物车里的商品，后点修改数量
     clickBtnXiugaishuliangShoppingCarGood () {
       if (this.chooeseGoods.goods.length) {
-        // 显示弹窗
         let key = 'undefined'
         this.chooeseGoods.goods.map((good, index) => {
           if (good.is_checked === true) {
@@ -970,7 +1027,6 @@ export default {
         }
       }
       if (this.chooeseGoods.fuwuGoods.length) {
-        // 显示弹窗
         let key = 'undefined'
         this.chooeseGoods.fuwuGoods.map((good, index) => {
           if (good.is_checked === true) {
@@ -982,6 +1038,20 @@ export default {
           this.xiugaishuliangDialog.isShow = true
         } else {
           alert('请购物车选择要修改数量的服务商品');
+        }
+      }
+      if (this.chooeseGoods.cardList.length) {
+        let key = 'undefined'
+        this.chooeseGoods.cardList.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          this.xiugaishuliangDialog.inputValue = this.chooeseGoods.cardList[key].num
+          this.xiugaishuliangDialog.isShow = true
+        } else {
+          alert('请购物车选择要修改数量的服务卡');
         }
       }
     },
@@ -1018,6 +1088,21 @@ export default {
         if (key !== 'undefined') {
           if (parseFloat(this.xiugaishuliangDialog.inputValue) >= 1) {
             this.chooeseGoods.fuwuGoods[key].num = this.xiugaishuliangDialog.inputValue
+            this.xiugaishuliangDialog.inputValue = ''
+            this.xiugaishuliangDialog.isShow = false
+          }
+        }
+      }
+      if (this.chooeseGoods.cardList.length) {
+        let key = 'undefined'
+        this.chooeseGoods.cardList.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (parseFloat(this.xiugaishuliangDialog.inputValue) >= 1) {
+            this.chooeseGoods.cardList[key].num = this.xiugaishuliangDialog.inputValue
             this.xiugaishuliangDialog.inputValue = ''
             this.xiugaishuliangDialog.isShow = false
           }
@@ -1067,6 +1152,25 @@ export default {
           alert('请在购物车选择要修改价格的服务商品');
         }
       }
+      if (this.chooeseGoods.cardList.length) {
+        // 显示弹窗
+        let key = 'undefined'
+        this.chooeseGoods.cardList.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (this.chooeseGoods.cardList[key].is_edit === 1) {
+            this.xiugaijiageDialog.inputValue = this.chooeseGoods.cardList[key].edit_price
+          } else {
+            this.xiugaijiageDialog.inputValue = this.chooeseGoods.cardList[key].price
+          }
+          this.xiugaijiageDialog.isShow = true
+        } else {
+          alert('请在购物车选择要修改价格的服务卡');
+        }
+      }
     },
     clickChangejiageShoppingCarGood (code){
       let n = this.xiugaijiageDialog.inputValue
@@ -1106,6 +1210,22 @@ export default {
           if ((parseFloat(this.xiugaijiageDialog.inputValue) < parseFloat(this.chooeseGoods.fuwuGoods[key].price)) && (parseFloat(this.xiugaijiageDialog.inputValue) > 0)) {
             this.chooeseGoods.fuwuGoods[key].is_edit = 1
             this.chooeseGoods.fuwuGoods[key].edit_price = this.xiugaijiageDialog.inputValue
+            this.xiugaijiageDialog.inputValue = ''
+            this.xiugaijiageDialog.isShow = false
+          }
+        }
+      }
+      if (this.chooeseGoods.cardList.length) {
+        let key = 'undefined'
+        this.chooeseGoods.cardList.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if ((parseFloat(this.xiugaijiageDialog.inputValue) < parseFloat(this.chooeseGoods.cardList[key].price)) && (parseFloat(this.xiugaijiageDialog.inputValue) > 0)) {
+            this.chooeseGoods.cardList[key].is_edit = 1
+            this.chooeseGoods.cardList[key].edit_price = this.xiugaijiageDialog.inputValue
             this.xiugaijiageDialog.inputValue = ''
             this.xiugaijiageDialog.isShow = false
           }
@@ -1154,7 +1274,7 @@ export default {
     getServiceItemList () {
       let data = {}
       data.page = `${this.requestFuwuGoodData.page},${this.requestFuwuGoodData.num}`
-      data.vip_rank = this.jiezhangDialog.memberVip.level_id
+      data.member_id = this.jiezhangDialog.memberVip.id
       postServiceItemList(data).then((res) => {
         if (res.data.length === 0) {
           if (this.requestFuwuGoodData.page !== 1) {
@@ -1279,7 +1399,8 @@ export default {
       data.bar_code = `${this.sousuoshangpingDialog.title}`
       postGoodsByCode(data).then((res) => {
         if (res.data instanceof Object && !(res.data instanceof Array)) {
-          console.log(res.data)
+          this.chooeseGoods.cardList = []
+          this.chooeseGoods.goods = []
           let good = res.data
           good.num = 1
           good.is_checked = false
@@ -1294,7 +1415,6 @@ export default {
           this.chooeseGoods.goods.push(good)
           this.chooeseGoods.fuwuGoods = []
         } else {
-          alert('没有找到该条形码的商品')
         }
 
       }).catch((err) => {
@@ -1304,25 +1424,39 @@ export default {
     //计算结算总价
     sumChooseGoodsMoney(){
       let sumMoney = 0
+      let modifyMoney = 0
       if (this.chooeseGoods.goods.length) {
         for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
+          sumMoney += this.chooeseGoods.goods[i].num * this.chooeseGoods.goods[i].price
           if (this.chooeseGoods.goods[i].is_edit === 1) {
-            sumMoney += this.chooeseGoods.goods[i].num * this.chooeseGoods.goods[i].edit_price
+            modifyMoney += this.chooeseGoods.goods[i].num * this.chooeseGoods.goods[i].edit_price
           } else {
-            sumMoney += this.chooeseGoods.goods[i].num * this.chooeseGoods.goods[i].price
+            modifyMoney += this.chooeseGoods.goods[i].num * this.chooeseGoods.goods[i].price
           }
         }
       }
       if (this.chooeseGoods.fuwuGoods.length) {
         for (let i = 0; i < this.chooeseGoods.fuwuGoods.length; i++) {
+          sumMoney += this.chooeseGoods.fuwuGoods[i].num * this.chooeseGoods.fuwuGoods[i].price
           if (this.chooeseGoods.fuwuGoods[i].is_edit === 1) {
-            sumMoney += this.chooeseGoods.fuwuGoods[i].num * this.chooeseGoods.fuwuGoods[i].edit_price
+            modifyMoney += this.chooeseGoods.fuwuGoods[i].num * this.chooeseGoods.fuwuGoods[i].edit_price
           } else {
-            sumMoney += this.chooeseGoods.fuwuGoods[i].num * this.chooeseGoods.fuwuGoods[i].price
+            modifyMoney += this.chooeseGoods.fuwuGoods[i].num * this.chooeseGoods.fuwuGoods[i].price
+          }
+        }
+      }
+      if (this.chooeseGoods.cardList.length) {
+        for (let i = 0; i < this.chooeseGoods.cardList.length; i++) {
+          sumMoney += this.chooeseGoods.cardList[i].num * this.chooeseGoods.cardList[i].price
+          if (this.chooeseGoods.cardList[i].is_edit === 1) {
+            modifyMoney += this.chooeseGoods.cardList[i].num * this.chooeseGoods.cardList[i].edit_price
+          } else {
+            modifyMoney += this.chooeseGoods.cardList[i].num * this.chooeseGoods.cardList[i].price
           }
         }
       }
       this.jiezhangDialog.sumMoney = sumMoney
+      this.jiezhangDialog.modifyMoney = modifyMoney
     },
     // 选择会员
     clickChoosesMemberByKeyboard (code) {
@@ -1544,8 +1678,29 @@ export default {
       if (key === 'flag') {
         alert('请选择要购买的服务卡')
         return
+      } else {
+        // 支付方式  1=微信支付 2=支付宝  3=余额  4=银行卡  5=现金  6=美团   7=赠送  8=门店自用 9=兑换  10=包月服务    11=定制疗程     99=管理员充值
+        // let requestData = {
+        //   member_id: this.jiezhangDialog.memberVip.id,
+        //   price: this.goukaDialog.cardsList[key].price,
+        //   card_id: this.goukaDialog.cardsList[key].id,
+        //   waiter: this.jiezhangDialog.nowWaiter.id,
+        //   pay: 1
+        // }
+        // console.log(requestData)
+//添加服务卡进购物车
+        this.chooeseGoods.cardList = []
+        this.chooeseGoods.fuwuGoods = []
+        this.chooeseGoods.goods = []
+        let addTopCarCard = this.goukaDialog.cardsList[key]
+        addTopCarCard.num = 1
+        addTopCarCard.is_checked = false
+        addTopCarCard.is_edit = 0
+        addTopCarCard.edit_price = addTopCarCard.price
+        this.chooeseGoods.cardList.push(addTopCarCard)
+        this.sumChooseGoodsMoney()
+        this.$forceUpdate()
       }
-
     }
   }
 }
@@ -1671,11 +1826,13 @@ export default {
     }
   }
   .caozuo-buttons{
+    overflow: hidden;
     height: calc(100vh - 110px);
-    width: 100%;display: flex;
+    width: 100%;
+    display: flex;
     align-items: center;
-    justify-content: center;
-    flex-wrap:wrap;
+    flex-wrap:nowrap;
+    justify-content:space-between;
     flex-direction:column;
     .caozuo-button{
       width: 154px!important;

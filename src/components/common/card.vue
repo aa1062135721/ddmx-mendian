@@ -63,7 +63,7 @@ export default {
       }
       .head_body{
         padding: 20px;
-        background: #F6D2BE;
+        background: #f6c291;
         .title{
           width:100%;
           line-height: 40px;

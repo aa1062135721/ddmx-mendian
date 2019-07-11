@@ -14,9 +14,8 @@
         <div class="div">
         </div>
         <div>
-          <p class="yuanjia">
-
-            <!-- 原价: ¥ {{ogood.price}} -->
+          <p class="yuanjia" v-if="ogood.is_service_goods === '1'">
+             原价: ¥ {{ogood.price}}
           </p>
         </div>
         <div>
