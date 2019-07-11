@@ -137,7 +137,7 @@
                 </ul>
                 <div class="buttons">
                   <button @click="xuanzehuiyuanDialog.isShow = true" class="my-btn">选择会员</button>
-                  <button @click="jiezhangDialog.isShow = true"  class="my-btn">结账</button>
+                  <button @click="jiezhangDialogClickBtn"  class="my-btn">结账</button>
                 </div>
               </div>
             </div>
@@ -236,15 +236,15 @@
             <ul>
               <li class="clear-both">
                 <span class="float-left">应收</span>
-                <span class="float-right font-red">¥ {{jiezhangDialog.sumMoney}}</span>
+                <span class="float-right font-red">¥ {{jiezhangDialog.modifyMoney}}</span>
               </li>
               <li class="clear-both">
-                <span class="float-left">代金券</span>
-                <span class="float-right">¥ 20</span>
+                <span class="float-left"></span>
+                <span class="float-right"></span>
               </li>
               <li class="clear-both">
                 <span class="float-left">改价</span>
-                <span class="float-right">¥ 10</span>
+                <span class="float-right">¥ {{jiezhangDialog.modifyMoney - jiezhangDialog.sumMoney}}</span>
               </li>
               <li class="clear-both">
                 <span class="float-left"><span>会员</span> <span class="font-blue">{{jiezhangDialog.memberVip.nickname}}</span></span>
@@ -1701,7 +1701,71 @@ export default {
         this.sumChooseGoodsMoney()
         this.$forceUpdate()
       }
-    }
+    },
+
+    //结账操作
+    jiezhangDialogClickBtn() {
+      if (!this.jiezhangDialog.memberVip.id) {
+        alert('请先选择会员')
+        return
+      }
+      if (!this.jiezhangDialog.nowWaiter.id) {
+        alert('请先选择服务人员')
+        return
+      }
+      if (!(this.chooeseGoods.goods.length !== 0 || this.chooeseGoods.cardList.length !== 0 ||  this.chooeseGoods.fuwuGoods.length !== 0)) {
+        alert('购物车里为空，请选择商品')
+        return
+      }
+      this.jiezhangDialog.isShow = true
+    },
+    jiezhangDialogClickOk () {
+      let requestData = {
+        member: this.jiezhangDialog.memberVip.id,       //会员id
+        waiter: this.jiezhangDialog.nowWaiter.id,        //服务员id
+        pay_way: 1,
+        goods: [],
+        service_goods:[],
+      }
+      if (this.chooeseGoods.goods.length) {
+        let arr = []
+        let obj = {}
+        this.chooeseGoods.goods.map((item, index) => {
+          obj.id = item.id
+          obj.num = item.num
+          obj.price = item.price
+          obj.is_edit = item.is_edit
+          if (item.is_edit) {
+            obj.edit_price = item.edit_price
+          }
+          arr.push(obj)
+        })
+        requestData.goods = arrr
+      }
+      if (this.chooeseGoods.fuwuGoods.length) {
+        let arr = []
+        let obj = {}
+        this.chooeseGoods.fuwuGoods.map((item, index) => {
+          obj.id = item.id
+          obj.num = item.num
+          obj.price = item.price
+          obj.is_edit = item.is_edit
+          if (item.is_edit) {
+            obj.edit_price = item.edit_price
+          }
+
+        })
+        requestData.service_goods = arrr
+      }
+      if (this.chooeseGoods.cardList.length) {
+        let requestData = {
+          member_id: this.jiezhangDialog.memberVip.id,       //会员id
+          waiter: this.jiezhangDialog.nowWaiter.id,        //服务员id
+          pay:1,//支付方式
+          card_id:this.chooeseGoods.cardList[0].id,//服务卡id
+        }
+      }
+    },
   }
 }
 </script>
