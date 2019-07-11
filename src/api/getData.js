@@ -80,6 +80,15 @@ export const postMemberVipRecharge = (data = null) => {
 }
 
 /**
+ * 收银大屏-会员充值记录
+ * @param data
+ * @returns {*}
+ */
+export const postMemberVipRechargeLog = (data = null) => {
+  return Vue.prototype.$post('/Recharge/rechargeLog', data)
+}
+
+/**
  * 收银大屏-新增会员
  * @param data
  * @returns {*}

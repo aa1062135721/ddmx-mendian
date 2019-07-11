@@ -39,7 +39,7 @@
               <br><br>
               <el-button @click="huiyuanDialog.isShow = true" class="caozuo-button" type="primary">会员</el-button>
               <br><br>
-              <el-button @click="goukaDialog.isShow = true" class="caozuo-button" type="primary">购卡</el-button>
+              <el-button @click="goukaDialogShow" class="caozuo-button" type="primary">购卡</el-button>
             </div>
           </el-col>
           <el-col :span="8">
@@ -373,8 +373,8 @@
                 </table>
               </div>
               <div class="tab-btns">
-                <el-button :class="{'active':!huiyuanDialog.showFuwuTable}" @click="huiyuanDialog.showFuwuTable = false">充值记录</el-button>
-                <el-button :class="{'active':huiyuanDialog.showFuwuTable}" @click="huiyuanDialog.showFuwuTable = true">服务卡</el-button>
+                <el-button :class="{'active':!huiyuanDialog.showFuwuTable}" @click="huiyuanDialogSearchRechargeLog">充值记录</el-button>
+                <el-button :class="{'active':huiyuanDialog.showFuwuTable}" @click="huiyuanDialogSearchServiceCardList">服务卡</el-button>
               </div>
             </div>
             <div class="float-right right">
@@ -403,12 +403,18 @@
             </el-table>
             <!-- 充值记录 -->
             <el-table v-show="!huiyuanDialog.showFuwuTable" :data="huiyuanDialog.chongzhijiluList" min-height="216" border style="width: 100%">
-              <el-table-column prop="nickname" label="会员" width="180"></el-table-column>
-              <el-table-column prop="chongzhijine" label="充值金额"></el-table-column>
-              <el-table-column prop="daozhangjine" label="到账金额"></el-table-column>
-              <el-table-column prop="xianzhiyaoqiu" label="限制要求"></el-table-column>
-              <el-table-column prop="fuwurenyuan" label="服务人员"></el-table-column>
-              <el-table-column prop="status" label="状态"></el-table-column>
+              <el-table-column prop="member_id" label="会员"></el-table-column>
+              <el-table-column prop="price" label="充值金额"></el-table-column>
+              <el-table-column prop="price" label="到账金额"></el-table-column>
+              <el-table-column prop="waiter" label="服务人员"></el-table-column>
+              <el-table-column label="状态">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.price < 0">已退</span>
+                  <span class='font-red' v-else>成功</span>
+                  <br>
+                  <span v-if="scope.row.price < 0">{{ scope.row.create_time }}</span>
+                </template>
+              </el-table-column>
               <el-table-column prop="create_time" label="充值时间"></el-table-column>
             </el-table>
           </div>
@@ -468,8 +474,8 @@
       <el-dialog class="goukaxiangmu-tanchuan" title="购卡项目" :visible.sync="goukaDialog.isShow" width="886px" :center="true">
        <div class="content">
          <div class="search">
-           <el-input class="goods-search" @keyup.enter.native="goukaDialogSearch"   placeholder="搜索服务卡名称"  v-model="goukaDialog.title">
-             <el-button slot="append" icon="el-icon-search" @click="goukaDialogSearch"></el-button>
+           <el-input class="goods-search" @keyup.enter.native="goukaDialogChoosesCardType(0)"   placeholder="搜索服务卡名称"  v-model="goukaDialog.title">
+             <el-button slot="append" icon="el-icon-search" @click="goukaDialogChoosesCardType(0)"></el-button>
            </el-input>
          </div>
          <div class="tab-btns">
@@ -483,8 +489,8 @@
          <div class="footer">
            <el-button @click="goukaDialogSearchCardsPre" class="btn">上一页</el-button>
            <el-button @click="goukaDialogSearchCardsNext" class="btn">下一页</el-button>
-           <el-button class="btn">取消</el-button>
-           <el-button class="btn">立即购买</el-button>
+           <el-button @click="goukaDialog.isShow = false" class="btn">取消</el-button>
+           <el-button @click="goukaDialogNowBuy" class="btn">立即购买</el-button>
          </div>
        </div>
       </el-dialog>
@@ -498,7 +504,7 @@ import vKeyboard from '../common/Keyboard.vue'
 import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-ok'
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
-import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards } from '../../api/getData'
+import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -584,18 +590,18 @@ export default {
       //  会员查询 - 单击会员按钮后的弹窗所需要的数据
       huiyuanDialog: {
         isShow: false, // 是否显示会员查询对话框
-        mobile: '', // 要查询的会员手机号码
+        mobile: '13637765376', // 要查询的会员手机号码
         // 会员信息
         huiyuanInfo: {
-          // id: 5110, // 会员id
-          // mobile: '13637765376', // 会员电话
-          // shop_code: 'A00036', // 所属门店的门店编号
-          // level_id: 6, // 会员等级id
-          // nickname: '荣柱', // 姓名
-          // level_name: '七星会员', // 会员等级名称
-          // money: '0.00', // 余额
-          // amount: '0.05', // 累积充值
-          // regtime: '1970-01-01 08:33:37'// 加入时间
+          id: 5110, // 会员id
+          mobile: '13637765376', // 会员电话
+          shop_code: 'A00036', // 所属门店的门店编号
+          level_id: 6, // 会员等级id
+          nickname: '荣柱', // 姓名
+          level_name: '七星会员', // 会员等级名称
+          money: '0.00', // 余额
+          amount: '0.05', // 累积充值
+          regtime: '1970-01-01 08:33:37'// 加入时间
         },
         // 新增会员对话框
         addHuiyuanDialog: {
@@ -605,36 +611,33 @@ export default {
         },
         // 展示服务卡购买记录
         showFuwuTable: false,
-        // 会员查询弹框里的表格-数据为 服务卡购买记录
+        // 服务卡购买记录
         fuwukaList: [
-          // {
-          //   id: 1,
-          //   card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
-          //   type: '1',
-          //   real_price: 100.00,
-          //   month: 2,
-          //   year: 2019,
-          //   create_time: '2019-07-03 11:47:15',
-          //   start_time: '未激活',
-          //   end_time: '2019-07-13 11:47:15',
-          //   over_time: 1562989635,
-          //   status: 0,
-          //   type_card: '次卡',
-          //   status_name: '未激活'
-          // }
+          {
+            id: 1,
+            card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
+            type: '1',
+            real_price: 100.00,
+            month: 2,
+            year: 2019,
+            create_time: '2019-07-03 11:47:15',
+            start_time: '未激活',
+            end_time: '2019-07-13 11:47:15',
+            over_time: 1562989635,
+            status: 0,
+            type_card: '次卡',
+            status_name: '未激活'
+          }
         ],
         // 会员充值记录
         chongzhijiluList: [
-          // {
-          //   id: 1,
-          //   nickname: '会员名',
-          //   create_time: '2019-07-03 11:47:15',
-          //   status: '成功',
-          //   fuwurenyuan: '张三',
-          //   chongzhijine: 300,
-          //   daozhangjine: 300,
-          //   xianzhiyaoqiu: '无限制'
-          // }
+          {
+            id: 5,
+            member_id: "哈哈(18046057585)",   //会员信息
+            price: "10.11",   //充值金额、到账金额（当price小于0是表示已退，已退时间与充值时间一致）
+            create_time: "2019-07-03 09:57:06",   //时间
+            waiter: "1"   //服务人员名称
+          }
         ],
         // 耗卡弹窗
         haokaDialog: {
@@ -672,18 +675,18 @@ export default {
       // 单击充值按钮后的弹窗所需要的数据
       chongzhiDialog: {
         isShow: false, // 充值弹窗显示与否
-        mobile: '',
+        mobile: '13637765376',
         chooeseWho: 'mobile',
         huiyuanInfo: {
-          // id: 5110, // 会员id
-          // mobile: '13637765376', // 会员电话
-          // shop_code: 'A00036', // 所属门店的门店编号
-          // level_id: 6, // 会员等级id
-          // nickname: '荣柱', // 姓名
-          // level_name: '七星会员', // 会员等级名称
-          // money: '0.00', // 余额
-          // amount: '0.05', // 累积充值
-          // regtime: '1970-01-01 08:33:37'// 加入时间
+          id: 5110, // 会员id
+          mobile: '13637765376', // 会员电话
+          shop_code: 'A00036', // 所属门店的门店编号
+          level_id: 6, // 会员等级id
+          nickname: '荣柱', // 姓名
+          level_name: '七星会员', // 会员等级名称
+          money: '0.00', // 余额
+          amount: '0.05', // 累积充值
+          regtime: '1970-01-01 08:33:37'// 加入时间
         },
         isShowHuiyuanDengjiDialog: false, // 等级说明弹框显示与否
         payType: '5', // 充值方式
@@ -703,6 +706,35 @@ export default {
           {
             is_checked: false,
             id: 3,
+            card_id: null,
+            shop_id: 27,
+            shop_name: "江与城店",
+            card_name: "艾灸推拿",
+            cover: "",
+            critulation: 100,
+            exchange_num: 100,
+            restrict_num: 2,
+            start_time: 1561478400,
+            end_time: 1565823999,
+            integral_price: 0,
+            create_time: 1561533639,
+            status: "1",
+            del: "1",
+            creator_id: 1,
+            update_time: null,
+            modifier: null,
+            type: "2",
+            term_of_validity: null,
+            all_shop: "1",
+            give: "0",
+            day: 10,
+            use_day: 30,
+            month: 0,
+            year: 0
+          },
+          {
+            is_checked: false,
+            id: 4,
             card_id: null,
             shop_id: 27,
             shop_name: "江与城店",
@@ -1384,7 +1416,7 @@ export default {
       postSearchVip(requestData).then(res => {
         if (res.data) {
           this.huiyuanDialog.huiyuanInfo = res.data
-          this.huiyuanDialogSearchServiceCardList()
+          this.huiyuanDialogSearchRechargeLog()
         }
       }).catch(err => {
         console.log(err)
@@ -1417,27 +1449,42 @@ export default {
       })
     },
     huiyuanDialogSearchRechargeLog () {
-      let requestData = {member_id: this.huiyuanDialog.huiyuanInfo.id}
-      postMemberServiceCards(requestData).then(res => {
-        this.huiyuanDialog.chongzhijiluList = res.data
-      })
+      if (this.huiyuanDialog.huiyuanInfo.id) {
+        this.huiyuanDialog.showFuwuTable = false
+        let requestData = {member_id: this.huiyuanDialog.huiyuanInfo.id,page: '1,5'}
+        postMemberVipRechargeLog(requestData).then(res => {
+          this.huiyuanDialog.chongzhijiluList = res.data
+        })
+      } else {
+        alert('请查询选择会员')
+      }
     },
     huiyuanDialogSearchServiceCardList () {
-      let requestData = {member_id: this.huiyuanDialog.huiyuanInfo.id}
-      postMemberServiceCards(requestData).then(res => {
-        if (res.data) {
-          this.huiyuanDialog.fuwukaList = res.data
-        } else {
-          this.huiyuanDialog.fuwukaList = []
-        }
-      }).catch(err => {
+      if (this.huiyuanDialog.huiyuanInfo.id) {
+        this.huiyuanDialog.showFuwuTable = true
+        let requestData = {member_id: this.huiyuanDialog.huiyuanInfo.id}
+        postMemberServiceCards(requestData).then(res => {
+          if (res.data) {
+            this.huiyuanDialog.fuwukaList = res.data
+          } else {
+            this.huiyuanDialog.fuwukaList = []
+          }
+        }).catch(err => {
 
-      })
+        })
+      } else {
+        alert('请查询选择会员')
+      }
     },
 
     //购卡弹框
+    goukaDialogShow () {
+      this.goukaDialog.isShow = true
+      this.goukaDialogSearch()
+    },
     goukaDialogChoosesCardType (type) {
-      this.goukaDialog.title = ''
+      if (type !== 0)
+        this.goukaDialog.title = ''
       this.goukaDialog.requestData.type = type
       this.goukaDialog.requestData.page = 1
       this.goukaDialogSearch()
@@ -1445,17 +1492,25 @@ export default {
     goukaDialogSearch () {
       let requestData = {
         search: this.goukaDialog.title,
-        type: this.goukaDialog.type,
-        page: this.goukaDialog.page,
-        limit: this.goukaDialog.limit,
+        type: this.goukaDialog.requestData.type,
+        page: this.goukaDialog.requestData.page,
+        limit: this.goukaDialog.requestData.limit,
+      }
+      if (!requestData.search) {
+        delete requestData.search
+      }
+      if (!requestData.type) {
+        delete requestData.type
       }
       postBuyServiceCards(requestData).then(res => {
-        if (res.data) {
-          this.goukaDialog.requestData.total = res.total
+        this.goukaDialog.requestData.total = res.total
+        if(res.data) {
           res.data.map(item => {
             item.is_checked = false
           })
           this.goukaDialog.cardsList  = res.data
+        } else {
+          this.goukaDialog.cardsList  = []
         }
       }).catch(err => {
 
@@ -1478,6 +1533,19 @@ export default {
         res.is_checked = false
       })
       this.goukaDialog.cardsList[key].is_checked = true
+    },
+    goukaDialogNowBuy(){
+      let key = 'flag'
+      this.goukaDialog.cardsList.map((item, index) => {
+        if(item.is_checked === true) {
+          key = index
+        }
+      })
+      if (key === 'flag') {
+        alert('请选择要购买的服务卡')
+        return
+      }
+
     }
   }
 }

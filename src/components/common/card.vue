@@ -3,7 +3,7 @@
       <div class="card" :class="{'active' : ocard.is_checked}">
         <img v-if="ocard.is_checked" class="ischeck" src="../../assets/icon/is-chooese.png" alt="卡片被选中">
         <div class="head_body">
-          <div class="title">
+          <div class="title overflow-row1-ellipsis">
             <img v-if="ocard.month" src="../../assets/icon/card-month.png" alt="月卡图标">
             <img v-if="ocard.use_day" src="../../assets/icon/card-times.png" alt="次卡图标">
             <img v-if="ocard.year" src="../../assets/icon/card-year.png" alt="年卡图标">
@@ -11,11 +11,11 @@
           </div>
           <div class="body1">
             <span class="font-red float-left" style="font-size: 16px;">￥</span>
-            <span class="font-red float-left">{{ocard.card_name}}</span>
+            <span class="font-red float-left">{{ocard.price}}</span>
             <span class="float-right">查看详情</span>
           </div>
-          <div class="body2"><span class="float-left">水育单次体验卷</span><span class="float-right">中医药浴理疗</span></div>
-          <div class="body2"><span class="float-left">水育单次体验卷</span><span class="float-right">中医药浴理疗</span></div>
+          <div class="body2 overflow-row1-ellipsis"><span class="float-left">水育单次体验卷</span><span class="float-right">中医药浴理疗</span></div>
+          <div class="body2 overflow-row1-ellipsis"><span class="float-left">水育单次体验卷</span><span class="float-right">中医药浴理疗</span></div>
         </div>
         <div class="footer">
           <span class="float-left">最低价格：420元</span>
