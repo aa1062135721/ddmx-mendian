@@ -434,8 +434,8 @@
               <el-table-column prop="status_name" label="状态"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button v-if="scope.row.type === '0'" size="mini">激活</el-button>
-                  <el-button v-if="scope.row.type === '1'" size="mini" @click="huiyuanDialog.haokaDialog.isShow = true">耗卡</el-button>
+                  <el-button v-if="scope.row.type === '0'" size="mini" @click="huiyuanDialogActiveServiceCard(scope.row)">激活</el-button>
+                  <el-button v-if="scope.row.type === '1'" size="mini" @click="huiyuanDialogUseServiceCardList huiyuanDialog.haokaDialog.isShow = true">耗卡</el-button>
                   <el-button v-if="scope.row.type === '2'" size="mini" @click="huiyuanDialog.shiyongjiluDialog.isShow = true">使用记录</el-button>
                   <el-button v-if="scope.row.type === '4'" size="mini" @click="huiyuanDialog.tuikaDialog.isShow = true">退卡详情</el-button>
                 </template>
@@ -483,7 +483,11 @@
             <el-table-column prop="name" label="服务项目" width="180"></el-table-column>
             <el-table-column prop="haveTimes" label="次数" width="180"></el-table-column>
             <el-table-column prop="haisheng" label="剩余次数" width="180"></el-table-column>
-            <el-table-column prop="caozuo" label="操作" width="180"></el-table-column>
+            <el-table-column label="操作" width="180">
+              <template slot-scope="scope">
+                <el-button v-if="scope.row.type === '4'" size="mini" @click="huiyuanDialogUseServiceCard(scope.row)">立即使用</el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
       </el-dialog>
@@ -686,7 +690,7 @@ export default {
         ],
         // 耗卡弹窗
         haokaDialog: {
-          isShow: false,
+          isShow: true,
           tableData: [
             {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
             {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
@@ -1649,6 +1653,43 @@ export default {
       } else {
         alert('请查询选择会员')
       }
+    },
+    huiyuanDialogActiveServiceCard (card){
+      console.log(card)
+      let requestData = {
+        card_id:card.id,
+        waiter:1,
+      }
+      postMemberServiceCardsActive(requestData).then(res => {
+
+      }).catch(err => {
+
+      })
+    },
+    // 耗卡列表
+    huiyuanDialogUseServiceCardList(card){
+      console.log(card)
+      let requestData = {
+        ticket_id:card.id
+      }
+      postMemberServiceCardsUseList(requestData).then(res => {
+
+      }).catch(err => {
+
+      })
+    },
+    //耗卡
+    huiyuanDialogUseServiceCard(card) {
+      console.log(card)
+      let requestData = {
+        card_id:card.id,
+        waiter:1,
+      }
+      postMemberServiceCardsActive(requestData).then(res => {
+
+      }).catch(err => {
+
+      })
     },
 
     //购卡弹框

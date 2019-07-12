@@ -107,6 +107,33 @@ export const postMemberServiceCards = (data = null) => {
 }
 
 /**
+ * 收银大屏-会员的服务卡-激活
+ * @param data
+ * @returns {*}
+ */
+export const postMemberServiceCardsActive = (data = null) => {
+  return Vue.prototype.$post('/ticket/active', data)
+}
+
+/**
+ * 收银大屏-会员的服务卡-耗卡列表
+ * @param data
+ * @returns {*}
+ */
+export const postMemberServiceCardsUseList = (data = null) => {
+  return Vue.prototype.$post('/ticket/ticket_consume_list', data)
+}
+
+/**
+ * 收银大屏-会员的服务卡-耗卡列表-使用
+ * @param data
+ * @returns {*}
+ */
+export const postMemberServiceCardsUse = (data = null) => {
+  return Vue.prototype.$post('/ticket/ticket_consume', data)
+}
+
+/**
  * 收银大屏-购买服务卡-服务卡列表
  * @param data
  * @returns {*}
