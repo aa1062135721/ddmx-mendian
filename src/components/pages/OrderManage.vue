@@ -30,9 +30,9 @@
 </template>
 
 <script>
-    export default {
-        name: "OrderManage"
-    }
+export default {
+  name: 'OrderManage'
+}
 </script>
 
 <style scoped>

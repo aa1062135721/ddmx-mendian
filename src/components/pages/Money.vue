@@ -435,7 +435,7 @@
               <el-table-column label="操作">
                 <template slot-scope="scope">
                   <el-button v-if="scope.row.type === '0'" size="mini" @click="huiyuanDialogActiveServiceCard(scope.row)">激活</el-button>
-                  <el-button v-if="scope.row.type === '1'" size="mini" @click="huiyuanDialogUseServiceCardList huiyuanDialog.haokaDialog.isShow = true">耗卡</el-button>
+                  <el-button v-if="scope.row.type === '1'" size="mini" @click="huiyuanDialogUseServiceCardList(scope.row)">耗卡</el-button>
                   <el-button v-if="scope.row.type === '2'" size="mini" @click="huiyuanDialog.shiyongjiluDialog.isShow = true">使用记录</el-button>
                   <el-button v-if="scope.row.type === '4'" size="mini" @click="huiyuanDialog.tuikaDialog.isShow = true">退卡详情</el-button>
                 </template>
@@ -480,12 +480,13 @@
       <el-dialog title="耗卡" :visible.sync="huiyuanDialog.haokaDialog.isShow" width="648px" :center="true">
         <div style="height: 240px;">
           <el-table :data="huiyuanDialog.haokaDialog.tableData" border  style="height: 240px;">
-            <el-table-column prop="name" label="服务项目" width="180"></el-table-column>
-            <el-table-column prop="haveTimes" label="次数" width="180"></el-table-column>
-            <el-table-column prop="haisheng" label="剩余次数" width="180"></el-table-column>
+            <el-table-column prop="sname" label="服务项目" width="180"></el-table-column>
+            <el-table-column prop="num" label="次数" width="180"></el-table-column>
+            <el-table-column prop="s_num" label="剩余次数" width="180"></el-table-column>
             <el-table-column label="操作" width="180">
               <template slot-scope="scope">
-                <el-button v-if="scope.row.type === '4'" size="mini" @click="huiyuanDialogUseServiceCard(scope.row)">立即使用</el-button>
+                {{scope.row.type}}
+                <el-button  size="mini" @click="huiyuanDialogUseServiceCard(scope.row)">立即使用</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -538,7 +539,7 @@
          </div>
        </div>
       </el-dialog>
-      <!--      结账成功弹框-->
+      <!-- 结账成功弹框-->
       <v-show-my-dialog :dialogTableVisible="jiezhangDialog.jiezhangSuccessDialog.isShow" :content="jiezhangDialog.jiezhangSuccessDialog.content" :seconds="jiezhangDialog.jiezhangSuccessDialog.seconds"></v-show-my-dialog>
     </div>
 </template>
@@ -551,7 +552,7 @@ import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-o
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
 import vShowMyDialog from '../common/ShowMyDialog'
-import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards  } from '../../api/getData'
+import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -576,24 +577,24 @@ export default {
 
       // 结账中的商品
       chooeseGoods: {
-        //选择的普通商品
-        goods:[
-            // {
-            //   bar_code: "4897097930084",
-            //   id: 1617,
-            //   is_service_goods: "0",
-            //   pics: "http://picture.ddxm661.com/9a47a20190318164340290",
-            //   price: "198.00",
-            //   stock: 8,
-            //   title: "芮欧轻奢婴儿纸尿裤NB68片",
-            //   is_checked: false,//是否被选中
-            //   num: 3,         //商品数量
-            //   is_edit: "1",     //此商品是否修改了单价：1是，0否
-            //   edit_price: "10.00"   //修改的单价，如果edit_price=1，则必填此参数
-            // }
+        // 选择的普通商品
+        goods: [
+          // {
+          //   bar_code: "4897097930084",
+          //   id: 1617,
+          //   is_service_goods: "0",
+          //   pics: "http://picture.ddxm661.com/9a47a20190318164340290",
+          //   price: "198.00",
+          //   stock: 8,
+          //   title: "芮欧轻奢婴儿纸尿裤NB68片",
+          //   is_checked: false,//是否被选中
+          //   num: 3,         //商品数量
+          //   is_edit: "1",     //此商品是否修改了单价：1是，0否
+          //   edit_price: "10.00"   //修改的单价，如果edit_price=1，则必填此参数
+          // }
         ],
-        //选择的服务商品
-        fuwuGoods:[
+        // 选择的服务商品
+        fuwuGoods: [
           // {
           //     bar_code: "4897097930084",
           //     id: 1617,
@@ -607,7 +608,7 @@ export default {
           //     edit_price: "10.00"   //修改的单价，如果edit_price=1，则必填此参数
           // }
         ],
-        //购卡弹窗选择的卡片列表
+        // 购卡弹窗选择的卡片列表
         cardList: []
       },
       // 修改价格弹窗显示与否
@@ -618,7 +619,7 @@ export default {
 
       // 购物车 修改商品数量弹窗
       xiugaishuliangDialog: {
-        isShow: false,// 修改数量弹窗显示与否
+        isShow: false, // 修改数量弹窗显示与否
         inputValue: '' // 修改数量的值
       },
       // 搜索商品弹窗
@@ -682,10 +683,10 @@ export default {
         chongzhijiluList: [
           {
             id: 5,
-            member_id: "哈哈(18046057585)",   //会员信息
-            price: "10.11",   //充值金额、到账金额（当price小于0是表示已退，已退时间与充值时间一致）
-            create_time: "2019-07-03 09:57:06",   //时间
-            waiter: "1"   //服务人员名称
+            member_id: '哈哈(18046057585)', // 会员信息
+            price: '10.11', // 充值金额、到账金额（当price小于0是表示已退，已退时间与充值时间一致）
+            create_time: '2019-07-03 09:57:06', // 时间
+            waiter: '1' // 服务人员名称
           }
         ],
         // 耗卡弹窗
@@ -696,7 +697,7 @@ export default {
             {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
             {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
             {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
-            {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
+            {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0}
           ]
         },
         // 使用记录弹窗
@@ -707,17 +708,17 @@ export default {
             {name: '水域', time: '2018-09-20 14:12:20', who: 5},
             {name: '水域', time: '2018-09-20 14:12:20', who: 5},
             {name: '水域', time: '2018-09-20 14:12:20', who: 5},
-            {name: '水域', time: '2018-09-20 14:12:20', who: 5},
+            {name: '水域', time: '2018-09-20 14:12:20', who: 5}
           ]
         },
         // 退卡详情
         tuikaDialog: {
           isShow: false,
           tableData: [
-            {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了',reg: '无'},
-            {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了',reg: '无'},
-            {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了',reg: '无'},
-            {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了',reg: '无'}
+            {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了', reg: '无'},
+            {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了', reg: '无'},
+            {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了', reg: '无'},
+            {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了', reg: '无'}
           ]
         }
       },
@@ -747,19 +748,19 @@ export default {
         mobile: ''
       },
 
-      //购卡弹窗
+      // 购卡弹窗
       goukaDialog: {
         isShow: false,
-        title: '',// 请输入购卡名称
-        cardsList:[// 服务卡列表
+        title: '', // 请输入购卡名称
+        cardsList: [// 服务卡列表
           {
             is_checked: false,
             id: 3,
             card_id: null,
             shop_id: 27,
-            shop_name: "江与城店",
-            card_name: "艾灸推拿",
-            cover: "",
+            shop_name: '江与城店',
+            card_name: '艾灸推拿',
+            cover: '',
             critulation: 100,
             exchange_num: 100,
             restrict_num: 2,
@@ -767,15 +768,15 @@ export default {
             end_time: 1565823999,
             integral_price: 0,
             create_time: 1561533639,
-            status: "1",
-            del: "1",
+            status: '1',
+            del: '1',
             creator_id: 1,
             update_time: null,
             modifier: null,
-            type: "2",
+            type: '2',
             term_of_validity: null,
-            all_shop: "1",
-            give: "0",
+            all_shop: '1',
+            give: '0',
             day: 10,
             use_day: 30,
             month: 0,
@@ -786,9 +787,9 @@ export default {
             id: 4,
             card_id: null,
             shop_id: 27,
-            shop_name: "江与城店",
-            card_name: "艾灸推拿",
-            cover: "",
+            shop_name: '江与城店',
+            card_name: '艾灸推拿',
+            cover: '',
             critulation: 100,
             exchange_num: 100,
             restrict_num: 2,
@@ -796,30 +797,30 @@ export default {
             end_time: 1565823999,
             integral_price: 0,
             create_time: 1561533639,
-            status: "1",
-            del: "1",
+            status: '1',
+            del: '1',
             creator_id: 1,
             update_time: null,
             modifier: null,
-            type: "2",
+            type: '2',
             term_of_validity: null,
-            all_shop: "1",
-            give: "0",
+            all_shop: '1',
+            give: '0',
             day: 10,
             use_day: 30,
             month: 0,
             year: 0
-          },
+          }
         ],
         requestData: {
-          total:0,
+          total: 0,
           page: 1,
           limit: 4,
-          type: 1,// 卡卷类型 1为次卡 2为月卡  3为季卡  4为年卡
+          type: 1// 卡卷类型 1为次卡 2为月卡  3为季卡  4为年卡
         }
       },
       // 结账弹窗所需要的数据
-      jiezhangDialog:{
+      jiezhangDialog: {
         isShow: false, // 结账对话框显示与否
         // 当前选中的会员信息
         memberVip: {
@@ -847,17 +848,17 @@ export default {
           name: '请选择服务员', // 服务员名称
           type: '未知' // 服务类型
         },
-        sumMoney: 0.00,//所购商品的合计
-        modifyMoney: 0.00,//改价参数,
-        chooesePayWay: 1,//支付方式
-        closedPayWay: [ //被禁用的支付方式
+        sumMoney: 0.00, // 所购商品的合计
+        modifyMoney: 0.00, // 改价参数,
+        chooesePayWay: 1, // 支付方式
+        closedPayWay: [ // 被禁用的支付方式
           // 1,4,5
         ],
         // 支付完成之后弹出的结账成功弹框
-        jiezhangSuccessDialog:{
+        jiezhangSuccessDialog: {
           isShow: false,
           content: '结账成功',
-          seconds: 1500//多少毫秒之后自动关闭
+          seconds: 1500// 多少毫秒之后自动关闭
         }
       }
     }
@@ -871,9 +872,9 @@ export default {
   },
   methods: {
     // 将商品加入购物车
-    addShoppingCar (good){
+    addShoppingCar (good) {
       // console.log(good)
-      //服务商品
+      // 服务商品
       if (good.is_service_goods === '1') {
         good.num = 1
         good.is_checked = false
@@ -889,10 +890,10 @@ export default {
         this.chooeseGoods.cardList = []
         this.chooeseGoods.fuwuGoods.push(good)
       }
-      //普通商品
+      // 普通商品
       if (good.is_service_goods === '0') {
-        //检查库存是否为0
-        if (good.stock > 0){
+        // 检查库存是否为0
+        if (good.stock > 0) {
           good.num = 1
           good.is_checked = false
           good.is_edit = 0
@@ -946,7 +947,7 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          this.chooeseGoods.goods.splice(key, 1);
+          this.chooeseGoods.goods.splice(key, 1)
         }
       }
       if (this.chooeseGoods.fuwuGoods.length) {
@@ -957,7 +958,7 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          this.chooeseGoods.fuwuGoods.splice(key, 1);
+          this.chooeseGoods.fuwuGoods.splice(key, 1)
         }
       }
       if (this.chooeseGoods.cardList.length) {
@@ -968,7 +969,7 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          this.chooeseGoods.cardList.splice(key, 1);
+          this.chooeseGoods.cardList.splice(key, 1)
         }
       }
       this.sumChooseGoodsMoney()
@@ -984,8 +985,7 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if (this.chooeseGoods.goods[key].num < this.chooeseGoods.goods[key].stock)
-            this.chooeseGoods.goods[key].num++
+          if (this.chooeseGoods.goods[key].num < this.chooeseGoods.goods[key].stock) { this.chooeseGoods.goods[key].num++ }
         }
       }
       if (this.chooeseGoods.fuwuGoods.length) {
@@ -1023,8 +1023,7 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if (this.chooeseGoods.goods[key].num > 1)
-            this.chooeseGoods.goods[key].num --
+          if (this.chooeseGoods.goods[key].num > 1) { this.chooeseGoods.goods[key].num-- }
         }
       }
       if (this.chooeseGoods.fuwuGoods.length) {
@@ -1035,8 +1034,7 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if (this.chooeseGoods.fuwuGoods[key].num > 1)
-            this.chooeseGoods.fuwuGoods[key].num --
+          if (this.chooeseGoods.fuwuGoods[key].num > 1) { this.chooeseGoods.fuwuGoods[key].num-- }
         }
       }
       if (this.chooeseGoods.cardList.length) {
@@ -1047,8 +1045,7 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if (this.chooeseGoods.cardList[key].num > 1)
-            this.chooeseGoods.cardList[key].num --
+          if (this.chooeseGoods.cardList[key].num > 1) { this.chooeseGoods.cardList[key].num-- }
         }
       }
       this.sumChooseGoodsMoney()
@@ -1067,7 +1064,7 @@ export default {
           this.xiugaishuliangDialog.inputValue = this.chooeseGoods.goods[key].num
           this.xiugaishuliangDialog.isShow = true
         } else {
-          alert('请购物车选择要修改数量的商品');
+          alert('请购物车选择要修改数量的商品')
         }
       }
       if (this.chooeseGoods.fuwuGoods.length) {
@@ -1081,7 +1078,7 @@ export default {
           this.xiugaishuliangDialog.inputValue = this.chooeseGoods.fuwuGoods[key].num
           this.xiugaishuliangDialog.isShow = true
         } else {
-          alert('请购物车选择要修改数量的服务商品');
+          alert('请购物车选择要修改数量的服务商品')
         }
       }
       if (this.chooeseGoods.cardList.length) {
@@ -1095,18 +1092,18 @@ export default {
           this.xiugaishuliangDialog.inputValue = this.chooeseGoods.cardList[key].num
           this.xiugaishuliangDialog.isShow = true
         } else {
-          alert('请购物车选择要修改数量的服务卡');
+          alert('请购物车选择要修改数量的服务卡')
         }
       }
     },
-    clickChangeNumShoppingCarGood (code){
+    clickChangeNumShoppingCarGood (code) {
       let n = this.xiugaishuliangDialog.inputValue.toString()
       n += code
-      if(/^\+?[1-9][0-9]*$/.test(n)) {
+      if (/^\+?[1-9][0-9]*$/.test(n)) {
         this.xiugaishuliangDialog.inputValue += code
       }
     },
-    clickChangeNumShoppingCarGoodOk (){
+    clickChangeNumShoppingCarGoodOk () {
       if (this.chooeseGoods.goods.length) {
         let key = 'undefined'
         this.chooeseGoods.goods.map((good, index) => {
@@ -1174,7 +1171,7 @@ export default {
           }
           this.xiugaijiageDialog.isShow = true
         } else {
-          alert('请在购物车选择要修改价格的商品');
+          alert('请在购物车选择要修改价格的商品')
         }
       }
       if (this.chooeseGoods.fuwuGoods.length) {
@@ -1193,7 +1190,7 @@ export default {
           }
           this.xiugaijiageDialog.isShow = true
         } else {
-          alert('请在购物车选择要修改价格的服务商品');
+          alert('请在购物车选择要修改价格的服务商品')
         }
       }
       if (this.chooeseGoods.cardList.length) {
@@ -1212,21 +1209,18 @@ export default {
           }
           this.xiugaijiageDialog.isShow = true
         } else {
-          alert('请在购物车选择要修改价格的服务卡');
+          alert('请在购物车选择要修改价格的服务卡')
         }
       }
     },
-    clickChangejiageShoppingCarGood (code){
+    clickChangejiageShoppingCarGood (code) {
       let n = this.xiugaijiageDialog.inputValue
-      if(code !== '.')
-        n += code
-      else
-        n += code + '0'
-      if(/^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/.test(n)) {
+      if (code !== '.') { n += code } else { n += code + '0' }
+      if (/^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/.test(n)) {
         this.xiugaijiageDialog.inputValue += code
       }
     },
-    clickChangejiageShoppingCarGoodOk (){
+    clickChangejiageShoppingCarGoodOk () {
       if (this.chooeseGoods.goods.length) {
         let key = 'undefined'
         this.chooeseGoods.goods.map((good, index) => {
@@ -1356,7 +1350,7 @@ export default {
           } else {
             this.requestGoodData.who = this.requestGoodData.typeNameList[i - 1].id
           }
-          this.clickFenleiBtn (this.requestGoodData.who)
+          this.clickFenleiBtn(this.requestGoodData.who)
           break
         }
       }
@@ -1370,7 +1364,7 @@ export default {
           } else {
             this.requestGoodData.who = this.requestGoodData.typeNameList[i + 1].id
           }
-          this.clickFenleiBtn (this.requestGoodData.who)
+          this.clickFenleiBtn(this.requestGoodData.who)
           break
         }
       }
@@ -1460,13 +1454,12 @@ export default {
           this.chooeseGoods.fuwuGoods = []
         } else {
         }
-
       }).catch((err) => {
         console.log(err, '按条形码搜索商品失败')
       })
     },
-    //计算结算总价
-    sumChooseGoodsMoney(){
+    // 计算结算总价
+    sumChooseGoodsMoney () {
       let sumMoney = 0
       let modifyMoney = 0
       if (this.chooeseGoods.goods.length) {
@@ -1525,7 +1518,7 @@ export default {
     chongzhiDialogInputFocus (str) {
       this.chongzhiDialog.chooeseWho = str
     },
-    chongzhiDialogGetCode(code) {
+    chongzhiDialogGetCode (code) {
       if (this.chongzhiDialog.chooeseWho === 'mobile') {
         this.chongzhiDialog.mobile += `${code}`
       }
@@ -1552,11 +1545,11 @@ export default {
         alert('请输入正确的手机号')
         return
       }
-      if(!/^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/.test(this.chongzhiDialog.payMoney)) {
+      if (!/^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/.test(this.chongzhiDialog.payMoney)) {
         alert('请输入正确的充值金额')
         return
       }
-      if(!this.chongzhiDialog.payType){
+      if (!this.chongzhiDialog.payType) {
         alert('请选择支付方式')
         return
       }
@@ -1567,7 +1560,7 @@ export default {
       let requestData = {
         member_id: this.chongzhiDialog.huiyuanInfo.id,
         price: this.chongzhiDialog.payMoney,
-        pay_way: this.chongzhiDialog.payType,
+        pay_way: this.chongzhiDialog.payType
       }
       postMemberVipRecharge(requestData).then(res => {
         if (res.data) {
@@ -1581,7 +1574,7 @@ export default {
         console.log('充值失败', err)
       })
     },
-    //会员查询弹框中的事件
+    // 会员查询弹框中的事件
     huiyuanDialogGetCode (code) {
       this.huiyuanDialog.mobile += `${code}`
     },
@@ -1629,7 +1622,7 @@ export default {
     huiyuanDialogSearchRechargeLog () {
       if (this.huiyuanDialog.huiyuanInfo.id) {
         this.huiyuanDialog.showFuwuTable = false
-        let requestData = {member_id: this.huiyuanDialog.huiyuanInfo.id,page: '1,5'}
+        let requestData = {member_id: this.huiyuanDialog.huiyuanInfo.id, page: '1,5'}
         postMemberVipRechargeLog(requestData).then(res => {
           this.huiyuanDialog.chongzhijiluList = res.data
         })
@@ -1648,58 +1641,60 @@ export default {
             this.huiyuanDialog.fuwukaList = []
           }
         }).catch(err => {
-
+          console.log(err)
         })
       } else {
         alert('请查询选择会员')
       }
     },
-    huiyuanDialogActiveServiceCard (card){
+    huiyuanDialogActiveServiceCard (card) {
       console.log(card)
       let requestData = {
-        card_id:card.id,
-        waiter:1,
+        card_id: card.id,
+        waiter: 1
       }
       postMemberServiceCardsActive(requestData).then(res => {
 
       }).catch(err => {
-
+        console.log(err)
       })
     },
     // 耗卡列表
-    huiyuanDialogUseServiceCardList(card){
+    huiyuanDialogUseServiceCardList (card) {
       console.log(card)
+      this.huiyuanDialog.haokaDialog.isShow = true
       let requestData = {
-        ticket_id:card.id
+        ticket_id: card.id
       }
       postMemberServiceCardsUseList(requestData).then(res => {
-
+        if (res.data) {
+          this.huiyuanDialog.haokaDialog.tableData = res.data
+        }
       }).catch(err => {
-
+        console.log(err)
       })
     },
-    //耗卡
-    huiyuanDialogUseServiceCard(card) {
+    // 耗卡
+    huiyuanDialogUseServiceCard (card) {
       console.log(card)
       let requestData = {
-        card_id:card.id,
-        waiter:1,
+        card_id: card.id,
+        waiter: 1
       }
-      postMemberServiceCardsActive(requestData).then(res => {
+      postMemberServiceCardsUseListTicket(requestData).then(res => {
 
       }).catch(err => {
-
+        console.log(err)
       })
     },
 
-    //购卡弹框
+    // 购卡弹框
     goukaDialogShow () {
       this.goukaDialog.isShow = true
       this.goukaDialogSearch()
     },
     goukaDialogChoosesCardType (type) {
-      if (type !== 0)
-        this.goukaDialog.title = ''
+      if (type !== 0) { this.goukaDialog.title = '' }
       this.goukaDialog.requestData.type = type
       this.goukaDialog.requestData.page = 1
       this.goukaDialogSearch()
@@ -1709,7 +1704,7 @@ export default {
         search: this.goukaDialog.title,
         type: this.goukaDialog.requestData.type,
         page: this.goukaDialog.requestData.page,
-        limit: this.goukaDialog.requestData.limit,
+        limit: this.goukaDialog.requestData.limit
       }
       if (!requestData.search) {
         delete requestData.search
@@ -1719,46 +1714,45 @@ export default {
       }
       postBuyServiceCards(requestData).then(res => {
         this.goukaDialog.requestData.total = res.total
-        if(res.data) {
+        if (res.data) {
           res.data.map(item => {
             item.is_checked = false
           })
-          this.goukaDialog.cardsList  = res.data
+          this.goukaDialog.cardsList = res.data
         } else {
-          this.goukaDialog.cardsList  = []
+          this.goukaDialog.cardsList = []
         }
       }).catch(err => {
-
+        console.log(err)
       })
     },
     goukaDialogSearchCardsNext () {
       if (this.goukaDialog.requestData.page < (this.goukaDialog.requestData.total / this.goukaDialog.requestData.limit)) {
-        this.goukaDialog.requestData.page ++
+        this.goukaDialog.requestData.page++
         this.goukaDialogSearch()
       }
     },
     goukaDialogSearchCardsPre () {
       if (this.goukaDialog.requestData.page > 1) {
-        this.goukaDialog.requestData.page --
+        this.goukaDialog.requestData.page--
         this.goukaDialogSearch()
       }
     },
-    goukaDialogClickChoosesCard(key) {
+    goukaDialogClickChoosesCard (key) {
       this.goukaDialog.cardsList.map(res => {
         res.is_checked = false
       })
       this.goukaDialog.cardsList[key].is_checked = true
     },
-    goukaDialogNowBuy(){
+    goukaDialogNowBuy () {
       let key = 'flag'
       this.goukaDialog.cardsList.map((item, index) => {
-        if(item.is_checked === true) {
+        if (item.is_checked === true) {
           key = index
         }
       })
       if (key === 'flag') {
         alert('请选择要购买的服务卡')
-        return
       } else {
         // 支付方式  1=微信支付 2=支付宝  3=余额  4=银行卡  5=现金  6=美团   7=赠送  8=门店自用 9=兑换  10=包月服务    11=定制疗程     99=管理员充值
         // let requestData = {
@@ -1769,7 +1763,7 @@ export default {
         //   pay: 1
         // }
         // console.log(requestData)
-//添加服务卡进购物车
+        // 添加服务卡进购物车
         this.chooeseGoods.cardList = []
         this.chooeseGoods.fuwuGoods = []
         this.chooeseGoods.goods = []
@@ -1785,8 +1779,8 @@ export default {
       }
     },
 
-    //结账操作
-    jiezhangDialogClickBtn() {
+    // 结账操作
+    jiezhangDialogClickBtn () {
       if (!this.jiezhangDialog.memberVip.id) {
         alert('请先选择会员')
         return
@@ -1795,22 +1789,22 @@ export default {
         alert('请先选择服务人员')
         return
       }
-      if (!(this.chooeseGoods.goods.length !== 0 || this.chooeseGoods.cardList.length !== 0 ||  this.chooeseGoods.fuwuGoods.length !== 0)) {
+      if (!(this.chooeseGoods.goods.length !== 0 || this.chooeseGoods.cardList.length !== 0 || this.chooeseGoods.fuwuGoods.length !== 0)) {
         alert('购物车里为空，请选择商品')
         return
       }
       this.jiezhangDialog.isShow = true
     },
-    jiezhangDialogChoosesPayWay(way) {
+    jiezhangDialogChoosesPayWay (way) {
       this.jiezhangDialog.chooesePayWay = way
     },
     jiezhangDialogClickOk () {
       let requestData = {
-        member: this.jiezhangDialog.memberVip.id,       //会员id
-        waiter: this.jiezhangDialog.nowWaiter.id,        //服务员id
+        member: this.jiezhangDialog.memberVip.id, // 会员id
+        waiter: this.jiezhangDialog.nowWaiter.id, // 服务员id
         pay_way: this.jiezhangDialog.chooesePayWay,
         goods: [],
-        service_goods:[],
+        service_goods: []
       }
       if (this.chooeseGoods.goods.length) {
         let arr = []
@@ -1859,11 +1853,11 @@ export default {
       if (this.chooeseGoods.cardList.length) {
         // TODO
         let requestData = {
-          member_id: this.jiezhangDialog.memberVip.id,       //会员id
-          waiter: this.jiezhangDialog.nowWaiter.id,        //服务员id
-          pay: this.jiezhangDialog.chooesePayWay,//支付方式
-          card_id:this.chooeseGoods.cardList[0].id,//服务卡id
-          price:100,//服务卡id
+          member_id: this.jiezhangDialog.memberVip.id, // 会员id
+          waiter: this.jiezhangDialog.nowWaiter.id, // 服务员id
+          pay: this.jiezhangDialog.chooesePayWay, // 支付方式
+          card_id: this.chooeseGoods.cardList[0].id, // 服务卡id
+          price: 100// 服务卡id
         }
         postNowPayServiceCards(requestData).then(res => {
           this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
@@ -1872,7 +1866,7 @@ export default {
           console.log(err)
         })
       }
-    },
+    }
   }
 }
 </script>
