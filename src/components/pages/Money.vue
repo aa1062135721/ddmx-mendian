@@ -2,29 +2,28 @@
 <template>
     <div class="bg">
       <v-head></v-head>
-      <div style="padding: 10px 20px;">
-        <el-row :gutter="20">
-          <el-col :span="13">
-            <div class="grid-content all-goods">
-              <div class="goods-type clear-both">
-                <el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button>
-                <el-button class="page-fenlei-button float-left" icon="el-icon-arrow-left" @click="clickFenleiBtnPre"></el-button>
+      <div class="get-money-content">
+          <div style="width: 1038px">
+            <div class="all-goods">
+              <div class="goods-type">
+                <div><el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button></div>
+                <div><el-button class="page-fenlei-button float-left" icon="el-icon-arrow-left" @click="clickFenleiBtnPre"></el-button></div>
                 <div class='type-btn'>
-                  <el-button v-for="(item) in requestGoodData.typeNameList"  :key="item.id" class="fenlei-button" :class="{'fenlei-button-active':(requestGoodData.isChooeseFenleiGood && requestGoodData.who === item.id)}" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>
+                    <el-button v-for="(item) in requestGoodData.typeNameList"  :key="item.id" class="fenlei-button" :class="{'fenlei-button-active':(requestGoodData.isChooeseFenleiGood && requestGoodData.who === item.id)}" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>
                 </div>
-                <el-button class="page-fenlei-button float-right" icon="el-icon-arrow-right" @click="clickFenleiBtnNext"></el-button>
+                <div><el-button class="page-fenlei-button float-right" icon="el-icon-arrow-right" @click="clickFenleiBtnNext"></el-button></div>
               </div>
               <div class="flex-goods">
                   <v-good v-for="(item) in goodsList" :key="item.id" :ogood="item" class="goods" @click.native="addShoppingCar(item)"></v-good>
-                </div>
-                <div class="page-buttons">
+              </div>
+              <div class="page-buttons">
                 <button class="page-button" @click="clickPrePageBtn">上一页</button>
                 <button class="page-button"  @click="clickNextPageBtn">下一页</button>
               </div>
             </div>
-          </el-col>
-          <el-col :span="3">
-            <div class="grid-content caozuo-buttons">
+          </div>
+          <div style="width: 154px;">
+            <div class="caozuo-buttons">
               <el-button @click="clickAddNumShoppingCarGood" class="caozuo-button" type="primary" style="font-size: 45px;">&nbsp;&nbsp;+&nbsp;&nbsp;</el-button>
               <el-button @click="clickSubNumShoppingCarGood" class="caozuo-button" type="primary">&nbsp;&nbsp;-&nbsp;&nbsp;</el-button>
               <el-button @click="clickBtnXiugaishuliangShoppingCarGood" class="caozuo-button" type="primary">数量</el-button>
@@ -34,9 +33,9 @@
               <el-button @click="huiyuanDialog.isShow = true" class="caozuo-button" type="primary">会员</el-button>
               <el-button @click="goukaDialogShow" class="caozuo-button" type="primary">购卡</el-button>
             </div>
-          </el-col>
-          <el-col :span="8">
-            <div class="grid-content bg-purple jiesuan-goods" >
+          </div>
+          <div style="width: 636px;">
+            <div class="jiesuan-goods" >
               <div class="search">
                 <el-input class="goods-search"  @keyup.enter.native="getGoodByCondition" placeholder="商品名称/条形码"  v-model="sousuoshangpingDialog.title">
                   <el-button slot="append" icon="el-icon-search" @click="getGoodByCondition"></el-button>
@@ -141,8 +140,7 @@
                 </div>
               </div>
             </div>
-          </el-col>
-        </el-row>
+          </div>
       </div>
 
       <!--修改价格弹框-->
@@ -1844,32 +1842,13 @@ export default {
     width: 100%;
     background:#a6c9e2;
   }
-  .el-row {
-    margin-bottom: 20px;
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-  .el-col {
-    border-radius: 4px;
-  }
-  .bg-purple-dark {
-    /*background: #99a9bf;*/
-  }
-  .bg-purple {
-    /*background: #d3dce6;*/
-    height: 100%;
-  }
-  .bg-purple-light {
-    /*background: #e5e9f2;*/
-  }
-  .grid-content {
-    border-radius: 4px;
-    min-height: 36px;
-  }
-  .row-bg {
-    padding: 10px 0;
-    /*background-color: #f9fafc;*/
+  .get-money-content{
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    overflow:hidden;
+    padding: 20px 20px 0 20px;
   }
   .all-goods{
     height: calc(100vh - 110px);
@@ -1879,19 +1858,20 @@ export default {
     justify-content: space-between;
     flex-wrap:wrap;
     flex-direction:column;
+
     .goods-type{
       height: 54px;
       width: 100%;
       display: flex;
-      align-items: center;
+      /*align-items: center;*/
       flex-wrap: nowrap;
       justify-content: space-between;
       .type-btn{
-        width:800px;
+        width:700px;
         overflow: hidden;
         display: flex;
         flex-wrap: nowrap;
-        justify-content: space-between;
+        justify-content: flex-start;
       }
       .fenlei-button{
         font-size:20px!important;
@@ -1918,13 +1898,11 @@ export default {
     }
     .flex-goods{
       height: 700px;
-      /*height: 100%;*/
-      min-height: 700px;
-      max-height: 885px;
+      max-height: 824px;
       overflow-y: scroll;
       width: 100%;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       flex-wrap:wrap;
       align-items:flex-start;
       justify-content: space-between;
@@ -1936,7 +1914,8 @@ export default {
     .page-buttons{
       text-align: center;
       width: 100%;
-      height: 32px;
+      height: 42px;
+      padding-bottom: 10;
       .page-button{
         width:84px;
         height:32px;
@@ -1966,6 +1945,7 @@ export default {
     flex-wrap:nowrap;
     justify-content:space-between;
     flex-direction:column;
+    padding-bottom: 10px;
     .caozuo-button{
       width: 154px!important;
       height: 60px!important;
@@ -1985,6 +1965,7 @@ export default {
   .jiesuan-goods{
     overflow: hidden;
     height: calc(100vh - 110px);
+    padding-bottom: 10px;
     width: 100%;
     display: flex;
     justify-content: space-between;
