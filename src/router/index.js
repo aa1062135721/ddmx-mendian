@@ -46,7 +46,7 @@ const router = new Router({
       component: resolve => require(['@/components/common/Home.vue'], resolve),
       children: [
         {
-          path: '/',
+          path: '',
           name: 'Home1',
           meta: {
             title: '首页',
@@ -55,7 +55,7 @@ const router = new Router({
           component: resolve => require(['@/components/pages/Index.vue'], resolve)
         },
         {
-          path: '/index',
+          path: 'index',
           name: 'Home2',
           meta: {
             title: '首页',
@@ -64,7 +64,7 @@ const router = new Router({
           component: resolve => require(['@/components/pages/Index.vue'], resolve)
         },
         {
-          path: '/order',
+          path: 'order',
           name: 'Order',
           meta: {
             title: '订单管理',

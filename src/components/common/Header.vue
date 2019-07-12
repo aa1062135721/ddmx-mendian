@@ -6,9 +6,9 @@
       </div>
       <div class="tabs float-right">
           <ul>
-            <li class="active">前台收银</li>
-            <li @click="goToUrl('/help')"><i class="el-icon-question"></i> 帮助中心</li>
-            <li @click="handleFullScreen"><i class="el-icon-rank"></i> 全屏</li>
+            <li @click="goToUrl('/money')" :class="{'active' : $route.path === '/money'}">前台收银</li>
+            <li @click="goToUrl('/help')" :class="{'active' : $route.path === '/help'}"><i class="el-icon-question"></i> 帮助中心</li>
+            <li @click="handleFullScreen" :class="{'active' : fullscreen}"><i class="el-icon-rank"></i> {{fullscreen ? `取消全屏` : `全屏`}}</li>
             <li>{{userInfo.user_nickname ? userInfo.user_nickname : '超级管理员'}}</li>
             <li @click="handleCommand"><i class="el-icon-switch-button"></i></li>
           </ul>
@@ -21,6 +21,7 @@ import { postUserInfo } from '../../api/getData'
 export default {
   data () {
     return {
+      fullscreen: false,
       userInfo: {
         id: 1, // 用户id
         user_type: 1, //
