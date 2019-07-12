@@ -53,6 +53,24 @@ const router = new Router({
             requireAuth: true// 需要登录
           },
           component: resolve => require(['@/components/pages/Index.vue'], resolve)
+        },
+        {
+          path: '/index',
+          name: 'Home2',
+          meta: {
+            title: '首页',
+            requireAuth: true// 需要登录
+          },
+          component: resolve => require(['@/components/pages/Index.vue'], resolve)
+        },
+        {
+          path: '/order',
+          name: 'Order',
+          meta: {
+            title: '订单管理',
+            requireAuth: true// 需要登录
+          },
+          component: resolve => require(['@/components/pages/OrderManage.vue'], resolve)
         }
       ]
     },

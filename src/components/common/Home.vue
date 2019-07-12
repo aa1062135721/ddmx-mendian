@@ -30,3 +30,12 @@ export default {
   }
 }
 </script>
+<style lang="less" scoped>
+  .content-box{
+    position: absolute;
+    left: 268px;
+    top: 68px;
+    width:calc(100vw - 268px);
+    height:calc(100vh - 68px);
+  }
+</style>

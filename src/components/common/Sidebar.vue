@@ -1,24 +1,17 @@
 <template>
     <div class="sidebar">
-        <el-menu class="sidebar-el-menu" :default-active="onRoutes" :collapse="collapse" background-color="#324157"
-            text-color="#bfcbd9" active-text-color="#20a0ff" unique-opened router>
-            <template v-for="item in items">
-                <template v-if="item.subs">
-                    <el-submenu :index="item.index" :key="item.index">
-                        <template slot="title">
-                            <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
-                        </template>
-                        <el-menu-item v-for="(subItem,i) in item.subs" :key="i" :index="subItem.index">
-                            {{ subItem.title }}
-                        </el-menu-item>
-                    </el-submenu>
-                </template>
-                <template v-else>
-                    <el-menu-item :index="item.index" :key="item.index">
-                        <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
-                    </el-menu-item>
-                </template>
-            </template>
+        <el-menu class="sidebar-el-menu"
+                 background-color="#000"
+                 text-color="#fff"
+                 active-text-color="#f00"
+                 @select="handleOpen"
+                 :router="isRouter"
+                 :default-active="$route.path"
+                 >
+          <el-menu-item v-for="item in items" :index="item.index" :key="item.index">
+            <i class="my-icon" :class="item.icon"></i>
+            <span slot="title">{{ item.title }}</span>
+          </el-menu-item>
         </el-menu>
     </div>
 </template>
@@ -28,71 +21,89 @@ export default {
   data () {
     return {
       collapse: false,
+      isRouter: false,
+      nowRouter: '/home/order',
       items: [
         {
-          icon: 'el-icon-setting',
-          index: 'dashboard',
-          title: '系统首页'
+          title: '前台收银',
+          icon: 'reception-get-money',
+          index: '/money'
         },
         {
-          icon: 'el-icon-tickets',
-          index: 'table',
-          title: '基础表格'
+          title: '店铺状况',
+          icon: 'shop-status',
+          index: 'order'
         },
         {
-          icon: 'el-icon-message',
-          index: 'tabs',
-          title: 'tab选项卡'
+          title: '订单管理',
+          icon: 'order-manage',
+          index: '/home/order'
         },
         {
-          icon: 'el-icon-date',
-          index: '3',
-          title: '表单相关',
-          subs: [
-            {
-              index: 'form',
-              title: '基本表单'
-            },
-            {
-              index: 'editor',
-              title: '富文本编辑器'
-            },
-            {
-              index: 'markdown',
-              title: 'markdown编辑器'
-            },
-            {
-              index: 'upload',
-              title: '文件上传'
-            }
-          ]
+          title: '营销管理',
+          icon: 'marketing-manage',
+          index: '/home/index'
         },
         {
-          icon: 'el-icon-star-on',
-          index: 'charts',
-          title: 'schart图表'
+          title: '会员管理',
+          icon: 'member-manage',
+          index: '15'
         },
         {
-          icon: 'el-icon-rank',
-          index: 'drag',
-          title: '拖拽列表'
+          title: '库存管理',
+          icon: 'stock-manage',
+          index: '16'
         },
         {
-          icon: 'el-icon-warning',
-          index: 'permission',
-          title: '权限测试'
+          title: '报表分析',
+          icon: 'statement-analysis',
+          index: '17'
         },
         {
-          icon: 'el-icon-error',
-          index: '404',
-          title: '404页面'
+          title: '支出管理',
+          icon: 'expenditure-manage',
+          index: '19'
+        },
+        {
+          title: '系统设置',
+          icon: 'system-setting',
+          index: '20'
         }
+        // {
+        //   icon: 'el-icon-date',
+        //   index: '/21',
+        //   title: '表单相关',
+        //   subs: [
+        //     {
+        //       index: 'form',
+        //       title: '基本表单'
+        //     },
+        //     {
+        //       index: 'editor',
+        //       title: '富文本编辑器'
+        //     },
+        //     {
+        //       index: 'markdown',
+        //       title: 'markdown编辑器'
+        //     },
+        //     {
+        //       index: 'upload',
+        //       title: '文件上传'
+        //     }
+        //   ]
+        // }
       ]
     }
   },
   computed: {
-    onRoutes () {
-      return this.$route.path.replace('/', '')
+  },
+  methods: {
+    handleOpen (key, keyPath) {
+      console.log(key, keyPath)
+      this.$router.push({
+        path: key,
+        query: {}
+      })
     }
   },
   created () {
@@ -100,19 +111,110 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
     .sidebar{
-        display: block;
-        position: absolute;
-        left: 0;
-        top: 70px;
-        bottom:0;
-      background: #ccc;
+      width: 268px;
+      height: 100%;
+      display: block;
+      position: absolute;
+      left: 0;
+      top: 68px;
+      bottom:0;
+      overflow: hidden;
     }
     .sidebar-el-menu:not(.el-menu--collapse){
-        width: 250px;
+        width: 268px;
     }
     .sidebar > ul {
-        height:100%;
+      height:100%
+    }
+    .my-icon{
+      margin-right: 20px;
+      width: 48px!important;
+      height: 48px!important;
+    }
+    li{
+      height: 88px;
+      line-height: 88px;
+      font-size:26px;
+      font-family:SourceHanSansCN-Regular;
+      font-weight:400;
+      color: #ffffff;
+    }
+   .reception-get-money{
+     background: url(../../assets/sidebar-icon/reception-get-money.png) center no-repeat;
+     &:before{
+       content: "\e611";
+       font-size: 48px;
+       visibility: hidden;
+     }
+   }
+    .marketing-manage{
+      background: url(../../assets/sidebar-icon/marketing-manage.png) center no-repeat;
+      &:before{
+        content: "\e611";
+        font-size: 48px;
+        visibility: hidden;
+      }
+    }
+
+    .order-manage{
+      background: url(../../assets/sidebar-icon/order-manage.png) center no-repeat;
+      &:before{
+        content: "\e611";
+        font-size: 48px;
+        visibility: hidden;
+      }
+    }
+    .shop-status{
+      background: url(../../assets/sidebar-icon/shop-status.png) center no-repeat;
+      &:before{
+        content: "\e611";
+        font-size: 48px;
+        visibility: hidden;
+      }
+    }
+    .member-manage{
+      background: url(../../assets/sidebar-icon/member-manage.png) center no-repeat;
+      font-size: 48px;
+      &:before{
+        content: "\e611";
+        font-size: 48px;
+        visibility: hidden;
+      }
+    }
+    .stock-manage{
+      background: url(../../assets/sidebar-icon/stock-manange.png) center no-repeat;
+      font-size: 48px;
+      &:before{
+        content: "\e611";
+        font-size: 48px;
+        visibility: hidden;
+      }
+    }
+    .statement-analysis{
+      background: url(../../assets/sidebar-icon/statement-analysis.png) center no-repeat;
+      font-size: 48px;
+      &:before{
+        content: "\e611";
+        font-size: 48px;
+        visibility: hidden;
+      }
+    }
+    .expenditure-manage{
+      background: url(../../assets/sidebar-icon/expenditure-manage.png) center no-repeat;
+      &:before{
+        content: "\e611";
+        font-size: 48px;
+        visibility: hidden;
+      }
+    }
+    .system-setting{
+      background: url(../../assets/sidebar-icon/system-setting.png) center no-repeat;
+      &:before{
+        content: "\e611";
+        font-size: 48px;
+        visibility: hidden;
+      }
     }
 </style>
