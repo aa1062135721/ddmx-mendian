@@ -1,8 +1,8 @@
 <template>
     <div>
-      <el-dialog :title="title" :visible.sync="dialogTableVisible" width="298px">
+      <el-dialog :visible.sync="visible" width="298px">
        <div class="box">
-         <img src="" alt="">
+         <img  src="../../assets/images/alert-logo.png" alt="图片">
          <div class="txt">
            {{content}}
          </div>
@@ -15,10 +15,6 @@
 export default {
   name: 'ShowMyDialog',
   props: {
-    title: {// 对话框标题
-      type: String,
-      default: ''
-    },
     dialogTableVisible: {// 对话框显示与否
       type: Boolean,
       default: false
@@ -26,16 +22,25 @@ export default {
     content: {
       type: String,
       default: ''
+    },
+    seconds: {
+      type: Number,
+      default: 2000
     }
   },
   data () {
     return {
+      visible: this.dialogTableVisible,
+      timer: ''
     }
   },
   components: {},
   beforeMount () {
   },
   mounted () {
+    setTimeout(() => {
+      this.visible = false
+    }, this.seconds)
   },
   computed: {},
   methods: {
@@ -48,18 +53,21 @@ export default {
 
 <style lang="less" scoped>
 .box{
-  width:298px;
-  height:298px;
-  background:rgba(255,255,255,1);
+  width:100%;
   border-radius:10px;
+  text-align: center;
   img{
+    margin: auto;
     width:83px;
     height:104px;
   }
   .txt{
-    width:117px;
-    height:29px;
+    width:100%;
+    height:30px;
+    line-height: 30px;
     font-size:30px;
+    margin-top: 35px;
+    margin-bottom: 64px;
     font-family:SourceHanSansCN-Regular;
     font-weight:400;
     color:rgba(26,26,26,1);

@@ -114,3 +114,21 @@ export const postMemberServiceCards = (data = null) => {
 export const postBuyServiceCards = (data = null) => {
   return Vue.prototype.$post('/ticket/ticket_list', data)
 }
+
+/**
+ * 收银大屏-商品，服务商品-结算
+ * @param data
+ * @returns {*}
+ */
+export const postNowPayGoods = (data = null) => {
+  return Vue.prototype.$post('/Settlement/index', data)
+}
+
+/**
+ * 收银大屏-购买服务卡-立即支付
+ * @param data
+ * @returns {*}
+ */
+export const postNowPayServiceCards = (data = null) => {
+  return Vue.prototype.$post('/ticket/buy', data)
+}

@@ -256,45 +256,74 @@
               </li>
             </ul>
             <div class="div">
-              <button>取消</button>
-              <button>确认结账</button>
+              <button @click="jiezhangDialog.isShow = false">取消</button>
+              <button @click="jiezhangDialogClickOk">确认结账</button>
             </div>
           </div>
           <div class="float-right my-right">
+<!--            1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
             <div class="div">
-              <span class="span-btn">
-                <img src="../../assets/icon/checkout-huiyuanka.png" alt="">
+              <span v-if="jiezhangDialog.closedPayWay.indexOf(3) !== -1" class="span-btn closed">
+                <img src="../../assets/icon/checkout-huiyuanka.png" alt="会员卡">
                 <span>会员卡</span>
               </span>
-              <span class="span-btn closed">
-                <img src="../../assets/icon/checkout-xianjing.png" alt="">
+              <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 3}" @click="jiezhangDialogChoosesPayWay(3)">
+                <img src="../../assets/icon/checkout-huiyuanka.png" alt="会员卡">
+                <span>会员卡</span>
+              </span>
+              <span  v-if="jiezhangDialog.closedPayWay.indexOf(5) !== -1"  class="span-btn closed">
+                <img src="../../assets/icon/checkout-xianjing.png" alt="现金支付">
+                <span>现金</span>
+              </span>
+              <span  v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 5}" @click="jiezhangDialogChoosesPayWay(5)">
+                <img src="../../assets/icon/checkout-xianjing.png" alt="现金支付">
                 <span>现金</span>
               </span>
             </div>
             <div class="div">
-              <span class="span-btn active">
-                <img src="../../assets/icon/checkout-weixin.png" alt="">
+              <span v-if="jiezhangDialog.closedPayWay.indexOf(1) !== -1" class="span-btn closed">
+                <img src="../../assets/icon/checkout-weixin.png" alt="微信图标">
                 <span>微信</span>
               </span>
-              <span class="span-btn">
-                <img src="../../assets/icon/checkout-zhifubao.png" alt="">
+              <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 1}" @click="jiezhangDialogChoosesPayWay(1)">
+                <img src="../../assets/icon/checkout-weixin.png" alt="微信图标">
+                <span>微信</span>
+              </span>
+              <span v-if="jiezhangDialog.closedPayWay.indexOf(2) !== -1" class="span-btn closed">
+                <img src="../../assets/icon/checkout-zhifubao.png" alt="支付宝图标">
+                <span>支付宝</span>
+              </span>
+              <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 2}" @click="jiezhangDialogChoosesPayWay(2)">
+                <img src="../../assets/icon/checkout-zhifubao.png" alt="支付宝图标">
                 <span>支付宝</span>
               </span>
             </div>
-             <div class="div">
-               <span class="span-btn">
-                <img src="../../assets/icon/checkout-yinhangka.png" alt=""><span>银行卡</span>
+            <div class="div">
+               <span v-if="jiezhangDialog.closedPayWay.indexOf(4) !== -1" class="span-btn closed">
+                <img src="../../assets/icon/checkout-yinhangka.png" alt="银行卡"><span>银行卡</span>
                </span>
-               <span class="span-btn">
+               <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 4}" @click="jiezhangDialogChoosesPayWay(4)">
+                <img src="../../assets/icon/checkout-yinhangka.png" alt="银行卡"><span>银行卡</span>
+               </span>
+               <span v-if="jiezhangDialog.closedPayWay.indexOf(6) !== -1"  class="span-btn closed">
                 <img src="../../assets/icon/checkout-meituan.png" alt=""><span>美团</span>
-              </span>
-             </div>
-             <div class="div">
-               <span class="span-btn">
-                <img src="../../assets/icon/checkout-zengpin-sel.png" alt=""><span>赠送</span>
                </span>
-               <span class="span-btn">
-                <img src="../../assets/icon/checkout-mendian.png" alt=""><span>门店自用</span>
+               <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 6}" @click="jiezhangDialogChoosesPayWay(6)">
+                <img src="../../assets/icon/checkout-meituan.png" alt=""><span>美团</span>
+               </span>
+             </div>
+            <div class="div">
+               <span v-if="jiezhangDialog.closedPayWay.indexOf(7) !== -1"  class="span-btn closed">
+                <img src="../../assets/icon/checkout-zengpin-sel.png" alt="赠送"><span>赠送</span>
+               </span>
+               <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 7}" @click="jiezhangDialogChoosesPayWay(7)">
+                <img src="../../assets/icon/checkout-zengpin-sel.png" alt="赠送"><span>赠送</span>
+               </span>
+               <span  v-if="jiezhangDialog.closedPayWay.indexOf(8) !== -1"   class="span-btn closed">
+                <img src="../../assets/icon/checkout-mendian.png" alt="门店自用"><span>门店自用</span>
+               </span>
+               <span class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 8}" @click="jiezhangDialogChoosesPayWay(8)">
+                <img src="../../assets/icon/checkout-mendian.png" alt="门店自用"><span>门店自用</span>
                </span>
              </div>
           </div>
@@ -507,6 +536,8 @@
          </div>
        </div>
       </el-dialog>
+      <!--      结账成功弹框-->
+      <v-show-my-dialog :dialogTableVisible="jiezhangDialog.jiezhangSuccessDialog.isShow" :content="jiezhangDialog.jiezhangSuccessDialog.content" :seconds="jiezhangDialog.jiezhangSuccessDialog.seconds"></v-show-my-dialog>
     </div>
 </template>
 
@@ -517,7 +548,8 @@ import vKeyboard from '../common/Keyboard.vue'
 import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-ok'
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
-import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog } from '../../api/getData'
+import vShowMyDialog from '../common/ShowMyDialog'
+import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards  } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -809,17 +841,27 @@ export default {
         ],
         // 当前选中的服务人员
         nowWaiter: {
-          id: 0, // 服务员id  当服务员的id为0师表示为当前登录的店长
+          id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
           name: '请选择服务员', // 服务员名称
           type: '未知' // 服务类型
         },
         sumMoney: 0.00,//所购商品的合计
-        modifyMoney: 0.00,//改价参数
+        modifyMoney: 0.00,//改价参数,
+        chooesePayWay: 1,//支付方式
+        closedPayWay: [ //被禁用的支付方式
+          // 1,4,5
+        ],
+        // 支付完成之后弹出的结账成功弹框
+        jiezhangSuccessDialog:{
+          isShow: false,
+          content: '结账成功',
+          seconds: 1500//多少毫秒之后自动关闭
+        }
       }
     }
   },
   components: {
-    vHead, vGood, vKeyboard, vKeyboardWithoutPointWithOk, vKeyboardWithoutPoint, vCard
+    vHead, vGood, vKeyboard, vKeyboardWithoutPointWithOk, vKeyboardWithoutPoint, vCard, vShowMyDialog
   },
   mounted () {
     this.getGoodsType()
@@ -1698,6 +1740,7 @@ export default {
         addTopCarCard.is_edit = 0
         addTopCarCard.edit_price = addTopCarCard.price
         this.chooeseGoods.cardList.push(addTopCarCard)
+        this.goukaDialog.isShow = false
         this.sumChooseGoodsMoney()
         this.$forceUpdate()
       }
@@ -1709,7 +1752,7 @@ export default {
         alert('请先选择会员')
         return
       }
-      if (!this.jiezhangDialog.nowWaiter.id) {
+      if (this.jiezhangDialog.nowWaiter.id === -1) {
         alert('请先选择服务人员')
         return
       }
@@ -1719,11 +1762,14 @@ export default {
       }
       this.jiezhangDialog.isShow = true
     },
+    jiezhangDialogChoosesPayWay(way) {
+      this.jiezhangDialog.chooesePayWay = way
+    },
     jiezhangDialogClickOk () {
       let requestData = {
         member: this.jiezhangDialog.memberVip.id,       //会员id
         waiter: this.jiezhangDialog.nowWaiter.id,        //服务员id
-        pay_way: 1,
+        pay_way: this.jiezhangDialog.chooesePayWay,
         goods: [],
         service_goods:[],
       }
@@ -1740,7 +1786,14 @@ export default {
           }
           arr.push(obj)
         })
-        requestData.goods = arrr
+        requestData.goods = arr
+        // delete requestData.service_goods
+        postNowPayGoods(requestData).then(res => {
+          this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
+          console.log(res)
+        }).catch(err => {
+          console.log(err)
+        })
       }
       if (this.chooeseGoods.fuwuGoods.length) {
         let arr = []
@@ -1753,17 +1806,32 @@ export default {
           if (item.is_edit) {
             obj.edit_price = item.edit_price
           }
-
+          arr.push(obj)
         })
-        requestData.service_goods = arrr
+        requestData.service_goods = arr
+        // delete requestData.goods
+        postNowPayGoods(requestData).then(res => {
+          this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
+          console.log(res)
+        }).catch(err => {
+          console.log(err)
+        })
       }
       if (this.chooeseGoods.cardList.length) {
+        // TODO
         let requestData = {
           member_id: this.jiezhangDialog.memberVip.id,       //会员id
           waiter: this.jiezhangDialog.nowWaiter.id,        //服务员id
-          pay:1,//支付方式
+          pay: this.jiezhangDialog.chooesePayWay,//支付方式
           card_id:this.chooeseGoods.cardList[0].id,//服务卡id
+          price:100,//服务卡id
         }
+        postNowPayServiceCards(requestData).then(res => {
+          this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
+          console.log(res)
+        }).catch(err => {
+          console.log(err)
+        })
       }
     },
   }
@@ -2208,6 +2276,9 @@ export default {
           display: flex;
           justify-content: space-between;
           .span-btn{
+            &:hover{
+              cursor:pointer;
+            }
             position: relative;
             width:176px;
             height:56px;
