@@ -1,9 +1,10 @@
 <template>
+  <div>
     <div class="bg">
       <div class="card" :class="{'active' : ocard.is_checked}">
         <img v-if="ocard.is_checked" class="ischeck" src="../../assets/icon/is-chooese.png" alt="卡片被选中">
         <div class="head_body"
-             :class="{'head_body_bg_color_time' : ocard.type === '1', 'head_body_bg_color_month' : ocard.type === '2',  'head_body_bg_color_year' : ocard.type === '4',}">
+             :class="{'head_body_bg_color_time' : ocard.type === '1', 'head_body_bg_color_month' : ocard.type === '2',  'head_body_bg_color_year' : ocard.type === '4'}">
           <div class="title overflow-row1-ellipsis">
             <img v-if="ocard.type === '2'" src="../../assets/icon/card-month.png" alt="月卡图标">
             <img v-if="ocard.type === '1'" src="../../assets/icon/card-times.png" alt="次卡图标">
@@ -13,7 +14,7 @@
           <div class="body1">
             <span class="font-red float-left" style="font-size: 16px;">￥</span>
             <span class="font-red float-left">{{ocard.price}}</span>
-            <span class="float-right">查看详情</span>
+            <span class="float-right" style="" @click.stop="showDetails(ocard)">查看详情</span>
           </div>
           <div class="body2 overflow-row1-ellipsis" v-if="ocard.service.length">
             <span class="float-left" v-if="ocard.service[0]">{{ocard.service[0].service_name}} {{ocard.service[0].num}}次</span>
@@ -30,6 +31,44 @@
         </div>
       </div>
     </div>
+    <!-- 查看详情弹框  -->
+    <el-dialog title="查看详情" :visible.sync="detailDialog.isShow" width="524px" :center="true"  :append-to-body="true">
+      <div>
+        <div  style="margin-bottom: 10px;">
+          <div class="detail_header">时间有效期</div>
+          <div class="detail_content">
+            <div class="yuan float-left"></div>
+            <div class="title float-left">激活过期时间：5天</div>
+            <div class="text clear-both">
+            </div>
+          </div>
+          <div class="detail_content">
+            <div class="yuan float-left"></div>
+            <div class="title float-left">激活后使用过期时间：10天</div>
+            <div class="text clear-both">
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 10px;">
+          <div class="detail_header">服务项目</div>
+          <div class="detail_content">
+            <div class="yuan float-left"></div>
+            <div class="title float-left">中医药浴理疗（10次)</div>
+            <div class="text clear-both">
+              要求：发生的发生地方的大神带发大水发斯蒂芬发斯蒂芬发发生的发生地方的大神带发大水发斯蒂芬发斯蒂芬发斯蒂芬阿发斯蒂芬斯蒂芬阿发斯蒂芬
+            </div>
+          </div>
+          <div class="detail_content">
+            <div class="yuan float-left"></div>
+            <div class="title float-left">中医药浴理疗（10次)</div>
+            <p class="text clear-both">
+              要求：发生的发生地方的大神带发大水发斯蒂芬发斯蒂芬发发生的发生地方的大神带发大水发斯蒂芬发斯蒂芬发斯蒂芬阿发斯蒂芬斯蒂芬阿发斯蒂芬
+            </p>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
@@ -42,6 +81,14 @@ export default {
   },
   data () {
     return {
+      detailDialog: {
+        isShow: false
+      }
+    }
+  },
+  methods: {
+    showDetails (details) {
+      this.detailDialog.isShow = true
     }
   }
 
@@ -56,7 +103,7 @@ export default {
     font-size:16px;
     font-family:SourceHanSansCN-Regular;
     font-weight:400;
-    color:#ffffff;
+    color:#474747;
     background: #ffffff;
     box-shadow:0px 0px 11px 1px rgba(33,33,33,0.19);
     .card{
@@ -97,7 +144,10 @@ export default {
           .float-right{
             font-size:20px;
             font-weight:400;
-            color:rgba(255,255,255,1);
+            color:#474747;
+            &:hover{
+              cursor:pointer;
+            }
           }
         }
         .body2{
@@ -107,7 +157,7 @@ export default {
           margin-bottom: 0px;
           font-size: 16px;
           line-height: 16px;
-          color:rgba(255,255,255,1);
+          color:#474747;
         }
       }
       .head_body_bg_color_month{
@@ -137,6 +187,46 @@ export default {
     }
     .active{
       border: 1px solid red;
+    }
+  }
+  .detail_header{
+    width: 100%;
+    height:25px;
+    font-size:20px;
+    line-height: 25px;
+    font-family:SourceHanSansCN-Regular;
+    font-weight:400;
+    color:rgba(26,26,26,1);
+    margin-bottom: 5px;
+  }
+  .detail_content{
+    margin-left:5px;
+    margin-bottom: 10px;
+    font-size:20px;
+    line-height: 25px;
+    font-family:SourceHanSansCN-Regular;
+    color:rgba(128,128,128,1);
+    .yuan{
+      width:8px!important;
+      height:8px!important;
+      background:rgba(46,202,241,1)!important;
+      border-radius:50%!important;
+      margin-top:9px;
+      margin-right: 5px;
+    }
+    .title{
+      height: 25px;
+      line-height: 25px;
+      font-size:18px;
+      font-family:SourceHanSansCN-Regular;
+      font-weight:400;
+      color:rgba(128,128,128,1);
+    }
+    .text{
+      font-size:16px;
+      font-family:SourceHanSansCN-Regular;
+      font-weight:400;
+      color:rgba(128,128,128,1);
     }
   }
 </style>
