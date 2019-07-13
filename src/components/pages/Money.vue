@@ -530,7 +530,7 @@
            <el-button @click="goukaDialogChoosesCardType(4)" class="btn" :class="{'active': (!goukaDialog.title && goukaDialog.requestData.type === 4)}">年卡</el-button>
          </div>
          <div class="bodys">
-             <v-card v-for="(item, index) in goukaDialog.cardsList" :key="item.id" :ocard="item" @click.native="goukaDialogClickChoosesCard(index)"></v-card>
+             <v-card class="card-botton" v-for="(item, index) in goukaDialog.cardsList" :key="item.id" :ocard="item" @click.native="goukaDialogClickChoosesCard(index)"></v-card>
          </div>
          <div class="footer">
            <el-button @click="goukaDialogSearchCardsPre" class="btn">上一页</el-button>
@@ -640,7 +640,7 @@ export default {
       },
       //  会员查询 - 单击会员按钮后的弹窗所需要的数据
       huiyuanDialog: {
-        isShow: true, // 是否显示会员查询对话框
+        isShow: false, // 是否显示会员查询对话框
         mobile: '13637765376', // 要查询的会员手机号码
         // 会员信息
         huiyuanInfo: {
@@ -700,7 +700,7 @@ export default {
         },
         // 使用记录弹窗
         shiyongjiluDialog: {
-          isShow: true,
+          isShow: false,
           tableData: [
             {name: '水育', time: '2018-09-20 14:12:20', who: 5},
             {name: '水域', time: '2018-09-20 14:12:20', who: 5},
@@ -723,18 +723,18 @@ export default {
       // 单击充值按钮后的弹窗所需要的数据
       chongzhiDialog: {
         isShow: false, // 充值弹窗显示与否
-        mobile: '13637765376',
+        mobile: '',
         chooeseWho: 'mobile',
         huiyuanInfo: {
-          id: 5110, // 会员id
-          mobile: '13637765376', // 会员电话
-          shop_code: 'A00036', // 所属门店的门店编号
-          level_id: 6, // 会员等级id
-          nickname: '荣柱', // 姓名
-          level_name: '七星会员', // 会员等级名称
-          money: '0.00', // 余额
-          amount: '0.05', // 累积充值
-          regtime: '1970-01-01 08:33:37'// 加入时间
+          // id: 5110, // 会员id
+          // mobile: '13637765376', // 会员电话
+          // shop_code: 'A00036', // 所属门店的门店编号
+          // level_id: 6, // 会员等级id
+          // nickname: '荣柱', // 姓名
+          // level_name: '七星会员', // 会员等级名称
+          // money: '0.00', // 余额
+          // amount: '0.05', // 累积充值
+          // regtime: '1970-01-01 08:33:37'// 加入时间
         },
         isShowHuiyuanDengjiDialog: false, // 等级说明弹框显示与否
         payType: '5', // 充值方式
@@ -751,64 +751,10 @@ export default {
         isShow: false,
         title: '', // 请输入购卡名称
         cardsList: [// 服务卡列表
-          {
-            is_checked: false,
-            id: 3,
-            card_id: null,
-            shop_id: 27,
-            shop_name: '江与城店',
-            card_name: '艾灸推拿',
-            cover: '',
-            critulation: 100,
-            exchange_num: 100,
-            restrict_num: 2,
-            start_time: 1561478400,
-            end_time: 1565823999,
-            integral_price: 0,
-            create_time: 1561533639,
-            status: '1',
-            del: '1',
-            creator_id: 1,
-            update_time: null,
-            modifier: null,
-            type: '2',
-            term_of_validity: null,
-            all_shop: '1',
-            give: '0',
-            day: 10,
-            use_day: 30,
-            month: 0,
-            year: 0
-          },
-          {
-            is_checked: false,
-            id: 4,
-            card_id: null,
-            shop_id: 27,
-            shop_name: '江与城店',
-            card_name: '艾灸推拿',
-            cover: '',
-            critulation: 100,
-            exchange_num: 100,
-            restrict_num: 2,
-            start_time: 1561478400,
-            end_time: 1565823999,
-            integral_price: 0,
-            create_time: 1561533639,
-            status: '1',
-            del: '1',
-            creator_id: 1,
-            update_time: null,
-            modifier: null,
-            type: '2',
-            term_of_validity: null,
-            all_shop: '1',
-            give: '0',
-            day: 10,
-            use_day: 30,
-            month: 0,
-            year: 0
-          }
+          {id: 1, card_name: "艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1", type: "1", month: "", price: "100.00", mprice: "100.00", service: [{num: 10, service_name: "艾灸"}]},
+          {id: 2, card_name: "艾灸推拿", type: "2", month: "", price: "100.00", mprice: "100.00", service: []},
+          {id: 3, card_name: "艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1", type: "3", month: "", price: "100.00", mprice: "100.00", service: [{num: 10, service_name: "艾灸"}]},
+          {id: 4, card_name: "艾灸推拿", type: "4", month: "", price: "100.00", mprice: "100.00", service: []}
         ],
         requestData: {
           total: 0,
@@ -1597,7 +1543,7 @@ export default {
         pay_way: this.chongzhiDialog.payType
       }
       postMemberVipRecharge(requestData).then(res => {
-        if (res.data) {
+        if (res.code === '200') {
           this.$message({
             message: res.msg,
             type: 'success'
@@ -1620,9 +1566,12 @@ export default {
         })
         return
       }
+      this.huiyuanDialog.huiyuanInfo = {}
+      this.huiyuanDialog.fuwukaList = []
+      this.huiyuanDialog.chongzhijiluList = []
       let requestData = {mobile: this.huiyuanDialog.mobile}
       postSearchVip(requestData).then(res => {
-        if (res.data) {
+        if (res.data.id) {
           this.huiyuanDialog.huiyuanInfo = res.data
           this.huiyuanDialogSearchRechargeLog()
         }
@@ -1966,18 +1915,31 @@ export default {
         })
       }
       if (this.chooeseGoods.cardList.length) {
-        // TODO
+        console.log(this.chooeseGoods.cardList)
         let requestData = {
           member_id: this.jiezhangDialog.memberVip.id, // 会员id
           waiter: this.jiezhangDialog.nowWaiter.id, // 服务员id
           pay: this.jiezhangDialog.chooesePayWay, // 支付方式
           card_id: this.chooeseGoods.cardList[0].id, // 服务卡id
-          price: 100// 服务卡id
+          price: this.chooeseGoods.cardList[0].is_edit ? this.chooeseGoods.cardList[0].edit_price : this.chooeseGoods.cardList[0].price
         }
         console.log(requestData)
         postNowPayServiceCards(requestData).then(res => {
-          this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
           console.log(res)
+          if (res.code === '200') {
+            this.jiezhangDialog.nowWaiter = {
+              id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
+              name: '请选择服务员', // 服务员名称
+              type: '未知' // 服务类型
+            }
+            this.jiezhangDialog.memberVip = {}
+            this.chooeseGoods.cardList = []
+            this.jiezhangDialog.isShow = false
+            this.jiezhangDialog.sumMoney = 0
+            this.jiezhangDialog.modifyMoney = 0
+            this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
+            this.$forceUpdate
+          }
         }).catch(err => {
           console.log(err)
         })
@@ -2107,6 +2069,7 @@ export default {
       font-family:SourceHanSansCN-Regular;
       font-weight:400!important;
       color:rgba(26,26,26,1)!important;
+      margin-left: 0;
     }
     .caozuo-button:active{
       color: #fff!important;
@@ -2575,7 +2538,7 @@ export default {
       }
       .bodys{
         width: 100%;
-        height: 410px;
+        height: 430px;
         margin-bottom:28px;
         display: flex;
         align-items: center;
@@ -2583,6 +2546,9 @@ export default {
         align-items:flex-start;
         justify-content: space-between;
         align-content:flex-start;
+        .card-botton{
+          margin-bottom: 28px;
+        }
       }
       .footer{
         width: 100%;
