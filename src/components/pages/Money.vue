@@ -436,8 +436,8 @@
                 <template slot-scope="scope">
                   <el-button v-if="scope.row.type === '0'" size="mini" @click="huiyuanDialogActiveServiceCard(scope.row)">激活</el-button>
                   <el-button v-if="scope.row.type === '1'" size="mini" @click="huiyuanDialogUseServiceCardList(scope.row)">耗卡</el-button>
-                  <el-button v-if="scope.row.type === '2'" size="mini" @click="huiyuanDialog.shiyongjiluDialog.isShow = true">使用记录</el-button>
-                  <el-button v-if="scope.row.type === '4'" size="mini" @click="huiyuanDialog.tuikaDialog.isShow = true">退卡详情</el-button>
+                  <el-button v-if="scope.row.type === '2'" size="mini" @click="huiyuanDialogServiceCardUseRecords(scope.row)">使用记录</el-button>
+                  <el-button v-if="scope.row.type === '4'" size="mini" @click="huiyuanDialogServiceCardReturnCardsDetails(scope.row)">退卡详情</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -478,15 +478,16 @@
       </el-dialog>
       <!-- 会员查询-耗卡  -->
       <el-dialog title="耗卡" :visible.sync="huiyuanDialog.haokaDialog.isShow" width="648px" :center="true">
-        <div style="height: 240px;">
-          <el-table :data="huiyuanDialog.haokaDialog.tableData" border  style="height: 240px;">
-            <el-table-column prop="sname" label="服务项目" width="180"></el-table-column>
-            <el-table-column prop="num" label="次数" width="180"></el-table-column>
-            <el-table-column prop="s_num" label="剩余次数" width="180"></el-table-column>
-            <el-table-column label="操作" width="180">
+        <div>
+          <el-table :data="huiyuanDialog.haokaDialog.tableData" border style="height: 240px;">
+            <el-table-column prop="sname" label="服务项目"></el-table-column>
+            <el-table-column prop="num" label="次数"></el-table-column>
+            <el-table-column prop="s_num" label="剩余次数"></el-table-column>
+            <el-table-column label="操作">
               <template slot-scope="scope">
-                {{scope.row.type}}
-                <el-button  size="mini" @click="huiyuanDialogUseServiceCard(scope.row)">立即使用</el-button>
+                <span v-if="scope.row.type === '立即使用'" style="color: blue;" @click="huiyuanDialogUseServiceCard(scope.row)">{{scope.row.type}}</span>
+                <span v-else-if="scope.row.type === '不可用'" class="font-red">{{scope.row.type}}</span>
+                <span v-else>{{scope.row.type}}</span>
               </template>
             </el-table-column>
           </el-table>
@@ -540,7 +541,7 @@
        </div>
       </el-dialog>
       <!-- 结账成功弹框-->
-      <v-show-my-dialog :dialogTableVisible="jiezhangDialog.jiezhangSuccessDialog.isShow" :content="jiezhangDialog.jiezhangSuccessDialog.content" :seconds="jiezhangDialog.jiezhangSuccessDialog.seconds"></v-show-my-dialog>
+      <v-show-my-dialog v-if="jiezhangDialog.jiezhangSuccessDialog.isShow" :dialogTableVisible="jiezhangDialog.jiezhangSuccessDialog.isShow" :content="jiezhangDialog.jiezhangSuccessDialog.content" :seconds="jiezhangDialog.jiezhangSuccessDialog.seconds"></v-show-my-dialog>
     </div>
 </template>
 
@@ -552,7 +553,7 @@ import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-o
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
 import vShowMyDialog from '../common/ShowMyDialog'
-import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket } from '../../api/getData'
+import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -639,7 +640,7 @@ export default {
       },
       //  会员查询 - 单击会员按钮后的弹窗所需要的数据
       huiyuanDialog: {
-        isShow: false, // 是否显示会员查询对话框
+        isShow: true, // 是否显示会员查询对话框
         mobile: '13637765376', // 要查询的会员手机号码
         // 会员信息
         huiyuanInfo: {
@@ -660,7 +661,7 @@ export default {
           nickname: ''
         },
         // 展示服务卡购买记录
-        showFuwuTable: false,
+        showFuwuTable: true,
         // 服务卡购买记录
         fuwukaList: [
           {
@@ -675,8 +676,7 @@ export default {
             end_time: '2019-07-13 11:47:15',
             over_time: 1562989635,
             status: 0,
-            type_card: '次卡',
-            status_name: '未激活'
+            type_card: '次卡', status_name: '未激活'
           }
         ],
         // 会员充值记录
@@ -691,18 +691,16 @@ export default {
         ],
         // 耗卡弹窗
         haokaDialog: {
-          isShow: true,
+          isShow: false,
           tableData: [
-            {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
-            {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
-            {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
-            {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0},
-            {name: '水域', haveTimes: 100, haisheng: 5, caozuo: 0}
+            {sname: "艾灸", num: "不限制", id: 1, s_num: "不限制", status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: "不可用"},
+            {sname: "艾灸", num: "不限制", id: 2, s_num: "不限制", status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: "立即使用"},
+            {sname: "艾灸", num: "不限制", id: 3, s_num: "不限制", status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: "无"},
           ]
         },
         // 使用记录弹窗
         shiyongjiluDialog: {
-          isShow: false,
+          isShow: true,
           tableData: [
             {name: '水育', time: '2018-09-20 14:12:20', who: 5},
             {name: '水域', time: '2018-09-20 14:12:20', who: 5},
@@ -882,7 +880,10 @@ export default {
         good.edit_price = good.price
         for (let i = 0; i < this.chooeseGoods.fuwuGoods.length; i++) {
           if (this.chooeseGoods.fuwuGoods[i].id === good.id) {
-            alert('该服务商品已经存在购物车了')
+            this.$message({
+              message: '该服务商品已经存在购物车了,请在购物车里选择它后编辑它',
+              type: 'error'
+            })
             return
           }
         }
@@ -899,12 +900,18 @@ export default {
           good.is_edit = 0
           good.edit_price = good.price
         } else {
-          alert('该商品的库存不足')
+          this.$message({
+            message: '该商品的库存不足，不能加入购物车',
+            type: 'error'
+          })
           return
         }
         for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
           if (this.chooeseGoods.goods[i].id === good.id) {
-            alert('该商品已经存在购物车了')
+            this.$message({
+              message: '该商品已经存在购物车了,请在购物车里选择它后编辑它',
+              type: 'error'
+            })
             return
           }
         }
@@ -1064,7 +1071,10 @@ export default {
           this.xiugaishuliangDialog.inputValue = this.chooeseGoods.goods[key].num
           this.xiugaishuliangDialog.isShow = true
         } else {
-          alert('请购物车选择要修改数量的商品')
+          this.$message({
+            message: '请选中购物车里的商品',
+            type: 'error'
+          })
         }
       }
       if (this.chooeseGoods.fuwuGoods.length) {
@@ -1078,7 +1088,10 @@ export default {
           this.xiugaishuliangDialog.inputValue = this.chooeseGoods.fuwuGoods[key].num
           this.xiugaishuliangDialog.isShow = true
         } else {
-          alert('请购物车选择要修改数量的服务商品')
+          this.$message({
+            message: '请选中购物车里的商品',
+            type: 'error'
+          })
         }
       }
       if (this.chooeseGoods.cardList.length) {
@@ -1092,7 +1105,10 @@ export default {
           this.xiugaishuliangDialog.inputValue = this.chooeseGoods.cardList[key].num
           this.xiugaishuliangDialog.isShow = true
         } else {
-          alert('请购物车选择要修改数量的服务卡')
+          this.$message({
+            message: '请选中购物车里的商品',
+            type: 'error'
+          })
         }
       }
     },
@@ -1171,7 +1187,10 @@ export default {
           }
           this.xiugaijiageDialog.isShow = true
         } else {
-          alert('请在购物车选择要修改价格的商品')
+          this.$message({
+            message: '请选中购物车里的商品',
+            type: 'error'
+          })
         }
       }
       if (this.chooeseGoods.fuwuGoods.length) {
@@ -1190,7 +1209,10 @@ export default {
           }
           this.xiugaijiageDialog.isShow = true
         } else {
-          alert('请在购物车选择要修改价格的服务商品')
+          this.$message({
+            message: '请选中购物车里的商品',
+            type: 'error'
+          })
         }
       }
       if (this.chooeseGoods.cardList.length) {
@@ -1209,7 +1231,10 @@ export default {
           }
           this.xiugaijiageDialog.isShow = true
         } else {
-          alert('请在购物车选择要修改价格的服务卡')
+          this.$message({
+            message: '请选中购物车里的商品',
+            type: 'error'
+          })
         }
       }
     },
@@ -1409,15 +1434,18 @@ export default {
     // 按搜索商品(商品标题和条形码)
     getGoodByCondition (str) {
       if (this.sousuoshangpingDialog.title.length === 0) {
-        alert('请输入内容')
+        this.$message({
+          message: '请输入商品名或条形码',
+          type: 'error'
+        })
         return
       }
       if (/^[0-9]+$/.test(this.sousuoshangpingDialog.title)) {
-        // alert('全部是数字')
+        // 全部是数字
         this.searchGoodsByGoodCode()
       } else {
         this.sousuoshangpingDialog.isShow = true
-        // alert('非纯数字')
+        // 非纯数字
         this.searchGoodsByGoodName()
       }
     },
@@ -1446,7 +1474,10 @@ export default {
           good.edit_price = good.price
           for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
             if (this.chooeseGoods.goods[i].id === good.id) {
-              alert('该商品已经存在购物车了')
+              this.$message({
+                message: '该商品已经存在购物车了，请选中后再操作',
+                type: 'error'
+              })
               return
             }
           }
@@ -1508,7 +1539,10 @@ export default {
             console.log(err)
           })
         } else {
-          alert('请输入正确的手机号')
+          this.$message({
+            message: '请输入正确的手机号',
+            type: 'error'
+          })
         }
       } else {
         this.xuanzehuiyuanDialog.mobile += code
@@ -1565,7 +1599,7 @@ export default {
       postMemberVipRecharge(requestData).then(res => {
         if (res.data) {
           this.$message({
-            message: '恭喜你，这是一条成功消息',
+            message: res.msg,
             type: 'success'
           })
           this.chongzhiDialogSearchMemberVip()
@@ -1580,7 +1614,10 @@ export default {
     },
     huiyuanDialogSearchMemberVip () {
       if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.huiyuanDialog.mobile)) {
-        alert('请输入正确的手机号')
+        this.$message({
+          message: '请输入正确的手机号',
+          type: 'error'
+        })
         return
       }
       let requestData = {mobile: this.huiyuanDialog.mobile}
@@ -1606,15 +1643,27 @@ export default {
         nickname: this.huiyuanDialog.addHuiyuanDialog.nickname
       }
       if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(requestData.mobile)) {
-        alert('请输入正确的手机号')
+        this.$message({
+          message: '请输入正确的手机号',
+          type: 'error'
+        })
         return
       }
       if (!/^[\u4e00-\u9fa5]+$/.test(requestData.nickname)) {
-        alert('请输入正确的会员昵称')
+        this.$message({
+          message: '请输入正确的会员昵称',
+          type: 'error'
+        })
         return
       }
       postAddMemberVip(requestData).then(res => {
-        alert(res.msg)
+        if (res.code === '200') {
+          this.$message({
+            message: res.msg,
+            type: 'success'
+          })
+        }
+
       }).catch(err => {
         console.log('新增会员失败', err)
       })
@@ -1627,7 +1676,10 @@ export default {
           this.huiyuanDialog.chongzhijiluList = res.data
         })
       } else {
-        alert('请查询选择会员')
+        this.$message({
+          message: '请输入要查询会员的手机号码后再查看Ta的充值记录',
+          type: 'error'
+        })
       }
     },
     huiyuanDialogSearchServiceCardList () {
@@ -1644,7 +1696,10 @@ export default {
           console.log(err)
         })
       } else {
-        alert('请查询选择会员')
+        this.$message({
+          message: '请输入要查询会员的手机号码后再查看Ta购买的服务卡',
+          type: 'error'
+        })
       }
     },
     huiyuanDialogActiveServiceCard (card) {
@@ -1662,7 +1717,6 @@ export default {
     // 耗卡列表
     huiyuanDialogUseServiceCardList (card) {
       console.log(card)
-      this.huiyuanDialog.haokaDialog.isShow = true
       let requestData = {
         ticket_id: card.id
       }
@@ -1673,19 +1727,40 @@ export default {
       }).catch(err => {
         console.log(err)
       })
+      this.huiyuanDialog.haokaDialog.isShow = true
     },
     // 耗卡
     huiyuanDialogUseServiceCard (card) {
       console.log(card)
       let requestData = {
-        card_id: card.id,
-        waiter: 1
+        service_id: card.id
       }
       postMemberServiceCardsUseListTicket(requestData).then(res => {
-
+        console.log(res)
       }).catch(err => {
         console.log(err)
       })
+    },
+    //使用记录
+    huiyuanDialogServiceCardUseRecords (card) {
+      let requestData = {
+        id:card.id
+      }
+      console.log(requestData)
+      postMemberServiceCardsUseRecords(requestData).then(res => {
+        console.log(res)
+        if (res.data) {
+          this.huiyuanDialog.shiyongjiluDialog.tableData = res.data
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+      this.huiyuanDialog.shiyongjiluDialog.isShow = true
+    },
+    //退卡详情
+    huiyuanDialogServiceCardReturnCardsDetails (card) {
+      this.huiyuanDialog.tuikaDialog.isShow = true
+      console.log(card)
     },
 
     // 购卡弹框
@@ -1752,7 +1827,10 @@ export default {
         }
       })
       if (key === 'flag') {
-        alert('请选择要购买的服务卡')
+        this.$message({
+          message: '请选择要购买的服务卡',
+          type: 'error'
+        })
       } else {
         // 支付方式  1=微信支付 2=支付宝  3=余额  4=银行卡  5=现金  6=美团   7=赠送  8=门店自用 9=兑换  10=包月服务    11=定制疗程     99=管理员充值
         // let requestData = {
@@ -1781,16 +1859,25 @@ export default {
 
     // 结账操作
     jiezhangDialogClickBtn () {
+      if (!(this.chooeseGoods.goods.length !== 0 || this.chooeseGoods.cardList.length !== 0 || this.chooeseGoods.fuwuGoods.length !== 0)) {
+        this.$message({
+          message: '购物车为空，请选择商品',
+          type: 'error'
+        })
+        return
+      }
       if (!this.jiezhangDialog.memberVip.id) {
-        alert('请先选择会员')
+        this.$message({
+          message: '请先选择会员',
+          type: 'error'
+        })
         return
       }
       if (this.jiezhangDialog.nowWaiter.id === -1) {
-        alert('请先选择服务人员')
-        return
-      }
-      if (!(this.chooeseGoods.goods.length !== 0 || this.chooeseGoods.cardList.length !== 0 || this.chooeseGoods.fuwuGoods.length !== 0)) {
-        alert('购物车里为空，请选择商品')
+        this.$message({
+          message: '请先选择服务人员',
+          type: 'error'
+        })
         return
       }
       this.jiezhangDialog.isShow = true
@@ -1820,10 +1907,24 @@ export default {
           arr.push(obj)
         })
         requestData.goods = arr
-        // delete requestData.service_goods
+        delete requestData.service_goods
+        console.log(requestData)
         postNowPayGoods(requestData).then(res => {
-          this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
           console.log(res)
+          if (res.code === '200') {
+            this.jiezhangDialog.nowWaiter = {
+              id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
+              name: '请选择服务员', // 服务员名称
+              type: '未知' // 服务类型
+            }
+            this.jiezhangDialog.memberVip = {}
+            this.chooeseGoods.goods = []
+            this.jiezhangDialog.isShow = false
+            this.jiezhangDialog.sumMoney = 0
+            this.jiezhangDialog.modifyMoney = 0
+            this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
+            this.$forceUpdate
+          }
         }).catch(err => {
           console.log(err)
         })
@@ -1842,10 +1943,24 @@ export default {
           arr.push(obj)
         })
         requestData.service_goods = arr
-        // delete requestData.goods
+        delete requestData.goods
+        console.log(requestData)
         postNowPayGoods(requestData).then(res => {
-          this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
           console.log(res)
+          if (res.code === '200') {
+            this.jiezhangDialog.nowWaiter = {
+              id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
+              name: '请选择服务员', // 服务员名称
+              type: '未知' // 服务类型
+            }
+            this.jiezhangDialog.memberVip = {}
+            this.chooeseGoods.fuwuGoods = []
+            this.jiezhangDialog.isShow = false
+            this.jiezhangDialog.sumMoney = 0
+            this.jiezhangDialog.modifyMoney = 0
+            this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
+            this.$forceUpdate
+          }
         }).catch(err => {
           console.log(err)
         })
@@ -1859,6 +1974,7 @@ export default {
           card_id: this.chooeseGoods.cardList[0].id, // 服务卡id
           price: 100// 服务卡id
         }
+        console.log(requestData)
         postNowPayServiceCards(requestData).then(res => {
           this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
           console.log(res)

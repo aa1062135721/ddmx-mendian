@@ -76,18 +76,6 @@ axios.interceptors.response.use(
       })
       return
     }
-    if (response.data.code !== '200') {
-      Vue.prototype.$message({
-        message: response.data.msg,
-        type: 'info'
-      })
-    }
-    if (response.data.code === '200') {
-      Vue.prototype.$message({
-        message: response.data.msg,
-        type: 'success'
-      })
-    }
     return response
   },
   error => {

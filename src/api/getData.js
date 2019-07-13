@@ -134,6 +134,15 @@ export const postMemberServiceCardsUseListTicket = (data = null) => {
 }
 
 /**
+ * 收银大屏-会员的服务卡-使用记录
+ * @param data
+ * @returns {*}
+ */
+export const postMemberServiceCardsUseRecords = (data = null) => {
+  return Vue.prototype.$post('/ticket/ticket_records', data)
+}
+
+/**
  * 收银大屏-购买服务卡-服务卡列表
  * @param data
  * @returns {*}
