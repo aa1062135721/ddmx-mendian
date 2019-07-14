@@ -676,7 +676,8 @@ export default {
             end_time: '2019-07-13 11:47:15',
             over_time: 1562989635,
             status: 0,
-            type_card: '次卡', status_name: '未激活'
+            type_card: '次卡',
+            status_name: '未激活'
           }
         ],
         // 会员充值记录
@@ -693,9 +694,9 @@ export default {
         haokaDialog: {
           isShow: false,
           tableData: [
-            {sname: "艾灸", num: "不限制", id: 1, s_num: "不限制", status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: "不可用"},
-            {sname: "艾灸", num: "不限制", id: 2, s_num: "不限制", status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: "立即使用"},
-            {sname: "艾灸", num: "不限制", id: 3, s_num: "不限制", status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: "无"},
+            {sname: '艾灸', num: '不限制', id: 1, s_num: '不限制', status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: '不可用'},
+            {sname: '艾灸', num: '不限制', id: 2, s_num: '不限制', status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: '立即使用'},
+            {sname: '艾灸', num: '不限制', id: 3, s_num: '不限制', status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: '无'}
           ]
         },
         // 使用记录弹窗
@@ -751,10 +752,10 @@ export default {
         isShow: false,
         title: '', // 请输入购卡名称
         cardsList: [// 服务卡列表
-          {id: 1, card_name: "艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1", type: "1", month: "", price: "100.00", mprice: "100.00", service: [{num: 10, service_name: "艾灸"}]},
-          {id: 2, card_name: "艾灸推拿", type: "2", month: "", price: "100.00", mprice: "100.00", service: []},
-          {id: 3, card_name: "艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1", type: "3", month: "", price: "100.00", mprice: "100.00", service: [{num: 10, service_name: "艾灸"}]},
-          {id: 4, card_name: "艾灸推拿", type: "4", month: "", price: "100.00", mprice: "100.00", service: []}
+          {id: 1, card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1', type: '1', month: '', price: '100.00', mprice: '100.00', service: [{num: 10, service_name: '艾灸'}]},
+          {id: 2, card_name: '艾灸推拿', type: '2', month: '', price: '100.00', mprice: '100.00', service: []},
+          {id: 3, card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1', type: '3', month: '', price: '100.00', mprice: '100.00', service: [{num: 10, service_name: '艾灸'}]},
+          {id: 4, card_name: '艾灸推拿', type: '4', month: '', price: '100.00', mprice: '100.00', service: []}
         ],
         requestData: {
           total: 0,
@@ -1612,7 +1613,6 @@ export default {
             type: 'success'
           })
         }
-
       }).catch(err => {
         console.log('新增会员失败', err)
       })
@@ -1690,10 +1690,10 @@ export default {
         console.log(err)
       })
     },
-    //使用记录
+    // 使用记录
     huiyuanDialogServiceCardUseRecords (card) {
       let requestData = {
-        id:card.id
+        id: card.id
       }
       console.log(requestData)
       postMemberServiceCardsUseRecords(requestData).then(res => {
@@ -1706,7 +1706,7 @@ export default {
       })
       this.huiyuanDialog.shiyongjiluDialog.isShow = true
     },
-    //退卡详情
+    // 退卡详情
     huiyuanDialogServiceCardReturnCardsDetails (card) {
       this.huiyuanDialog.tuikaDialog.isShow = true
       console.log(card)
@@ -1872,7 +1872,7 @@ export default {
             this.jiezhangDialog.sumMoney = 0
             this.jiezhangDialog.modifyMoney = 0
             this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
-            this.$forceUpdate
+            this.$forceUpdate()
           }
         }).catch(err => {
           console.log(err)
@@ -1908,7 +1908,7 @@ export default {
             this.jiezhangDialog.sumMoney = 0
             this.jiezhangDialog.modifyMoney = 0
             this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
-            this.$forceUpdate
+            this.$forceUpdate()
           }
         }).catch(err => {
           console.log(err)
@@ -1938,7 +1938,7 @@ export default {
             this.jiezhangDialog.sumMoney = 0
             this.jiezhangDialog.modifyMoney = 0
             this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
-            this.$forceUpdate
+            this.$forceUpdate()
           }
         }).catch(err => {
           console.log(err)
