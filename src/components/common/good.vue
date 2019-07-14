@@ -18,7 +18,7 @@
              原价: ¥ {{ogood.price}}
           </p>
         </div>
-        <div>
+        <div class="goods_price">
           <span class="xianjia">
             现价: ¥ {{ogood.price}}
           </span>
@@ -48,25 +48,22 @@ export default {
 
 <style  scoped>
   .bg{
-    width:324px;
-    height:150px;
+    width:326px;
+    height:152px;
     background:rgba(255,255,255,1);
-    border:1px solid rgba(229,229,229,1);
     border-radius:8px;
     overflow: hidden;
+    clear: both;
   }
   .left{
     width:126px;
-    height:122px;
+    height:152px;
     background:rgba(255,255,255,1);
-    margin-top: 15px;
-    margin-bottom: 15px;
-    margin-left: 15px;
     float: left;
   }
   .left img{
-    width:96px;
-    height:122px;
+    width:126px;
+    height:152px;
     border-radius:8px 0px 0px 8px;
   }
   .middle{
@@ -75,18 +72,14 @@ export default {
     border-right:1px solid rgba(229,229,229,1);
   }
   .right{
-    padding-left: 3px;
+    width: 169px;
     float: left;
-    width: 164px;
-    margin-top: 15px;
-    margin-bottom: 15px;
-    margin-right: 15px;
+    padding: 15px;
   }
   .right .div{
     height: 39px;
   }
   .title{
-    width:186px;
     height:46px;
     font-size:16px;
     font-weight:400;
@@ -107,6 +100,11 @@ export default {
     color:rgba(128,128,128,1);
     line-height:20px;
   }
+  .goods_price{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
   .xianjia{
     font-size:16px;
     font-family:SourceHanSansCN-Regular;
@@ -116,7 +114,7 @@ export default {
   }
   .kucun{
     font-size:14px;
-    float: right;
+    /*float: right;*/
     font-family:MicrosoftYaHei;
     font-weight:400;
     color:rgba(26,26,26,1);

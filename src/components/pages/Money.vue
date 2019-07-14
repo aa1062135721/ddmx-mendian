@@ -9,12 +9,16 @@
                 <div><el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button></div>
                 <div><el-button class="page-fenlei-button float-left" icon="el-icon-arrow-left" @click="clickFenleiBtnPre"></el-button></div>
                 <div class='type-btn'>
+                  <el-scrollbar>
                     <el-button v-for="(item) in requestGoodData.typeNameList"  :key="item.id" class="fenlei-button" :class="{'fenlei-button-active':(requestGoodData.isChooeseFenleiGood && requestGoodData.who === item.id)}" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>
+                  </el-scrollbar>
                 </div>
                 <div><el-button class="page-fenlei-button float-right" icon="el-icon-arrow-right" @click="clickFenleiBtnNext"></el-button></div>
               </div>
               <div class="flex-goods">
+                <el-scrollbar>
                   <v-good v-for="(item) in goodsList" :key="item.id" :ogood="item" class="goods" @click.native="addShoppingCar(item)"></v-good>
+                </el-scrollbar>
               </div>
               <div class="page-buttons">
                 <button class="page-button" @click="clickPrePageBtn">上一页</button>
@@ -42,39 +46,40 @@
                 </el-input>
               </div>
               <div class="pay-goods-box">
-                <ul v-if="chooeseGoods.goods.length" v-for="(good, key) in chooeseGoods.goods" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
-                  <li class="title clear-both">
-                    <span class="float-left">{{good.title}}</span>
-                    <span class="float-right">数量 {{good.num}}</span>
-                  </li>
-                  <li class="title code clear-both">
-                    <span class="float-left">{{good.bar_code}}</span>
-                    <span class="float-right red">￥{{good.is_edit ? good.edit_price * good.num : good.price * good.num}}</span>
-                  </li>
-                  <li class="title">
-                    <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
-                    <span class="red danjia" v-else>￥{{good.price}}</span>
-                    <span class="yuanjia" v-if="good.is_edit">原价￥{{good.price}}</span>
-<!--                    <span class="huiyuanjia">会员价￥{{good.price}}</span>-->
-                  </li>
-                </ul>
-                <ul v-if="chooeseGoods.fuwuGoods.length" v-for="(good, key) in chooeseGoods.fuwuGoods" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
-                  <li class="title clear-both">
-                    <span class="float-left">{{good.title}}</span>
-                    <span class="float-right">数量 {{good.num}}</span>
-                  </li>
-                  <li class="title code clear-both">
-                    <span class="float-left"></span>
-                    <span class="float-right red">￥{{good.is_edit ? good.edit_price * good.num : good.price * good.num}}</span>
-                  </li>
-                  <li class="title">
-                    <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
-                    <span class="red danjia" v-else>￥{{good.price}}</span>
-                    <span class="yuanjia" v-if="good.is_edit">原价￥{{good.price}}</span>
-                    <span class="huiyuanjia">会员价￥{{good.price}}</span>
-                  </li>
-                </ul>
-                <ul v-if="chooeseGoods.cardList.length" v-for="(good, key) in chooeseGoods.cardList" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
+                <el-scrollbar>
+                  <ul v-if="chooeseGoods.goods.length" v-for="(good, key) in chooeseGoods.goods" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
+                    <li class="title clear-both">
+                      <span class="float-left">{{good.title}}</span>
+                      <span class="float-right">数量 {{good.num}}</span>
+                    </li>
+                    <li class="title code clear-both">
+                      <span class="float-left">{{good.bar_code}}</span>
+                      <span class="float-right red">￥{{good.is_edit ? good.edit_price * good.num : good.price * good.num}}</span>
+                    </li>
+                    <li class="title">
+                      <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
+                      <span class="red danjia" v-else>￥{{good.price}}</span>
+                      <span class="yuanjia" v-if="good.is_edit">原价￥{{good.price}}</span>
+  <!--                    <span class="huiyuanjia">会员价￥{{good.price}}</span>-->
+                    </li>
+                  </ul>
+                  <ul v-if="chooeseGoods.fuwuGoods.length" v-for="(good, key) in chooeseGoods.fuwuGoods" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
+                    <li class="title clear-both">
+                      <span class="float-left">{{good.title}}</span>
+                      <span class="float-right">数量 {{good.num}}</span>
+                    </li>
+                    <li class="title code clear-both">
+                      <span class="float-left"></span>
+                      <span class="float-right red">￥{{good.is_edit ? good.edit_price * good.num : good.price * good.num}}</span>
+                    </li>
+                    <li class="title">
+                      <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
+                      <span class="red danjia" v-else>￥{{good.price}}</span>
+                      <span class="yuanjia" v-if="good.is_edit">原价￥{{good.price}}</span>
+                      <span class="huiyuanjia">会员价￥{{good.price}}</span>
+                    </li>
+                  </ul>
+                  <ul v-if="chooeseGoods.cardList.length" v-for="(good, key) in chooeseGoods.cardList" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
                   <li class="title clear-both">
                     <span class="float-left">{{good.card_name}}</span>
                     <span class="float-right">数量 {{good.num}}</span>
@@ -90,6 +95,7 @@
                     <!--                    <span class="huiyuanjia">会员价￥{{good.price}}</span>-->
                   </li>
                 </ul>
+                </el-scrollbar>
               </div>
               <div class="queren-xinxi">
                 <ul>
@@ -1966,25 +1972,26 @@ export default {
   .all-goods{
     height: calc(100vh - 110px);
     width: 100%;
-    overflow: hidden;
+    /*overflow: hidden;*/
     display: flex;
-    justify-content: space-between;
-    flex-wrap:wrap;
+    /*justify-content: space-between;*/
+    /*flex-wrap:wrap;*/
     flex-direction:column;
 
     .goods-type{
       height: 54px;
       width: 100%;
       display: flex;
-      /*align-items: center;*/
+      align-items: center;
       flex-wrap: nowrap;
       justify-content: space-between;
       .type-btn{
         width:700px;
-        overflow: hidden;
-        display: flex;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
+        .el-scrollbar__view {
+          display: flex;
+          flex-wrap: nowrap;
+          justify-content: flex-start;
+        }
       }
       .fenlei-button{
         font-size:20px!important;
@@ -2010,25 +2017,40 @@ export default {
       }
     }
     .flex-goods{
-      height: 700px;
-      max-height: 824px;
-      overflow-y: scroll;
-      width: 100%;
-      display: flex;
-      align-items: flex-start;
-      flex-wrap:wrap;
-      align-items:flex-start;
-      justify-content: space-between;
-      align-content:flex-start;
-      .goods{
-        margin-bottom: 16px;
+      /*height: 700px;*/
+      /*max-height: 824px;*/
+      /*width: 100%;*/
+      margin-top: 28px;
+      flex: 1;
+      overflow: hidden;
+      .el-scrollbar{
+        height: 100%;
+        width: 100%;
+        .el-scrollbar__wrap{
+          overflow: auto;
+        }
+        .el-scrollbar__view{
+          overflow: auto!important;
+          display: flex!important;
+          align-items: flex-start!important;
+          flex-wrap:wrap!important;
+          align-items:flex-start!important;
+          /*justify-content: space-between;*/
+          align-content:flex-start!important;
+          .goods{
+            margin: 0 30px 16px 0;
+            &:nth-child(3n) {
+              margin-right: 0;
+            }
+          }
+        }
       }
     }
     .page-buttons{
       text-align: center;
       width: 100%;
       height: 42px;
-      padding-bottom: 10;
+      padding: 17px 0;
       .page-button{
         width:84px;
         height:32px;
@@ -2051,7 +2073,9 @@ export default {
   }
   .caozuo-buttons{
     overflow: hidden;
-    height: calc(100vh - 110px);
+    /*height: calc(100vh - 110px);*/
+    height: 800px;
+    /*border: 1px solid red;*/
     width: 100%;
     display: flex;
     align-items: center;
@@ -2070,6 +2094,9 @@ export default {
       font-weight:400!important;
       color:rgba(26,26,26,1)!important;
       margin-left: 0;
+      &:last-child{
+        margin-bottom: 0;
+      }
     }
     .caozuo-button:active{
       color: #fff!important;
@@ -2101,54 +2128,70 @@ export default {
       }
     }
     .pay-goods-box{
-      width: 100%;
-      height:482px;
+      /*width: 100%;*/
+      /*height:482px;*/
+      /*overflow: auto;*/
+      overflow: hidden;
       background:rgba(255,255,255,1);
       border-radius:10px;
-      overflow-y:scroll;
-      ul{
-        list-style-type: none;
-        padding: 11px;
-        border-bottom:1px solid #ccc;
-        li{
-          width: 100%;
-          height: 20px;
-          margin-bottom: 14px;
+      .el-scrollbar {
+        overflow: hidden;
+        height: 482px;
+        .el-scrollbar__wrap{
+          overflow: hidden;
+          overflow-y: scroll;
         }
-        .title{
-          font-size:16px;
-          font-family:SourceHanSansCN-Regular;
-          font-weight:400;
-          color:rgba(26,26,26,1);
-          line-height:20px;
-          .red{
-            color:rgba(248,61,61,1);
+        .el-scrollbar__view{
+          overflow-y: auto!important;
+          ul{
+            width: calc(100% - 22px);
+            list-style-type: none;
+            overflow: hidden;
+            padding: 11px 0 11px 20px;
+            height: auto;
+            width: auto;
+            border-bottom:1px solid #ccc;
+            li{
+              width: calc(100% - 22px);
+              height: 20px;
+              margin-bottom: 14px;
+            }
+            .title{
+              font-size:16px;
+              font-family:SourceHanSansCN-Regular;
+              font-weight:400;
+              color:rgba(26,26,26,1);
+              line-height:20px;
+              .red{
+                color:rgba(248,61,61,1);
+              }
+              .danjia{
+                margin-right: 10px;
+              }
+              .yuanjia{
+                color: #808080;
+                margin-right: 10px;
+                text-decoration:line-through;
+              }
+              .huiyuanjia{
+                margin-right: 10px;
+                color: #2ECAF1;
+              }
+            }
+            .code{
+              font-size:14px;
+              color:rgba(128,128,128,1);
+            }
+            li:last-child{
+              margin-bottom: 0;
+            }
           }
-          .danjia{
-            margin-right: 10px;
-          }
-          .yuanjia{
-            color: #808080;
-            margin-right: 10px;
-            text-decoration:line-through;
-          }
-          .huiyuanjia{
-            margin-right: 10px;
-            color: #2ECAF1;
+          .active{
+            background:rgba(190,231,246,1);
           }
         }
-        .code{
-          font-size:14px;
-          color:rgba(128,128,128,1);
-        }
-        li:last-child{
-          margin-bottom: 0;
+      }
 
-        }
-      }
-      .active{
-        background:rgba(190,231,246,1);
-      }
     }
     .queren-xinxi{
       width: calc(100% - 30px);
