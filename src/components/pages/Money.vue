@@ -8,10 +8,10 @@
               <div class="goods-type">
                 <div><el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button></div>
                 <div><el-button class="page-fenlei-button float-left" icon="el-icon-arrow-left" @click="clickFenleiBtnPre"></el-button></div>
-                <div class='type-btn'>
-                  <el-scrollbar>
-                    <el-button v-for="(item) in requestGoodData.typeNameList"  :key="item.id" class="fenlei-button" :class="{'fenlei-button-active':(requestGoodData.isChooeseFenleiGood && requestGoodData.who === item.id)}" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>
-                  </el-scrollbar>
+                <div class="type-btns-wrapper" style="width:700px;overflow: hidden;" ref="personWrap">
+                  <div class='type-btns-content type-btn' ref="personTab" >
+                      <el-button v-for="(item) in requestGoodData.typeNameList"  :key="item.id" class="fenlei-button" :class="{'fenlei-button-active':(requestGoodData.isChooeseFenleiGood && requestGoodData.who === item.id)}" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>
+                  </div>
                 </div>
                 <div><el-button class="page-fenlei-button float-right" icon="el-icon-arrow-right" @click="clickFenleiBtnNext"></el-button></div>
               </div>
@@ -559,6 +559,7 @@ import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-o
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
 import vShowMyDialog from '../common/ShowMyDialog'
+import BScroll from 'better-scroll' // 滚动插件
 import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords } from '../../api/getData'
 
 export default {
@@ -820,6 +821,20 @@ export default {
   mounted () {
     this.getGoodsType()
     this.getServiceItemList()
+    this.$nextTick(() => {
+      if (!this.scroll) {
+        this.scroll = new BScroll(this.$refs.personWrap, {
+          startX: 0,
+          click: true,
+          scrollX: true,
+          // 忽略竖直方向的滚动
+          scrollY: false,
+          eventPassthrough: 'vertical'
+        })
+      } else {
+        this.scroll.refresh()
+      }
+    })
   },
   methods: {
     // 将商品加入购物车
@@ -1255,6 +1270,8 @@ export default {
     getGoodsType () {
       postTwotype().then((res) => {
         this.requestGoodData.typeNameList = res.data
+        let width = this.requestGoodData.typeNameList.length * 138 // 分类列表初始化长度
+        this.$refs.personTab.style.width = width + 'px' // 分类列表初始化长度
       }).catch((err) => {
         console.log(err, '分类列表获取失败')
       })
@@ -1321,6 +1338,7 @@ export default {
     },
     // 点击了分类按钮中的上一个
     clickFenleiBtnPre () {
+      // this.$refs.personWrap.scrollTo(-138, 0)
       for (let i = 0; i < this.requestGoodData.typeNameList.length; i++) {
         if (this.requestGoodData.typeNameList[i].id === this.requestGoodData.who) {
           if (i === 0) {
@@ -1335,6 +1353,7 @@ export default {
     },
     // 点击了分类按钮中的下一个
     clickFenleiBtnNext () {
+      // this.$refs.personWrap.scrollTo(138, 0)
       for (let i = 0; i < this.requestGoodData.typeNameList.length; i++) {
         if (this.requestGoodData.typeNameList[i].id === this.requestGoodData.who) {
           if (i === this.requestGoodData.typeNameList.length - 1) {
@@ -1986,12 +2005,10 @@ export default {
       flex-wrap: nowrap;
       justify-content: space-between;
       .type-btn{
-        width:700px;
-        .el-scrollbar__view {
-          display: flex;
-          flex-wrap: nowrap;
-          justify-content: flex-start;
-        }
+        /*width:700px;*/
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
       }
       .fenlei-button{
         font-size:20px!important;
