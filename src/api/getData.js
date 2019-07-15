@@ -168,3 +168,12 @@ export const postNowPayGoods = (data = null) => {
 export const postNowPayServiceCards = (data = null) => {
   return Vue.prototype.$post('/ticket/buy', data)
 }
+
+/**
+ * 帮助中心-获取帮助信息
+ * @param data
+ * @returns {*}
+ */
+export const postGetHelpList = (data = null) => {
+  return Vue.prototype.$post('/help/index', data)
+}

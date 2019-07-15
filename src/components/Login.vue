@@ -34,7 +34,7 @@ export default {
   data: function () {
     return {
       msg: '',
-      username: 'lizhanghong',
+      username: 'chenling',
       password: 'ddxm123'
     }
   },
