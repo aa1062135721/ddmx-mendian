@@ -64,4 +64,7 @@ export default {
     -webkit-line-clamp: 3;
     overflow: hidden;
   }
+  .el-scrollbar__wrap{
+    overflow: auto;
+  }
 </style>

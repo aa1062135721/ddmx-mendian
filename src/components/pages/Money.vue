@@ -1,9 +1,9 @@
 <!--suppress ALL -->
 <template>
-    <div class="bg">
+    <div class="bg bg-blue">
       <v-head></v-head>
       <div class="get-money-content">
-          <div style="width: 1038px">
+          <div style="width: 1038px;overflow: hidden;">
             <div class="all-goods">
               <div class="goods-type">
                 <div><el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button></div>
@@ -26,7 +26,7 @@
               </div>
             </div>
           </div>
-          <div style="width: 154px;">
+          <div style="width: 154px;overflow: hidden;">
             <div class="caozuo-buttons">
               <el-button @click="clickAddNumShoppingCarGood" class="caozuo-button" type="primary" style="font-size: 45px;">&nbsp;&nbsp;+&nbsp;&nbsp;</el-button>
               <el-button @click="clickSubNumShoppingCarGood" class="caozuo-button" type="primary">&nbsp;&nbsp;-&nbsp;&nbsp;</el-button>
@@ -38,7 +38,7 @@
               <el-button @click="goukaDialogShow" class="caozuo-button" type="primary">购卡</el-button>
             </div>
           </div>
-          <div style="width: 636px;">
+          <div style="width: 636px;overflow: hidden;">
             <div class="jiesuan-goods" >
               <div class="search">
                 <el-input class="goods-search"  @keyup.enter.native="getGoodByCondition" placeholder="商品名称/条形码"  v-model="sousuoshangpingDialog.title">
@@ -2127,7 +2127,7 @@ export default {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    flex-wrap:wrap;
+    flex-wrap:nowrap;
     flex-direction:column;
     .search{
       display: flex;

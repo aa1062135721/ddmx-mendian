@@ -30,7 +30,8 @@ const codeMessage = {
 }
 
 axios.defaults.timeout = 10000
-axios.defaults.baseURL = '/api/index/' // 'http://ddxmtp5.com/index'  // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
+// axios.defaults.baseURL = '/api/index/' // 'http://ddxmtp5.com/index'  // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
+axios.defaults.baseURL = 'http://ddxmtp5.com/index' // 'http://ddxmtp5.com/index'  // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
 
 // http request 拦截器
 axios.interceptors.request.use(
