@@ -35,7 +35,23 @@ export default {
     position: absolute;
     left: 268px;
     top: 68px;
+    background:#a6c9e2;
     width:calc(100vw - 268px);
     height:calc(100vh - 68px);
+    margin: auto;
+    overflow: hidden;
+    .content{
+      padding: 20px;
+      overflow: hidden;
+      width:1530px;
+      height:828px;
+      background:rgba(255,255,255,1);
+      border-radius:10px;
+      position: relative;
+      top: 50%;
+      margin-top: -434px;
+      left: 50%;
+      margin-left: -786px;
+    }
   }
 </style>
