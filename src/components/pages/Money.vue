@@ -1993,7 +1993,6 @@ export default {
   .bg{
     height: 100%;
     width: 100%;
-    background:#a6c9e2;
   }
   .get-money-content{
     display: flex;

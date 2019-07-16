@@ -34,8 +34,8 @@ export default {
   data: function () {
     return {
       msg: '',
-      username: 'chenling',
-      password: 'ddxm123'
+      username: '',
+      password: ''
     }
   },
   methods: {

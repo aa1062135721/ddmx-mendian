@@ -506,7 +506,7 @@ export default {
       color:rgba(128,128,128,1);
     }
   }
-/*  会员详情弹框*/
+  /* 会员详情弹框*/
   .order-manage-page-member-info{
 
   }

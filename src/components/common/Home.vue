@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper">
+    <div class="wrapper bg-blue">
         <v-head></v-head>
         <v-sidebar></v-sidebar>
         <div class="content-box" :class="{'content-collapse':collapse}">
@@ -35,7 +35,6 @@ export default {
     position: absolute;
     left: 268px;
     top: 68px;
-    background:#a6c9e2;
     width:calc(100vw - 268px);
     height:calc(100vh - 68px);
     margin: auto;

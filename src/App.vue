@@ -36,7 +36,7 @@ export default {
     color: rgba(46, 202, 241, 1);
   }
   .bg-blue {
-    background-color: #3DB5DB;
+    background:#a6c9e2;
   }
   .float-left {
     float: left;

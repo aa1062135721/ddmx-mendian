@@ -3,14 +3,13 @@
         <el-menu class="sidebar-el-menu"
                  background-color="#000"
                  text-color="#fff"
-                 active-text-color="#f00"
+                 active-text-color="#fff"
                  @select="handleOpen"
                  :router="isRouter"
                  :default-active="$route.path"
                  >
           <el-menu-item v-for="item in items" :index="item.index" :key="item.index">
-            <i class="my-icon" :class="item.icon"></i>
-            <span slot="title">{{ item.title }}</span>
+            <i class="my-icon" :class="item.icon"></i><span slot="title">{{ item.title }}</span>
           </el-menu-item>
         </el-menu>
     </div>
@@ -121,26 +120,38 @@ export default {
       top: 68px;
       bottom:0;
       overflow: hidden;
+      ul{
+        height:100%;
+        width: 100%;
+        li{
+          width: 100%;
+          height: 88px!important;
+          line-height: 88px!important;
+          font-size:48px;
+          font-family:SourceHanSansCN-Regular;
+          font-weight:400;
+          color: #ffffff;
+          span{
+            font-size:26px;
+            height: 88px;
+            width: 100%;
+            line-height: 88px;
+          }
+        }
+      }
     }
     .sidebar-el-menu:not(.el-menu--collapse){
         width: 268px;
     }
-    .sidebar > ul {
-      height:100%
+    .el-menu-item.is-active {
+      background-color: #06526E !important;
     }
     .my-icon{
       margin-right: 20px;
-      width: 48px!important;
-      height: 48px!important;
+      height: 88px!important;
+      line-height: 88px!important;
     }
-    li{
-      height: 88px;
-      line-height: 88px;
-      font-size:26px;
-      font-family:SourceHanSansCN-Regular;
-      font-weight:400;
-      color: #ffffff;
-    }
+
    .reception-get-money{
      background: url(../../assets/sidebar-icon/reception-get-money.png) center no-repeat;
      &:before{
