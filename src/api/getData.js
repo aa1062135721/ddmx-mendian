@@ -177,3 +177,39 @@ export const postNowPayServiceCards = (data = null) => {
 export const postGetHelpList = (data = null) => {
   return Vue.prototype.$post('/help/index', data)
 }
+
+/**
+ * 支出管理-营业支出列表
+ * @param data
+ * @returns {*}
+ */
+export const postExpenditureList = (data = null) => {
+  return Vue.prototype.$post('/Expenditure/expenditure_list', data)
+}
+
+/**
+ * 支出管理-支出类型管理列表
+ * @param data
+ * @returns {*}
+ */
+export const postExpenditureTypeNameList = (data = null) => {
+  return Vue.prototype.$post('/Expenditure/typesList', data)
+}
+
+/**
+ * 支出管理-营业支出的增加
+ * @param data
+ * @returns {*}
+ */
+export const postAddExpenditure = (data = null) => {
+  return Vue.prototype.$post('/Expenditure/expenditure_add', data)
+}
+
+/**
+ * 支出管理-营业支出的删除
+ * @param data
+ * @returns {*}
+ */
+export const postDelExpenditure = (data = null) => {
+  return Vue.prototype.$post('/Expenditure/deleteType', data)
+}

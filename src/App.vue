@@ -64,4 +64,14 @@ export default {
     -webkit-line-clamp: 3;
     overflow: hidden;
   }
+  .my-primary-btn{
+    color: #fff;
+    background: #2ECAF1;
+    border:1px solid #2ECAF1;
+  }
+  .my-secondary-btn{
+    border:1px solid #2ECAF1;
+    color: #2ECAF1;
+    background: #FFFFFF;
+  }
 </style>

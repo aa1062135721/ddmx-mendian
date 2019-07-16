@@ -4,7 +4,7 @@
         <el-tab-pane label="商品订单" name="first">
           <div class="search-condition">
             <div class="select">
-              <el-select v-model="nowWaiter.id" clearable placeholder="选择服务人员">
+              <el-select v-model="nowWaiter.name" clearable placeholder="选择服务人员" >
                 <el-option
                   v-for="item in waiter"
                   :key="item.id"
@@ -46,7 +46,6 @@
             <div class="select" style="width:368px;height:48px;">
               <el-input
                 placeholder="请输入需查询的会员手机号/订单号"
-                v-model="input"
                 clearable>
               </el-input>
             </div>
@@ -79,8 +78,160 @@
             </el-table>
           </div>
         </el-tab-pane>
-        <el-tab-pane label="服务订单" name="second">服务订单</el-tab-pane>
-        <el-tab-pane label="充值订单" name="third">充值订单</el-tab-pane>
+        <el-tab-pane label="服务订单" name="second">
+          <div class="search-condition">
+            <div class="select">
+              <el-select v-model="nowWaiter.name" clearable placeholder="选择服务人员" >
+                <el-option
+                  v-for="item in waiter"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select">
+              <el-select v-model="value" clearable placeholder="选择服务项目">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select">
+              <el-select v-model="value" clearable placeholder="选择支付方式">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select" style="width: 148px;">
+              <el-select v-model="value" clearable placeholder="选择状态">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select" style="width:368px;height:48px;">
+              <el-input
+                placeholder="请输入需查询的会员手机号/订单号"
+                clearable>
+              </el-input>
+            </div>
+            <div class="select">
+              <el-button plain>搜索</el-button>
+            </div>
+          </div>
+          <div class="search-btns">
+            <span class="span">筛选</span>
+            <el-button class="btn active">今日</el-button>
+            <el-button class="btn">昨日</el-button>
+            <el-button class="btn">本周</el-button>
+            <el-button class="btn">自定义</el-button>
+          </div>
+          <div class="serch-table">
+            <el-table :data="goodsOrderList" border style="width: 100%;" height="565">
+              <el-table-column prop="id" label="订单号" width="180"></el-table-column>
+              <el-table-column prop="mobile" label="会员账号" width="180"></el-table-column>
+              <el-table-column prop="price" label="付款金额"></el-table-column>
+              <el-table-column prop="good_price" label="商品成本"></el-table-column>
+              <el-table-column prop="is_out_good" label="是否外包商品"></el-table-column>
+              <el-table-column prop="pay_way" label="付款方式"></el-table-column>
+              <el-table-column prop="time" label="交易时间"></el-table-column>
+              <el-table-column prop="waiter" label="服务人员"></el-table-column>
+              <el-table-column prop="status" label="状态"></el-table-column>
+              <el-table-column prop="is_setting_goods_price" label="设置商品成本"></el-table-column>
+              <el-table-column label="操作">
+                <el-button size="mini" @click="orderDetailsDialog.isShow = true">订单详情</el-button>
+              </el-table-column>
+            </el-table>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="充值订单" name="third">
+          <div class="search-condition">
+            <div class="select">
+              <el-select v-model="nowWaiter.name" clearable placeholder="选择服务人员" >
+                <el-option
+                  v-for="item in waiter"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select">
+              <el-select v-model="value" clearable placeholder="选择服务项目">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select">
+              <el-select v-model="value" clearable placeholder="选择支付方式">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select" style="width: 148px;">
+              <el-select v-model="value" clearable placeholder="选择状态">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select" style="width:368px;height:48px;">
+              <el-input
+                placeholder="请输入需查询的会员手机号/订单号"
+                clearable>
+              </el-input>
+            </div>
+            <div class="select">
+              <el-button plain>搜索</el-button>
+            </div>
+          </div>
+          <div class="search-btns">
+            <span class="span">筛选</span>
+            <el-button class="btn active">今日</el-button>
+            <el-button class="btn">昨日</el-button>
+            <el-button class="btn">本周</el-button>
+            <el-button class="btn">自定义</el-button>
+          </div>
+          <div class="serch-table">
+            <el-table :data="goodsOrderList" border style="width: 100%;" height="565">
+              <el-table-column prop="id" label="订单号" width="180"></el-table-column>
+              <el-table-column prop="mobile" label="会员账号" width="180"></el-table-column>
+              <el-table-column prop="price" label="付款金额"></el-table-column>
+              <el-table-column prop="good_price" label="商品成本"></el-table-column>
+              <el-table-column prop="is_out_good" label="是否外包商品"></el-table-column>
+              <el-table-column prop="pay_way" label="付款方式"></el-table-column>
+              <el-table-column prop="time" label="交易时间"></el-table-column>
+              <el-table-column prop="waiter" label="服务人员"></el-table-column>
+              <el-table-column prop="status" label="状态"></el-table-column>
+              <el-table-column prop="is_setting_goods_price" label="设置商品成本"></el-table-column>
+              <el-table-column label="操作">
+                <el-button size="mini" @click="orderDetailsDialog.isShow = true">订单详情</el-button>
+              </el-table-column>
+            </el-table>
+          </div>
+        </el-tab-pane>
       </el-tabs>
 
       <!-- 订单详情弹框-->
@@ -141,12 +292,69 @@
           </div>
         </div>
       </el-dialog>
+      <!-- 会员详情-->
+      <el-dialog class="order-manage-page-member-info" title="会员详情" :visible.sync="memberInfoDialog.isShow" width="280px" :center="true">
+          <div>
+            <div class="content">
+              会员昵称：张三
+            </div>
+            <div class="content">
+              手机号码：15213710631
+            </div>
+            <div class="content">
+              所属门店：智鲁星城门店
+            </div>
+            <div class="content">
+              会员等级：三星会员
+            </div>
+            <div class="content">
+              加入时间：2017-11-20 18:30:20
+            </div>
+          </div>
+      </el-dialog>
+      <!-- 服务人员详情-->
+      <el-dialog class="order-manage-page-member-info" title="服务人员详情" :visible.sync="waiterInfoDialog.isShow" width="280px" :center="true">
+        <div>
+          <div class="content">
+            员工姓名：李四
+          </div>
+          <div class="content">
+            手机号码：15213710631
+          </div>
+          <div class="content">
+            所属门店：智鲁星城门店
+          </div>
+          <div class="content">
+            所属职位：水育师
+          </div>
+          <div class="content">
+            入职时间：2017-11-20 18:30:20
+          </div>
+        </div>
+      </el-dialog>
+      <!-- 外包商品成本设置-->
+      <el-dialog class="order-manage-page-member-info" title="外包商品成本设置" :visible.sync="settingOutGoodPriceDialog.isShow" width="550px" :center="true">
+        <div>
+          <el-table :data="goodsOrderList" border style="width: 100%;" height="142">
+            <el-table-column prop="id" label="订单号"></el-table-column>
+            <el-table-column prop="mobile" label="商品名称"></el-table-column>
+            <el-table-column prop="price" label="交易金额"></el-table-column>
+            <el-table-column  label="设置成本">
+              <el-input placeholder="请输入商品成本"></el-input>
+            </el-table-column>
+          </el-table>
+          <div style="text-align: center;margin-top: 15px;">
+            <el-button class="my-secondary-btn">取消</el-button>
+            <el-button class="my-primary-btn">确定</el-button>
+          </div>
+        </div>
+      </el-dialog>
     </div>
 </template>
 
 <script>
 export default {
-  name: 'OrderManage',
+  name: 'OrderManage', // 订单管理
   data () {
     return {
       activeName: 'first',
@@ -194,6 +402,15 @@ export default {
         id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
         name: '请选择服务员', // 服务员名称
         type: '未知' // 服务类型
+      },
+      memberInfoDialog: {
+        isShow: false
+      },
+      waiterInfoDialog: {
+        isShow: true
+      },
+      settingOutGoodPriceDialog: {
+        isShow: true,
       }
     }
   },
@@ -220,7 +437,7 @@ export default {
     }
     .el-tabs__content{
       .search-condition{
-        border: 1px solid red;
+        /*border: 1px solid red;*/
         display: flex;
         justify-content: flex-start;
         flex-direction:row;
@@ -228,12 +445,13 @@ export default {
         .select{
           width:188px;
           margin-right: 16px;
-          input{
-            border:1px solid rgba(210,210,210,1);
+          .el-input__inner{
+            border:1px solid red;
             height: 48px !important;
           }
           button{
-            height:48px;
+            /*height:48px;*/
+            /*border:1px solid red;*/
           }
         }
       }
@@ -287,6 +505,10 @@ export default {
       font-weight:400;
       color:rgba(128,128,128,1);
     }
+  }
+/*  会员详情弹框*/
+  .order-manage-page-member-info{
+
   }
 }
 </style>
