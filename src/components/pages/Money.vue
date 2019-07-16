@@ -8,17 +8,17 @@
               <div class="goods-type">
                 <div><el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button></div>
                 <div><el-button class="page-fenlei-button float-left" icon="el-icon-arrow-left" @click="clickFenleiBtnPre"></el-button></div>
-                <div class="type-btns-wrapper" style="width:700px;overflow: hidden;" ref="personWrap">
-                  <div class='type-btns-content type-btn' ref="personTab" >
+                <div class="type-btns-wrapper" style="width:700px;overflow: hidden;" ref="typeBtnsScroll">
+                  <div class='type-btns-content type-btn' ref="typeBtnsScrollContent" >
                       <el-button v-for="(item) in requestGoodData.typeNameList"  :key="item.id" class="fenlei-button" :class="{'fenlei-button-active':(requestGoodData.isChooeseFenleiGood && requestGoodData.who === item.id)}" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>
                   </div>
                 </div>
                 <div><el-button class="page-fenlei-button float-right" icon="el-icon-arrow-right" @click="clickFenleiBtnNext"></el-button></div>
               </div>
-              <div class="flex-goods">
-                <el-scrollbar>
+              <div style="overflow: hidden;width: 100%;flex: 1;margin-top: 28px;" ref="allGoodsScroll">
+                <div  ref="allGoodsScrollContent" class="flex-goods" >
                   <v-good v-for="(item) in goodsList" :key="item.id" :ogood="item" class="goods" @click.native="addShoppingCar(item)"></v-good>
-                </el-scrollbar>
+                </div>
               </div>
               <div class="page-buttons">
                 <button class="page-button" @click="clickPrePageBtn">上一页</button>
@@ -648,18 +648,18 @@ export default {
       //  会员查询 - 单击会员按钮后的弹窗所需要的数据
       huiyuanDialog: {
         isShow: false, // 是否显示会员查询对话框
-        mobile: '13637765376', // 要查询的会员手机号码
+        mobile: '', // 要查询的会员手机号码
         // 会员信息
         huiyuanInfo: {
-          id: 5110, // 会员id
-          mobile: '13637765376', // 会员电话
-          shop_code: 'A00036', // 所属门店的门店编号
-          level_id: 6, // 会员等级id
-          nickname: '荣柱', // 姓名
-          level_name: '七星会员', // 会员等级名称
-          money: '0.00', // 余额
-          amount: '0.05', // 累积充值
-          regtime: '1970-01-01 08:33:37'// 加入时间
+          // id: 5110, // 会员id
+          // mobile: '13637765376', // 会员电话
+          // shop_code: 'A00036', // 所属门店的门店编号
+          // level_id: 6, // 会员等级id
+          // nickname: '荣柱', // 姓名
+          // level_name: '七星会员', // 会员等级名称
+          // money: '0.00', // 余额
+          // amount: '0.05', // 累积充值
+          // regtime: '1970-01-01 08:33:37'// 加入时间
         },
         // 新增会员对话框
         addHuiyuanDialog: {
@@ -671,31 +671,31 @@ export default {
         showFuwuTable: true,
         // 服务卡购买记录
         fuwukaList: [
-          {
-            id: 1,
-            card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
-            type: '1',
-            real_price: 100.00,
-            month: 2,
-            year: 2019,
-            create_time: '2019-07-03 11:47:15',
-            start_time: '未激活',
-            end_time: '2019-07-13 11:47:15',
-            over_time: 1562989635,
-            status: 0,
-            type_card: '次卡',
-            status_name: '未激活'
-          }
+          // {
+          //   id: 1,
+          //   card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1',
+          //   type: '1',
+          //   real_price: 100.00,
+          //   month: 2,
+          //   year: 2019,
+          //   create_time: '2019-07-03 11:47:15',
+          //   start_time: '未激活',
+          //   end_time: '2019-07-13 11:47:15',
+          //   over_time: 1562989635,
+          //   status: 0,
+          //   type_card: '次卡',
+          //   status_name: '未激活'
+          // }
         ],
         // 会员充值记录
         chongzhijiluList: [
-          {
-            id: 5,
-            member_id: '哈哈(18046057585)', // 会员信息
-            price: '10.11', // 充值金额、到账金额（当price小于0是表示已退，已退时间与充值时间一致）
-            create_time: '2019-07-03 09:57:06', // 时间
-            waiter: '1' // 服务人员名称
-          }
+          // {
+          //   id: 5,
+          //   member_id: '哈哈(18046057585)', // 会员信息
+          //   price: '10.11', // 充值金额、到账金额（当price小于0是表示已退，已退时间与充值时间一致）
+          //   create_time: '2019-07-03 09:57:06', // 时间
+          //   waiter: '1' // 服务人员名称
+          // }
         ],
         // 耗卡弹窗
         haokaDialog: {
@@ -759,10 +759,10 @@ export default {
         isShow: false,
         title: '', // 请输入购卡名称
         cardsList: [// 服务卡列表
-          {id: 1, card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1', type: '1', month: '', price: '100.00', mprice: '100.00', service: [{num: 10, service_name: '艾灸'}]},
-          {id: 2, card_name: '艾灸推拿', type: '2', month: '', price: '100.00', mprice: '100.00', service: []},
-          {id: 3, card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1', type: '3', month: '', price: '100.00', mprice: '100.00', service: [{num: 10, service_name: '艾灸'}]},
-          {id: 4, card_name: '艾灸推拿', type: '4', month: '', price: '100.00', mprice: '100.00', service: []}
+          // {id: 1, card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1', type: '1', month: '', price: '100.00', mprice: '100.00', service: [{num: 10, service_name: '艾灸'}]},
+          // {id: 2, card_name: '艾灸推拿', type: '2', month: '', price: '100.00', mprice: '100.00', service: []},
+          // {id: 3, card_name: '艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1艾灸推拿1', type: '3', month: '', price: '100.00', mprice: '100.00', service: [{num: 10, service_name: '艾灸'}]},
+          // {id: 4, card_name: '艾灸推拿', type: '4', month: '', price: '100.00', mprice: '100.00', service: []}
         ],
         requestData: {
           total: 0,
@@ -822,17 +822,32 @@ export default {
     this.getGoodsType()
     this.getServiceItemList()
     this.$nextTick(() => {
-      if (!this.scroll) {
-        this.scroll = new BScroll(this.$refs.personWrap, {
+      if (!this.typeBtnsScroll) {
+        this.typeBtnsScroll = new BScroll(this.$refs.typeBtnsScroll, {
           startX: 0,
           click: true,
           scrollX: true,
           // 忽略竖直方向的滚动
           scrollY: false,
-          eventPassthrough: 'vertical'
+          mouseWheel: true,
+          // eventPassthrough: 'vertical'
         })
       } else {
-        this.scroll.refresh()
+        this.typeBtnsScroll.refresh()
+      }
+      if (!this.allGoodsScroll) {
+        this.allGoodsScroll = new BScroll(this.$refs.allGoodsScroll, {
+          startY: 0,
+          click: true,
+          scrollX: false,
+          scrollY: true,
+          mouseWheel: true,
+          // eventPassthrough: 'vertical'
+        })
+        this.$refs.allGoodsScrollContent.style.height = 824 + 'px' // 分类列表初始化长度
+        this.$refs.allGoodsScrollContent.style.width = '100%' // 分类列表初始化长度
+      } else {
+        this.allGoodsScroll.refresh()
       }
     })
   },
@@ -1271,7 +1286,7 @@ export default {
       postTwotype().then((res) => {
         this.requestGoodData.typeNameList = res.data
         let width = this.requestGoodData.typeNameList.length * 138 // 分类列表初始化长度
-        this.$refs.personTab.style.width = width + 'px' // 分类列表初始化长度
+        this.$refs.typeBtnsScrollContent.style.width = width + 'px' // 分类列表初始化长度
       }).catch((err) => {
         console.log(err, '分类列表获取失败')
       })
@@ -1974,7 +1989,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
   .bg{
     height: 100%;
     width: 100%;
@@ -2037,9 +2052,15 @@ export default {
       /*height: 700px;*/
       /*max-height: 824px;*/
       /*width: 100%;*/
-      margin-top: 28px;
+      /*margin-top: 28px;*/
       flex: 1;
       overflow: hidden;
+      display: flex;
+      align-items: flex-start;
+      flex-wrap:wrap;
+      align-items:flex-start;
+      justify-content: flex-start;
+      align-content:flex-start;
       .el-scrollbar{
         height: 100%;
         width: 100%;
@@ -2047,12 +2068,13 @@ export default {
           overflow: auto;
         }
         .el-scrollbar__view{
+          background: #000!important;
           overflow: auto!important;
           display: flex!important;
           align-items: flex-start!important;
           flex-wrap:wrap!important;
           align-items:flex-start!important;
-          /*justify-content: space-between;*/
+          justify-content: space-between!important;
           align-content:flex-start!important;
           .goods{
             margin: 0 30px 16px 0;
@@ -2062,12 +2084,27 @@ export default {
           }
         }
       }
+      .goods{
+        margin: 0 30px 16px 0;
+        &:nth-child(3n) {
+          margin-right: 0;
+        }
+        &:nth-child(13) {
+          margin-bottom: 0;
+        }
+        &:nth-child(14) {
+          margin-bottom: 0;
+        }
+        &:nth-child(15) {
+          margin-bottom: 0;
+        }
+      }
     }
     .page-buttons{
+      margin-top: 17px;
       text-align: center;
       width: 100%;
       height: 42px;
-      padding: 17px 0;
       .page-button{
         width:84px;
         height:32px;

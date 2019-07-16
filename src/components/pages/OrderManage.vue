@@ -4,12 +4,12 @@
         <el-tab-pane label="商品订单" name="first">
           <div class="search-condition">
             <div class="select">
-              <el-select v-model="value" clearable placeholder="选择服务人员">
+              <el-select v-model="nowWaiter.id" clearable placeholder="选择服务人员">
                 <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
+                  v-for="item in waiter"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
                 </el-option>
               </el-select>
             </div>
@@ -84,7 +84,6 @@
       </el-tabs>
 
       <!-- 订单详情弹框-->
-      <!--修改价格弹框-->
       <el-dialog class="order-details-dialog" title="订单详情" :visible.sync="orderDetailsDialog.isShow" width="968px" :center="true">
         <div>
           <div>
@@ -176,6 +175,25 @@ export default {
       // 订单详情弹窗内容
       orderDetailsDialog: {
         isShow: false
+      },
+      // 选择服务人员
+      waiter: [
+        {
+          id: 1, // 服务员id  当服务员的id为0师表示为当前登录的店长
+          name: '管理员', // 服务员名称
+          type: '店长' // 服务类型
+        },
+        {
+          id: 2, // 服务员id  当服务员的id为0师表示为当前登录的店长
+          name: '张三', // 服务员名称
+          type: '店长' // 服务类型
+        }
+      ],
+      // 当前选中的服务人员
+      nowWaiter: {
+        id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
+        name: '请选择服务员', // 服务员名称
+        type: '未知' // 服务类型
       }
     }
   },
@@ -187,7 +205,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .order-manage-page{
   .el-tabs{
     el-tabs__header{
@@ -202,6 +220,7 @@ export default {
     }
     .el-tabs__content{
       .search-condition{
+        border: 1px solid red;
         display: flex;
         justify-content: flex-start;
         flex-direction:row;
@@ -211,7 +230,7 @@ export default {
           margin-right: 16px;
           input{
             border:1px solid rgba(210,210,210,1);
-            height:48px;
+            height: 48px !important;
           }
           button{
             height:48px;
