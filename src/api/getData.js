@@ -213,3 +213,30 @@ export const postAddExpenditure = (data = null) => {
 export const postDelExpenditure = (data = null) => {
   return Vue.prototype.$post('/Expenditure/deleteType', data)
 }
+
+/**
+ * 订单管理-获取订单列表
+ * @param data
+ * @returns {*}
+ */
+export const postOrderList = (data = null) => {
+  return Vue.prototype.$post('/order/order_list', data)
+}
+
+/**
+ * 订单管理-获取服务员信息
+ * @param data
+ * @returns {*}
+ */
+export const postOrderWaiter = (data = null) => {
+  return Vue.prototype.$post('/order/waiter', data)
+}
+
+/**
+ * 订单管理-获取会员信息
+ * @param data
+ * @returns {*}
+ */
+export const postMemberInfo = (data = null) => {
+  return Vue.prototype.$post('/member/member', data)
+}
