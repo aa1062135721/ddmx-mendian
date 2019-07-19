@@ -240,3 +240,20 @@ export const postOrderWaiter = (data = null) => {
 export const postMemberInfo = (data = null) => {
   return Vue.prototype.$post('/member/member', data)
 }
+
+/**
+ * 订单管理-门店订单详情
+ * @param data
+ * @returns {*}
+ */
+export const postOrderDetails = (data = null) => {
+  return Vue.prototype.$post('/order/order_details', data)
+}
+/**
+ * 订单管理-门店订单详情 - 商品明细
+ * @param data
+ * @returns {*}
+ */
+export const postOrderDetailsGoods = (data = null) => {
+  return Vue.prototype.$post('/order/order_goods_list', data)
+}
