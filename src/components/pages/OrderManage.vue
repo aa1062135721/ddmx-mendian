@@ -4,7 +4,7 @@
         <el-tab-pane label="商品订单" name="1">
           <div class="search-condition">
             <div class="select">
-              <el-select v-model="requestData.nowWaiter.name" clearable placeholder="选择服务人员" >
+              <el-select v-model="requestData.nowWaiter" clearable placeholder="选择服务人员" >
                 <el-option
                   v-for="item in waiter"
                   :key="item.id"
@@ -14,7 +14,7 @@
               </el-select>
             </div>
             <div class="select">
-              <el-select v-model="requestData.payWay.name" clearable placeholder="选中支付方式">
+              <el-select v-model="requestData.payWay" clearable placeholder="选中支付方式">
                 <el-option
                   v-for="item in payWayList"
                   :key="item.id"
@@ -24,7 +24,129 @@
               </el-select>
             </div>
             <div class="select" style="width: 148px;">
-              <el-select v-model="requestData.orderStatus.name" clearable placeholder="选择状态">
+              <el-select v-model="requestData.orderStatus" clearable placeholder="选择状态">
+                <el-option
+                  v-for="item in orderStatus"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select" style="width: 148px;">
+              <el-select v-model="requestData.goodType" clearable placeholder="选择商品类型">
+                <el-option
+                  v-for="item in goodsType"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select" style="width:368px;height:48px;">
+              <el-input
+                v-model="requestData.mobile"
+                placeholder="请输入需查询的会员手机号/订单号"
+                clearable>
+              </el-input>
+            </div>
+            <div class="select">
+              <el-button plain @click="getOrderList">搜索</el-button>
+            </div>
+          </div>
+          <div class="search-btns">
+            <span class="span">筛选</span>
+            <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日</el-button>
+            <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日</el-button>
+            <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周</el-button>
+            <el-date-picker
+              @focus="chooseTimeDIY"
+              v-model="requestData.date"
+              type="daterange"
+              range-separator="至"
+              value-format="yyyy-MM-dd"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
+          </div>
+          <div class="serch-table">
+            <el-table :data="responseData1.data" border style="width: 100%;" height="565">
+              <el-table-column prop="sn" label="订单号"></el-table-column>
+              <el-table-column label="会员账号">
+                <template slot-scope="scope">
+                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)">{{scope.row.mobile}}</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column prop="old_amount" label="付款金额"></el-table-column>
+              <el-table-column prop="amount" label="商品成本"></el-table-column>
+              <el-table-column prop="is_out_good" label="是否外包商品"></el-table-column>
+              <el-table-column prop="pay_way" label="付款方式"></el-table-column>
+              <el-table-column prop="time" label="交易时间"></el-table-column>
+              <el-table-column label="服务人员">
+                <template slot-scope="scope">
+                  <el-button type="text" size="small" @click="getWaiterInfo(scope.row.waiter_id)">{{scope.row.waiter}}</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column prop="order_list_status" label="状态"></el-table-column>
+              <el-table-column prop="is_setting_goods_price" label="设置商品成本">
+                <template slot-scope="scope">
+                  <el-button size="mini" @click="settingOutGoodPriceDialog.isShow = true">设置</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope">
+                  <el-button size="mini" @click="orderDetailsDialog.isShow = true">订单详情</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <div class="footer">
+            <el-pagination
+              background
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="pageSizeChange"
+              :page-sizes="[1,10, 20, 30, 40]"
+              :page-size="requestData.limit"
+              @current-change="responseDataOnePageCurrentChange"
+              :current-page.sync="requestData.page"
+              :total="responseData1.count">
+            </el-pagination>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="服务订单" name="2">
+          <div class="search-condition">
+            <div class="select">
+              <el-select v-model="requestData.nowWaiter" clearable placeholder="选择服务人员" >
+                <el-option
+                  v-for="item in waiter"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select">
+              <el-select v-model="requestData.service" clearable placeholder="选择服务项目">
+                <el-option
+                  v-for="item in serviceList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select">
+              <el-select v-model="requestData.payWay" clearable placeholder="选中支付方式">
+                <el-option
+                  v-for="item in payWayList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select" style="width: 148px;">
+              <el-select v-model="requestData.orderStatus" clearable placeholder="选择状态">
                 <el-option
                   v-for="item in orderStatus"
                   :key="item.id"
@@ -41,36 +163,44 @@
               </el-input>
             </div>
             <div class="select">
-              <el-button plain>搜索</el-button>
+              <el-button plain @click="getOrderList">搜索</el-button>
             </div>
           </div>
           <div class="search-btns">
             <span class="span">筛选</span>
-            <el-button class="btn active">今日</el-button>
-            <el-button class="btn">昨日</el-button>
-            <el-button class="btn">本周</el-button>
-            <el-button class="btn">自定义</el-button>
+            <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日</el-button>
+            <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日</el-button>
+            <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周</el-button>
+            <el-date-picker
+              @focus="chooseTimeDIY"
+              v-model="requestData.date"
+              type="daterange"
+              range-separator="至"
+              value-format="yyyy-MM-dd"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
           </div>
           <div class="serch-table">
-            <el-table :data="orderList" border style="width: 100%;" height="565">
-              <el-table-column prop="id" label="订单号"></el-table-column>
+            <el-table :data="responseData2.data" border style="width: 100%;" height="565">
+              <el-table-column prop="sn" label="订单号"></el-table-column>
               <el-table-column label="会员账号">
                 <template slot-scope="scope">
                   <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)">{{scope.row.mobile}}</el-button>
                 </template>
               </el-table-column>
-              <el-table-column prop="price" label="付款金额"></el-table-column>
-              <el-table-column prop="good_price" label="商品成本"></el-table-column>
-              <el-table-column prop="is_out_good" label="是否外包商品"></el-table-column>
+              <el-table-column prop="old_amount" label="付款金额"></el-table-column>
               <el-table-column prop="pay_way" label="付款方式"></el-table-column>
+              <el-table-column prop="amount" label="服务成本"></el-table-column>
+              <el-table-column prop="is_out_good" label="是否外包服务"></el-table-column>
               <el-table-column prop="time" label="交易时间"></el-table-column>
               <el-table-column label="服务人员">
                 <template slot-scope="scope">
                   <el-button type="text" size="small" @click="getWaiterInfo(scope.row.waiter_id)">{{scope.row.waiter}}</el-button>
                 </template>
               </el-table-column>
-              <el-table-column prop="status" label="状态"></el-table-column>
-              <el-table-column prop="is_setting_goods_price" label="设置商品成本">
+              <el-table-column prop="order_list_status" label="状态"></el-table-column>
+              <el-table-column prop="is_setting_goods_price" label="设置服务成本">
                 <template slot-scope="scope">
                   <el-button size="mini" @click="settingOutGoodPriceDialog.isShow = true">设置</el-button>
                 </template>
@@ -82,12 +212,113 @@
               </el-table-column>
             </el-table>
           </div>
-        </el-tab-pane>
-        <el-tab-pane label="服务订单" name="2">
-          服务订单
+          <div class="footer">
+            <el-pagination
+              background
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="pageSizeChange"
+              :page-sizes="[1,10, 20, 30, 40]"
+              :page-size="requestData.limit"
+              @current-change="responseDataOnePageCurrentChange"
+              :current-page.sync="requestData.page"
+              :total="responseData2.count">
+            </el-pagination>
+          </div>
         </el-tab-pane>
         <el-tab-pane label="充值订单" name="3">
-          充值订单
+          <div class="search-condition">
+            <div class="select">
+              <el-select v-model="requestData.nowWaiter" clearable placeholder="选择服务人员" >
+                <el-option
+                  v-for="item in waiter"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select">
+              <el-select v-model="requestData.payWay" clearable placeholder="选中支付方式">
+                <el-option
+                  v-for="item in payWayList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select" style="width: 148px;">
+              <el-select v-model="requestData.orderStatus" clearable placeholder="选择状态">
+                <el-option
+                  v-for="item in orderStatus"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select" style="width:368px;height:48px;">
+              <el-input
+                v-model="requestData.mobile"
+                placeholder="请输入需查询的会员手机号/订单号"
+                clearable>
+              </el-input>
+            </div>
+            <div class="select">
+              <el-button plain @click="getOrderList">搜索</el-button>
+            </div>
+          </div>
+          <div class="search-btns">
+            <span class="span">筛选</span>
+            <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日</el-button>
+            <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日</el-button>
+            <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周</el-button>
+            <el-date-picker
+              @focus="chooseTimeDIY"
+              v-model="requestData.date"
+              type="daterange"
+              range-separator="至"
+              value-format="yyyy-MM-dd"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
+          </div>
+          <div class="serch-table">
+            <el-table :data="responseData3.data" border style="width: 100%;" height="565">
+              <el-table-column prop="sn" label="订单号"></el-table-column>
+              <el-table-column label="会员账号">
+                <template slot-scope="scope">
+                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)">{{scope.row.mobile}}</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column prop="old_amount" label="充值金额"></el-table-column>
+              <el-table-column prop="pay_way" label="付款方式"></el-table-column>
+              <el-table-column prop="time" label="交易时间"></el-table-column>
+              <el-table-column label="服务人员">
+                <template slot-scope="scope">
+                  <el-button type="text" size="small" @click="getWaiterInfo(scope.row.waiter_id)">{{scope.row.waiter}}</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column prop="remake" label="备注"></el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope">
+                  <el-button size="mini" @click="orderDetailsDialog.isShow = true">订单详情</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <div class="footer">
+            <el-pagination
+              background
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="pageSizeChange"
+              :page-sizes="[1,10, 20, 30, 40]"
+              :page-size="requestData.limit"
+              @current-change="responseDataOnePageCurrentChange"
+              :current-page.sync="requestData.page"
+              :total="responseData3.count">
+            </el-pagination>
+          </div>
         </el-tab-pane>
       </el-tabs>
 
@@ -125,7 +356,7 @@
           <div>
             <div class="title">商品信息</div>
             <div>
-              <el-table :data="orderList" border style="width: 100%;" height="142">
+              <el-table  border style="width: 100%;" height="142">
                 <el-table-column prop="id" label="订单号" width="180"></el-table-column>
                 <el-table-column prop="mobile" label="会员账号" width="180"></el-table-column>
                 <el-table-column prop="price" label="付款金额"></el-table-column>
@@ -137,7 +368,7 @@
           <div>
             <div class="title">退单信息</div>
             <div>
-              <el-table :data="orderList" border style="width: 100%;" height="142">
+              <el-table  border style="width: 100%;" height="142">
                 <el-table-column prop="id" label="订单号" width="180"></el-table-column>
                 <el-table-column prop="mobile" label="会员账号" width="180"></el-table-column>
                 <el-table-column prop="price" label="付款金额"></el-table-column>
@@ -192,7 +423,7 @@
       <!-- 外包商品成本设置-->
       <el-dialog class="order-manage-page-member-info" title="外包商品成本设置" :visible.sync="settingOutGoodPriceDialog.isShow" width="550px" :center="true">
         <div>
-          <el-table :data="orderList" border style="width: 100%;" height="142">
+          <el-table  border style="width: 100%;" height="142">
             <el-table-column prop="id" label="订单号"></el-table-column>
             <el-table-column prop="mobile" label="商品名称"></el-table-column>
             <el-table-column prop="price" label="交易金额"></el-table-column>
@@ -211,69 +442,79 @@
 
 <script>
 import { postOrderList, postWaiter, postOrderWaiter, postMemberInfo, } from '../../api/getData'
+import { changeTime,getWeekStartDateAndEndDateRange } from '../../utils'
+
 export default {
   name: 'OrderManage', // 订单管理
   data () {
     return {
       requestData: {
+        //服务项目
+        service: '',
+        // 分页
+        page: 1,
+        // 每页的条数
+        limit: 1,
         // 当前选中的服务人员
-        nowWaiter: {
-          id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
-          name: '请选择服务员', // 服务员名称
-          type: '未知' // 服务类型
-        },
+        nowWaiter: '',
         //当前选中的支付方式
-        payWay:{id: 1, name: '微信'},
+        payWay: '',
         // 选择订单状态
-        orderStatus:{id:1,name:'正常'},
+        orderStatus: '',
+        //
+        goodType: 1,
         //请输入需查询的会员手机号/订单号
         mobile: '',
         //门店id
         shop_code: 18,
         //订单类型 1=商品订单，2=服务卡订单 3=充值购卡 4=收银台收银
         type: '1',
+        // 筛选时间 自定义时间
+        date:[
+        ],
+        // 当前选择的时间// 1=今日，2=昨日，3=本周 0=未选择
+        timeBtnValue: 0,
+        startTime: '', //开始时间
+        endTime:'', //结束时间
       },
-      // 订单
-      orderList: [
-        {id: 1, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 2, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 3, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 4, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 5, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 6, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 7, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 8, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 9, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 10, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 11, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 12, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 13, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 14, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 15, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 16, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1},
-        {id: 17, mobile: '15213710631', price: 15.50, good_price: 10, is_out_good: '是', pay_way: '支付宝', time: '2019-12-05 15:30:29', waiter: '张三', status: '正常', is_setting_goods_price: 1}
-      ],
+      //商品订单
+      responseData1:{
+
+      },
+      //服务订单
+      responseData2:{
+
+      },
+      //充值订单
+      responseData3:{
+
+      },
       // 订单详情弹窗内容
       orderDetailsDialog: {
         isShow: false
       },
       // 选择服务人员
       waiter: [
-        {
-          id: 1, // 服务员id  当服务员的id为0师表示为当前登录的店长
-          name: '管理员', // 服务员名称
-          type: '店长' // 服务类型
-        },
-        {
-          id: 2, // 服务员id  当服务员的id为0师表示为当前登录的店长
-          name: '张三', // 服务员名称
-          type: '店长' // 服务类型
-        }
+        // {
+        //   id: 1, // 服务员id  当服务员的id为0师表示为当前登录的店长
+        //   name: '管理员', // 服务员名称
+        //   type: '店长' // 服务类型
+        // },
+      ],
+      //选择服务项目
+      serviceList:[
+        {id:1,name:'水育'}
       ],
       // 选择订单状态
       orderStatus:[
         {id:1,name:'正常'},
         {id:2,name:'退单'},
+      ],
+      // 商品类型
+      goodsType:[
+        {id:1, name: '全部'},
+        {id:2, name: '外包商品'},
+        {id:3, name: '公司商品'},
       ],
       //选择支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
       payWayList:[
@@ -319,19 +560,59 @@ export default {
     }
   },
   methods: {
+    //商品订单 页码操作
+    responseDataOnePageCurrentChange(val){
+      this.requestData.page = val
+      this.getOrderList()
+    },
+    pageSizeChange (val) {
+      // console.log(`每页 ${val} 条`)
+      this.requestData.limit = val
+      this.getOrderList()
+    },
+    // 1=今日，2=昨日，3=本周
+    chooseTime(type) {
+      this.requestData.timeBtnValue = type
+      switch (type) {
+        case 1:
+          this.requestData.startTime = changeTime(new Date().getTime())
+          this.requestData.endTime = changeTime(new Date().getTime())
+          this.requestData.date = []
+          break;
+        case 2:
+          this.requestData.startTime = changeTime(new Date().getTime() -  24 * 60 * 60 * 1000)
+          this.requestData.endTime = changeTime(new Date().getTime() -  24 * 60 * 60 * 1000)
+          this.requestData.date = []
+          break;
+        case 3:
+          let date = getWeekStartDateAndEndDateRange()
+          this.requestData.startTime = date[0]
+          this.requestData.endTime = date[1]
+          this.requestData.date = []
+          break;
+      }
+    },
+    // 自定义时间
+    chooseTimeDIY(){
+      this.requestData.startTime = ''
+      this.requestData.endTime = ''
+      this.requestData.timeBtnValue = 0
+    },
+
     //tab切换
     handleClick (tab, event) {
       console.log(tab, event)
+      this.requestData.page = 1
       this.getOrderList()
     },
 
     // 获取服务员列表
-    getWaiterList () {
-      postWaiter().then(res => {
+    async getWaiterList () {
+      await postWaiter(null).then(res => {
         if (res.data.length) {
           this.waiter = res.data
         }
-      }).cache(err => {
+      }).catch(err => {
         console.log(err)
       })
     },
@@ -348,22 +629,38 @@ export default {
       })
     },
     //获取单个服务员信息
-    getWaiterInfo(id = 11){
-      this.waiterInfoDialog.isShow = true
-      let data = {
-        id:id
-      }
-      postOrderWaiter(data).then(res=>{
+    async getWaiterInfo(id){
+      await postOrderWaiter({id: id}).then(res=>{
         this.waiterInfoDialog.waiterInfo = res.data
+        this.waiterInfoDialog.isShow = true
       }).catch(err=>{
         console.log(err)
       })
     },
     //获取订单列表
     getOrderList(){
-      postOrderList(this.requestData).then(res=>{
-        if (res.data){
-          this.orderList = res.data
+      let data = {
+        type: this.requestData.type,// 订单类型 1 商品订单  2 服务订单 3:充值购卡 4:收银台收款 5:购买卷卡（服务劵，服务卡...） 6:兑换券 默认为1
+        page: `${this.requestData.page},${this.requestData.limit}`
+      }
+      console.log('请求数据',this.requestData)
+      postOrderList(data).then(res=>{
+        console.log('订单列表', res)
+        if (res.code === '200') {
+          if (res.data){
+            switch (this.requestData.type) {
+              case "1":
+                this.responseData1 = res
+                break
+              case "2":
+                this.responseData2 = res
+                break
+              case "3":
+                this.responseData3 = res
+                break
+
+            }
+          }
         }
       }).catch(err=>{
         console.log(err)
@@ -436,6 +733,11 @@ export default {
           color: #fff;
           background:rgba(107,210,244,1);
         }
+      }
+
+      .footer{
+        margin-top: 20px;
+        text-align: right;
       }
     }
   }
