@@ -51,7 +51,7 @@ export default {
         {
           title: '库存管理',
           icon: 'stock-manage',
-          index: '16'
+          index: '/home/inventory'
         },
         {
           title: '报表分析',

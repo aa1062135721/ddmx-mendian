@@ -74,4 +74,10 @@ export default {
     color: #2ECAF1;
     background: #FFFFFF;
   }
+  .flex-space-between{
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
 </style>

@@ -80,6 +80,15 @@ const router = new Router({
             requireAuth: true// 需要登录
           },
           component: resolve => require(['@/components/pages/ExpenditureManage.vue'], resolve)
+        },
+        {
+          path: 'inventory',
+          name: 'Inventory',
+          meta: {
+            title: '库存管理-进销存',
+            requireAuth: true// 需要登录
+          },
+          component: resolve => require(['@/components/pages/InventoryManage.vue'], resolve)
         }
       ]
     },
