@@ -4,59 +4,32 @@
         <el-tab-pane label="调拨单" name="1">
           <div>
             <div class="search">
-              <el-select  clearable placeholder="选择调出仓库" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
+              <el-select  clearable placeholder="选择调入仓库" ></el-select>
+              <el-select  clearable placeholder="选择状态" v-model="transferSlipRequestData.status">
+                <el-option v-for="item in transferSlipPageData.status" :label="item.name" :value="item.id"></el-option>
               </el-select>
-              <el-select  clearable placeholder="选择调入仓库" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-              </el-select>
-              <el-select  clearable placeholder="选择状态" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-              </el-select>
-              <el-select  clearable placeholder="需要查询的时间" >
-                <el-option label="调拨时间"></el-option>
-                <el-option label="发货时间"></el-option>
-                <el-option label="入库时间"></el-option>
+              <el-select  clearable placeholder="需要查询的时间" v-model="transferSlipRequestData.selectTimeStatus">
+                <el-option v-for="item in transferSlipPageData.selectTimeStatus" :label="item.name" :value="item.id"></el-option>
               </el-select>
               <el-date-picker
                 type="daterange"
+                v-model="transferSlipRequestData.time"
                 range-separator="至"
                 value-format="yyyy-MM-dd"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期">
               </el-date-picker>
-              <el-input style="width: 300px;" placeholder="请输入需查询的订单号/商品名" clearable>
+              <el-input style="width: 300px;" v-model="transferSlipRequestData.title" placeholder="请输入需查询的订单号/商品名" clearable>
               </el-input>
               <el-button>搜索</el-button>
             </div>
-            <div class="search">
+            <div class="search" style="margin-top: 15px;">
               <el-button>导出</el-button>
-              <el-button>新增调拨</el-button>
+              <el-button @click="transferSlipPageData.addDialog.isShow = true">新增调拨</el-button>
             </div>
           </div>
-          <div>
-            <el-table  border style="width: 100%;" height="565">
+          <div style="margin-top: 15px;">
+            <el-table  border style="width: 100%;" height="620">
               <el-table-column prop="sn" label="调拨信息"></el-table-column>
               <el-table-column label="商品信息"></el-table-column>
               <el-table-column prop="amount" label="单位成本"></el-table-column>
@@ -76,32 +49,25 @@
 
             </el-table>
           </div>
+          <div class="footer" style="text-align: right;margin-top: 15px;">
+            <el-pagination
+              background
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change=""
+              :page-sizes="[1,10, 20, 30, 40]"
+              :page-size="transferSlipRequestData.limit"
+              @current-change=""
+              :current-page.sync="transferSlipRequestData.page"
+              :total="transferSlipPageData.count">
+            </el-pagination>
+          </div>
           <!-- 调拨单--新增调拨-->
-          <el-dialog  title="调拨"  width="968px" :center="true">
+          <el-dialog  :visible.sync="transferSlipPageData.addDialog.isShow"title="调拨"  width="968px" :center="true">
             <div>
-                <el-select  clearable placeholder="选择调出仓库" >
-                  <el-option
-                    label="item.name"
-                    value="item.id">
-                  </el-option>
-                  <el-option
-                    label="item.name"
-                    value="item.id">
-                  </el-option>
-                </el-select>
-                <el-select  clearable placeholder="选择调入仓库" >
-                  <el-option
-                    label="item.name"
-                    value="item.id">
-                  </el-option>
-                  <el-option
-                    label="item.name"
-                    value="item.id">
-                  </el-option>
-                </el-select>
-              <el-button>选择商品</el-button>
+              <el-select  clearable placeholder="选择调入仓库" ></el-select>
+              <el-button @click="transferSlipPageData.chooseGoodsDialog.isShow = true">选择商品</el-button>
             </div>
-            <div>
+            <div style="margin-top: 15px;">
               <el-table border style="width: 100%;">
                 <el-table-column prop="subtitle" label="序号"></el-table-column>
                 <el-table-column prop="num" label="商品名称"></el-table-column>
@@ -117,9 +83,15 @@
                 </el-table-column>
               </el-table>
             </div>
-            <div>
+            <div style="margin-top: 15px;">
               <div class="clear-both" style="height: 50px;">
-                <div class="float-left">合计调拨数量：4</div>
+                <div class="float-left">
+                  <el-form  label-width="110px">
+                    <el-form-item label="合计调拨数量：">
+                      4
+                    </el-form-item>
+                  </el-form>
+                </div>
                 <div class="float-right">
                   <el-form  label-width="80px">
                     <el-form-item label="备注：">
@@ -129,35 +101,19 @@
                 </div>
               </div>
             </div>
-            <div style="text-align: center;">
-              <el-button class="my-secondary-btn">取消</el-button>
+            <div style="text-align: center;margin-top: 15px;">
+              <el-button class="my-secondary-btn" @click="transferSlipPageData.addDialog.isShow = false">取消</el-button>
               <el-button class="my-primary-btn">确定</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--新增调拨 选择商品-->
-          <el-dialog  title="选择商品" width="968px" :center="true">
+          <el-dialog  :visible.sync="transferSlipPageData.chooseGoodsDialog.isShow" title="选择商品" width="968px" :center="true">
             <div style="margin-bottom: 15px;">
               <el-input placeholder="请输入商品名称" style="width: 180px;"></el-input>
               <el-input placeholder="请输入条形码" style="width: 180px;"></el-input>
               <el-select  clearable placeholder="选择一级分类" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
               </el-select>
               <el-select  clearable placeholder="选择二级分类" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
               </el-select>
               <el-button>查询</el-button>
             </div>
@@ -173,12 +129,12 @@
               </el-table>
             </div>
             <div style="text-align: center;margin-top: 20px;">
-              <el-button class="my-secondary-btn">取消</el-button>
+              <el-button class="my-secondary-btn" @click="transferSlipPageData.chooseGoodsDialog.isShow = false">取消</el-button>
               <el-button class="my-primary-btn">确定</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--发货-->
-          <el-dialog  title="发货"  width="968px" :center="true">
+          <el-dialog  :visible.sync="transferSlipPageData.sendGoodsDialog.isShow" title="发货"  width="968px" :center="true">
             <div class="flex-space-between" style="margin-bottom: 15px;">
               <span>调拨单号：XXXX</span>
               <span>调拨仓库：XXXXXX</span>
@@ -200,12 +156,12 @@
               </el-table>
             </div>
             <div style="text-align: center;margin-top: 20px;">
-              <el-button class="my-secondary-btn">取消</el-button>
+              <el-button class="my-secondary-btn" @click="transferSlipPageData.sendGoodsDialog.isShow = false">取消</el-button>
               <el-button class="my-primary-btn">确定发货</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--打印-->
-          <el-dialog  title="调拨单-打印" width="968px" :center="true">
+          <el-dialog  :visible.sync="transferSlipPageData.printingDialog.isShow" title="调拨单-打印" width="968px" :center="true">
             <div class="flex-space-between" style="margin-bottom: 15px;">
               <span>调拨单号：XXXX</span>
               <span>调拨仓库：XXXXXX</span>
@@ -230,12 +186,12 @@
               <span>收货人：fasdfads</span>
             </div>
             <div style="text-align: center;margin-top: 20px;">
-              <el-button class="my-secondary-btn">取消</el-button>
+              <el-button class="my-secondary-btn" @click="transferSlipPageData.printingDialog.isShow = false">取消</el-button>
               <el-button class="my-primary-btn">打印</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--调拨详情-->
-          <el-dialog  title="调拨详情" width="968px" :center="true">
+          <el-dialog  :visible.sync="transferSlipPageData.detailsDialog.isShow" title="调拨详情" width="968px" :center="true">
             <div>
               <el-steps :active="1" finish-status="success" align-center="true">
                 <el-step>
@@ -284,7 +240,7 @@
               <el-button class="my-primary-btn">取消发货</el-button>
             </div>
             <div style="text-align: center;margin-top: 20px;">
-              <el-button class="my-secondary-btn">取消</el-button>
+              <el-button class="my-secondary-btn" @click="transferSlipPageData.detailsDialog.isShow = false">取消</el-button>
               <el-button class="my-primary-btn">确认收货</el-button>
             </div>
           </el-dialog>
@@ -293,14 +249,6 @@
           <div>
             <div class="search">
               <el-select  clearable placeholder="选择盘点仓库" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
               </el-select>
               <el-select  clearable placeholder="选择状态" v-model="checkOrderRequestData.status">
                 <el-option
@@ -509,157 +457,144 @@
           <div>
             <div class="search">
               <el-select  clearable placeholder="选择盘点仓库" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
               </el-select>
-              <el-select  clearable placeholder="选择状态" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
+              <el-select  clearable placeholder="选择状态" v-model="checkLossOrderRequestData.status">
+                <el-option v-for="item in checkLossOrderPageData.status" :label="item.name" :value="item.id"></el-option>
               </el-select>
               <el-date-picker
+                v-model="checkLossOrderRequestData.time"
                 type="daterange"
                 range-separator="至"
                 value-format="yyyy-MM-dd"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期">
               </el-date-picker>
-              <el-input style="width: 300px;" placeholder="请输入需查询的订单号/商品名" clearable>
+              <el-input v-model="checkLossOrderRequestData.name" style="width: 300px;" placeholder="请输入需查询的订单号/商品名" clearable>
               </el-input>
-              <el-button>搜索</el-button>
+              <el-button @click="searchCheckLossOrder">搜索</el-button>
             </div>
-            <div class="search">
+            <div class="search" style="margin-top: 15px;">
               <el-button>导出</el-button>
             </div>
           </div>
-          <div>
-            <el-table  border style="width: 100%;" height="565">
-              <el-table-column prop="sn" label="订单号"></el-table-column>
-              <el-table-column label="盘点仓库"></el-table-column>
-              <el-table-column prop="amount" label="盘点人员"></el-table-column>
-              <el-table-column label="盘点时间"></el-table-column>
-              <el-table-column label="状态"></el-table-column>
+          <div style="margin-top: 15px;">
+            <el-table :data="checkLossOrderPageData.list" border style="width: 100%;" height="620">
+              <el-table-column prop="order_sn" label="订单号"></el-table-column>
+              <el-table-column prop="shop_id" label="盘点仓库"></el-table-column>
+              <el-table-column prop="user_name" label="盘点人员"></el-table-column>
+              <el-table-column prop="time" label="盘点时间"></el-table-column>
+              <el-table-column  prop="status" label="状态"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button type="text" size="mini">确认库存</el-button>
-                  <el-button type="text" size="mini">编辑</el-button>
-                  <el-button type="text" size="mini">详情</el-button>
+                  <el-button type="text" v-if="scope.row.status ==='待确认'" size="mini" @click="checkLossOrderConfirm(scope.row.id)">确认库存</el-button>
+                  <el-button type="text"  v-if="scope.row.status ==='待确认'" size="mini" @click="checkLossOrderConfirm(scope.row.id)">编辑</el-button>
+                  <el-button type="text" v-if="scope.row.status ==='已确认'" size="mini" @click="checkLossOrderDetails(scope.row.id)">详情</el-button>
                 </template>
               </el-table-column>
             </el-table>
           </div>
+          <div class="footer" style="text-align: right;margin-top: 15px;">
+            <el-pagination
+              background
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="checkLossOrderPageSizeChange"
+              :page-sizes="[1,10, 20, 30, 40]"
+              :page-size="checkLossOrderRequestData.limit"
+              @current-change="checkLossOrderOnePageCurrentChange"
+              :current-page.sync="checkLossOrderRequestData.page"
+              :total="checkLossOrderPageData.count">
+            </el-pagination>
+          </div>
           <!-- 盘亏单--盘点库存确认-->
-          <el-dialog  title="盘点库存确认"   width="968px" :center="true">
-            <div style="margin-bottom: 15px;">
-              <el-select  clearable placeholder="选择一级分类" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-              </el-select>
-              <el-select  clearable placeholder="选择二级分类" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-              </el-select>
-              <el-input placeholder="请输入商品名称" style="width: 180px;"></el-input>
-              <el-button>查询</el-button>
-            </div>
+          <el-dialog  title="盘点库存确认" :visible.sync="checkLossOrderPageData.inventoryConfirmDialog.isShow"   width="968px" :center="true">
             <div>
-              <el-table border style="width: 100%;">
-                <el-table-column ></el-table-column>
-                <el-table-column prop="real_price" label="序号"></el-table-column>
-                <el-table-column prop="num" label="商品名称"></el-table-column>
-                <el-table-column prop="price" label="一级分类"></el-table-column>
-                <el-table-column prop="pay_all_price" label="二级分类"></el-table-column>
-                <el-table-column prop="pay_all_price" label="当前库存"></el-table-column>
+              <el-table :data="checkLossOrderPageData.inventoryConfirmDialog.responseData.item" border style="width: 100%;">
+                <el-table-column type="index" label="序号"></el-table-column>
+                <el-table-column prop="title" label="商品名称"></el-table-column>
+                <el-table-column prop="type_id" label="一级分类"></el-table-column>
+                <el-table-column prop="type" label="二级分类"></el-table-column>
+                <el-table-column prop="stock" label="当前库存"></el-table-column>
                 <el-table-column prop="pay_all_price" label="盘点库存">
-                  <span class="font-blue">12</span>
-                  <span class="font-red">11</span>
+                  <template slot-scope="scope">
+                    <span class="font-blue" v-if="scope.row.stock>scope.row.num">{{scope.row.num}}</span>
+                    <span class="font-red" v-else>{{scope.row.num}}</span>
+                  </template>
                 </el-table-column>
-                <el-table-column prop="pay_all_price" label="备注">
-                  <el-input type="text" placeholder="请输入备注"></el-input>
+                <el-table-column label="备注">
+                  <template slot-scope="scope">
+                    <el-input type="text" placeholder="请输入备注" v-model="scope.row.remarks"></el-input>
+                  </template>
                 </el-table-column>
               </el-table>
             </div>
             <div style="margin-top: 15px;">
               <el-form>
                 <el-form-item label="备注：" label-width="55px">
-                  <el-input placeholder="请输入备注信息"></el-input>
+                  <el-input placeholder="请输入备注信息" v-model="checkLossOrderPageData.inventoryConfirmDialog.responseData.remarks"></el-input>
                 </el-form-item>
               </el-form>
             </div>
             <div style="text-align: center;margin-top: 20px;">
-              <el-button class="my-secondary-btn">取消</el-button>
+              <el-button class="my-secondary-btn" @click="checkLossOrderPageData.inventoryConfirmDialog.isShow = false">取消</el-button>
               <el-button class="my-primary-btn">确定</el-button>
+            </div>
+          </el-dialog>
+          <!-- 盘亏单--盘点库存确认-->
+          <el-dialog  title="盘亏单详情" :visible.sync="checkLossOrderPageData.detailsDialog.isShow"   width="968px" :center="true">
+            <div>
+              <el-table :data="checkLossOrderPageData.detailsDialog.responseData.item" border style="width: 100%;">
+                <el-table-column type="index" label="序号"></el-table-column>
+                <el-table-column prop="title" label="商品名称"></el-table-column>
+                <el-table-column prop="type_id" label="一级分类"></el-table-column>
+                <el-table-column prop="type" label="二级分类"></el-table-column>
+                <el-table-column prop="stock" label="当前库存"></el-table-column>
+                <el-table-column prop="pay_all_price" label="盘点库存">
+                  <template slot-scope="scope">
+                    <span class="font-blue" v-if="scope.row.stock>scope.row.num">{{scope.row.num}}</span>
+                    <span class="font-red" v-else>{{scope.row.num}}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column porp="remarks" label="备注"></el-table-column>
+              </el-table>
+            </div>
+            <div style="margin-top: 15px;">
+              <el-form>
+                <el-form-item label="备注：" label-width="55px">
+                  <el-input :disabled="true" placeholder="无" v-model="checkLossOrderPageData.detailsDialog.responseData.remarks"></el-input>
+                </el-form-item>
+              </el-form>
             </div>
           </el-dialog>
         </el-tab-pane>
         <el-tab-pane label="盘盈单" name="4">
           <div>
             <div class="search">
-              <el-select  clearable placeholder="选择盘点仓库" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-              </el-select>
-              <el-select  clearable placeholder="选择状态" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
+              <el-select  clearable placeholder="选择盘点仓库" ></el-select>
+              <el-select  clearable placeholder="选择状态" v-model="checkWinOrderRequestData.status">
+                <el-option v-for="item in checkWinOrderPageData.status" :label="item.name" :value="item.id"></el-option>
               </el-select>
               <el-date-picker
                 type="daterange"
+                v-model="checkWinOrderRequestData.time"
                 range-separator="至"
                 value-format="yyyy-MM-dd"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期">
               </el-date-picker>
-              <el-input style="width: 300px;" placeholder="请输入需查询的订单号/商品名" clearable>
-              </el-input>
-              <el-button>搜索</el-button>
+              <el-input style="width: 300px;" placeholder="请输入需查询的订单号/商品名" clearable v-model="checkWinOrderRequestData.name"></el-input>
+              <el-button @click="searchCheckWinOrder">搜索</el-button>
             </div>
-            <div class="search">
+            <div class="search" style="margin-top: 15px;">
               <el-button>导出</el-button>
             </div>
           </div>
-          <div>
-            <el-table  border style="width: 100%;" height="565">
-              <el-table-column prop="sn" label="订单号"></el-table-column>
-              <el-table-column label="盘点仓库"></el-table-column>
-              <el-table-column prop="amount" label="盘点人员"></el-table-column>
-              <el-table-column label="盘点时间"></el-table-column>
-              <el-table-column label="状态"></el-table-column>
+          <div style="margin-top: 15px">
+            <el-table :data="checkWinOrderPageData.list" border style="width: 100%;" height="620">
+              <el-table-column prop="order_sn" label="订单号"></el-table-column>
+              <el-table-column prop="shop_id" label="盘点仓库"></el-table-column>
+              <el-table-column prop="user_name" label="盘点人员"></el-table-column>
+              <el-table-column prop="time" label="盘点时间"></el-table-column>
+              <el-table-column prop="status" label="状态"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
                   <el-button type="text" size="mini">确认库存</el-button>
@@ -669,32 +604,20 @@
               </el-table-column>
             </el-table>
           </div>
+          <div class="footer" style="text-align: right;margin-top: 15px;">
+            <el-pagination
+              background
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="checkWinOrderPageSizeChange"
+              :page-sizes="[1,10, 20, 30, 40]"
+              :page-size="checkWinOrderRequestData.limit"
+              @current-change="checkWinOrderOnePageCurrentChange"
+              :current-page.sync="checkWinOrderRequestData.page"
+              :total="checkWinOrderPageData.count">
+            </el-pagination>
+          </div>
           <!-- 盘盈单--盘点库存确认-->
           <el-dialog  title="盘点库存确认"  width="968px" :center="true">
-            <div style="margin-bottom: 15px;">
-              <el-select  clearable placeholder="选择一级分类" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-              </el-select>
-              <el-select  clearable placeholder="选择二级分类" >
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-              </el-select>
-              <el-input placeholder="请输入商品名称" style="width: 180px;"></el-input>
-              <el-button>查询</el-button>
-            </div>
             <div>
               <el-table border style="width: 100%;">
                 <el-table-column ></el-table-column>
@@ -731,12 +654,54 @@
 
 <script>
   import {deepCopy} from '../../utils'
-  import {postCheckOrderList,postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm,postCheckOrderEdit } from '../../api/getData'
+  import {postCheckOrderList,postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm,postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
     export default {
       name: "InventoryManage", //库存管理，进销存
       data(){
         return{
-          type:"2",//1=调拨单，2=盘点单，3=盘亏单，4=盘盈单
+          type:"1",//1=调拨单，2=盘点单，3=盘亏单，4=盘盈单
+
+          //1=调拨单
+          transferSlipPageData:{
+            status:[
+              {id:1,name:'代发货'},
+              {id:2,name:'已发货'},
+              {id:3,name:'已收货'}
+            ],
+            selectTimeStatus:[
+              {id:1,name:'调拨时间'},
+              {id:2,name:'发货时间'},
+              {id:3,name:'入库时间'}
+            ],
+            //新增调拨单弹框
+            addDialog:{
+              isShow:false,
+            },
+            //选择商品弹框
+            chooseGoodsDialog:{
+              isShow:false,
+            },
+            //发货弹框
+            sendGoodsDialog:{
+              isShow:false
+            },
+            //打印
+            printingDialog:{
+              isShow:false
+            },
+            //调拨详情
+            detailsDialog:{
+              isShow:false
+            }
+          },
+          transferSlipRequestData:{
+            page:1,
+            limit:10,
+            time:[],
+            title:'',
+            status:'',
+            selectTimeStatus:'',
+          },
 
           //2=盘点单 页面需要的参数
           checkOrderPageData:{
@@ -844,10 +809,104 @@
             limit:10,//每页条数
             time:['',''],//开始时间结束时间
           },
+
+          //3=盘亏单 页面需要的参数
+          checkLossOrderPageData:{
+            status:[
+              {id:1,name:'待确认'},
+              {id:2,name:'已确认(确认库存)'}
+            ],
+            //盘亏单数据总数
+            count:100,
+            list:[
+              {
+                id: 1,
+                order_sn: "123456789",//订单号
+                creator_id: 1,
+                status: "待确认", //状态
+                shop_id: "总店",  //门店
+                time: "2019-07-15 16:03:20",  //时间
+                user_name: "admin"    //盘点人
+              }
+            ],
+            inventoryConfirmDialog:{
+              isShow:false,
+              responseData:{
+                id: 1,    //盘亏盘盈单的id
+                remarks: "留言",  //整个单据的备注
+                item: [
+                  // {
+                  //   id: 1,    //单据的商品列表的id
+                  //   stock: 10,    //当前库存
+                  //   num: 11,  //盘点库存
+                  //   remarks: "盘盈",  //每条商品的留言
+                  //   title: "测试商品7/18",    //商品名称
+                  //   type_id: "玩具童车",  //一级分类名称
+                  //   type: "拼插积木"  //二级分类名称
+                  // }
+                ]
+              }
+            },
+            detailsDialog:{
+              isShow:false,
+              responseData:{
+                id: 1,    //盘亏盘盈单的id
+                remarks: "留言",  //整个单据的备注
+                item: [
+                  // {
+                  //   id: 1,    //单据的商品列表的id
+                  //   stock: 10,    //当前库存
+                  //   num: 11,  //盘点库存
+                  //   remarks: "盘盈",  //每条商品的留言
+                  //   title: "测试商品7/18",    //商品名称
+                  //   type_id: "玩具童车",  //一级分类名称
+                  //   type: "拼插积木"  //二级分类名称
+                  // }
+                ]
+              }
+            }
+          },
+          checkLossOrderRequestData:{
+            status:'',
+            time:[],
+            page:1,
+            limit:10,
+            name:'',
+            type:2
+          },
+
+          //4=盘盈单 页面需要的参数
+          checkWinOrderPageData:{
+            status:[
+              {id:1,name:'待确认'},
+              {id:2,name:'已确认(确认库存)'}
+            ],
+            count:100,
+            list:[
+              {
+                id: 1,
+                order_sn: "123456789",//订单号
+                creator_id: 1,
+                status: "待确认", //状态
+                shop_id: "总店",  //门店
+                time: "2019-07-15 16:03:20",  //时间
+                user_name: "admin"    //盘点人
+              }
+            ],
+          },
+          checkWinOrderRequestData:{
+            status:'',
+            time:[],
+            page:1,
+            limit:10,
+            name:'',
+            type:1
+          },
         }
       },
       mounted(){
         // this.getCheckOrderList()
+        // this.getCheckLossOrWinOrderList(1)
       },
       methods:{
         //tab切换
@@ -861,8 +920,12 @@
               this.getCheckOrderList()
               break
             case "3":
+              this.checkLossOrderRequestData.page = 1
+              this.getCheckLossOrWinOrderList(1)
               break
             case "4":
+              this.checkWinOrderRequestData.page = 1
+              this.getCheckLossOrWinOrderList(2)
               break
           }
         },
@@ -1051,7 +1114,96 @@
           postCheckOrderEdit(this.checkOrderPageData.editDialog.responseData).then(res=>{
 
           })
-        }
+        },
+
+        //盘亏单，盘盈单请求列表
+        getCheckLossOrWinOrderList(type=2){
+          // 1 盘盈单 2 盘亏单
+          switch (type) {
+            case 1:
+              let data = {
+                type:type,
+                status:this.checkLossOrderRequestData.status,
+                page:`${this.checkLossOrderRequestData.page},${this.checkLossOrderRequestData.limit}`,
+                start_time:this.checkLossOrderRequestData.time[0],
+                end_time:this.checkLossOrderRequestData.time[1],
+                name:this.checkLossOrderRequestData.name
+              }
+              postCheckLossOrWinOrderList(data).then(res=>{
+                  if(res.code === 200){
+                    this.checkLossOrderPageData.count = res.count
+                    this.checkLossOrderPageData.list = res.data
+                  }
+              })
+              break
+            case 2:
+              let requestData = {
+                type:type,
+                status:this.checkWinOrderRequestData.status,
+                page:`${this.checkWinOrderRequestData.page},${this.checkWinOrderRequestData.limit}`,
+                start_time:this.checkWinOrderRequestData.time[0],
+                end_time:this.checkWinOrderRequestData.time[1],
+                name:this.checkWinOrderRequestData.name
+              }
+              postCheckLossOrWinOrderList(requestData).then(res=>{
+                if(res.code === 200){
+                  this.checkWinOrderPageData.count = res.count
+                  this.checkWinOrderPageData.list = res.data
+                }
+              })
+              break
+          }
+        },
+        //盘亏单搜索按钮
+        searchCheckLossOrder(){
+          this.checkLossOrderRequestData.page = 1
+          this.getCheckLossOrWinOrderList(2)
+        },
+        //盘亏单 页码操作
+        checkLossOrderOnePageCurrentChange(val){
+          this.checkLossOrderRequestData.page = val
+          this.getCheckLossOrWinOrderList(2)
+        },
+        //盘亏单，每页数据条数操作
+        checkLossOrderPageSizeChange (val) {
+          this.checkLossOrderRequestData.limit = val
+          this.getCheckLossOrWinOrderList(2)
+        },
+        //盘亏单 详情
+        async checkLossOrderDetails(id){
+          await postCheckLossOrWinOrderDetails({id}).then(res=>{
+            if(res.code===200){
+              this.checkLossOrderPageData.detailsDialog.responseData = res.data
+              this.checkLossOrderPageData.detailsDialog.isShow = true
+            }
+          })
+        },
+        //盘亏单 待确认
+        async checkLossOrderConfirm(id){
+          await postCheckLossOrWinOrderDetails({id}).then(res=>{
+            if(res.code===200){
+              this.checkLossOrderPageData.inventoryConfirmDialog.responseData = res.data
+              this.checkLossOrderPageData.inventoryConfirmDialog.isShow = true
+            }
+          })
+        },
+
+
+        //盘盈单搜索按钮
+        searchCheckWinOrder(){
+          this.checkWinOrderRequestData.page = 1
+          this.getCheckLossOrWinOrderList(1)
+        },
+        //盘盈单 页码操作
+        checkWinOrderOnePageCurrentChange(val){
+          this.checkWinOrderRequestData.page = val
+          this.getCheckLossOrWinOrderList(1)
+        },
+        //盘亏单，每页数据条数操作
+        checkWinOrderPageSizeChange (val) {
+          this.checkLossOrderRequestData.limit = val
+          this.getCheckLossOrWinOrderList(1)
+        },
       }
     }
 </script>

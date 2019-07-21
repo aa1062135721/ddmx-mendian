@@ -322,3 +322,23 @@ export const postCheckOrderConfirm = (data = null) => {
 export const postCheckOrderEdit = (data = null) => {
   return Vue.prototype.$post('/Check/editRemarks', data)
 }
+
+/**
+ * 订单管理-库存管理 - 盘亏盈单 - 列表
+ 其他信息不允许编辑
+ * @param data
+ * @returns {*}
+ */
+export const postCheckLossOrWinOrderList = (data = null) => {
+  return Vue.prototype.$post('/Check/inventory', data)
+}
+
+/**
+ * 订单管理-库存管理 - 盘亏盈单 - 详情
+ 其他信息不允许编辑
+ * @param data
+ * @returns {*}
+ */
+export const postCheckLossOrWinOrderDetails = (data = null) => {
+  return Vue.prototype.$post('/Check/inventory_info', data)
+}
