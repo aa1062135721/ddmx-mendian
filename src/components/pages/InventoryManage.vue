@@ -302,131 +302,206 @@
                   value="item.id">
                 </el-option>
               </el-select>
-              <el-select  clearable placeholder="选择状态" >
+              <el-select  clearable placeholder="选择状态" v-model="checkOrderRequestData.status">
                 <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
+                  v-for="item in checkOrderPageData.status"
+                  :label="item.name"
+                  :value="item.id">
                 </el-option>
               </el-select>
               <el-date-picker
                 type="daterange"
+                v-model="checkOrderRequestData.time"
                 range-separator="至"
                 value-format="yyyy-MM-dd"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期">
               </el-date-picker>
-              <el-input style="width: 300px;" placeholder="请输入需查询的订单号/商品名" clearable>
+              <el-input style="width: 300px;" v-model="checkOrderRequestData.name" placeholder="订单号/商品名(目前仅支持单号搜索)" clearable>
               </el-input>
-              <el-button>搜索</el-button>
+              <el-button @click="getCheckOrderList">搜索</el-button>
             </div>
-            <div class="search">
+            <div class="search" style="margin-top: 15px;">
               <el-button>导出</el-button>
-              <el-button>新增盘点</el-button>
+              <el-button @click="clickAddCheckOrder">新增盘点</el-button>
             </div>
           </div>
-          <div>
-            <el-table  border style="width: 100%;" height="565">
-              <el-table-column prop="sn" label="订单号"></el-table-column>
-              <el-table-column label="盘点仓库"></el-table-column>
-              <el-table-column prop="amount" label="盘点人员"></el-table-column>
-              <el-table-column label="盘点时间"></el-table-column>
-              <el-table-column label="状态"></el-table-column>
+          <div  style="margin-top: 15px;">
+            <el-table :data="checkOrderPageData.list"  border style="width: 100%;" height="620">
+              <el-table-column prop="order_sn" label="订单号"></el-table-column>
+              <el-table-column prop="shop_id" label="盘点仓库"></el-table-column>
+              <el-table-column prop="user_name" label="盘点人员"></el-table-column>
+              <el-table-column prop="time" label="盘点时间"></el-table-column>
+              <el-table-column prop="status" label="状态"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button type="text" size="mini">确认盘点</el-button>
-                  <el-button type="text" size="mini">编辑</el-button>
-                  <el-button type="text" size="mini">详情</el-button>
-                  <el-button type="text" size="mini">删除</el-button>
+                  <el-button type="text" v-if="scope.row.status === '盘点待确认'" size="mini" @click="clickCheckOrderConfirm(scope.row.id)">确认盘点</el-button>
+                  <el-button type="text" v-if="scope.row.status === '盘点待确认'" size="mini" @click="clickCheckOrderEdit(scope.row.id)">编辑</el-button>
+                  <el-button type="text" size="mini" @click="clickCheckOrderDetails(scope.row.id)">详情</el-button>
+                  <el-button type="text" v-if="scope.row.status === '盘点待确认'" size="mini" @click="clickCheckOrderDel(scope.row.id)">删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
           </div>
+          <div class="footer" style="text-align: right;margin-top: 15px;">
+            <el-pagination
+              background
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="checkOrderPageSizeChange"
+              :page-sizes="[1,10, 20, 30, 40]"
+              :page-size="checkOrderRequestData.limit"
+              @current-change="checkOrderOnePageCurrentChange"
+              :current-page.sync="checkOrderRequestData.page"
+              :total="checkOrderPageData.count">
+            </el-pagination>
+          </div>
           <!-- 盘点单--新增盘点-->
-          <el-dialog  title="新增盘点"  width="968px" :center="true">
+          <el-dialog :visible.sync="checkOrderPageData.addDialog.isShow"  title="新增盘点"  width="968px" :center="true">
             <div style="margin-bottom: 15px;">
-              <el-select  clearable placeholder="选择一级分类" ></el-select>
-              <el-select  clearable placeholder="选择二级分类" ></el-select>
-              <el-input placeholder="请输入需查询的商品名称" style="width: 300px;"></el-input>
-              <el-button>查询</el-button>
+              <el-radio-group v-model="checkOrderPageData.addDialog.stock_type">
+                <el-radio :label="1">只看未盘点商品</el-radio>
+                <el-radio :label="2">全部</el-radio>
+              </el-radio-group>
             </div>
             <div style="margin-bottom: 15px;">
-              <el-radio-group >
-                <el-radio :label="3">只看未盘点商品</el-radio>
-                <el-radio :label="6">全部</el-radio>
-              </el-radio-group>
-              <el-button style="margin-left:10px; ">新增商品</el-button>
+              <el-select  clearable placeholder="选择一级分类" v-model="checkOrderPageData.addDialog.topCategoryId"  @change="clickAddCheckOrderTwoCategory">
+                <el-option
+                  v-for="item in checkOrderPageData.addDialog.topCategory"
+                  :label="item.cname"
+                  :key="item.id"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+              <el-select  clearable placeholder="选择二级分类" v-model="checkOrderPageData.addDialog.twoCategoryId">
+                <el-option
+                  v-for="item in checkOrderPageData.addDialog.twoCategory"
+                  :label="item.cname"
+                  :key="item.id"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+              <el-input placeholder="请输入需查询的商品名称" v-model="checkOrderPageData.addDialog.title" style="width: 300px;"></el-input>
+              <el-button  @click="getCheckOrderGoodList">查询</el-button>
             </div>
             <div>
-              <el-table border style="width: 100%;">
-                <el-table-column prop="subtitle" label="序号"></el-table-column>
-                <el-table-column prop="num" label="商品名称"></el-table-column>
-                <el-table-column prop="price" label="一级分类"></el-table-column>
-                <el-table-column prop="pay_all_price" label="二级分类"></el-table-column>
-                <el-table-column prop="pay_all_price" label="当前库存"></el-table-column>
-                <el-table-column prop="pay_all_price" label="盘点库存">
-                  <el-input placehoder="请输入盘点库存"></el-input>
-                  <span class="font-red">48</span>
-                  <span class="font-blue">40</span>
+              <el-table :data="checkOrderPageData.addDialog.list" border style="width: 100%;">
+                <el-table-column type="index" label="序号"></el-table-column>
+                <el-table-column prop="item_title" label="商品名称"></el-table-column>
+                <el-table-column prop="top_category" label="一级分类"></el-table-column>
+                <el-table-column prop="two_category" label="二级分类"></el-table-column>
+                <el-table-column prop="stock_reality" label="当前库存"></el-table-column>
+                <el-table-column label="盘点库存">
+                  <template slot-scope="scope">
+                    <el-input placehoder="请输入盘点库存" v-model="scope.row.stock_now"></el-input>
+                  </template>
                 </el-table-column>
               </el-table>
             </div>
             <div style="margin-top: 15px;">
               <el-form>
                 <el-form-item label="备注：" label-width="55px">
-                  <el-input placeholder="请输入备注信息"></el-input>
+                  <el-input placeholder="请输入备注信息" v-model="checkOrderPageData.addDialog.remarks"></el-input>
                 </el-form-item>
               </el-form>
             </div>
             <div style="text-align: center;">
-              <el-button class="my-secondary-btn">取消</el-button>
-              <el-button class="my-primary-btn">确定</el-button>
+              <el-button class="my-secondary-btn" @click="checkOrderPageData.addDialog.isShow = false">取消</el-button>
+              <el-button class="my-primary-btn" @click="clickAddCheckOrderDialogOk">确定</el-button>
             </div>
           </el-dialog>
           <!-- 盘点单--新增调拨 新增商品-->
-          <el-dialog  title="选择商品"  width="968px" :center="true">
+          <el-dialog  title="选择商品" :visible.sync="checkOrderPageData.addGoodsDialog.isShow" width="968px" :center="true">
             <div style="margin-bottom: 15px;">
-              <el-input placeholder="请输入商品名称" style="width: 180px;"></el-input>
+              <el-input placeholder="请输入商品名称" v-model="checkOrderPageData.addDialog.title"  style="width: 180px;"></el-input>
               <el-input placeholder="请输入条形码" style="width: 180px;"></el-input>
-              <el-select  clearable placeholder="选择一级分类" >
+              <el-select  clearable placeholder="选择一级分类" v-model="checkOrderPageData.addDialog.topCategoryId" @change="clickAddCheckOrderTwoCategory">
                 <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
+                  v-for="item in checkOrderPageData.addDialog.topCategory"
+                  :label="item.cname"
+                  :key="item.id"
+                  :value="item.id">
                 </el-option>
               </el-select>
-              <el-select  clearable placeholder="选择二级分类" >
+              <el-select  clearable placeholder="选择二级分类" v-model="checkOrderPageData.addDialog.twoCategoryId">
                 <el-option
-                  label="item.name"
-                  value="item.id">
-                </el-option>
-                <el-option
-                  label="item.name"
-                  value="item.id">
+                  v-for="item in checkOrderPageData.addDialog.twoCategory"
+                  :label="item.cname"
+                  :key="item.id"
+                  :value="item.id">
                 </el-option>
               </el-select>
-              <el-button>查询</el-button>
+              <el-button @click="getCheckOrderGoodList">查询</el-button>
             </div>
             <div>
-              <el-table border style="width: 100%;">
-                <el-table-column ></el-table-column>
-                <el-table-column prop="num" label="商品名称"></el-table-column>
-                <el-table-column prop="real_price" label="条形码"></el-table-column>
-                <el-table-column prop="price" label="一级分类"></el-table-column>
-                <el-table-column prop="pay_all_price" label="二级分类"></el-table-column>
-                <el-table-column prop="pay_all_price" label="库存"></el-table-column>
-                <el-table-column prop="pay_all_price" label="单价"></el-table-column>
+              <el-table :data="checkOrderPageData.addGoodsDialog.list"
+                        tooltip-effect="dark"
+                        @selection-change="clickAddGoodsDialogHandleSelectionChange"
+                        border style="width: 100%;">
+                <el-table-column type="selection" width="55"></el-table-column>
+                <el-table-column prop="title" label="商品名称"></el-table-column>
+                <el-table-column prop="type_id" label="一级分类"></el-table-column>
+                <el-table-column prop="type" label="二级分类"></el-table-column>
+                <el-table-column prop="stock" label="库存"></el-table-column>
+                <el-table-column prop="selling_price" label="单价"></el-table-column>
               </el-table>
             </div>
             <div style="text-align: center;margin-top: 20px;">
-              <el-button class="my-secondary-btn">取消</el-button>
-              <el-button class="my-primary-btn">确定</el-button>
+              <el-button class="my-secondary-btn" @click="checkOrderPageData.addGoodsDialog.isShow = false">取消</el-button>
+              <el-button class="my-primary-btn" @click="clickAddGoodsDialogOk">确定</el-button>
+            </div>
+          </el-dialog>
+          <!-- 盘点单--详情-->
+          <el-dialog :visible.sync="checkOrderPageData.detailsDialog.isShow"  title="盘点详情"  width="968px" :center="true">
+            <div>
+              <el-table :data="checkOrderPageData.detailsDialog.list" border style="width: 100%;">
+                <el-table-column type="index" label="序号"></el-table-column>
+                <el-table-column prop="item_title" label="商品名称"></el-table-column>
+                <el-table-column prop="top_category" label="一级分类"></el-table-column>
+                <el-table-column prop="two_category" label="二级分类"></el-table-column>
+                <el-table-column prop="stock_reality" label="当前库存"></el-table-column>
+                <el-table-column label="盘点库存">
+                  <template slot-scope="scope">
+                    <span class="font-red" v-if="scope.row.stock_now<scope.row.stock_reality">{{scope.row.stock_now}}</span>
+                    <span class="font-blue" v-else>{{scope.row.stock_now}}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+            <div style="margin-top: 15px;">
+              <el-form>
+                <el-form-item label="备注：" label-width="55px">
+                  <el-input placeholder="无"  :disabled="true" v-model="checkOrderPageData.detailsDialog.remarks"></el-input>
+                </el-form-item>
+              </el-form>
+            </div>
+          </el-dialog>
+          <!-- 盘点单--编辑 只允许 编辑 备注信息，其他信息不允许编辑 -->
+          <el-dialog :visible.sync="checkOrderPageData.editDialog.isShow"  title="编辑盘点单"  width="968px" :center="true">
+            <div>
+              <el-table :data="checkOrderPageData.editDialog.responseData.item" border style="width: 100%;">
+                <el-table-column type="index" label="序号"></el-table-column>
+                <el-table-column prop="item_title" label="商品名称"></el-table-column>
+                <el-table-column prop="top_category" label="一级分类"></el-table-column>
+                <el-table-column prop="two_category" label="二级分类"></el-table-column>
+                <el-table-column prop="stock_reality" label="当前库存"></el-table-column>
+                <el-table-column label="盘点库存">
+                  <template slot-scope="scope">
+                    <span class="font-red" v-if="scope.row.stock_now<scope.row.stock_reality">{{scope.row.stock_now}}</span>
+                    <span class="font-blue" v-else>{{scope.row.stock_now}}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+            <div style="margin-top: 15px;">
+              <el-form>
+                <el-form-item label="备注：" label-width="55px">
+                  <el-input placeholder="无"  v-model="checkOrderPageData.editDialog.responseData.remarks"></el-input>
+                </el-form-item>
+              </el-form>
+            </div>
+            <div style="text-align: center;">
+              <el-button class="my-secondary-btn" @click="checkOrderPageData.editDialog.isShow = false">取消</el-button>
+              <el-button class="my-primary-btn" @click="clickCheckOrderEditOk">确定编辑</el-button>
             </div>
           </el-dialog>
         </el-tab-pane>
@@ -595,7 +670,7 @@
             </el-table>
           </div>
           <!-- 盘盈单--盘点库存确认-->
-          <el-dialog  title="盘点库存确认" :visible.sync="show"  width="968px" :center="true">
+          <el-dialog  title="盘点库存确认"  width="968px" :center="true">
             <div style="margin-bottom: 15px;">
               <el-select  clearable placeholder="选择一级分类" >
                 <el-option
@@ -655,19 +730,328 @@
 </template>
 
 <script>
+  import {deepCopy} from '../../utils'
+  import {postCheckOrderList,postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm,postCheckOrderEdit } from '../../api/getData'
     export default {
-        name: "InventoryManage", //库存管理，进销存
+      name: "InventoryManage", //库存管理，进销存
       data(){
         return{
-          show:true,//
-          type:"4",//1=调拨单，2=盘点单，3=盘亏单，4=盘盈单
+          type:"2",//1=调拨单，2=盘点单，3=盘亏单，4=盘盈单
+
+          //2=盘点单 页面需要的参数
+          checkOrderPageData:{
+            // 状态：1盘点待确定,2库存待确认(已确认盘点单),3已完成
+            status:[
+              {id:1,name:'盘点待确定'},
+              {id:2,name:'库存待确认(已确认盘点单)'},
+              {id:3,name:'已完成'},
+            ],
+            //盘点单列表总数
+            count:200,
+            //盘点单请求列表
+            list:[
+              {
+                id: 1,    //查看详情时的id
+                order_sn: "123132132",    //盘点单号
+                user_id: 1,
+                status: "盘点待确认", //状态
+                shop_id: "总店",  //门店
+                time: "2019-08-19 10:37:23",  //盘点时间
+                user_name: "admin"    //盘点人员
+              },
+            ],
+            //新增盘点单弹框
+            addDialog:{
+              isShow:false,
+              //一级分类
+              topCategoryId:'',//当前选中的一级分类,用来获取二级分类
+              topCategory:[
+                // {cname:'奶粉',id:1,pid:0}
+              ],
+              //二级分类
+              twoCategoryId:'',
+              twoCategory:[
+                // {cname:'奶粉',id:1,pid:0}
+              ],
+              title:'',//商品名称
+              stock_type: 1,//获取商品的类型：1获取库存不为0的列表,2获取库存为0的列表
+              list:[
+                // {
+                //   item_id: 1768,    //商品id
+                //   item_title: "\u5546\u54c1",   //商品名称
+                //   top_category:'一级分类', //一级分类
+                //   two_category:'二级分类',//二级分类
+                //   stock_reality:5,  //当前库存
+                //   stock_now:0,//盘点库存
+                // }
+              ],
+              //备注
+              remarks:''
+            },
+            //新增商品弹框
+            addGoodsDialog:{
+              isShow:false,
+              multipleSelection: [],
+              list:[
+                // {
+                //   id: 1738,     //商品id
+                //   title: "测试商品7/18",    //商品名称
+                //   type_id: "玩具童车",  //一级分类名称
+                //   type: "拼插积木", //二级分类名称
+                //   selling_price: "11000.00",    //销售价格
+                //   stock: 8  //当前库存
+                // }
+              ]
+            },
+            //盘点详情
+            detailsDialog:{
+              isShow:false,
+              remarks:'',
+              list:[
+                // {
+                //   item_id: 1768,    //商品id
+                //   item_title: "\u5546\u54c1",   //商品名称
+                //   top_category:'一级分类', //一级分类
+                //   two_category:'二级分类',//二级分类
+                //   stock_reality:5,  //当前库存
+                //   stock_now:0,//盘点库存
+                // }
+              ]
+            },
+            //编辑盘点单
+            editDialog:{
+              isShow:false,
+              responseData:{
+                remarks:'',
+                item:[
+                  {
+                    item_id: 1768,    //商品id
+                    item_title: "\u5546\u54c1",   //商品名称
+                    top_category:'一级分类', //一级分类
+                    two_category:'二级分类',//二级分类
+                    stock_reality:5,  //当前库存
+                    stock_now:0,//盘点库存
+                  }
+                ]
+              }
+            }
+          },
+          //2=盘点单请求需要的数据
+          checkOrderRequestData:{
+            status:'',//状态：1盘点待确定,2库存待确认(已确认盘点单),3已完成
+            name:'',//盘点单单号(目前仅支持单号搜索)
+            page:1,//页码
+            limit:10,//每页条数
+            time:['',''],//开始时间结束时间
+          },
         }
+      },
+      mounted(){
+        // this.getCheckOrderList()
       },
       methods:{
         //tab切换
         handleClick (tab, event) {
-          console.log(tab, event)
+          //1=调拨单，2=盘点单，3=盘亏单，4=盘盈单
+          switch (tab.name) {
+            case "1":
+              break
+            case "2":
+              this.checkOrderRequestData.page = 1
+              this.getCheckOrderList()
+              break
+            case "3":
+              break
+            case "4":
+              break
+          }
         },
+
+        //盘点单 页码操作
+        checkOrderOnePageCurrentChange(val){
+          this.checkOrderRequestData.page = val
+          this.getCheckOrderList()
+        },
+        //盘点单，每页数据条数操作
+        checkOrderPageSizeChange (val) {
+          this.checkOrderRequestData.limit = val
+          this.getCheckOrderList()
+        },
+        //获取盘点单列表
+        getCheckOrderList(){
+          let data = {
+            status:this.checkOrderRequestData.status,
+            name:this.checkOrderRequestData.name,
+            page:`${this.checkOrderRequestData.page},${this.checkOrderRequestData.limit}`,
+            start_time:`${this.checkOrderRequestData.time[0]}`,
+            end_time:`${this.checkOrderRequestData.time[1]}`,
+          }
+          postCheckOrderList(data).then(res=>{
+            console.log(res)
+          })
+        },
+        //新增盘点单对话框显示
+        clickAddCheckOrder(){
+          this.checkOrderPageData.addDialog.isShow = true
+          //获取一级分类
+          postTwotype().then(res=>{
+            if(res.data.length){
+              this.checkOrderPageData.addDialog.topCategory = res.data
+            }
+          })
+        },
+        //新增盘点单对话框获取二级分类列表
+        clickAddCheckOrderTwoCategory(){
+          this.checkOrderPageData.addDialog.twoCategoryId = ''
+          this.checkOrderPageData.addDialog.twoCategory = []
+          if (!this.checkOrderPageData.addDialog.topCategoryId) {
+            //没有选择一级分类
+            return
+          }
+          let data = {
+            type:this.checkOrderPageData.addDialog.topCategoryId
+          }
+          postTwotype(data).then(res=>{
+            if(res.data.length){
+              this.checkOrderPageData.addDialog.twoCategory = res.data
+            }
+          })
+        },
+        //新增盘点单弹框盘—>新增商品弹框 选中商品操作
+        clickAddGoodsDialogHandleSelectionChange(val) {
+          console.log(val)
+          this.checkOrderPageData.addGoodsDialog.multipleSelection = val
+        },
+        //盘点单 -新增盘点单时 获取商品别表
+        getCheckOrderGoodList(){
+          this.checkOrderPageData.addGoodsDialog.isShow = true
+          let data = {
+            stock_type:this.checkOrderPageData.addDialog.stock_type,
+            title:this.checkOrderPageData.addDialog.title,
+            type_id:this.checkOrderPageData.addDialog.topCategoryId,
+            type:this.checkOrderPageData.addDialog.twoCategoryId
+          }
+          postCheckOrderAddGoodList(data).then(res=>{
+            if (res.data.length) {
+              this.checkOrderPageData.addGoodsDialog.list = res.data
+            }
+          })
+        },
+        //新增盘点单弹框盘->选择商品—>确定按钮
+        clickAddGoodsDialogOk() {
+          // {
+          //   "item_id": 1738,    //商品id
+          //   "item_title": "\u5546\u54c1",   //商品名称
+          //   top_category:'一级分类', //一级分类
+          //   two_category:'二级分类',//二级分类
+          //   "stock_reality": 20,    //当前库存
+          //   "stock_now": 10     //盘点库存
+          // }
+          //数据格式化
+          let formatArr = []
+          this.checkOrderPageData.addGoodsDialog.multipleSelection.forEach((item) => {
+            formatArr.push({
+              item_id:item.id,//商品id
+              item_title:item.title, //商品名称
+              top_category:item.type_id, //一级分类
+              two_category:item.type,//二级分类
+              stock_reality:item.stock,  //当前库存
+              stock_now:0,//盘点库存
+            })
+          })
+
+          //数据拼接
+          let newArr = this.checkOrderPageData.addDialog.list.concat(formatArr)
+          //去重
+          let obj = {};
+          newArr = newArr.reduce((item, next) =>{
+              obj[next.item_id] ? '' : obj[next.item_id] = true && item.push(next)
+              return item
+          }, [])
+          this.checkOrderPageData.addDialog.list = newArr
+          this.checkOrderPageData.addGoodsDialog.isShow = false
+        },
+        //新增盘点单弹框盘—>确定按钮
+        clickAddCheckOrderDialogOk(){
+          let itemArr = []
+          for (let i=0;i<this.checkOrderPageData.addDialog.list.length;i++){
+            if (!Number.isInteger(Number.parseFloat(this.checkOrderPageData.addDialog.list[i].stock_now))) {
+              this.$message({
+                showClose: true,
+                message: `请正确输入【${this.checkOrderPageData.addDialog.list[i].item_title}】商品的盘点库存。`,
+                type: 'error'
+              });
+              return
+            }
+            itemArr.push({
+              item_id:this.checkOrderPageData.addDialog.list[i].item_id,//商品id
+              item_title:this.checkOrderPageData.addDialog.list[i].item_title, //商品名称
+              stock_reality:this.checkOrderPageData.addDialog.list[i].stock_reality,  //当前库存
+              stock_now:this.checkOrderPageData.addDialog.list[i].stock_now,//盘点库存
+            })
+          }
+          let data = {
+            remarks:this.checkOrderPageData.addDialog.remarks,
+            item:itemArr
+          }
+          postCheckOrderAdd(data).then(res=>{
+            if (res.code === 200) {
+              this.checkOrderRequestData.page = 1
+              this.getCheckOrderList()
+              this.checkOrderPageData.addDialog.list = []
+              this.checkOrderPageData.addDialog.isShow = false
+            }
+          })
+        },
+        //盘点单查看详情
+        async clickCheckOrderDetails(id){
+          await postCheckOrderInfo({id:id}).then(res=>{
+            if (res.code === 200){
+              this.checkOrderPageData.detailsDialog.isShow = true
+              this.checkOrderPageData.detailsDialog.remarks=res.data.remarks
+              this.checkOrderPageData.detailsDialog.list=res.data.item
+            }
+          })
+        },
+        //盘点单删除
+        clickCheckOrderDel(id){
+          postCheckOrderDel({id}).then(res=>{
+            if (res.code === 200){
+              this.getCheckOrderList()
+            }
+          })
+        },
+        //盘点单 确认盘点
+        async clickCheckOrderConfirm(id){
+          let responseData = null
+          await postCheckOrderInfo({id:id}).then(res=>{
+            if (res.code === 200){
+              responseData = res.data
+            }
+          })
+          if (responseData) {
+            await postCheckOrderConfirm(responseData).then(res=>{
+              if (res.code === 200){
+                this.getCheckOrderList()
+              }
+            })
+          }
+        },
+        //盘点单 编辑
+        async clickCheckOrderEdit(id){
+          await postCheckOrderInfo({id:id}).then(res=>{
+            if (res.code === 200){
+              this.checkOrderPageData.editDialog.responseData = res.data
+              this.checkOrderPageData.editDialog.isShow = true
+            }
+          })
+        },
+        //盘点单 确认编辑
+        async clickCheckOrderEditOk(){
+          postCheckOrderEdit(this.checkOrderPageData.editDialog.responseData).then(res=>{
+
+          })
+        }
       }
     }
 </script>

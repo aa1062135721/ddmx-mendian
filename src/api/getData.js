@@ -249,6 +249,7 @@ export const postMemberInfo = (data = null) => {
 export const postOrderDetails = (data = null) => {
   return Vue.prototype.$post('/order/order_details', data)
 }
+
 /**
  * 订单管理-门店订单详情 - 商品明细
  * @param data
@@ -256,4 +257,68 @@ export const postOrderDetails = (data = null) => {
  */
 export const postOrderDetailsGoods = (data = null) => {
   return Vue.prototype.$post('/order/order_goods_list', data)
+}
+
+/**
+ * 订单管理-库存管理 - 盘点单列表
+ * @param data
+ * @returns {*}
+ */
+export const postCheckOrderList = (data = null) => {
+  return Vue.prototype.$post('/Check/index', data)
+}
+
+/**
+ * 订单管理-库存管理 - 盘点单 -新增盘点单时 获取商品别表
+ * @param data
+ * @returns {*}
+ */
+export const postCheckOrderAddGoodList = (data = null) => {
+  return Vue.prototype.$post('/Check/add', data)
+}
+
+/**
+ * 订单管理-库存管理 - 盘点单 -新增盘点单
+ * @param data
+ * @returns {*}
+ */
+export const postCheckOrderAdd = (data = null) => {
+  return Vue.prototype.$post('/Check/doPost', data)
+}
+
+/**
+ * 订单管理-库存管理 - 盘点单 -详情
+ * @param data
+ * @returns {*}
+ */
+export const postCheckOrderInfo = (data = null) => {
+  return Vue.prototype.$post('/Check/info', data)
+}
+
+/**
+ * 订单管理-库存管理 - 盘点单 -删除
+ * @param data
+ * @returns {*}
+ */
+export const postCheckOrderDel = (data = null) => {
+  return Vue.prototype.$post('/Check/del', data)
+}
+
+/**
+ * 订单管理-库存管理 - 盘点单 -删除
+ * @param data
+ * @returns {*}
+ */
+export const postCheckOrderConfirm = (data = null) => {
+  return Vue.prototype.$post('/Check/confirm', data)
+}
+
+/**
+ * 订单管理-库存管理 - 盘点单 -编辑 --只允许 编辑 备注信息，
+ 其他信息不允许编辑
+ * @param data
+ * @returns {*}
+ */
+export const postCheckOrderEdit = (data = null) => {
+  return Vue.prototype.$post('/Check/editRemarks', data)
 }
