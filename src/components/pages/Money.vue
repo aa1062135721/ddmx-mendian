@@ -829,7 +829,7 @@ export default {
           scrollX: true,
           // 忽略竖直方向的滚动
           scrollY: false,
-          mouseWheel: true,
+          mouseWheel: true
           // eventPassthrough: 'vertical'
         })
       } else {
@@ -841,7 +841,7 @@ export default {
           click: true,
           scrollX: false,
           scrollY: true,
-          mouseWheel: true,
+          mouseWheel: true
           // eventPassthrough: 'vertical'
         })
         this.$refs.allGoodsScrollContent.style.height = 824 + 'px' // 分类列表初始化长度

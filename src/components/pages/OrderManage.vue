@@ -491,22 +491,22 @@
 
 <script>
 import { postOrderList, postWaiter, postOrderWaiter, postMemberInfo, postOrderDetails, postOrderDetailsGoods } from '../../api/getData'
-import { changeTime,getWeekStartDateAndEndDateRange } from '../../utils'
+import { changeTime, getWeekStartDateAndEndDateRange } from '../../utils'
 
 export default {
   name: 'OrderManage', // 订单管理
   data () {
     return {
       // 退货原因列表
-      returnOrderResult:[
-        {id:1,name:'你这个东西太贵了。'},
-        {id:2,name:'你这个东西是打发点死大多数大饭店太贵了。'},
-        {id:3,name:'说是。'},
-        {id:4,name:'你这个东西太事实上贵了。'},
-        {id:5,name:'其他原因。'},
+      returnOrderResult: [
+        {id: 1, name: '你这个东西太贵了。'},
+        {id: 2, name: '你这个东西是打发点死大多数大饭店太贵了。'},
+        {id: 3, name: '说是。'},
+        {id: 4, name: '你这个东西太事实上贵了。'},
+        {id: 5, name: '其他原因。'}
       ],
       requestData: {
-        //服务项目
+        // 服务项目
         service: '',
         // 分页
         page: 1,
@@ -514,80 +514,80 @@ export default {
         limit: 1,
         // 当前选中的服务人员
         nowWaiter: '',
-        //当前选中的支付方式
+        // 当前选中的支付方式
         payWay: '',
         // 选择订单状态
         orderStatus: '',
         //
         goodType: 1,
-        //请输入需查询的会员手机号/订单号
+        // 请输入需查询的会员手机号/订单号
         mobile: '',
-        //门店id
+        // 门店id
         shop_code: 18,
-        //订单类型 1=商品订单，2=服务卡订单 3=充值购卡 4=收银台收银
+        // 订单类型 1=商品订单，2=服务卡订单 3=充值购卡 4=收银台收银
         type: '1',
         // 筛选时间 自定义时间
-        date:[
+        date: [
         ],
         // 当前选择的时间// 1=今日，2=昨日，3=本周 0=未选择
         timeBtnValue: 0,
-        startTime: '', //开始时间
-        endTime:'', //结束时间
+        startTime: '', // 开始时间
+        endTime: '' // 结束时间
       },
-      //商品订单
-      responseData1:{
+      // 商品订单
+      responseData1: {
 
       },
-      //服务订单
-      responseData2:{
+      // 服务订单
+      responseData2: {
 
       },
-      //充值订单
-      responseData3:{
+      // 充值订单
+      responseData3: {
 
       },
       // 商品订单-退单弹框
-      returnOrderDialog1:{
+      returnOrderDialog1: {
         isShow: false
       },
       // 商品订单-订单详情弹窗内容
       orderDetailsDialog1: {
         isShow: false,
         id: 2,
-        sn: "XM155937958663",
-        time: "2019-06-02 18:49:46",
-        shop_code: "总店",
-        is_online: "门店收银",
-        waiter: "测试员工2",
-        old_amount: "136.00",
-        amount: "130.00",
+        sn: 'XM155937958663',
+        time: '2019-06-02 18:49:46',
+        shop_code: '总店',
+        is_online: '门店收银',
+        waiter: '测试员工2',
+        old_amount: '136.00',
+        amount: '130.00',
         member: {
-          mobile: "17723582121",
-          nickname: "罗文2222",
-          level: "普通会员",
-          money: "29.01"
+          mobile: '17723582121',
+          nickname: '罗文2222',
+          level: '普通会员',
+          money: '29.01'
         },
         goods: [
           {
-            id: 1,    //订单商品表的id
-            subtitle: "新西兰S-26惠氏婴幼儿奶粉2段900g/罐",       //商品购买时的商品名称
-            num: 2,   //数量
-            refund: 0,    //退货数量
-            price: "179.00",  //原价
-            real_price: "179.00", //实际
-            pay_all_price: 358    //付款总数
+            id: 1, // 订单商品表的id
+            subtitle: '新西兰S-26惠氏婴幼儿奶粉2段900g/罐', // 商品购买时的商品名称
+            num: 2, // 数量
+            refund: 0, // 退货数量
+            price: '179.00', // 原价
+            real_price: '179.00', // 实际
+            pay_all_price: 358 // 付款总数
           },
           {
             id: 2,
-            subtitle: "安琪憨贝洁婴儿柔湿巾80片1包装",
+            subtitle: '安琪憨贝洁婴儿柔湿巾80片1包装',
             num: 2,
             refund: 2,
-            price: "151.00",
-            real_price: "151.00",
+            price: '151.00',
+            real_price: '151.00',
             pay_all_price: 302
           }
         ],
-        pay_way: "现金支付"
+        pay_way: '现金支付'
       },
       // 选择服务人员
       waiter: [
@@ -597,23 +597,23 @@ export default {
         //   type: '店长' // 服务类型
         // },
       ],
-      //选择服务项目
-      serviceList:[
-        {id:1,name:'水育'}
+      // 选择服务项目
+      serviceList: [
+        {id: 1, name: '水育'}
       ],
       // 选择订单状态
-      orderStatus:[
-        {id:1,name:'正常'},
-        {id:2,name:'退单'},
+      orderStatus: [
+        {id: 1, name: '正常'},
+        {id: 2, name: '退单'}
       ],
       // 商品类型
-      goodsType:[
-        {id:1, name: '全部'},
-        {id:2, name: '外包商品'},
-        {id:3, name: '公司商品'},
+      goodsType: [
+        {id: 1, name: '全部'},
+        {id: 2, name: '外包商品'},
+        {id: 3, name: '公司商品'}
       ],
-      //选择支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
-      payWayList:[
+      // 选择支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
+      payWayList: [
         {id: 1, name: '微信'},
         {id: 2, name: '支付宝'},
         {id: 3, name: '余额(会员卡)'},
@@ -625,39 +625,39 @@ export default {
         {id: 9, name: '兑换'},
         {id: 10, name: '包月服务'},
         {id: 11, name: '定制疗程'},
-        {id: 99, name: '管理员充值'},
+        {id: 99, name: '管理员充值'}
       ],
       // 会员信息弹框
       memberInfoDialog: {
         isShow: false,
-        memberInfo:{
-          nickname: "涵涵妈",
-          mobile: "18725928054",
-          shop_code: "两江时光店",
-          level: "普通会员",
-          addtime: "2017-08-15 12:52:04"
+        memberInfo: {
+          nickname: '涵涵妈',
+          mobile: '18725928054',
+          shop_code: '两江时光店',
+          level: '普通会员',
+          addtime: '2017-08-15 12:52:04'
         }
       },
       // 服务人员信息弹框
       waiterInfoDialog: {
         isShow: false,
-        waiterInfo:{
-          name: "测试员工",
-          mobile: "15223622442",
-          shop: "测试门店10",
-          type: "水育,大保健,艾灸",
-          addtime: "2018-11-02 09:32:27"
+        waiterInfo: {
+          name: '测试员工',
+          mobile: '15223622442',
+          shop: '测试门店10',
+          type: '水育,大保健,艾灸',
+          addtime: '2018-11-02 09:32:27'
         }
       },
       // 设置商品成本弹框
       settingOutGoodPriceDialog: {
-        isShow: false,
+        isShow: false
       }
     }
   },
   methods: {
-    //查看订单详情
-    async showOrderDetails(type, id){
+    // 查看订单详情
+    async showOrderDetails (type, id) {
       let data = {
         type,
         id
@@ -672,17 +672,17 @@ export default {
       })
 
       let data2 = {
-        order_id:id,
-        type:type,
+        order_id: id,
+        type: type
       }
-      await postOrderDetailsGoods(data2).then(res=>{
+      await postOrderDetailsGoods(data2).then(res => {
         if (res.code === '200') {
           this.orderDetailsDialog1.goodList = res.data
         }
       })
     },
-    //商品订单 页码操作
-    responseDataOnePageCurrentChange(val){
+    // 商品订单 页码操作
+    responseDataOnePageCurrentChange (val) {
       this.requestData.page = val
       this.getOrderList()
     },
@@ -692,35 +692,35 @@ export default {
       this.getOrderList()
     },
     // 1=今日，2=昨日，3=本周
-    chooseTime(type) {
+    chooseTime (type) {
       this.requestData.timeBtnValue = type
       switch (type) {
         case 1:
           this.requestData.startTime = changeTime(new Date().getTime())
           this.requestData.endTime = changeTime(new Date().getTime())
           this.requestData.date = []
-          break;
+          break
         case 2:
-          this.requestData.startTime = changeTime(new Date().getTime() -  24 * 60 * 60 * 1000)
-          this.requestData.endTime = changeTime(new Date().getTime() -  24 * 60 * 60 * 1000)
+          this.requestData.startTime = changeTime(new Date().getTime() - 24 * 60 * 60 * 1000)
+          this.requestData.endTime = changeTime(new Date().getTime() - 24 * 60 * 60 * 1000)
           this.requestData.date = []
-          break;
+          break
         case 3:
           let date = getWeekStartDateAndEndDateRange()
           this.requestData.startTime = date[0]
           this.requestData.endTime = date[1]
           this.requestData.date = []
-          break;
+          break
       }
     },
     // 自定义时间
-    chooseTimeDIY(){
+    chooseTimeDIY () {
       this.requestData.startTime = ''
       this.requestData.endTime = ''
       this.requestData.timeBtnValue = 0
     },
 
-    //tab切换
+    // tab切换
     handleClick (tab, event) {
       console.log(tab, event)
       this.requestData.page = 1
@@ -737,57 +737,56 @@ export default {
         console.log(err)
       })
     },
-    //获取会员信息
-    getMemberInfo(id = 1){
+    // 获取会员信息
+    getMemberInfo (id = 1) {
       this.memberInfoDialog.isShow = true
       let data = {
-        id:id
+        id: id
       }
-      postMemberInfo(data).then(res=>{
+      postMemberInfo(data).then(res => {
         this.memberInfoDialog.memberInfo = res.data
-      }).catch(err=>{
+      }).catch(err => {
         console.log(err)
       })
     },
-    //获取单个服务员信息
-    async getWaiterInfo(id){
-      await postOrderWaiter({id: id}).then(res=>{
+    // 获取单个服务员信息
+    async getWaiterInfo (id) {
+      await postOrderWaiter({id: id}).then(res => {
         this.waiterInfoDialog.waiterInfo = res.data
         this.waiterInfoDialog.isShow = true
-      }).catch(err=>{
+      }).catch(err => {
         console.log(err)
       })
     },
-    //获取订单列表
-    getOrderList(){
+    // 获取订单列表
+    getOrderList () {
       let data = {
-        type: this.requestData.type,// 订单类型 1 商品订单  2 服务订单 3:充值购卡 4:收银台收款 5:购买卷卡（服务劵，服务卡...） 6:兑换券 默认为1
+        type: this.requestData.type, // 订单类型 1 商品订单  2 服务订单 3:充值购卡 4:收银台收款 5:购买卷卡（服务劵，服务卡...） 6:兑换券 默认为1
         page: this.requestData.page,
-        limit: this.requestData.limit,
+        limit: this.requestData.limit
       }
-      console.log('请求数据',this.requestData)
-      postOrderList(data).then(res=>{
+      console.log('请求数据', this.requestData)
+      postOrderList(data).then(res => {
         console.log('订单列表', res)
         if (res.code === '200') {
-          if (res.data){
+          if (res.data) {
             switch (this.requestData.type) {
-              case "1":
+              case '1':
                 this.responseData1 = res
                 break
-              case "2":
+              case '2':
                 this.responseData2 = res
                 break
-              case "3":
+              case '3':
                 this.responseData3 = res
                 break
-
             }
           }
         }
-      }).catch(err=>{
+      }).catch(err => {
         console.log(err)
       })
-    },
+    }
   },
   mounted () {
     this.getOrderList()

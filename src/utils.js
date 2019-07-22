@@ -47,16 +47,16 @@ export const changeTime = (timstamp, flag) => {
  * 获得本周的开始日期和结束时间 为 2017-12-11 格式
  * @returns {*['2017-12-11','2017-12-18']}
  */
-export const  getWeekStartDateAndEndDateRange = () =>{
-  let oneDayLong = 24*60*60*1000 ;
-  let now = new Date();
-  let mondayTime = now.getTime() - (now.getDay()-1)*oneDayLong;
-  let sundayTime = now.getTime() + (7-now.getDay())*oneDayLong;
-  let monday = new Date(mondayTime);
-  let sunday = new Date(sundayTime);
-  let weekRange = [changeTime(monday.getTime()), changeTime(sunday.getTime())];
-  console.log(weekRange);
-  return weekRange;
+export const getWeekStartDateAndEndDateRange = () => {
+  let oneDayLong = 24 * 60 * 60 * 1000
+  let now = new Date()
+  let mondayTime = now.getTime() - (now.getDay() - 1) * oneDayLong
+  let sundayTime = now.getTime() + (7 - now.getDay()) * oneDayLong
+  let monday = new Date(mondayTime)
+  let sunday = new Date(sundayTime)
+  let weekRange = [changeTime(monday.getTime()), changeTime(sunday.getTime())]
+  console.log(weekRange)
+  return weekRange
 }
 
 /***
