@@ -2,7 +2,7 @@
     <div class="header clear-both">
       <div class="logo float-left">
         <img class="img" src="../../assets/images/logo.png" alt="logo">
-        <span class="title">鲁能星城店</span>
+        <span class="title">{{userInfo.shop_name}}</span>
       </div>
       <div class="tabs float-right">
           <ul>
@@ -37,6 +37,7 @@ export default {
         user_nickname: '超级管理员', // 名称
         user_email: '465497241@qq.com', // 邮箱
         user_url: '',
+        shop_name:'只能星城店',
         avatar: '',
         signature: '',
         last_login_ip: '127.0.0.1',
@@ -62,8 +63,15 @@ export default {
     },
     // 退出登录
     handleCommand () {
-      removeStore('token')
-      this.$router.push('/login')
+      this.$confirm('您确认退出本系统吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        removeStore('token')
+        this.$router.push('/login')
+      }).catch(() => {
+      });
     },
     // 全屏事件
     handleFullScreen () {

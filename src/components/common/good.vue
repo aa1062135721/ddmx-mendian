@@ -1,20 +1,23 @@
 <template>
     <div class="bg">
       <div class="left">
-        <img  v-lazy="ogood.pics" alt="商品封面">
+        <img  v-lazy="ogood.pic" alt="商品封面">
       </div>
       <div class="middle">
       </div>
       <div class="right">
         <div class="div">
-          <p class="title">
+          <p class="title overflow-row1-ellipsis">
             {{ogood.title}}
           </p>
         </div>
         <div class="div">
+          <p class="title overflow-row1-ellipsis" v-if="ogood.is_service_goods === '0'">
+            条形码：{{ogood.bar_code}}
+          </p>
         </div>
         <div>
-          <p class="yuanjia" v-if="ogood.is_service_goods === '1'">
+          <p class="yuanjia overflow-row1-ellipsis" v-if="ogood.is_service_goods === '1'">
              原价: ¥ {{ogood.price}}
           </p>
         </div>

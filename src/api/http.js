@@ -61,6 +61,7 @@ axios.interceptors.request.use(
 // http reponse 拦截器
 axios.interceptors.response.use(
   response => {
+    Vue.prototype.$message.closeAll()
     if (response.data.code === '-2') {
       Vue.prototype.$message({
         message: response.data.msg,
