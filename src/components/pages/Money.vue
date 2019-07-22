@@ -135,7 +135,9 @@
 <!--                  </li>-->
                   <li>
                     <span class="float-left">结算</span>
-                    <span class="float-right">￥{{jiezhangDialog.modifyMoney}}</span>
+                    <!-- 支付方式为赠送，需要支付的钱为0-->
+                    <span class="float-right" v-if="jiezhangDialog.chooesePayWay === 7">￥0</span>
+                    <span class="float-right" v-else>￥{{jiezhangDialog.modifyMoney}}</span>
                   </li>
                 </ul>
                 <div class="buttons">
@@ -238,7 +240,9 @@
             <ul>
               <li class="clear-both">
                 <span class="float-left">应收</span>
-                <span class="float-right font-red">¥ {{jiezhangDialog.modifyMoney}}</span>
+                <!-- 选择赠送的支付方式，费用显示为0-->
+                <span class="float-right font-red" v-if="jiezhangDialog.chooesePayWay === 7">￥ 0</span>
+                <span class="float-right font-red" v-else>¥ {{jiezhangDialog.modifyMoney}}</span>
               </li>
               <li class="clear-both">
                 <span class="float-left"></span>
@@ -324,7 +328,7 @@
                <span  v-if="jiezhangDialog.closedPayWay.indexOf(8) !== -1"   class="span-btn closed">
                 <img src="../../assets/icon/checkout-mendian.png" alt="门店自用"><span>门店自用</span>
                </span>
-               <span class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 8}" @click="jiezhangDialogChoosesPayWay(8)">
+               <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 8}" @click="jiezhangDialogChoosesPayWay(8)">
                 <img src="../../assets/icon/checkout-mendian.png" alt="门店自用"><span>门店自用</span>
                </span>
              </div>
@@ -805,8 +809,8 @@ export default {
         sumMoney: 0.00, // 所购商品的合计
         modifyMoney: 0.00, // 改价参数,
         chooesePayWay: 1, // 支付方式
-        closedPayWay: [ // 被禁用的支付方式
-          // 1,4,5
+        closedPayWay: [ // 被禁用的支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
+          3,7
         ],
         // 支付完成之后弹出的结账成功弹框
         jiezhangSuccessDialog: {
@@ -1293,7 +1297,7 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if ((parseFloat(this.xiugaijiageDialog.inputValue) < parseFloat(this.chooeseGoods.goods[key].price)) && (parseFloat(this.xiugaijiageDialog.inputValue) > 0)) {
+          if (parseFloat(this.xiugaijiageDialog.inputValue) > 0) {
             this.chooeseGoods.goods[key].is_edit = 1
             this.chooeseGoods.goods[key].edit_price = this.xiugaijiageDialog.inputValue
             this.xiugaijiageDialog.inputValue = ''
@@ -1309,7 +1313,7 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if ((parseFloat(this.xiugaijiageDialog.inputValue) < parseFloat(this.chooeseGoods.fuwuGoods[key].price)) && (parseFloat(this.xiugaijiageDialog.inputValue) > 0)) {
+          if (parseFloat(this.xiugaijiageDialog.inputValue) > 0) {
             this.chooeseGoods.fuwuGoods[key].is_edit = 1
             this.chooeseGoods.fuwuGoods[key].edit_price = this.xiugaijiageDialog.inputValue
             this.xiugaijiageDialog.inputValue = ''
@@ -1325,7 +1329,7 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if ((parseFloat(this.xiugaijiageDialog.inputValue) < parseFloat(this.chooeseGoods.cardList[key].price)) && (parseFloat(this.xiugaijiageDialog.inputValue) > 0)) {
+          if (parseFloat(this.xiugaijiageDialog.inputValue) > 0) {
             this.chooeseGoods.cardList[key].is_edit = 1
             this.chooeseGoods.cardList[key].edit_price = this.xiugaijiageDialog.inputValue
             this.xiugaijiageDialog.inputValue = ''
@@ -1628,6 +1632,7 @@ export default {
             if (res.data) {
               this.jiezhangDialog.memberVip = res.data
               this.xuanzehuiyuanDialog.isShow = false
+              this.jiezhangDialog.closedPayWay = [] //选择了会员，支付方式多了 会员卡和 赠送
             }
           }).catch(err => {
             console.log(err)
@@ -2007,8 +2012,8 @@ export default {
       }
       if (this.chooeseGoods.goods.length) {
         let arr = []
-        let obj = {}
         this.chooeseGoods.goods.map((item, index) => {
+          let obj = {}
           obj.id = item.id
           obj.num = item.num
           obj.price = item.price
@@ -2043,8 +2048,8 @@ export default {
       }
       if (this.chooeseGoods.fuwuGoods.length) {
         let arr = []
-        let obj = {}
         this.chooeseGoods.fuwuGoods.map((item, index) => {
+          let obj = {}
           obj.id = item.id
           obj.num = item.num
           obj.price = item.price
@@ -2078,7 +2083,6 @@ export default {
         })
       }
       if (this.chooeseGoods.cardList.length) {
-        console.log(this.chooeseGoods.cardList)
         let requestData = {
           member_id: this.jiezhangDialog.memberVip.id, // 会员id
           waiter: this.jiezhangDialog.nowWaiter.id, // 服务员id
@@ -2086,9 +2090,7 @@ export default {
           card_id: this.chooeseGoods.cardList[0].id, // 服务卡id
           price: this.chooeseGoods.cardList[0].is_edit ? this.chooeseGoods.cardList[0].edit_price : this.chooeseGoods.cardList[0].price
         }
-        console.log(requestData)
         postNowPayServiceCards(requestData).then(res => {
-          console.log(res)
           if (res.code === '200') {
             this.jiezhangDialog.nowWaiter = {
               id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
