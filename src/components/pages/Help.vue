@@ -2,7 +2,7 @@
     <div class="page-help bg-blue">
       <div class="header clear-both">
         <div class="logo float-left">
-          <!--<img class="img" src="../../assets/images/logo.png" alt="logo">-->
+          <img class="img" src="../../assets/images/logo.png" alt="logo"  @click="goToUrl('/home')">
           <span class="title">帮助中心</span>
         </div>
         <div class="tabs float-right">
@@ -123,7 +123,11 @@ export default {
       }
       this.requestData.page += 1
       this.searchHelp()
-    }
+    },
+    // 跳转到页面
+    goToUrl (url) {
+      this.$router.push(url)
+    },
   },
   beforeDestroy () {
   }
@@ -190,7 +194,7 @@ export default {
               border-radius:22px!important;
             }
             .el-input__icon{
-              font-size: 20px!important;
+              /*font-size: 20px!important;*/
             }
             &:hover{
               cursor:pointer;

@@ -182,7 +182,7 @@
         <div class="clear-both both">
           <div class="float-left left">
             <div class="one">
-              <el-input @keyup.13.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')" v-model="chongzhiDialog.mobile" placeholder="请输入会员手机号" clearable></el-input>
+              <el-input @keyup.13.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')" v-model="chongzhiDialog.mobile" placeholder="请输入会员手机号" clearable maxlength="11"></el-input>
             </div>
             <div class="two">
               <ul>
@@ -214,7 +214,7 @@
               </el-radio-group>
             </div>
             <div class="four">
-              <el-input @focus="chongzhiDialogInputFocus('money')" v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额" clearable></el-input>
+              <el-input @focus="chongzhiDialogInputFocus('money')" v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额，正整数" clearable></el-input>
             </div>
           </div>
           <div class="float-right right">
@@ -1658,7 +1658,8 @@ export default {
           })
         }
       } else {
-        this.xuanzehuiyuanDialog.mobile += code
+        if (this.xuanzehuiyuanDialog.mobile.length<11)
+          this.xuanzehuiyuanDialog.mobile += code
       }
     },
     // 充值弹框
@@ -1667,21 +1668,34 @@ export default {
     },
     chongzhiDialogGetCode (code) {
       if (this.chongzhiDialog.chooeseWho === 'mobile') {
-        this.chongzhiDialog.mobile += `${code}`
+        if (this.chongzhiDialog.mobile.length<11)
+          this.chongzhiDialog.mobile += `${code}`
       }
       if (this.chongzhiDialog.chooeseWho === 'money') {
-        this.chongzhiDialog.payMoney += `${code}`
+        if (/^[1-9]\d*$/.test(this.chongzhiDialog.payMoney + `${code}`)) {
+          this.chongzhiDialog.payMoney += `${code}`
+        }
       }
     },
     chongzhiDialogSearchMemberVip () {
       if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
-        alert('请输入正确的手机号')
+        this.$message.closeAll()
+        this.$message({
+          message: '请输入正确的手机号',
+          type: 'error'
+        })
         return
       }
       let requestData = {mobile: this.chongzhiDialog.mobile}
       postSearchVip(requestData).then(res => {
-        if (res.data) {
+        if (res.data.id) {
           this.chongzhiDialog.huiyuanInfo = res.data
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '没有查询到该会员的信息',
+            type: 'error'
+          })
         }
       }).catch(err => {
         console.log(err)
@@ -1689,19 +1703,43 @@ export default {
     },
     chongzhiDialogBtnOk () {
       if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
-        alert('请输入正确的手机号')
-        return
-      }
-      if (!/^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/.test(this.chongzhiDialog.payMoney)) {
-        alert('请输入正确的充值金额')
-        return
-      }
-      if (!this.chongzhiDialog.payType) {
-        alert('请选择支付方式')
+        this.$message.closeAll()
+        this.$message({
+          message: '请输入正确的手机号',
+          type: 'error'
+        })
         return
       }
       if (!this.chongzhiDialog.huiyuanInfo.id) {
-        alert('请选择要充值的会员')
+        this.$message.closeAll()
+        this.$message({
+          message: '请先查询会员的信息',
+          type: 'error'
+        })
+        return
+      }
+      if (!/^[1-9]\d*$/.test(this.chongzhiDialog.payMoney)) {
+        this.$message.closeAll()
+        this.$message({
+          message: '充值金额为正整数哦',
+          type: 'error'
+        })
+        return
+      }
+      if (!this.chongzhiDialog.payType) {
+        this.$message.closeAll()
+        this.$message({
+          message: '请选择支付方式',
+          type: 'error'
+        })
+        return
+      }
+      if (!this.chongzhiDialog.huiyuanInfo.id) {
+        this.$message.closeAll()
+        this.$message({
+          message: '请选择要充值的会员',
+          type: 'error'
+        })
         return
       }
       let requestData = {
@@ -1711,6 +1749,7 @@ export default {
       }
       postMemberVipRecharge(requestData).then(res => {
         if (res.code === '200') {
+          this.$message.closeAll()
           this.$message({
             message: res.msg,
             type: 'success'
@@ -1769,10 +1808,10 @@ export default {
         })
         return
       }
-      if (!/^[\u4e00-\u9fa5]+$/.test(requestData.nickname)) {
+      if (!/^[\u4e00-\u9fa5]+$/.test(requestData.nickname.replace(/(^\s*)|(\s*$)/g, ""))) {
         this.$message.closeAll()
         this.$message({
-          message: '请输入正确的会员昵称',
+          message: '会员昵称要求为汉字哦',
           type: 'error'
         })
         return
@@ -2169,7 +2208,6 @@ export default {
       }
       .fenlei-button{
         font-size:20px!important;
-        width:138px;
         height:54px;
         border: 0!important;
         background:rgba(107,210,244,1)!important;

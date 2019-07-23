@@ -1,7 +1,7 @@
 <template>
     <div class="header clear-both">
       <div class="logo float-left">
-        <img class="img" src="../../assets/images/logo.png" alt="logo">
+        <img class="img" src="../../assets/images/logo.png" alt="logo"  @click="goToUrl('/home')">
         <span class="title">{{userInfo.shop_name}}</span>
       </div>
       <div class="tabs float-right">
