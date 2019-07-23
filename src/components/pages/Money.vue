@@ -53,7 +53,7 @@
                     </li>
                     <li class="title code clear-both">
                       <span class="float-left">{{good.bar_code}}</span>
-                      <span class="float-right red">￥{{good.is_edit ? good.edit_price * good.num : good.price * good.num}}</span>
+                      <span class="float-right red">￥{{good.is_edit ? parseFloat(good.edit_price * good.num).toFixed(2) : parseFloat(good.price * good.num).toFixed(2)}}</span>
                     </li>
                     <li class="title">
                       <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
@@ -69,7 +69,7 @@
                     </li>
                     <li class="title code clear-both">
                       <span class="float-left"></span>
-                      <span class="float-right red">￥{{good.is_edit ? good.edit_price * good.num : good.price * good.num}}</span>
+                      <span class="float-right red">￥{{good.is_edit ? parseFloat(good.edit_price * good.num).toFixed(2) : parseFloat(good.price * good.num).toFixed(2)}}</span>
                     </li>
                     <li class="title">
                       <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
@@ -85,7 +85,7 @@
                   </li>
                   <li class="title code clear-both">
                     <span class="float-left"></span>
-                    <span class="float-right red">￥{{good.is_edit ? good.edit_price * good.num : good.price * good.num}}</span>
+                    <span class="float-right red">￥{{good.is_edit ? parseFloat(good.edit_price * good.num).toFixed(2) : parseFloat(good.price * good.num).toFixed(2)}}</span>
                   </li>
                   <li class="title">
                     <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
@@ -114,16 +114,16 @@
                     </span>
                   </li>
                   <li>
-                    <span class="float-left">会员&nbsp;<span class="font-blue">{{jiezhangDialog.memberVip.nickname}}</span></span>
-                    <span class="float-right">余额￥{{jiezhangDialog.memberVip.money}}</span>
+                    <span class="float-left">会员&nbsp;<span class="font-blue">{{jiezhangDialog.memberVip.nickname ? jiezhangDialog.memberVip.nickname : '未选择'}}</span></span>
+                    <span class="float-right">余额￥{{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : 0}}</span>
                   </li>
                   <li>
                     <span class="float-left">合计</span>
-                    <span  class="float-right">￥{{jiezhangDialog.sumMoney}}</span>
+                    <span  class="float-right">￥{{parseFloat(jiezhangDialog.sumMoney).toFixed(2)}}</span>
                   </li>
                   <li>
                     <span class="float-left">改价</span>
-                    <span  class="float-right">￥{{jiezhangDialog.modifyMoney - jiezhangDialog.sumMoney}}</span>
+                    <span  class="float-right">￥{{parseFloat(jiezhangDialog.modifyMoney - jiezhangDialog.sumMoney).toFixed(2)}}</span>
                   </li>
 <!--                  <li>-->
 <!--                    <span class="float-left">折扣</span>-->
@@ -866,7 +866,8 @@ export default {
         good.num = 1
         good.is_checked = false
         good.is_edit = 0
-        good.edit_price = good.price
+        good.edit_price = parseFloat(good.price).toFixed(2)
+        good.price = parseFloat(good.price).toFixed(2)
         for (let i = 0; i < this.chooeseGoods.fuwuGoods.length; i++) {
           if (this.chooeseGoods.fuwuGoods[i].id === good.id) {
             this.$message.closeAll()
@@ -903,7 +904,8 @@ export default {
           good.num = 1
           good.is_checked = false
           good.is_edit = 0
-          good.edit_price = good.price
+          good.edit_price = parseFloat(good.price).toFixed(2)
+          good.price = parseFloat(good.price).toFixed(2)
         } else {
           this.$message.closeAll()
           this.$message({
@@ -1300,7 +1302,7 @@ export default {
         if (key !== 'undefined') {
           if (parseFloat(this.xiugaijiageDialog.inputValue) > 0) {
             this.chooeseGoods.goods[key].is_edit = 1
-            this.chooeseGoods.goods[key].edit_price = this.xiugaijiageDialog.inputValue
+            this.chooeseGoods.goods[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
             this.xiugaijiageDialog.inputValue = ''
             this.xiugaijiageDialog.isShow = false
           }
@@ -1316,7 +1318,7 @@ export default {
         if (key !== 'undefined') {
           if (parseFloat(this.xiugaijiageDialog.inputValue) > 0) {
             this.chooeseGoods.fuwuGoods[key].is_edit = 1
-            this.chooeseGoods.fuwuGoods[key].edit_price = this.xiugaijiageDialog.inputValue
+            this.chooeseGoods.fuwuGoods[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
             this.xiugaijiageDialog.inputValue = ''
             this.xiugaijiageDialog.isShow = false
           }
@@ -1332,7 +1334,7 @@ export default {
         if (key !== 'undefined') {
           if (parseFloat(this.xiugaijiageDialog.inputValue) > 0) {
             this.chooeseGoods.cardList[key].is_edit = 1
-            this.chooeseGoods.cardList[key].edit_price = this.xiugaijiageDialog.inputValue
+            this.chooeseGoods.cardList[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
             this.xiugaijiageDialog.inputValue = ''
             this.xiugaijiageDialog.isShow = false
           }
@@ -1595,8 +1597,8 @@ export default {
     },
     // 计算结算总价
     sumChooseGoodsMoney () {
-      let sumMoney = 0
-      let modifyMoney = 0
+      let sumMoney = 0.00
+      let modifyMoney = 0.00
       if (this.chooeseGoods.goods.length) {
         for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
           sumMoney += this.chooeseGoods.goods[i].num * this.chooeseGoods.goods[i].price
@@ -1627,8 +1629,8 @@ export default {
           }
         }
       }
-      this.jiezhangDialog.sumMoney = sumMoney
-      this.jiezhangDialog.modifyMoney = modifyMoney
+      this.jiezhangDialog.sumMoney = sumMoney.toFixed(2)
+      this.jiezhangDialog.modifyMoney = modifyMoney.toFixed(2)
     },
     // 选择会员
     clickChoosesMemberByKeyboard (code) {
@@ -2012,7 +2014,8 @@ export default {
             addTopCarCard.num = 1
             addTopCarCard.is_checked = false
             addTopCarCard.is_edit = 0
-            addTopCarCard.edit_price = addTopCarCard.price
+            addTopCarCard.edit_price = parseFloat(addTopCarCard.price).toFixed(2)
+            addTopCarCard.price = parseFloat(addTopCarCard.price).toFixed(2)
             this.chooeseGoods.cardList.push(addTopCarCard)
             this.goukaDialog.isShow = false
             this.sumChooseGoodsMoney()
