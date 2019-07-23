@@ -241,7 +241,7 @@
               <li class="clear-both">
                 <span class="float-left">应收</span>
                 <!-- 选择赠送的支付方式，费用显示为0-->
-                <span class="float-right font-red" v-if="jiezhangDialog.chooesePayWay === 7">￥ 0</span>
+                <span class="float-right font-red" v-if="jiezhangDialog.chooesePayWay === 7">￥ 0.00</span>
                 <span class="float-right font-red" v-else>¥ {{jiezhangDialog.modifyMoney}}</span>
               </li>
               <li class="clear-both">
@@ -250,11 +250,11 @@
               </li>
               <li class="clear-both">
                 <span class="float-left">改价</span>
-                <span class="float-right">¥ {{jiezhangDialog.modifyMoney - jiezhangDialog.sumMoney}}</span>
+                <span class="float-right">¥ {{parseFloat(jiezhangDialog.modifyMoney - jiezhangDialog.sumMoney).toFixed(2)}}</span>
               </li>
               <li class="clear-both">
-                <span class="float-left"><span>会员</span> <span class="font-blue">{{jiezhangDialog.memberVip.nickname}}</span></span>
-                <span class="float-right">余额：¥ {{jiezhangDialog.memberVip.money}}</span>
+                <span class="float-left"><span>会员</span> <span class="font-blue">{{jiezhangDialog.memberVip.nickname?jiezhangDialog.memberVip.nickname:'未选择'}}</span></span>
+                <span class="float-right">余额：¥ {{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : '0.00'}}</span>
               </li>
               <li class="clear-both">
                 <span class="float-left"><span>服务人员</span> <span class="font-blue">{{jiezhangDialog.nowWaiter.name}}</span></span>
@@ -325,7 +325,7 @@
                <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 7}" @click="jiezhangDialogChoosesPayWay(7)">
                 <img src="../../assets/icon/checkout-zengpin-sel.png" alt="赠送"><span>赠送</span>
                </span>
-               <span  v-if="jiezhangDialog.closedPayWay.indexOf(8) !== -1"   class="span-btn closed">
+               <span  v-if="jiezhangDialog.closedPayWay.indexOf(8) !== -1 || jiezhangDialog.memberVip.id"   class="span-btn closed">
                 <img src="../../assets/icon/checkout-mendian.png" alt="门店自用"><span>门店自用</span>
                </span>
                <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 8}" @click="jiezhangDialogChoosesPayWay(8)">
@@ -1642,6 +1642,13 @@ export default {
               this.jiezhangDialog.memberVip = res.data
               this.xuanzehuiyuanDialog.isShow = false
               this.jiezhangDialog.closedPayWay = [] //选择了会员，支付方式多了 会员卡和 赠送
+              //选择了会员，根据会员的等级，服务商品有会员价
+              if (this.chooeseGoods.fuwuGoods.length){
+                this.getServiceItemList()
+                this.requestFuwuGoodData.isChooeseFuwuGood = true
+                this.requestGoodData.isChooeseFenleiGood = false
+                this.chooeseGoods.fuwuGoods = []
+              }
             } else {
               this.$message.closeAll()
               this.$message({
