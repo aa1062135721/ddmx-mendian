@@ -18,15 +18,15 @@
         </div>
         <div>
           <p class="yuanjia overflow-row1-ellipsis" v-if="ogood.is_service_goods === '1'">
-             原价: ¥ {{ogood.price}}
+             原价: ¥ {{parseFloat(ogood.price).toFixed(2)}}
           </p>
         </div>
         <div class="goods_price">
           <span class="xianjia">
-            现价: ¥ {{ogood.price}}
+            现价: ¥ {{parseFloat(ogood.price).toFixed(2)}}
           </span>
           <span class="kucun" v-if="ogood.stock || ogood.stock >= 0">
-            <img src="../../assets/icon/kucun.png" alt="库存"> {{ogood.stock}}
+            <img src="../../assets/icon/kucun.png" alt="库存"> {{parseInt(ogood.stock)}}
           </span>
         </div>
       </div>

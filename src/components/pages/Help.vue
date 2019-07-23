@@ -12,9 +12,9 @@
                 placeholder="请输入内容"
                 style="width:496px;"
                 v-model="content"
-                @keyup.enter.native="searchHelp"
+                @keyup.enter.native="goSearchHelp"
               >
-                <i slot="suffix" class="el-input__icon el-icon-search" @click="searchHelp"></i>
+                <i slot="suffix" class="el-input__icon el-icon-search" @click="goSearchHelp"></i>
               </el-input>
             </li>
             <li></li>
@@ -25,14 +25,12 @@
         </div>
       </div>
       <div class="my-body clear-both">
-        <el-scrollbar class="left float-left">
-          <ul>
+          <ul  class="left float-left" v-infinite-scroll="loadMoreHelps" infinite-scroll-immediate="false">
             <li v-for="(item, index) in hepls" :key="item.id" :class="{'active' : item.is_checked}" @click="clickTiltle(index)">
               <span class="title float-left overflow-row1-ellipsis"><span v-html="item.title"></span></span>
               <i class="el-icon-arrow-right float-right"></i>
             </li>
           </ul>
-        </el-scrollbar>
         <div class="right float-right">
           <h1 class="title" v-if="hepls.length" v-html="hepls[index].title"></h1>
           <div class="content" v-if="hepls.length" v-html="hepls[index].content"></div>
@@ -47,6 +45,7 @@ export default {
   name: 'Index',
   data () {
     return {
+      noMore:false,
       content: '', // 搜索的内容
       index: 0, // 当前被选中的
       requestData: { // page: '1,20'
@@ -54,7 +53,7 @@ export default {
         limit: 20
       },
       hepls: [
-        {is_checked: true, id: 1, title: '第1次测试', content: `<p><span style="text-align: justify;">6月14日，英国皇家科学院院士、英国皇家工程院院士安妮·尼维尔（Anne Neville）到长安汽车进行交流，并带来了以《表面工程在下一代汽车零部件摩擦和腐蚀方面的重要性》为题的精彩分享。</span><br style="text-align: justify;"><span style="text-align: justify;">&nbsp;&nbsp;&nbsp;&nbsp; 安妮·尼维尔教授的交流，为大力推进科技创新的长安汽车提供了一个交流学习的机会，长安汽车也通过此次交流向世界展现一个正在从汽车大国迈向汽车强国应有的技术实力。</span><br style="text-align: justify;"><span style="text-align: justify;"></span><img title="1560510190912758.jpg" alt="1.jpg" src="http://www.changan.com.cn/uploads_ueditor/image/20190614/1560510190912758.jpg" _src="//www.changan.com.cn/uploads_ueditor/image/20190614/1560510190912758.jpg" style="text-align: justify;"><span style="text-align: justify;">加强国际交流，英国皇家两院院士专程分享</span></p>`}
+        // {is_checked: true, id: 1, title: '第1次测试', content: `<p><span style="text-align: justify;">6月14日，英国皇家科学院院士、英国皇家工程院院士安妮·尼维尔（Anne Neville）到长安汽车进行交流，并带来了以《表面工程在下一代汽车零部件摩擦和腐蚀方面的重要性》为题的精彩分享。</span><br style="text-align: justify;"><span style="text-align: justify;">&nbsp;&nbsp;&nbsp;&nbsp; 安妮·尼维尔教授的交流，为大力推进科技创新的长安汽车提供了一个交流学习的机会，长安汽车也通过此次交流向世界展现一个正在从汽车大国迈向汽车强国应有的技术实力。</span><br style="text-align: justify;"><span style="text-align: justify;"></span><img title="1560510190912758.jpg" alt="1.jpg" src="http://www.changan.com.cn/uploads_ueditor/image/20190614/1560510190912758.jpg" _src="//www.changan.com.cn/uploads_ueditor/image/20190614/1560510190912758.jpg" style="text-align: justify;"><span style="text-align: justify;">加强国际交流，英国皇家两院院士专程分享</span></p>`}
       ]
     }
   },
@@ -98,15 +97,32 @@ export default {
             res.data.map(item => {
               item.is_checked = false
             })
-            this.hepls = res.data
-            this.hepls[0].is_checked = true
+            if (this.requestData.page === 1) {
+              this.hepls = res.data
+              this.noMore = false
+              this.hepls[0].is_checked = true
+            } else{
+              this.hepls.push(...res.data)
+            }
           }
         } else {
-          this.hepls = []
+          this.noMore = true
         }
       }).catch(err => {
         console.log(err)
       })
+    },
+    goSearchHelp(){
+      this.noMore = false
+      this.requestData.page = 1
+      this.searchHelp()
+    },
+    loadMoreHelps(){
+      if (this.noMore){
+        return
+      }
+      this.requestData.page += 1
+      this.searchHelp()
     }
   },
   beforeDestroy () {
@@ -114,7 +130,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
   .page-help{
     height: 100%;
     width: 100%;
@@ -192,43 +208,38 @@ export default {
       .left{
         height: calc(100% - 68px);
         overflow-y:auto;
-        overflow-x: hidden;
         width:398px;
         background: #fff;
-        ul{
+        text-align: center;
+        list-style-type: none;
+        width:398px;
+        li{
+          clear: both;
           overflow-x: hidden;
+          cursor:pointer;
+          height:84px;
+          line-height: 84px;
+          width: calc(100% - 20px);
+          padding: 0 10px;
           text-align: center;
-          height: auto;
-          list-style-type: none;
-          width:398px;
-          li{
-            clear: both;
-            overflow-x: hidden;
-            cursor:pointer;
-            height:84px;
+          border-bottom:1px solid rgba(204,204,204,1);
+          font-size:24px;
+          font-family:SourceHanSansCN-Regular;
+          font-weight:400;
+          color:rgba(26,26,26,1);
+          .title{
+            width: 80%;
+          }
+          i{
+            color: #B8B8B8;
+            font-size: 24px;
+            font-weight: bolder;
+            height: 84px;
             line-height: 84px;
-            width: calc(100% - 20px);
-            padding: 0 10px;
-            text-align: center;
-            border-bottom:1px solid rgba(204,204,204,1);
-            font-size:24px;
-            font-family:SourceHanSansCN-Regular;
-            font-weight:400;
-            color:rgba(26,26,26,1);
-            .title{
-              width: 80%;
-            }
-            i{
-              color: #B8B8B8;
-              font-size: 24px;
-              font-weight: bolder;
-              height: 84px;
-              line-height: 84px;
-            }
           }
-          .active{
-            background:rgba(235,235,235,1);
-          }
+        }
+        .active{
+          background:rgba(235,235,235,1);
         }
       }
       .right{

@@ -6,10 +6,11 @@
       </div>
       <div class="tabs float-right">
           <ul>
-            <li @click="goToUrl('/money')" :class="{'active' : $route.path === '/money'}">前台收银</li>
+            <li @click="goToUrl('/money')" v-if="$route.path !== '/money'">前台收银</li>
+            <li @click="goToUrl('/home')" v-else>进入后台</li>
             <li @click="goToUrl('/help')" :class="{'active' : $route.path === '/help'}"><i class="el-icon-question"></i> 帮助中心</li>
-            <li @click="handleFullScreen" :class="{'active' : fullscreen}"><i class="el-icon-rank"></i> {{fullscreen ? `取消全屏` : `全屏`}}</li>
-            <li>{{userInfo.user_nickname ? userInfo.user_nickname : '超级管理员'}}</li>
+            <li @click="handleFullScreen" :class="{'active' : fullscreen}"><i class="el-icon-rank"></i> {{fullscreen ? `取消全屏` : `全屏模式`}}</li>
+            <li>{{userInfo.user_nickname}}</li>
             <li @click="handleCommand"><i class="el-icon-switch-button"></i></li>
           </ul>
       </div>
@@ -34,10 +35,10 @@ export default {
         user_status: 1,
         user_login: 'admin', // 账号
         user_pass: '###7f4613cc5b4b2a6d99069dbeca8335d9',
-        user_nickname: '超级管理员', // 名称
+        user_nickname: '', // 名称
         user_email: '465497241@qq.com', // 邮箱
         user_url: '',
-        shop_name:'只能星城店',
+        shop_name:'',
         avatar: '',
         signature: '',
         last_login_ip: '127.0.0.1',

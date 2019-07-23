@@ -641,14 +641,14 @@ export default {
         isShow: false, // 搜索商品弹窗显示与否
         title: '', // 搜索商品标题，这里是标题，不是条形码，如果是条形码，点击按钮直接添加到购物车
         goodsList: [
-          {
-            id: 1730, // 商品id
-            title: '美杰紫色毛巾', // 商品名称
-            price: '7.00', // 商品的原价，现价
-            bar_code: '2300201800208', // 商品条形码
-            pics: 'http://picture.ddxm661.com/9a47a20190318164340290', // 商品的图片
-            stock: 10// 商品的库存
-          }
+          // {
+          //   id: 1730, // 商品id
+          //   title: '美杰紫色毛巾', // 商品名称
+          //   price: '7.00', // 商品的原价，现价
+          //   bar_code: '2300201800208', // 商品条形码
+          //   pics: 'http://picture.ddxm661.com/9a47a20190318164340290', // 商品的图片
+          //   stock: 10// 商品的库存
+          // }
         ] // 按标题搜索商品后得到的结果
       },
       //  会员查询 - 单击会员按钮后的弹窗所需要的数据
@@ -914,6 +914,7 @@ export default {
         }
         for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
           if (this.chooeseGoods.goods[i].id === good.id) {
+            this.$message.closeAll()
             this.$message({
               message: '该商品已经存在购物车了,请在购物车里选择它后编辑它',
               type: 'error'
@@ -1523,7 +1524,6 @@ export default {
         // 全部是数字
         this.searchGoodsByGoodCode()
       } else {
-        this.sousuoshangpingDialog.isShow = true
         // 非纯数字
         this.searchGoodsByGoodName()
       }
@@ -1533,7 +1533,9 @@ export default {
       let data = {}
       data.title = `${this.sousuoshangpingDialog.title}`
       postGoods(data).then((res) => {
-        this.sousuoshangpingDialog.goodsList = res.data
+        if (res.data.length)
+          this.sousuoshangpingDialog.goodsList = res.data
+        this.sousuoshangpingDialog.isShow = true
       }).catch((err) => {
         console.log(err, '搜索商品失败')
       })
@@ -1543,7 +1545,7 @@ export default {
       let data = {}
       data.bar_code = `${this.sousuoshangpingDialog.title}`
       postGoodsByCode(data).then((res) => {
-        if (res.data instanceof Object && !(res.data instanceof Array)) {
+        if (res.data instanceof Object && !(res.data instanceof Array) && res.data.id) {
           if (this.chooeseGoods.cardList.length || this.chooeseGoods.fuwuGoods.length ) {
             this.$confirm('您确认清空购物车中的商品，重新添加另一种商品吗？', '提示', {
               confirmButtonText: '确定',
@@ -1581,6 +1583,11 @@ export default {
           this.chooeseGoods.cardList = []
           this.chooeseGoods.fuwuGoods = []
         } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '没有检索到该商品',
+            type: 'error'
+          })
         }
       }).catch((err) => {
         console.log(err, '按条形码搜索商品失败')
@@ -1629,10 +1636,16 @@ export default {
         if (/^[1][3,4,5,7,8][0-9]{9}$/.test(this.xuanzehuiyuanDialog.mobile)) {
           let requestData = {mobile: this.xuanzehuiyuanDialog.mobile}
           postSearchVip(requestData).then(res => {
-            if (res.data) {
+            if (res.data.id) {
               this.jiezhangDialog.memberVip = res.data
               this.xuanzehuiyuanDialog.isShow = false
               this.jiezhangDialog.closedPayWay = [] //选择了会员，支付方式多了 会员卡和 赠送
+            } else {
+              this.$message.closeAll()
+              this.$message({
+                message: '没有查询到该会员的信息',
+                type: 'error'
+              })
             }
           }).catch(err => {
             console.log(err)
@@ -1710,7 +1723,9 @@ export default {
     },
     // 会员查询弹框中的事件
     huiyuanDialogGetCode (code) {
-      this.huiyuanDialog.mobile += `${code}`
+      if (this.huiyuanDialog.mobile.length<11){
+        this.huiyuanDialog.mobile += `${code}`
+      }
     },
     huiyuanDialogSearchMemberVip () {
       if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.huiyuanDialog.mobile)) {
@@ -1764,11 +1779,14 @@ export default {
       }
       postAddMemberVip(requestData).then(res => {
         if (res.code === '200') {
+          this.huiyuanDialog.addHuiyuanDialog.isShow = false
           this.$message.closeAll()
           this.$message({
             message: res.msg,
             type: 'success'
           })
+          this.huiyuanDialog.mobile = requestData.mobile
+          this.huiyuanDialogSearchMemberVip()
         }
       }).catch(err => {
         console.log('新增会员失败', err)
