@@ -28,46 +28,46 @@ export default {
           icon: 'reception-get-money',
           index: '/money'
         },
-        {
-          title: '店铺状况',
-          icon: 'shop-status',
-          index: 'order'
-        },
+        // {
+        //   title: '店铺状况',
+        //   icon: 'shop-status',
+        //   index: 'order'
+        // },
         {
           title: '订单管理',
           icon: 'order-manage',
           index: '/home/order'
         },
-        {
-          title: '营销管理',
-          icon: 'marketing-manage',
-          index: '/home/index'
-        },
-        {
-          title: '会员管理',
-          icon: 'member-manage',
-          index: '15'
-        },
+        // {
+        //   title: '营销管理',
+        //   icon: 'marketing-manage',
+        //   index: '/home/index'
+        // },
+        // {
+        //   title: '会员管理',
+        //   icon: 'member-manage',
+        //   index: '15'
+        // },
         {
           title: '库存管理',
           icon: 'stock-manage',
           index: '/home/inventory'
         },
-        {
-          title: '报表分析',
-          icon: 'statement-analysis',
-          index: '17'
-        },
+        // {
+        //   title: '报表分析',
+        //   icon: 'statement-analysis',
+        //   index: '17'
+        // },
         {
           title: '支出管理',
           icon: 'expenditure-manage',
           index: '/home/expenditure'
         },
-        {
-          title: '系统设置',
-          icon: 'system-setting',
-          index: '20'
-        }
+        // {
+        //   title: '系统设置',
+        //   icon: 'system-setting',
+        //   index: '20'
+        // }
         // {
         //   icon: 'el-icon-date',
         //   index: '/21',

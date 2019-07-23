@@ -75,7 +75,7 @@
                       <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
                       <span class="red danjia" v-else>￥{{good.price}}</span>
                       <span class="yuanjia" v-if="good.is_edit">原价￥{{good.price}}</span>
-                      <span class="huiyuanjia">会员价￥{{good.price}}</span>
+                      <span class="huiyuanjia" v-if="jiezhangDialog.memberVip.id">会员价￥{{good.price}}</span>
                     </li>
                   </ul>
                   <ul v-if="chooeseGoods.cardList.length" v-for="(good, key) in chooeseGoods.cardList" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
