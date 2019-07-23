@@ -62,7 +62,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style  lang="less">
     .login-wrap{
         position: relative;
         width:100%;
@@ -70,81 +70,81 @@ export default {
         background-image: url('../assets/images/login-bg.png');
         background-size: cover;
         font-size:14px;
-    }
-    .ms-login{
+      .ms-login{
         position: absolute;
         left:50%;
         top:50%;
-        width:468px;
-        height:616px;
-        margin:-308px 0 0 -234px;
-        /* padding:40px; */
+        width:398px;
+        height:516px;
+        margin:-250px 0 0 -199px;
         border-radius: 5px;
         background: #fff;
         text-align: center;
-        /* border: 1px solid black; */
-    }
-    .logo{
-        text-align: center;
-        width: 100%;
-        margin-top: 56px;
-        margin-bottom: 48px;
-    }
-    .tips{
-        width:100%;
-        /* border: 1px solid red; */
-        text-align: center;
-        margin-bottom: 14px;
-    }
-    .tips p{
-        width:324px;
-        font-size:12px;
-        /* border: 1px solid black; */
-        margin: auto;
-        text-align: left;
-        color:red;
+        .urser-name {
+          width:324px;
+          text-align: center;
+          margin-bottom: 20px;
+          font-size: 20px;
+          .el-input__inner{
+            height:48px;
+            background:rgba(255,255,255,1);
+            border-radius:8px;
+            font-size: 16px!important;
+          }
+        }
+        .password{
+          width:324px;
+          text-align: center;
+          margin-bottom:20px;
+          font-size: 20px;
+          .el-input__inner{
+            height:48px;
+            background:rgba(255,255,255,1);
+            border-radius:8px;
+            font-size: 16px!important;
+          }
+        }
+        .logo{
+          text-align: center;
+          width: 100%;
+          margin-top: 40px;
+          margin-bottom: 26px;
+          img{
+            height:140px;
+          }
+          p{
+            height:25px;
+            font-size:26px;
+            font-family:SourceHanSansCN-Regular;
+            font-weight:400;
+            color:#2ECAF1;
+            margin-top: 20px;
+          }
+        }
+        .tips{
+          width:100%;
+          /* border: 1px solid red; */
+          text-align: center;
+          margin-bottom: 20px;
+          p{
+            width:324px;
+            font-size:12px;
+            /* border: 1px solid black; */
+            margin: auto;
+            text-align: left;
+            color:red;
+          }
+        }
+        .login-btn{
+          width:100%;
+          height:48px;
+          text-align: center;
+          button{
+            width:324px;
+            height:48px;
+          }
+        }
+      }
     }
 
-    .logo img{
-        height:140px;
-    }
-    .logo p{
-        height:25px;
-        font-size:26px;
-        font-family:SourceHanSansCN-Regular;
-        font-weight:400;
-        color:rgba(15,156,242,1);
-        margin-top: 40px;
-    }
-    .urser-name {
-        width:324px;
-        text-align: center;
-        margin-bottom: 14px;
-    }
-    .urser-name .el-input__inner{
-        height:48px;
-        background:rgba(255,255,255,1);
-        border-radius:8px;
-    }
-
-    .password{
-        width:324px;
-        text-align: center;
-        margin-bottom: 14px;
-    }
-    .password .el-input__inner{
-        height:48px;
-        background:rgba(255,255,255,1);
-        border-radius:8px;
-    }
-
-    .login-btn{
-        width:100%;
-        height:48px;
-        text-align: center;
-    }
-    .login-btn button{
-        width:324px;
-        height:48px;
-    }
 </style>

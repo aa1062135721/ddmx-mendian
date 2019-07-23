@@ -102,7 +102,8 @@
                     <span class="float-right select">
                       <el-dropdown class="user-name" trigger="click" @command="clickWaiter">
                         <span class="el-dropdown-link"  @click="getWaiterList()">
-                          <span class="font-blue">{{jiezhangDialog.nowWaiter.name}}</span> [{{jiezhangDialog.nowWaiter.type}}]  <i class="el-icon-arrow-down"></i>
+                          <span v-if="jiezhangDialog.nowWaiter.id != -1"><span class="font-blue">{{jiezhangDialog.nowWaiter.name}}</span> [{{jiezhangDialog.nowWaiter.type}}]  <i class="el-icon-arrow-down"></i></span>
+                          <span v-else> <span class="font-blue">请选择服务人员</span> <i class="el-icon-arrow-down"></i></span>
                         </span>
                         <el-dropdown-menu slot="dropdown">
                           <el-dropdown-item v-for="(item) in jiezhangDialog.waiter" :key="item.id" :command="item">
@@ -549,7 +550,14 @@
        </div>
       </el-dialog>
       <!-- 结账成功弹框-->
-      <v-show-my-dialog v-if="jiezhangDialog.jiezhangSuccessDialog.isShow" :dialogTableVisible="jiezhangDialog.jiezhangSuccessDialog.isShow" :content="jiezhangDialog.jiezhangSuccessDialog.content" :seconds="jiezhangDialog.jiezhangSuccessDialog.seconds"></v-show-my-dialog>
+      <el-dialog class="jiezhang-chenggong-tanchuan":visible.sync="jiezhangDialog.jiezhangSuccessDialog.isShow" width="298px">
+        <div class="box">
+          <img  src="../../assets/images/alert-logo.png" alt="图片">
+          <div class="txt">
+            {{jiezhangDialog.jiezhangSuccessDialog.content}}
+          </div>
+        </div>
+      </el-dialog>
     </div>
 </template>
 
@@ -560,7 +568,6 @@ import vKeyboard from '../common/Keyboard.vue'
 import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-ok'
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
-import vShowMyDialog from '../common/ShowMyDialog'
 import BScroll from 'better-scroll' // 滚动插件
 import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords } from '../../api/getData'
 
@@ -804,7 +811,7 @@ export default {
         nowWaiter: {
           id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
           name: '请选择服务员', // 服务员名称
-          type: '未知' // 服务类型
+          type: '' // 服务类型
         },
         sumMoney: 0.00, // 所购商品的合计
         modifyMoney: 0.00, // 改价参数,
@@ -822,7 +829,7 @@ export default {
     }
   },
   components: {
-    vHead, vGood, vKeyboard, vKeyboardWithoutPointWithOk, vKeyboardWithoutPoint, vCard, vShowMyDialog
+    vHead, vGood, vKeyboard, vKeyboardWithoutPointWithOk, vKeyboardWithoutPoint, vCard
   },
   mounted () {
     this.getGoodsType()
@@ -1642,6 +1649,10 @@ export default {
               this.jiezhangDialog.memberVip = res.data
               this.xuanzehuiyuanDialog.isShow = false
               this.jiezhangDialog.closedPayWay = [] //选择了会员，支付方式多了 会员卡和 赠送
+              //选择了会员，根据会员的等级，服务商品有会员价
+              if (this.requestFuwuGoodData.isChooeseFuwuGood) {
+                this.getServiceItemList()
+              }
               //选择了会员，根据会员的等级，服务商品有会员价
               if (this.chooeseGoods.fuwuGoods.length){
                 this.getServiceItemList()
@@ -2844,6 +2855,31 @@ export default {
             background: #2DC2F3;
           }
         }
+      }
+    }
+  }
+  /*结账成功弹框*/
+  .jiezhang-chenggong-tanchuan{
+    .box{
+      width:100%;
+      border-radius:10px;
+      text-align: center;
+      img{
+        margin: auto;
+        width:83px;
+        height:104px;
+      }
+      .txt{
+        width:100%;
+        height:30px;
+        line-height: 30px;
+        font-size:30px;
+        margin-top: 35px;
+        margin-bottom: 64px;
+        font-family:SourceHanSansCN-Regular;
+        font-weight:400;
+        color:rgba(26,26,26,1);
+        text-align: center;
       }
     }
   }
