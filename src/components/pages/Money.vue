@@ -2148,6 +2148,12 @@ export default {
             this.jiezhangDialog.sumMoney = 0
             this.jiezhangDialog.modifyMoney = 0
             this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
+            if (this.requestGoodData.isChooeseFenleiGood){
+              this.getGoods()
+            }
+            setTimeout(() => {
+              this.jiezhangDialog.jiezhangSuccessDialog.isShow = false
+            }, this.jiezhangDialog.jiezhangSuccessDialog.seconds)
             this.$forceUpdate()
           }
         }).catch(err => {
@@ -2184,6 +2190,12 @@ export default {
             this.jiezhangDialog.sumMoney = 0
             this.jiezhangDialog.modifyMoney = 0
             this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
+            if (this.requestGoodData.isChooeseFenleiGood){
+              this.getGoods()
+            }
+            setTimeout(() => {
+              this.jiezhangDialog.jiezhangSuccessDialog.isShow = false
+            }, this.jiezhangDialog.jiezhangSuccessDialog.seconds)
             this.$forceUpdate()
           }
         }).catch(err => {
@@ -2211,6 +2223,12 @@ export default {
             this.jiezhangDialog.sumMoney = 0
             this.jiezhangDialog.modifyMoney = 0
             this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
+            if (this.requestGoodData.isChooeseFenleiGood){
+              this.getGoods()
+            }
+            setTimeout(() => {
+              this.jiezhangDialog.jiezhangSuccessDialog.isShow = false
+            }, this.jiezhangDialog.jiezhangSuccessDialog.seconds)
             this.$forceUpdate()
           }
         }).catch(err => {

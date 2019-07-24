@@ -60,6 +60,10 @@ export default {
   methods: {
     // 跳转到页面
     goToUrl (url) {
+      if (url === '/help'){
+        window.open("#/help");
+        return
+      }
       this.$router.push(url)
     },
     // 退出登录
