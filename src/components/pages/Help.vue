@@ -53,7 +53,7 @@ export default {
         limit: 20
       },
       hepls: [
-        // {is_checked: true, id: 1, title: '第1次测试', content: `<p><span style="text-align: justify;">6月14日，英国皇家科学院院士、英国皇家工程院院士安妮·尼维尔（Anne Neville）到长安汽车进行交流，并带来了以《表面工程在下一代汽车零部件摩擦和腐蚀方面的重要性》为题的精彩分享。</span><br style="text-align: justify;"><span style="text-align: justify;">&nbsp;&nbsp;&nbsp;&nbsp; 安妮·尼维尔教授的交流，为大力推进科技创新的长安汽车提供了一个交流学习的机会，长安汽车也通过此次交流向世界展现一个正在从汽车大国迈向汽车强国应有的技术实力。</span><br style="text-align: justify;"><span style="text-align: justify;"></span><img title="1560510190912758.jpg" alt="1.jpg" src="http://www.changan.com.cn/uploads_ueditor/image/20190614/1560510190912758.jpg" _src="//www.changan.com.cn/uploads_ueditor/image/20190614/1560510190912758.jpg" style="text-align: justify;"><span style="text-align: justify;">加强国际交流，英国皇家两院院士专程分享</span></p>`}
+        {is_checked: true, id: 0, title: '', content: ``}
       ]
     }
   },
@@ -249,7 +249,7 @@ export default {
       .right{
         height: calc(100% - 68px);
         width:1436px;
-        overflow: hidden;
+        overflow: auto;
         background: #fff;
         .title{
           font-size:30px;
@@ -267,8 +267,6 @@ export default {
            line-height:30px;
            text-align:justify;
            width:calc(1436px - 48px);
-           overflow-y: auto;
-           overflow-x: hidden;
            padding: 0 24px 30px 24px;
            height: calc(100% - 95px - 30px);
         }

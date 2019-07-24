@@ -41,15 +41,15 @@
           <div style="width: 636px;overflow: hidden;">
             <div class="jiesuan-goods" >
               <div class="search">
-                <el-input class="goods-search"  @keyup.enter.native="getGoodByCondition" placeholder="商品名称/条形码"  v-model="sousuoshangpingDialog.title">
-                  <el-button slot="append" icon="el-icon-search" @click="getGoodByCondition"></el-button>
+                <el-input class="goods-search" @keyup.native="getGoodByCondition" placeholder="商品名称/条形码"  v-model="sousuoshangpingDialog.title">
+                  <el-button slot="append" icon="el-icon-search" @click="getGoodByConditionOk"></el-button>
                 </el-input>
               </div>
               <div class="pay-goods-box">
                   <ul v-if="chooeseGoods.goods.length" v-for="(good, key) in chooeseGoods.goods" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
                     <li class="title clear-both">
                       <span class="float-left">{{good.title}}</span>
-                      <span class="float-right">数量 {{good.num}}</span>
+                      <span class="float-right">X {{good.num}}</span>
                     </li>
                     <li class="title code clear-both">
                       <span class="float-left">{{good.bar_code}}</span>
@@ -65,7 +65,7 @@
                   <ul v-if="chooeseGoods.fuwuGoods.length" v-for="(good, key) in chooeseGoods.fuwuGoods" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
                     <li class="title clear-both">
                       <span class="float-left">{{good.title}}</span>
-                      <span class="float-right">数量 {{good.num}}</span>
+                      <span class="float-right">X {{good.num}}</span>
                     </li>
                     <li class="title code clear-both">
                       <span class="float-left"></span>
@@ -81,7 +81,7 @@
                   <ul v-if="chooeseGoods.cardList.length" v-for="(good, key) in chooeseGoods.cardList" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
                   <li class="title clear-both">
                     <span class="float-left">{{good.card_name}}</span>
-                    <span class="float-right">数量 {{good.num}}</span>
+                    <span class="float-right">X {{good.num}}</span>
                   </li>
                   <li class="title code clear-both">
                     <span class="float-left"></span>
@@ -340,7 +340,7 @@
        <el-dialog class="sousuoshangping-tanchuan" title="搜索商品" :visible.sync="sousuoshangpingDialog.isShow" width="660px" :center="true">
         <div class="content">
           <div class="clear-both" style="width:100%;height:52px;margin-bottom: 20px;">
-            <div class="float-left" style="width: 75%;">
+            <div class="float-left" style="width:80%;">
               <el-input  placeholder="请输入您需要查询的商品名字" v-model="sousuoshangpingDialog.title" @keyup.enter.native="searchGoodsByGoodName" ></el-input>
             </div>
             <div class="float-right"  style="width: 20%;text-align: right;">
@@ -1292,11 +1292,7 @@ export default {
       }
     },
     clickChangejiageShoppingCarGood (code) {
-      let n = this.xiugaijiageDialog.inputValue
-      if (code !== '.') { n += code } else { n += code + '0' }
-      if (/^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/.test(n)) {
         this.xiugaijiageDialog.inputValue += code
-      }
     },
     clickChangejiageShoppingCarGoodOk () {
       if (this.chooeseGoods.goods.length) {
@@ -1307,11 +1303,17 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if (parseFloat(this.xiugaijiageDialog.inputValue) > 0) {
+          if ((parseFloat(this.xiugaijiageDialog.inputValue) > 0) && (parseFloat(this.xiugaijiageDialog.inputValue) >= parseFloat(this.chooeseGoods.goods[key].minimum_selling_price))) {
             this.chooeseGoods.goods[key].is_edit = 1
             this.chooeseGoods.goods[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
             this.xiugaijiageDialog.inputValue = ''
             this.xiugaijiageDialog.isShow = false
+          } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '修改的价格不能低于设置的最低售价',
+              type: 'error'
+            })
           }
         }
       }
@@ -1521,21 +1523,17 @@ export default {
     },
     // 按搜索商品(商品标题和条形码)
     getGoodByCondition (str) {
-      if (this.sousuoshangpingDialog.title.length === 0) {
-        this.$message.closeAll()
-        this.$message({
-          message: '请输入商品名或条形码',
-          type: 'error'
-        })
-        return
-      }
       if (/^[0-9]+$/.test(this.sousuoshangpingDialog.title)) {
-        // 全部是数字
-        this.searchGoodsByGoodCode()
-      } else {
-        // 非纯数字
-        this.searchGoodsByGoodName()
+        if (this.sousuoshangpingDialog.title.length >= 5) {
+          // 全部是数字
+          this.searchGoodsByGoodCode()
+        }
       }
+    },
+    getGoodByConditionOk(){
+      this.sousuoshangpingDialog.isShow = true
+      if (this.sousuoshangpingDialog.title.length!==0)
+        this.searchGoodsByGoodName()
     },
     // 搜索商品按商品名
     searchGoodsByGoodName () {
@@ -1561,36 +1559,63 @@ export default {
               cancelButtonText: '取消',
               type: 'warning'
             }).then(() => {
+              let good = res.data
+              good.num = 1
+              good.is_checked = false
+              good.is_edit = 0
+              good.edit_price = good.price
+              for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
+                if (this.chooeseGoods.goods[i].id === good.id) {
+                  this.$message.closeAll()
+                  this.$message({
+                    message: '该商品已经存在购物车了，请选中后再操作',
+                    type: 'error'
+                  })
+                  return
+                }
+              }
+              if(good.stock <= 0){
+                this.$message.closeAll()
+                this.$message({
+                  message: '该商品库存不足，无法添加购物车',
+                  type: 'error'
+                })
+                return
+              }
+              this.chooeseGoods.goods.push(good)
+              this.chooeseGoods.cardList = []
+              this.chooeseGoods.fuwuGoods = []
             }).catch(() => {
               return
             });
+          } else {
+              let good = res.data
+              good.num = 1
+              good.is_checked = false
+              good.is_edit = 0
+              good.edit_price = good.price
+              for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
+                if (this.chooeseGoods.goods[i].id === good.id) {
+                  this.$message.closeAll()
+                  this.$message({
+                    message: '该商品已经存在购物车了，请选中后再操作',
+                    type: 'error'
+                  })
+                  return
+                }
+              }
+              if(good.stock <= 0){
+                this.$message.closeAll()
+                this.$message({
+                  message: '该商品库存不足，无法添加购物车',
+                  type: 'error'
+                })
+                return
+              }
+              this.chooeseGoods.goods.push(good)
+              this.chooeseGoods.cardList = []
+              this.chooeseGoods.fuwuGoods = []
           }
-          let good = res.data
-          good.num = 1
-          good.is_checked = false
-          good.is_edit = 0
-          good.edit_price = good.price
-          for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
-            if (this.chooeseGoods.goods[i].id === good.id) {
-              this.$message.closeAll()
-              this.$message({
-                message: '该商品已经存在购物车了，请选中后再操作',
-                type: 'error'
-              })
-              return
-            }
-          }
-          if(good.stock <= 0){
-            this.$message.closeAll()
-            this.$message({
-              message: '该商品库存不足，无法添加购物车',
-              type: 'error'
-            })
-            return
-          }
-          this.chooeseGoods.goods.push(good)
-          this.chooeseGoods.cardList = []
-          this.chooeseGoods.fuwuGoods = []
         } else {
           this.$message.closeAll()
           this.$message({
@@ -1649,11 +1674,11 @@ export default {
               this.jiezhangDialog.memberVip = res.data
               this.xuanzehuiyuanDialog.isShow = false
               this.jiezhangDialog.closedPayWay = [] //选择了会员，支付方式多了 会员卡和 赠送
-              //选择了会员，根据会员的等级，服务商品有会员价
+              //选择了会员，根据会员的等级，服务商品有会员价 刷新接口
               if (this.requestFuwuGoodData.isChooeseFuwuGood) {
                 this.getServiceItemList()
               }
-              //选择了会员，根据会员的等级，服务商品有会员价
+              //选择了会员，根据会员的等级，服务商品有会员价 刷新接口
               if (this.chooeseGoods.fuwuGoods.length){
                 this.getServiceItemList()
                 this.requestFuwuGoodData.isChooeseFuwuGood = true
@@ -1666,6 +1691,7 @@ export default {
                 message: '没有查询到该会员的信息',
                 type: 'error'
               })
+              this.jiezhangDialog.closedPayWay = [3,7] //没有选择了会员，支付方式少了 会员卡和 赠送
               this.jiezhangDialog.memberVip = {}
             }
           }).catch(err => {
@@ -1677,6 +1703,8 @@ export default {
             message: '请输入正确的手机号',
             type: 'error'
           })
+          this.jiezhangDialog.closedPayWay = [3,7] //没有选择了会员，支付方式少了 会员卡和 赠送
+          this.jiezhangDialog.memberVip = {}
         }
       } else {
         if (this.xuanzehuiyuanDialog.mobile.length<11)
@@ -2374,7 +2402,7 @@ export default {
       border-radius:10px;
       margin-bottom: 28px;
       .goods-search{
-        font-size:22px;
+        font-size:16px;
         font-family:SourceHanSansCN-Regular;
         font-weight:400;
         color:rgba(26,26,26,1);
@@ -2414,6 +2442,7 @@ export default {
           line-height:20px;
           .red{
             color:rgba(248,61,61,1);
+            font-size: 18px;
           }
           .danjia{
             margin-right: 10px;
