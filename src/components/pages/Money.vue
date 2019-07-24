@@ -141,9 +141,9 @@
                     <span class="float-right" v-else>￥{{jiezhangDialog.modifyMoney}}</span>
                   </li>
                 </ul>
-                <div class="buttons">
-                  <button @click="xuanzehuiyuanDialog.isShow = true" class="my-btn">选择会员</button>
-                  <button @click="jiezhangDialogClickBtn"  class="my-btn">结账</button>
+                <div class="buttons" style="margin-top: 40px;">
+                  <el-button @click="xuanzehuiyuanDialog.isShow = true" class="my-btn">选择会员</el-button>
+                  <el-button @click="jiezhangDialogClickBtn"  class="my-btn active">结账</el-button>
                 </div>
               </div>
             </div>
@@ -1666,6 +1666,7 @@ export default {
                 message: '没有查询到该会员的信息',
                 type: 'error'
               })
+              this.jiezhangDialog.memberVip = {}
             }
           }).catch(err => {
             console.log(err)
@@ -2110,7 +2111,7 @@ export default {
             this.jiezhangDialog.nowWaiter = {
               id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
               name: '请选择服务员', // 服务员名称
-              type: '未知' // 服务类型
+              type: '' // 服务类型
             }
             this.jiezhangDialog.memberVip = {}
             this.chooeseGoods.goods = []
@@ -2361,16 +2362,17 @@ export default {
   .jiesuan-goods{
     overflow: hidden;
     height: calc(100vh - 110px);
-    padding-bottom: 10px;
+    /*padding-bottom: 10px;*/
     width: 100%;
     display: flex;
-    justify-content: space-between;
-    flex-wrap:nowrap;
+    /*justify-content: space-between;*/
+    /*flex-wrap:nowrap;*/
     flex-direction:column;
     .search{
       display: flex;
       background: none;
       border-radius:10px;
+      margin-bottom: 28px;
       .goods-search{
         font-size:22px;
         font-family:SourceHanSansCN-Regular;
@@ -2387,6 +2389,7 @@ export default {
       height:482px;
       overflow: auto;
       overflow: hidden;
+      margin-bottom: 28px;
       background:rgba(255,255,255,1);
       border-radius:10px;
       overflow-y: auto!important;
@@ -2481,11 +2484,11 @@ export default {
           margin-left: 5px;
           margin-right: 5px;
           color:rgba(46,202,241,1);
-          &:active{
-            border: 0;
-            background:rgba(45,194,243,1);
-            color:rgba(255,255,255,1);
-          }
+        }
+        .active{
+          border: 0;
+          background:rgba(45,194,243,1);
+          color:rgba(255,255,255,1);
         }
       }
     }

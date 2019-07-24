@@ -57,12 +57,14 @@ export default {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     overflow: hidden;
+    text-overflow:ellipsis;/*显示省略号来代表被修剪的文本*/
   }
   .overflow-row3-ellipsis{
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     overflow: hidden;
+    text-overflow:ellipsis;/*显示省略号来代表被修剪的文本*/
   }
   .my-primary-btn{
     color: #fff;
