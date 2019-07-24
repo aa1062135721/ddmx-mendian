@@ -2430,7 +2430,7 @@ export default {
   .caozuo-buttons{
     overflow: hidden;
     /*height: calc(100vh - 110px);*/
-    height: 800px;
+    height: 700px;
     /*border: 1px solid red;*/
     width: 100%;
     display: flex;
@@ -2458,6 +2458,7 @@ export default {
       color: #fff!important;
       background:rgba(245,86,86,1)!important;
     }
+
   }
   .jiesuan-goods{
     overflow: hidden;
