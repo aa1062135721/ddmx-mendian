@@ -42,7 +42,6 @@
             <div class="jiesuan-goods" >
               <div class="search">
                 <el-input class="goods-search" @keyup.native="getGoodByCondition" placeholder="商品名称/条形码"  v-model="sousuoshangpingDialog.title">
-<!--                  <el-button slot="append" icon="el-icon-search" @click="getGoodByConditionOk"></el-button>-->
                   <i slot="suffix" class="el-input__icon el-icon-search" @click="getGoodByConditionOk"></i>
                 </el-input>
               </div>
@@ -184,7 +183,7 @@
         <div class="clear-both both">
           <div class="float-left left">
             <div class="one">
-              <el-input @keyup.13.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')" v-model="chongzhiDialog.mobile" placeholder="请输入会员手机号" clearable maxlength="11"></el-input>
+              <el-input @keyup.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')" v-model="chongzhiDialog.mobile" placeholder="请输入会员手机号" clearable maxlength="11"></el-input>
             </div>
             <div class="two">
               <ul>
@@ -368,7 +367,7 @@
         <div class="clear-both div">
             <div class="float-left left">
               <div class="search">
-                <el-input @keyup.enter.native="clickChoosesMemberByKeyboard('ok')" v-model="xuanzehuiyuanDialog.mobile" placeholder="请输入会员手机号" maxlength="11"></el-input>
+                <el-input @keyup.native="clickChoosesMemberByKeyboard('ok')" v-model="xuanzehuiyuanDialog.mobile" placeholder="请输入会员手机号" maxlength="11"></el-input>
               </div>
               <div class="content">
                 <ul>
@@ -406,7 +405,7 @@
             <div class="float-left left">
               <div class="search-btns">
                 <el-button type="primary" @click="huiyuanDialog.addHuiyuanDialog.isShow = true">新增会员</el-button>
-                <el-input style="width:392px;" @keyup.enter.native="huiyuanDialogSearchMemberVip" v-model="huiyuanDialog.mobile" placeholder="请输入您需要查询的会员手机号码"  maxlength="11"></el-input>
+                <el-input style="width:392px;" @keyup.native="huiyuanDialogSearchMemberVip" v-model="huiyuanDialog.mobile" placeholder="请输入您需要查询的会员手机号码"  maxlength="11"></el-input>
                 <el-button  plain @click="huiyuanDialogSearchMemberVip">搜索</el-button>
               </div>
               <div class="user-info el-table--border">
@@ -531,7 +530,7 @@
        <div class="content">
          <div class="search">
            <el-input class="goods-search" @keyup.enter.native="goukaDialogChoosesCardType(0)"   placeholder="搜索服务卡名称"  v-model="goukaDialog.title">
-             <el-button slot="append" icon="el-icon-search" @click="goukaDialogChoosesCardType(0)"></el-button>
+             <i slot="suffix" class="el-input__icon el-icon-search" @click="goukaDialogChoosesCardType(0)"></i>
            </el-input>
          </div>
          <div class="tab-btns">
@@ -546,7 +545,7 @@
            <el-button @click="goukaDialogSearchCardsPre" class="btn">上一页</el-button>
            <el-button @click="goukaDialogSearchCardsNext" class="btn">下一页</el-button>
            <el-button @click="goukaDialog.isShow = false" class="btn">取消</el-button>
-           <el-button @click="goukaDialogNowBuy" class="btn">立即购买</el-button>
+           <el-button @click="goukaDialogNowBuy" class="btn active">立即购买</el-button>
          </div>
        </div>
       </el-dialog>
@@ -1668,44 +1667,46 @@ export default {
     // 选择会员
     clickChoosesMemberByKeyboard (code) {
       if (code === 'ok') {
-        if (/^[1][3,4,5,7,8][0-9]{9}$/.test(this.xuanzehuiyuanDialog.mobile)) {
-          let requestData = {mobile: this.xuanzehuiyuanDialog.mobile}
-          postSearchVip(requestData).then(res => {
-            if (res.data.id) {
-              this.jiezhangDialog.memberVip = res.data
-              this.xuanzehuiyuanDialog.isShow = false
-              this.jiezhangDialog.closedPayWay = [] //选择了会员，支付方式多了 会员卡和 赠送
-              //选择了会员，根据会员的等级，服务商品有会员价 刷新接口
-              if (this.requestFuwuGoodData.isChooeseFuwuGood) {
-                this.getServiceItemList()
+        if (this.xuanzehuiyuanDialog.mobile.length === 11) {
+          if (/^[1][3,4,5,7,8][0-9]{9}$/.test(this.xuanzehuiyuanDialog.mobile)) {
+            let requestData = {mobile: this.xuanzehuiyuanDialog.mobile}
+            postSearchVip(requestData).then(res => {
+              if (res.data.id) {
+                this.jiezhangDialog.memberVip = res.data
+                this.xuanzehuiyuanDialog.isShow = false
+                this.jiezhangDialog.closedPayWay = [] //选择了会员，支付方式多了 会员卡和 赠送
+                //选择了会员，根据会员的等级，服务商品有会员价 刷新接口
+                if (this.requestFuwuGoodData.isChooeseFuwuGood) {
+                  this.getServiceItemList()
+                }
+                //选择了会员，根据会员的等级，服务商品有会员价 刷新接口
+                if (this.chooeseGoods.fuwuGoods.length){
+                  this.getServiceItemList()
+                  this.requestFuwuGoodData.isChooeseFuwuGood = true
+                  this.requestGoodData.isChooeseFenleiGood = false
+                  this.chooeseGoods.fuwuGoods = []
+                }
+              } else {
+                this.$message.closeAll()
+                this.$message({
+                  message: '没有查询到该会员的信息',
+                  type: 'error'
+                })
+                this.jiezhangDialog.closedPayWay = [3,7] //没有选择了会员，支付方式少了 会员卡和 赠送
+                this.jiezhangDialog.memberVip = {}
               }
-              //选择了会员，根据会员的等级，服务商品有会员价 刷新接口
-              if (this.chooeseGoods.fuwuGoods.length){
-                this.getServiceItemList()
-                this.requestFuwuGoodData.isChooeseFuwuGood = true
-                this.requestGoodData.isChooeseFenleiGood = false
-                this.chooeseGoods.fuwuGoods = []
-              }
-            } else {
-              this.$message.closeAll()
-              this.$message({
-                message: '没有查询到该会员的信息',
-                type: 'error'
-              })
-              this.jiezhangDialog.closedPayWay = [3,7] //没有选择了会员，支付方式少了 会员卡和 赠送
-              this.jiezhangDialog.memberVip = {}
-            }
-          }).catch(err => {
-            console.log(err)
-          })
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请输入正确的手机号',
-            type: 'error'
-          })
-          this.jiezhangDialog.closedPayWay = [3,7] //没有选择了会员，支付方式少了 会员卡和 赠送
-          this.jiezhangDialog.memberVip = {}
+            }).catch(err => {
+              console.log(err)
+            })
+          } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '请输入正确的手机号',
+              type: 'error'
+            })
+            this.jiezhangDialog.closedPayWay = [3,7] //没有选择了会员，支付方式少了 会员卡和 赠送
+            this.jiezhangDialog.memberVip = {}
+          }
         }
       } else {
         if (this.xuanzehuiyuanDialog.mobile.length<11)
@@ -1728,6 +1729,9 @@ export default {
       }
     },
     chongzhiDialogSearchMemberVip () {
+      if (this.chongzhiDialog.mobile.length!==11){
+        return
+      }
       if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
         this.$message.closeAll()
         this.$message({
@@ -1817,26 +1821,34 @@ export default {
       }
     },
     huiyuanDialogSearchMemberVip () {
-      if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.huiyuanDialog.mobile)) {
-        this.$message.closeAll()
-        this.$message({
-          message: '请输入正确的手机号',
-          type: 'error'
-        })
-        return
-      }
-      this.huiyuanDialog.huiyuanInfo = {}
-      this.huiyuanDialog.fuwukaList = []
-      this.huiyuanDialog.chongzhijiluList = []
-      let requestData = {mobile: this.huiyuanDialog.mobile}
-      postSearchVip(requestData).then(res => {
+      if (this.huiyuanDialog.mobile.length === 11){
+        if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.huiyuanDialog.mobile)) {
+          this.$message.closeAll()
+          this.$message({
+            message: '请输入正确的手机号',
+            type: 'error'
+          })
+          return
+        }
+        this.huiyuanDialog.huiyuanInfo = {}
+        this.huiyuanDialog.fuwukaList = []
+        this.huiyuanDialog.chongzhijiluList = []
+        let requestData = {mobile: this.huiyuanDialog.mobile}
+        postSearchVip(requestData).then(res => {
         if (res.data.id) {
           this.huiyuanDialog.huiyuanInfo = res.data
           this.huiyuanDialogSearchRechargeLog()
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '没有查询到会员信息',
+            type: 'error'
+          })
         }
       }).catch(err => {
         console.log(err)
       })
+      }
     },
     huiyuanDialogAddMemberGetCode (code) {
       if (code === 'ok') {
@@ -2901,10 +2913,10 @@ export default {
           font-size:20px;
           font-family:SourceHanSansCN-Regular;
           font-weight:400;
-          &:active{
-            color: #ffffff;
-            background: #2DC2F3;
-          }
+        }
+        .active{
+          color: #ffffff;
+          background: #2DC2F3;
         }
       }
     }
