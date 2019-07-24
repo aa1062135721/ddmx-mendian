@@ -825,7 +825,6 @@ export default {
         modifyMoney: 0.00, // 改价参数,
         chooesePayWay: 1, // 支付方式
         closedPayWay: [ // 被禁用的支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
-          3,7
         ],
         // 支付完成之后弹出的结账成功弹框
         jiezhangSuccessDialog: {
@@ -1691,7 +1690,6 @@ export default {
               if (res.data.id) {
                 this.jiezhangDialog.memberVip = res.data
                 this.xuanzehuiyuanDialog.isShow = false
-                this.jiezhangDialog.closedPayWay = [] //选择了会员，支付方式多了 会员卡和 赠送
                 //选择了会员，根据会员的等级，服务商品有会员价 刷新接口
                 if (this.requestFuwuGoodData.isChooeseFuwuGood) {
                   this.getServiceItemList()
@@ -1709,7 +1707,6 @@ export default {
                   message: '没有查询到该会员的信息',
                   type: 'error'
                 })
-                this.jiezhangDialog.closedPayWay = [3,7] //没有选择了会员，支付方式少了 会员卡和 赠送
                 this.jiezhangDialog.memberVip = {}
               }
             }).catch(err => {
@@ -1721,9 +1718,10 @@ export default {
               message: '请输入正确的手机号',
               type: 'error'
             })
-            this.jiezhangDialog.closedPayWay = [3,7] //没有选择了会员，支付方式少了 会员卡和 赠送
             this.jiezhangDialog.memberVip = {}
           }
+        } else {
+          this.jiezhangDialog.memberVip = {}
         }
       } else {
         if (this.xuanzehuiyuanDialog.mobile.length<11)
@@ -2134,6 +2132,8 @@ export default {
         })
         return
       }
+      //这人需要确定用户的支付方式
+      this.confirmPayWay()
       this.jiezhangDialog.isShow = true
     },
     jiezhangDialogChoosesPayWay (way) {
@@ -2264,7 +2264,31 @@ export default {
           console.log(err)
         })
       }
-    }
+    },
+    //结账时可选支付方式
+    confirmPayWay () {
+      if (this.jiezhangDialog.memberVip.id) {//选择了会员
+        if (this.chooeseGoods.fuwuGoods.length){
+          this.jiezhangDialog.closedPayWay = [8]
+        }
+        if (this.chooeseGoods.goods.length){
+          this.jiezhangDialog.closedPayWay = []
+        }
+        if (this.chooeseGoods.cardList.length){
+          this.jiezhangDialog.closedPayWay = []
+        }
+      } else {//没有选择会员
+        if (this.chooeseGoods.fuwuGoods.length){
+          this.jiezhangDialog.closedPayWay = [3,7,8]
+        }
+        if (this.chooeseGoods.goods.length){
+          this.jiezhangDialog.closedPayWay = [3,7]
+        }
+        if (this.chooeseGoods.cardList.length){
+          this.jiezhangDialog.closedPayWay = [3,7]
+        }
+      }
+    },
   }
 }
 </script>
