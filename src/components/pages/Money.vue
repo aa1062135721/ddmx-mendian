@@ -42,7 +42,8 @@
             <div class="jiesuan-goods" >
               <div class="search">
                 <el-input class="goods-search" @keyup.native="getGoodByCondition" placeholder="商品名称/条形码"  v-model="sousuoshangpingDialog.title">
-                  <el-button slot="append" icon="el-icon-search" @click="getGoodByConditionOk"></el-button>
+<!--                  <el-button slot="append" icon="el-icon-search" @click="getGoodByConditionOk"></el-button>-->
+                  <i slot="suffix" class="el-input__icon el-icon-search" @click="getGoodByConditionOk"></i>
                 </el-input>
               </div>
               <div class="pay-goods-box">

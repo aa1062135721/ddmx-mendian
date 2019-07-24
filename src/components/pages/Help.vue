@@ -250,14 +250,14 @@ export default {
         height: calc(100% - 68px);
         width:1436px;
         overflow: auto;
+        overflow-x: hidden;
         background: #fff;
         .title{
           font-size:30px;
-          height: 35px;
           line-height: 35px;
           font-family:SourceHanSansCN-Regular;
           font-weight:400;
-          color:rgba(26,26,26,1);text-align: center;margin: 30px 0;
+          color:rgba(26,26,26,1);text-align: center;margin: 50px 0;
         }
         .content{
            font-size:20px;
@@ -266,9 +266,10 @@ export default {
            color:rgba(26,26,26,1);
            line-height:30px;
            text-align:justify;
-           width:calc(1436px - 48px);
-           padding: 0 24px 30px 24px;
+           width:calc(1436px - 60px);
+           padding: 30px;
            height: calc(100% - 95px - 30px);
+           margin-top: 50px;
         }
       }
     }
