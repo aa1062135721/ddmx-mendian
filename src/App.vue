@@ -55,7 +55,7 @@ export default {
   .overflow-row2-ellipsis{
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     overflow: hidden;
     text-overflow:ellipsis;/*显示省略号来代表被修剪的文本*/
   }

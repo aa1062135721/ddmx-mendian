@@ -242,6 +242,15 @@ export const postMemberInfo = (data = null) => {
 }
 
 /**
+ * 订单管理-获取会员信息
+ * @param data
+ * @returns {*}
+ */
+export const postMemberLevelInfo = (data = null) => {
+  return Vue.prototype.$post('/index/level_info', data)
+}
+
+/**
  * 订单管理-门店订单详情
  * @param data
  * @returns {*}

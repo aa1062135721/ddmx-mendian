@@ -28,8 +28,8 @@
           </div>
           <div style="width: 154px;overflow: hidden;">
             <div class="caozuo-buttons">
-              <el-button @click="clickAddNumShoppingCarGood" class="caozuo-button" type="primary" style="font-size: 45px;">&nbsp;&nbsp;+&nbsp;&nbsp;</el-button>
-              <el-button @click="clickSubNumShoppingCarGood" class="caozuo-button" type="primary">&nbsp;&nbsp;-&nbsp;&nbsp;</el-button>
+              <el-button @click="clickAddNumShoppingCarGood" class="caozuo-button" type="primary" style="font-size: 30px!important;font-weight: bolder!important;">&nbsp;&nbsp;+&nbsp;&nbsp;</el-button>
+              <el-button @click="clickSubNumShoppingCarGood" class="caozuo-button" type="primary"  style="font-size: 30px!important;font-weight: bolder!important;">&nbsp;&nbsp;-&nbsp;&nbsp;</el-button>
               <el-button @click="clickBtnXiugaishuliangShoppingCarGood" class="caozuo-button" type="primary">数量</el-button>
               <el-button @click="clickBtnXiugaijiageShoppingCarGood" class="caozuo-button" type="primary">改价</el-button>
               <el-button @click="clickDelShoppingCarGood" class="caozuo-button" type="primary">删除</el-button>
@@ -201,7 +201,7 @@
                 </li>
                 <li>
                   <span class="float-left">会员等级</span>
-                  <span class="float-right">{{ chongzhiDialog.huiyuanInfo.level_name }}&nbsp;<i class="el-icon-question font-blue" @click="chongzhiDialog.isShowHuiyuanDengjiDialog = true"></i></span>
+                  <span class="float-right">{{ chongzhiDialog.huiyuanInfo.level_name }}&nbsp;<i class="el-icon-question font-blue" @click="getMemberLevelInfo"></i></span>
                 </li>
               </ul>
             </div>
@@ -225,13 +225,9 @@
         </div>
       </el-dialog>
       <!--会员等级说明弹框-->
-      <el-dialog class="huiyuandengjishuoming-tanchuan" title="会员等级说明" :visible.sync="chongzhiDialog.isShowHuiyuanDengjiDialog" width="372px" :center="true">
+      <el-dialog class="huiyuandengjishuoming-tanchuan" title="会员等级说明" :visible.sync="chongzhiDialog.isShowHuiyuanDengjiDialog.isShow" width="480px" :center="true">
         <div class="content">
-          <span>三星会员：充值200</span>
-          <span>四星会员：充值200</span>
-          <span>五星会员：充值200</span>
-          <span>六星会员：充值200</span>
-          <span>七星会员：充值200</span>
+          <span class="overflow-row2-ellipsis" v-for="item in chongzhiDialog.isShowHuiyuanDengjiDialog.responseData">{{item.level_name}}：充值{{item.price}}</span>
         </div>
       </el-dialog>
       <!--结账弹框-->
@@ -569,7 +565,7 @@ import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-o
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
 import BScroll from 'better-scroll' // 滚动插件
-import { postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords } from '../../api/getData'
+import { postMemberLevelInfo, postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -757,7 +753,19 @@ export default {
           // amount: '0.05', // 累积充值
           // regtime: '1970-01-01 08:33:37'// 加入时间
         },
-        isShowHuiyuanDengjiDialog: false, // 等级说明弹框显示与否
+        isShowHuiyuanDengjiDialog:{
+          isShow:false,// 等级说明弹框显示与否
+          responseData:[
+            // {
+            //   price: "80.00",   //充值金额
+            //   level_name: "五级会员"    //会员名称
+            // },
+            // {
+            //   price: "60.00",
+            //   level_name: "四级会员"
+            // }
+          ]
+        },
         payType: '5', // 充值方式
         payMoney: '' // 充值金额
       },
@@ -866,6 +874,15 @@ export default {
     this.getWaiterList()
   },
   methods: {
+    //获取会员等级说明
+    async getMemberLevelInfo(){
+      await postMemberLevelInfo().then(res=>{
+        if (res.code === '200') {
+          this.chongzhiDialog.isShowHuiyuanDengjiDialog.responseData = res.data
+          this.chongzhiDialog.isShowHuiyuanDengjiDialog.isShow = true
+        }
+      })
+    },
     // 将商品加入购物车
     addShoppingCar (good) {
       // 服务商品
@@ -2644,15 +2661,14 @@ export default {
   /*会员等级说明弹框样式*/
   .huiyuandengjishuoming-tanchuan{
     .content{
-      width: 332px;
+      width: 432px;
       display: flex;
       flex-direction:row;
       flex-wrap: wrap;
-      justify-content:flex-start;
+      justify-content:space-between;
       span{
-        width:150px;
-        height:20px;
-        overflow: hidden;
+        width:200px;
+        height:40px;
         line-height: 20px;
         font-size:16px;
         margin-bottom: 18px;
@@ -2661,6 +2677,9 @@ export default {
         font-family:SourceHanSansCN-Regular;
         font-weight:400;
         color:rgba(128,128,128,1);
+        &:nth-child(2n){
+          text-align: right;
+        }
       }
     }
   }
