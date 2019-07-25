@@ -363,8 +363,7 @@ export const postTransferSlipList = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 列表
- 其他信息不允许编辑
+ * 订单管理-库存管理 - 调拨单 - 新增
  * @param data
  * @returns {*}
  */
@@ -373,8 +372,80 @@ export const postTransferSlipAdd = (data = null) => {
 }
 
 /**
+ * 订单管理-库存管理 - 调拨单 - 删除
+ * @param data
+ * @returns {*}
+ */
+export const postTransferSlipDel = (data = null) => {
+  return Vue.prototype.$post('/allot/del', data)
+}
+
+/**
+ * 订单管理-库存管理 - 调拨单 - 发货弹框-获取调拨单信息
+ * @param data
+ * @returns {*}
+ */
+export const postTransferSlipSendGoodsGetInfo = (data = null) => {
+  return Vue.prototype.$post('/allot/out_shop_list', data)
+}
+
+/**
+ * 订单管理-库存管理 - 调拨单 - 发货弹框-获取商品列表
+ * @param data
+ * @returns {*}
+ */
+export const postTransferSlipSendGoodsGetGoodList = (data = null) => {
+  return Vue.prototype.$post('/allot/out_shop_item', data)
+}
+
+/**
+ * 订单管理-库存管理 - 调拨单 - 发货
+ * @param data
+ * @returns {*}
+ */
+export const postTransferSlipSendGoods = (data = null) => {
+  return Vue.prototype.$post('/allot/out_shop', data)
+}
+
+/**
+ * 订单管理-库存管理 - 调拨单 - 取消发货
+ * @param data
+ * @returns {*}
+ */
+export const postTransferSlipSendGoodsCancel = (data = null) => {
+  return Vue.prototype.$post('/allot/shop_cancel', data)
+}
+
+
+/**
+ * 订单管理-库存管理 - 调拨单 - 详情
+ * @param data
+ * @returns {*}
+ */
+export const postTransferSlipDetails = (data = null) => {
+  return Vue.prototype.$post('/allot/allot_confirm_list', data)
+}
+
+/**
+ * 订单管理-库存管理 - 调拨单 - 详情-商品列表 ?确认收货列表表单
+ * @param data
+ * @returns {*}
+ */
+export const postTransferSlipGoodsDetails = (data = null) => {
+  return Vue.prototype.$post('/allot/allot_confirm_list_table', data)
+}
+
+/**
+ * 订单管理-库存管理 - 调拨单 - 确认收货
+ * @param data
+ * @returns {*}
+ */
+export const postTransferSlipConfirmGoods = (data = null) => {
+  return Vue.prototype.$post('/allot/confirm_shop', data)
+}
+
+/**
  * 订单管理-库存管理 - 调拨单 - 调入，调出 仓库列表
- 其他信息不允许编辑
  * @param data
  * @returns {*}
  */

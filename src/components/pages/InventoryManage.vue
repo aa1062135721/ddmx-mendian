@@ -60,16 +60,18 @@
               <el-table-column label="状态">
                 <template slot-scope="scope">
                  <span v-if="scope.row.status === 1">调拨中</span>
-                 <span v-if="scope.row.status === 0">代发货</span>
+                 <span v-if="scope.row.status === 0">待发货</span>
                  <span v-if="scope.row.status === 2">已完成</span>
                 </template>
               </el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button type="text" size="mini" v-if="scope.row.status === 0">发货</el-button>
-                  <el-button type="text" size="mini">打印</el-button>
-                  <el-button type="text" size="mini">编辑/详情</el-button>
-                  <el-button type="text" size="mini" v-if="scope.row.status === 0">删除</el-button>
+                  <el-button type="text" size="mini" v-if="scope.row.status === 0" @click="clickTransferSlipSendGoods(scope.row.id)">发货</el-button>
+                  <el-button type="text" size="mini" v-if="scope.row.status === 1" @click="clickTransferSlipSendGoodsCancel(scope.row.id)">取消发货</el-button>
+                  <el-button type="text" size="mini" @click="transferSlipPageData.printingDialog.isShow = true">打印</el-button>
+                  <el-button type="text" size="mini" v-if="scope.row.status === 1" @click="clickTransferSlipDetails(scope.row.id)">确认收货</el-button>
+                  <el-button type="text" size="mini" v-if="scope.row.status === 0" @click="clickTransferSlipDel(scope.row.id)">删除</el-button>
+                  <el-button type="text" size="mini" @click="clickTransferSlipDetails(scope.row.id)">详情</el-button>
                 </template>
               </el-table-column>
 
@@ -188,28 +190,25 @@
           <!-- 调拨单--发货-->
           <el-dialog  :visible.sync="transferSlipPageData.sendGoodsDialog.isShow" title="发货"  width="968px" :center="true">
             <div class="flex-space-between" style="margin-bottom: 15px;">
-              <span>调拨单号：XXXX</span>
-              <span>调拨仓库：XXXXXX</span>
-              <span>调拨人员：XXXXXX</span>
-              <span>调拨时间：2017-11-20 13:15:32</span>
+              <span>调拨单号：{{transferSlipPageData.sendGoodsDialog.responseData.sn}}</span>
+              <span>调拨仓库：{{transferSlipPageData.sendGoodsDialog.responseData.shop_name}}</span>
+              <span>调拨人员：{{transferSlipPageData.sendGoodsDialog.responseData.creator}}</span>
+              <span>调拨时间：{{transferSlipPageData.sendGoodsDialog.responseData.time}}</span>
             </div>
             <div style="margin-bottom: 5px;">
-              <span>备注：无大神打发第三方大神的法定分</span>
+              <span>备注：{{transferSlipPageData.sendGoodsDialog.responseData.remark}}</span>
             </div>
             <div>
-              <el-table border style="width: 100%;">
-                <el-table-column ></el-table-column>
-                <el-table-column prop="num" label="商品名称"></el-table-column>
-                <el-table-column prop="real_price" label="条形码"></el-table-column>
-                <el-table-column prop="price" label="一级分类"></el-table-column>
-                <el-table-column prop="pay_all_price" label="二级分类"></el-table-column>
-                <el-table-column prop="pay_all_price" label="库存"></el-table-column>
-                <el-table-column prop="pay_all_price" label="单价"></el-table-column>
+              <el-table :data="transferSlipPageData.sendGoodsDialog.responseGoodList" border style="width: 100%;">
+                <el-table-column type="index" label="序号"></el-table-column>
+                <el-table-column prop="item" label="商品名称"></el-table-column>
+                <el-table-column prop="bar_code" label="条形码"></el-table-column>
+                <el-table-column prop="num" label="发货数量"></el-table-column>
               </el-table>
             </div>
             <div style="text-align: center;margin-top: 20px;">
               <el-button class="my-secondary-btn" @click="transferSlipPageData.sendGoodsDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn">确定发货</el-button>
+              <el-button class="my-primary-btn" @click="clickTransferSlipSendGoodsOk(transferSlipPageData.sendGoodsDialog.id)">确定发货</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--打印-->
@@ -239,21 +238,21 @@
             </div>
             <div style="text-align: center;margin-top: 20px;">
               <el-button class="my-secondary-btn" @click="transferSlipPageData.printingDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn">打印</el-button>
+              <el-button class="my-primary-btn" @click="window.print()">打印</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--调拨详情-->
           <el-dialog  :visible.sync="transferSlipPageData.detailsDialog.isShow" title="调拨详情" width="968px" :center="true">
             <div>
-              <el-steps :active="1" finish-status="success" align-center="true">
+              <el-steps :active="transferSlipPageData.detailsDialog.responseData.status + 1" finish-status="success" :align-center="true">
                 <el-step>
                   <template slot="title" >
-                    <div style="color: #303133;font-weight: 700;">调拨(<span style="color: #1A1A1A;font-weight: normal;">总公司</span>)</div>
+                    <div style="color: #303133;font-weight: 700;">调拨(<span style="color: #1A1A1A;font-weight: normal;">{{transferSlipPageData.detailsDialog.responseData.out_shop}}</span>)</div>
                   </template>
                   <template slot="description">
-                    <span style="color: black;">张三</span>
+                    <span style="color: black;">{{transferSlipPageData.detailsDialog.responseData.creator}}</span>
                     <br>
-                    <span style="color: black;">2019-10-12 12：12：12</span>
+                    <span style="color: black;">{{transferSlipPageData.detailsDialog.responseData.create_time}}</span>
                   </template>
                 </el-step>
                 <el-step>
@@ -261,39 +260,35 @@
                     <div style="color: #303133;font-weight: 700;">发货</div>
                   </template>
                   <template slot="description" >
-                    <span style="color: black;">李四</span>
+                    <span style="color: black;">{{transferSlipPageData.detailsDialog.responseData.out_admin_user || '发货人'}}</span>
                     <br>
-                    <span style="color: black;">2019-10-13 12：12：12</span>
+                    <span style="color: black;">{{transferSlipPageData.detailsDialog.responseData.out_time}}</span>
                   </template>
                 </el-step>
                 <el-step title="">
                   <template slot="title">
-                    <div style="color: #303133;font-weight: 700;">确认收货(<span style="color: #1A1A1A;font-weight: normal;">江与城店</span>)</div>
+                    <div style="color: #303133;font-weight: 700;">确认收货(<span style="color: #1A1A1A;font-weight: normal;">{{transferSlipPageData.detailsDialog.responseData.in_shop}}</span>)</div>
                   </template>
                   <template slot="description" >
-                    <span class="font-red">到期时间</span>
+                    <span class="font-red">{{transferSlipPageData.detailsDialog.responseData.in_admin_user}}</span>
                     <br>
-                    <span class="font-red">2019-10-13 12：12：12</span>
+                    <span class="font-red">{{transferSlipPageData.detailsDialog.responseData.in_time}}</span>
                   </template>
                 </el-step>
               </el-steps>
             </div>
             <div style="margin-top: 30px;">
-              <el-table border style="width: 100%;">
-                <el-table-column label="序号">序号</el-table-column>
-                <el-table-column prop="num" label="商品名称"></el-table-column>
-                <el-table-column prop="real_price" label="条形码"></el-table-column>
-                <el-table-column prop="real_price" label="当前库存"></el-table-column>
-                <el-table-column prop="price" label="调拨数量"></el-table-column>
+              <el-table :data="transferSlipPageData.detailsDialog.responseGoodList" border style="width: 100%;">
+                <el-table-column type="index" label="序号"></el-table-column>
+                <el-table-column prop="item" label="商品名称"></el-table-column>
+                <el-table-column prop="bar_code" label="条形码"></el-table-column>
+                <el-table-column prop="stock" label="当前库存"></el-table-column>
+                <el-table-column prop="num" label="调拨数量"></el-table-column>
               </el-table>
             </div>
-            <div style="text-align: center;margin-top: 20px;">
-              <el-button class="my-secondary-btn">取消</el-button>
-              <el-button class="my-primary-btn">取消发货</el-button>
-            </div>
-            <div style="text-align: center;margin-top: 20px;">
+            <div style="text-align: center;margin-top: 20px;"  v-if="transferSlipPageData.detailsDialog.responseData.status === 1">
               <el-button class="my-secondary-btn" @click="transferSlipPageData.detailsDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn">确认收货</el-button>
+              <el-button class="my-primary-btn" @click="clickTransferSlipConfirmGoods(transferSlipPageData.detailsDialog.responseData.id)">确认收货</el-button>
             </div>
           </el-dialog>
         </el-tab-pane>
@@ -672,7 +667,7 @@
 </template>
 
 <script>
-import { postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
+import { postTransferSlipConfirmGoods, postTransferSlipSendGoodsGetInfo, postTransferSlipSendGoodsGetGoodList, postTransferSlipGoodsDetails, postTransferSlipDetails, postTransferSlipSendGoods, postTransferSlipSendGoodsCancel, postTransferSlipDel, postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
 export default {
   name: 'InventoryManage', // 库存管理，进销存
   data () {
@@ -764,7 +759,27 @@ export default {
         },
         // 发货弹框
         sendGoodsDialog: {
-          isShow: false
+          isShow: false,
+          id:0,//需要发货的调拨单id
+          // 调拨单信息
+          responseData:{
+           // sn: "DB2019072300001",
+           // shop_name: "留云路店",
+           // creator: "堕落嚣张",
+           // time: "2019-07-23 15:38:57",
+           // remark: "",
+           // id: 1
+          },
+          //发货商品列表
+          responseGoodList:[
+            {
+              // item_id: 27,
+              // item: "港版美素佳儿1段  1罐装",
+              // num: 1,
+              // bar_code: "暂无条形码",
+              // stock: 0
+            }
+          ],
         },
         // 打印
         printingDialog: {
@@ -772,7 +787,38 @@ export default {
         },
         // 调拨详情
         detailsDialog: {
-          isShow: false
+          isShow: false,
+          responseData:{
+            // amount: null,
+            // create_time: "2019-07-25 14:45:26",
+            // creator: "公司帐户",
+            // creator_id: 177,
+            // del: "1",
+            // id: 14,
+            // in_admin_id: 0,
+            // in_admin_user: "到期时间",
+            // in_shop: "测试门店10",
+            // in_time: "2019-07-26 14:45:40",
+            // number: 1,
+            // out_admin_id: null,
+            // out_admin_user: null,
+            // out_shop: "测试WY",
+            // out_time: "2019-07-25 14:45:40",
+            // remark: "发斯蒂芬",
+            // sn: "DB2019072500004",
+            // status: 1,
+            // type: 1,
+            // union_code: null,
+          },
+          responseGoodList:[
+            {
+              // item_id: 27,
+              // item: "港版美素佳儿1段  1罐装",
+              // num: 1,
+              // bar_code: "暂无条形码",
+              // stock: 0
+            }
+          ]
         }
       },
       transferSlipRequestData: {
@@ -1036,6 +1082,88 @@ export default {
           this.transferSlipPageData.list = res.data ? res.data : []
       })
     },
+    //删除调拨单
+    clickTransferSlipDel(id){
+      this.$confirm('您确认删除本条调拨信息吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        postTransferSlipDel({id:id}).then(res=>{
+          if (res.result) {
+            this.getTransferSlipList()
+          }
+        })
+      }).catch(() => {
+      });
+    },
+    //调拨单取消发货操作
+    clickTransferSlipSendGoodsCancel(id){
+      this.$confirm('您确认取消发货操作吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        postTransferSlipSendGoodsCancel({id}).then(res=>{
+          if (res.result){
+            this.getTransferSlipList()
+          }
+        })
+      }).catch(() => {
+      });
+
+    },
+    //调拨单发货弹框展示操作
+    async clickTransferSlipSendGoods(id){
+      this.transferSlipPageData.sendGoodsDialog.id = id
+      await postTransferSlipSendGoodsGetGoodList({id}).then(res=>{
+        this.transferSlipPageData.sendGoodsDialog.responseGoodList = res.data
+      })
+      await postTransferSlipSendGoodsGetInfo({id}).then(res=>{
+        this.transferSlipPageData.sendGoodsDialog.responseData = res.data
+      })
+      this.transferSlipPageData.sendGoodsDialog.isShow = true
+    },
+    //调拨单确认发货
+    clickTransferSlipSendGoodsOk(id){
+      this.$confirm('您确认进行发货操作吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        postTransferSlipSendGoods({id}).then(res=>{
+          if (res.result){
+            this.getTransferSlipList()
+            this.transferSlipPageData.sendGoodsDialog.isShow = true
+          }
+        })
+      }).catch(() => {
+      });
+    },
+    //调拨单详情
+    async clickTransferSlipDetails(id){
+      await postTransferSlipDetails({id}).then(res=>{
+        this.transferSlipPageData.detailsDialog.responseData = res.data
+      })
+      await postTransferSlipGoodsDetails({id}).then(res=>{
+        this.transferSlipPageData.detailsDialog.responseGoodList = res.data
+        this.transferSlipPageData.detailsDialog.isShow = true
+      })
+    },
+    //调拨单确认收货
+    clickTransferSlipConfirmGoods(id){
+      this.$confirm('您正在进行确认收货操作？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        postTransferSlipConfirmGoods({id}).then(res=>{
+          this.getTransferSlipList()
+          this.transferSlipPageData.detailsDialog.isShow = false
+        })
+      }).catch(() => {
+      })
+    },
     //新增调拨单弹框显示
     transferSlipAddDialogShow(){
       // 获取一级分类
@@ -1173,7 +1301,9 @@ export default {
         data.remark.push(this.transferSlipPageData.addDialog.list[i].remark)
       }
       postTransferSlipAdd({data:data}).then(res=>{
-        console.log(res)
+        this.transferSlipPageData.addDialog.isShow = false
+        this.transferSlipRequestData.page = 1
+        this.getTransferSlipList()
       })
     },
     //获取仓库列表
