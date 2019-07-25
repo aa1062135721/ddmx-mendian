@@ -351,3 +351,23 @@ export const postCheckLossOrWinOrderList = (data = null) => {
 export const postCheckLossOrWinOrderDetails = (data = null) => {
   return Vue.prototype.$post('/Check/inventory_info', data)
 }
+
+/**
+ * 订单管理-库存管理 - 调拨单 - 列表
+ 其他信息不允许编辑
+ * @param data
+ * @returns {*}
+ */
+export const postTransferSlipList = (data = null) => {
+  return Vue.prototype.$post('/allot/index', data)
+}
+
+/**
+ * 订单管理-库存管理 - 调拨单 - 调入，调出 仓库列表
+ 其他信息不允许编辑
+ * @param data
+ * @returns {*}
+ */
+export const postShopList = (data = null) => {
+  return Vue.prototype.$post('/index/shop_list', data)
+}

@@ -4,48 +4,57 @@
         <el-tab-pane label="调拨单" name="1">
           <div>
             <div class="search">
-              <el-select  clearable placeholder="选择调入仓库" v-model="transferSlipRequestData.status">
-                <el-option v-for="item in transferSlipPageData.status" :label="item.name" :key="item.id" :value="item.id"></el-option>
+              <el-select  clearable placeholder="选择调入仓库" v-model="transferSlipRequestData.in_shop">
+                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
+              </el-select>
+              <el-select  clearable placeholder="选择调出仓库" v-model="transferSlipRequestData.out_shop">
+                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
               </el-select>
               <el-select  clearable placeholder="选择状态" v-model="transferSlipRequestData.status">
                 <el-option v-for="item in transferSlipPageData.status" :label="item.name" :key="item.id" :value="item.id"></el-option>
               </el-select>
-              <el-select  clearable placeholder="需要查询的时间" v-model="transferSlipRequestData.selectTimeStatus">
-                <el-option v-for="item in transferSlipPageData.selectTimeStatus" :label="item.name" :key="item.id" :value="item.id"></el-option>
+              <el-select  clearable placeholder="需要查询的时间" v-model="transferSlipRequestData.time">
+                <el-option v-for="item in transferSlipPageData.time" :label="item.name" :key="item.id" :value="item.id"></el-option>
               </el-select>
               <el-date-picker
                 type="daterange"
-                v-model="transferSlipRequestData.time"
+                v-model="transferSlipRequestData.start_end_time"
                 range-separator="至"
                 value-format="yyyy-MM-dd"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期">
               </el-date-picker>
-              <el-input style="width: 300px;" v-model="transferSlipRequestData.title" placeholder="请输入需查询的订单号/商品名" clearable>
+              <el-input style="width: 300px;" v-model="transferSlipRequestData.search" placeholder="请输入需查询的订单号/商品名" clearable>
               </el-input>
               <el-button>搜索</el-button>
             </div>
             <div class="search" style="margin-top: 15px;">
               <el-button>导出</el-button>
-              <el-button @click="transferSlipPageData.addDialog.isShow = true">新增调拨</el-button>
+              <el-button @click="transferSlipAddDialogShow">新增调拨</el-button>
             </div>
           </div>
           <div style="margin-top: 15px;">
-            <el-table  border style="width: 100%;" height="620">
-              <el-table-column prop="sn" label="调拨信息"></el-table-column>
-              <el-table-column label="商品信息"></el-table-column>
+            <el-table  :data="transferSlipPageData.list" border style="width: 100%;" height="620">
+              <el-table-column  label="调拨信息"></el-table-column>
+              <el-table-column prop="item" label="商品信息"></el-table-column>
               <el-table-column prop="amount" label="单位成本"></el-table-column>
-              <el-table-column label="商品成本"></el-table-column>
-              <el-table-column label="调拨数量"></el-table-column>
-              <el-table-column label="发货信息"></el-table-column>
-              <el-table-column label="入库信息"></el-table-column>
-              <el-table-column label="状态"></el-table-column>
+              <el-table-column  label="商品成本"></el-table-column>
+              <el-table-column prop="number" label="调拨数量"></el-table-column>
+              <el-table-column prop="out_message" label="发货信息"></el-table-column>
+              <el-table-column prop="in_message" label="入库信息"></el-table-column>
+              <el-table-column label="状态">
+                <template slot-scope="scope">
+                 <span v-if="scope.row.status === 1">调拨中</span>
+                 <span v-if="scope.row.status === 0">代发货</span>
+                 <span v-if="scope.row.status === 2">已完成</span>
+                </template>
+              </el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button type="text" size="mini">发货</el-button>
+                  <el-button type="text" size="mini" v-if="scope.row.status === 0">发货</el-button>
                   <el-button type="text" size="mini">打印</el-button>
                   <el-button type="text" size="mini">编辑/详情</el-button>
-                  <el-button type="text" size="mini">删除</el-button>
+                  <el-button type="text" size="mini" v-if="scope.row.status === 0">删除</el-button>
                 </template>
               </el-table-column>
 
@@ -64,7 +73,9 @@
           <!-- 调拨单--新增调拨-->
           <el-dialog  :visible.sync="transferSlipPageData.addDialog.isShow" title="调拨"  width="968px" :center="true">
             <div>
-              <el-select  clearable placeholder="选择调入仓库" ></el-select>
+              <el-select  clearable placeholder="选择调入仓库" v-model="transferSlipPageData.addDialog.allot_in">
+                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
+              </el-select>
               <el-button @click="transferSlipPageData.chooseGoodsDialog.isShow = true">选择商品</el-button>
             </div>
             <div style="margin-top: 15px;">
@@ -109,23 +120,39 @@
           <!-- 调拨单--新增调拨 选择商品-->
           <el-dialog  :visible.sync="transferSlipPageData.chooseGoodsDialog.isShow" title="选择商品" width="968px" :center="true">
             <div style="margin-bottom: 15px;">
-              <el-input placeholder="请输入商品名称" style="width: 180px;"></el-input>
-              <el-input placeholder="请输入条形码" style="width: 180px;"></el-input>
-              <el-select  clearable placeholder="选择一级分类" >
+              <el-input placeholder="请输入商品名称" style="width: 180px;" v-model="transferSlipPageData.chooseGoodsDialog.title"></el-input>
+              <el-input placeholder="请输入条形码" style="width: 180px;"  v-model="transferSlipPageData.chooseGoodsDialog.title"></el-input>
+              <el-select  clearable placeholder="选择一级分类" v-model="transferSlipPageData.chooseGoodsDialog.topCategoryId" @change="clickTransferSlipAddTwoCategory">
+                <el-option
+                  v-for="item in transferSlipPageData.chooseGoodsDialog.topCategory"
+                  :label="item.cname"
+                  :key="item.id"
+                  :value="item.id">
+                </el-option>
               </el-select>
-              <el-select  clearable placeholder="选择二级分类" >
+              <el-select  clearable placeholder="选择二级分类" v-model="transferSlipPageData.chooseGoodsDialog.twoCategoryId">
+                <el-option
+                  v-for="item in transferSlipPageData.chooseGoodsDialog.twoCategory"
+                  :label="item.cname"
+                  :key="item.id"
+                  :value="item.id">
+                </el-option>
               </el-select>
               <el-button>查询</el-button>
             </div>
             <div>
-              <el-table border style="width: 100%;">
-                <el-table-column ></el-table-column>
-                <el-table-column prop="num" label="商品名称"></el-table-column>
-                <el-table-column prop="real_price" label="条形码"></el-table-column>
-                <el-table-column prop="price" label="一级分类"></el-table-column>
-                <el-table-column prop="pay_all_price" label="二级分类"></el-table-column>
-                <el-table-column prop="pay_all_price" label="库存"></el-table-column>
-                <el-table-column prop="pay_all_price" label="单价"></el-table-column>
+              <el-table
+                :data="transferSlipPageData.chooseGoodsDialog.list"
+                tooltip-effect="dark"
+                @selection-change="clickTransferSlipAddGoodsChange"
+                border style="width: 100%;">
+                <el-table-column type="selection" width="55"></el-table-column>
+                <el-table-column prop="title" label="条形码"></el-table-column>
+                <el-table-column prop="title" label="商品名称"></el-table-column>
+                <el-table-column prop="type_id" label="一级分类"></el-table-column>
+                <el-table-column prop="type" label="二级分类"></el-table-column>
+                <el-table-column prop="stock" label="库存"></el-table-column>
+                <el-table-column prop="selling_price" label="单价"></el-table-column>
               </el-table>
             </div>
             <div style="text-align: center;margin-top: 20px;">
@@ -248,9 +275,9 @@
         <el-tab-pane label="盘点单" name="2">
           <div>
             <div class="search">
-              <el-select  clearable placeholder="选择盘点仓库"  v-model="checkOrderRequestData.status">
+              <el-select  clearable placeholder="选择盘点仓库"  v-model="checkOrderRequestData.shop">
                 <el-option
-                  v-for="item in checkOrderPageData.status"
+                  v-for="item in shopList"
                   :label="item.name"
                   :key="item.id"
                   :value="item.id">
@@ -463,8 +490,8 @@
         <el-tab-pane label="盘亏单" name="3">
           <div>
             <div class="search">
-              <el-select  clearable placeholder="选择盘点仓库"  v-model="checkLossOrderRequestData.status">
-                <el-option v-for="item in checkLossOrderPageData.status" :label="item.name" :key="item.id" :value="item.id"></el-option>
+              <el-select  clearable placeholder="选择盘点仓库"  v-model="checkLossOrderRequestData.shop">
+                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
               </el-select>
               <el-select  clearable placeholder="选择状态" v-model="checkLossOrderRequestData.status">
                 <el-option v-for="item in checkLossOrderPageData.status" :label="item.name" :key="item.id" :value="item.id"></el-option>
@@ -541,8 +568,8 @@
         <el-tab-pane label="盘盈单" name="4">
           <div>
             <div class="search">
-              <el-select  clearable placeholder="选择盘点仓库"  v-model="checkWinOrderRequestData.status">
-                <el-option v-for="item in checkWinOrderPageData.status" :label="item.name" :key="item.id" :value="item.id"></el-option>
+              <el-select  clearable placeholder="选择盘点仓库"  v-model="checkWinOrderRequestData.shop">
+                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
               </el-select>
               <el-select  clearable placeholder="选择状态" v-model="checkWinOrderRequestData.status">
                 <el-option v-for="item in checkWinOrderPageData.status" :label="item.name" :key="item.id" :value="item.id"></el-option>
@@ -620,32 +647,83 @@
 </template>
 
 <script>
-import { postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
+import { postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
 export default {
   name: 'InventoryManage', // 库存管理，进销存
   data () {
     return {
       type: '1', // 1=调拨单，2=盘点单，3=盘亏单，4=盘盈单
-
+      //调出 或调出 仓库
+      shopList:[
+        {id: 0, name: '总店'},
+        {id: 1, name: '江与城'},
+        {id: 2, name: '已完成'}
+      ],
       // 1=调拨单
       transferSlipPageData: {
         status: [
-          {id: 1, name: '代发货'},
-          {id: 2, name: '已发货'},
-          {id: 3, name: '已收货'}
+          {id: 0, name: '待发货'},
+          {id: 1, name: '调拨中'},
+          {id: 2, name: '已完成'}
         ],
-        selectTimeStatus: [
-          {id: 1, name: '调拨时间'},
-          {id: 2, name: '发货时间'},
-          {id: 3, name: '入库时间'}
+        time: [
+          {id: 'create_time', name: '调拨时间'},
+          {id: 'out_time', name: '发货时间'},
+          {id: 'in_time', name: '入库时间'}
+        ],
+        //数据总数
+        count:0,
+        list:[
+          {
+            message: "\r\n    \t\t<p>订单号：DB2019072300003</p>\r\n    \t\t<p>调拨人员：堕落嚣张</p>\r\n    \t\t<p>调出仓库：留云路店</p>\r\n    \t\t<p>调拨时间：2019-07-23 15:47:23</p>\t\r\n    \t\t",
+            out_message: "\r\n    \t\t<p>发货人员：堕落嚣张</p>\r\n    \t\t<p>发货时间：2019-07-23 15:47:29</p>\r\n    \t\t",
+            in_message: "未入库",
+            item: "<p>港版美素佳儿1段  1罐装</p>",
+            number: "<p>1</p>",
+            status: 1,
+            id: 3
+          }
         ],
         // 新增调拨单弹框
         addDialog: {
-          isShow: false
+          isShow: false,
+          responseData:{
+            allot_in:'',//调入仓库id
+            count:1,//调拨商品总数
+            bar_code:['','fdadsfad'],//调拨商品的条形码s
+            item_id:[1,2],//调拨商品ids
+            item_name:['fasdfadf','dfadsfas'],//调拨商品名s
+            purchase_number:[1,2],//调拨数量s
+            remark:['备注1','备注2'],//调拨商品的描述s
+            remarks:'dfsgdasfads',//调拨单描述
+            worker_id:1,//调拨人id
+          }
         },
         // 选择商品弹框
         chooseGoodsDialog: {
-          isShow: false
+          isShow: false,
+          title:'',
+          multipleSelection: [],
+          list: [
+            {
+              id: 1738,     //商品id
+              title: "测试商品7/18",    //商品名称
+              type_id: "玩具童车",  //一级分类名称
+              type: "拼插积木", //二级分类名称
+              selling_price: "11000.00",    //销售价格
+              stock: 8  //当前库存
+            }
+          ],
+          // 一级分类
+          topCategoryId: '', // 当前选中的一级分类,用来获取二级分类
+          topCategory: [
+            // {cname:'奶粉',id:1,pid:0}
+          ],
+          // 二级分类
+          twoCategoryId: '',
+          twoCategory: [
+            // {cname:'奶粉',id:1,pid:0}
+          ],
         },
         // 发货弹框
         sendGoodsDialog: {
@@ -661,12 +739,14 @@ export default {
         }
       },
       transferSlipRequestData: {
+        out_shop:'',
+        in_shop:'',
         page: 1,
         limit: 10,
-        time: null,
-        title: '',
+        time: '',
+        search: '',
         status: '',
-        selectTimeStatus: ''
+        start_end_time: null
       },
 
       // 2=盘点单 页面需要的参数
@@ -768,6 +848,7 @@ export default {
       },
       // 2=盘点单请求需要的数据
       checkOrderRequestData: {
+        shop:'',//盘点仓库
         status: '', // 状态：1盘点待确定,2库存待确认(已确认盘点单),3已完成
         name: '', // 盘点单单号(目前仅支持单号搜索)
         page: 1, // 页码
@@ -814,6 +895,7 @@ export default {
         }
       },
       checkLossOrderRequestData: {
+        shop:'',
         status: '',
         time: null,
         page: 1,
@@ -860,6 +942,7 @@ export default {
         }
       },
       checkWinOrderRequestData: {
+        shop:'',
         status: '',
         time: null,
         page: 1,
@@ -872,6 +955,7 @@ export default {
   mounted () {
     // this.getCheckOrderList()
     // this.getCheckLossOrWinOrderList(1)
+    this.getShopList()
   },
   methods: {
     // tab切换
@@ -879,6 +963,7 @@ export default {
       // 1=调拨单，2=盘点单，3=盘亏单，4=盘盈单
       switch (tab.name) {
         case '1':
+          this.getTransferSlipList()
           break
         case '2':
           this.checkOrderRequestData.page = 1
@@ -893,6 +978,71 @@ export default {
           this.getCheckLossOrWinOrderList(1)
           break
       }
+    },
+
+    //调拨单获取列表
+    getTransferSlipList() {
+      let data = {
+        page:this.transferSlipRequestData.page,
+        limit:this.transferSlipRequestData.limit,
+        status:this.transferSlipRequestData.status,
+        search:this.transferSlipRequestData.search,
+        out_shop:this.transferSlipRequestData.out_shop,
+        in_shop:this.transferSlipRequestData.out_shop,
+        time:this.transferSlipRequestData.time,
+        start_time: this.transferSlipRequestData.start_end_time ? this.transferSlipRequestData.start_end_time[0] : '',
+        end_time: this.transferSlipRequestData.start_end_time ? this.transferSlipRequestData.start_end_time[1] : '',
+      }
+      postTransferSlipList(data).then(res=>{
+        if (res.code === 0) {
+          this.transferSlipPageData.count = res.count
+          this.transferSlipPageData.list = res.data
+        }
+      })
+    },
+    //新增调拨单弹框显示
+    transferSlipAddDialogShow(){
+      // 获取一级分类
+      postTwotype().then(res => {
+        if (res.data.length) {
+          this.transferSlipPageData.chooseGoodsDialog.topCategory = res.data
+        }
+      })
+      this.transferSlipPageData.addDialog.isShow = true
+    },
+    //新增调拨信息
+    addTransferSlip(){
+      let data = []
+    },
+    // 新增调拨 获取商品列表对话框 获取二级分类列表
+    clickTransferSlipAddTwoCategory () {
+      this.transferSlipPageData.chooseGoodsDialog.twoCategoryId = ''
+      this.transferSlipPageData.chooseGoodsDialog.twoCategory = []
+      if (!this.transferSlipPageData.chooseGoodsDialog.topCategoryId) {
+        // 没有选择一级分类
+        return
+      }
+      let data = {
+        type: this.transferSlipPageData.chooseGoodsDialog.topCategoryId
+      }
+      postTwotype(data).then(res => {
+        if (res.data.length) {
+          this.transferSlipPageData.chooseGoodsDialog.twoCategory = res.data
+        }
+      })
+    },
+    // 新增调拨—>新增商品弹框 选中商品操作
+    clickTransferSlipAddGoodsChange (val) {
+      console.log(val)
+      this.transferSlipPageData.chooseGoodsDialog.multipleSelection = val
+    },
+    //获取仓库列表
+    getShopList(){
+      postShopList().then(res=>{
+        if (res.code === 200){
+          this.shopList = res.data
+        }
+      })
     },
 
     // 盘点单 页码操作
@@ -912,7 +1062,8 @@ export default {
         name: this.checkOrderRequestData.name,
         page: `${this.checkOrderRequestData.page},${this.checkOrderRequestData.limit}`,
         start_time: this.checkOrderRequestData.time ? this.checkOrderRequestData.time[0] : '',
-        end_time: this.checkOrderRequestData.time ? this.checkOrderRequestData.time[1] : ''
+        end_time: this.checkOrderRequestData.time ? this.checkOrderRequestData.time[1] : '',
+        shop: this.checkOrderRequestData.shop,
       }
       postCheckOrderList(data).then(res => {
         if (res.code === 200) {
@@ -1095,7 +1246,8 @@ export default {
             page: `${this.checkWinOrderRequestData.page},${this.checkWinOrderRequestData.limit}`,
             start_time: this.checkWinOrderRequestData.time ? this.checkWinOrderRequestData.time[0] : '',
             end_time: this.checkWinOrderRequestData.time ? this.checkWinOrderRequestData.time[1] : '',
-            name: this.checkWinOrderRequestData.name
+            name: this.checkWinOrderRequestData.name,
+            shop:this.checkWinOrderRequestData.shop,
           }
           postCheckLossOrWinOrderList(requestData).then(res => {
             if (res.code === 200) {
@@ -1111,7 +1263,8 @@ export default {
             page: `${this.checkLossOrderRequestData.page},${this.checkLossOrderRequestData.limit}`,
             start_time: this.checkLossOrderRequestData.time ? this.checkLossOrderRequestData.time[0] : '',
             end_time: this.checkLossOrderRequestData.time ? this.checkLossOrderRequestData.time[1] : '',
-            name: this.checkLossOrderRequestData.name
+            name: this.checkLossOrderRequestData.name,
+            shop: this.checkLossOrderRequestData.shop,
           }
           postCheckLossOrWinOrderList(data).then(res => {
             if (res.code === 200) {
