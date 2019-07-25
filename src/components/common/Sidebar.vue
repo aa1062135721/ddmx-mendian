@@ -126,7 +126,6 @@ export default {
         li{
           width: 100%;
           height: 88px!important;
-          line-height: 88px!important;
           font-size:48px;
           font-family:SourceHanSansCN-Regular;
           font-weight:400;

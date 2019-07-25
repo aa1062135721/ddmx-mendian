@@ -3,7 +3,7 @@
     <div class="bg bg-blue">
       <v-head></v-head>
       <div class="get-money-content">
-          <div style="width: 1038px;overflow: hidden;">
+          <div style="width: 1038px;width:54.0625%;max-width:1038px;overflow: hidden;">
             <div class="all-goods">
               <div class="goods-type">
                 <div><el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button></div>
@@ -26,19 +26,23 @@
               </div>
             </div>
           </div>
-          <div style="width: 154px;overflow: hidden;">
+          <div style="width:100px;width:8.02%;overflow: hidden;">
             <div class="caozuo-buttons">
-              <el-button @click="clickAddNumShoppingCarGood" class="caozuo-button" type="primary" style="font-size: 30px!important;font-weight: bolder!important;">&nbsp;&nbsp;+&nbsp;&nbsp;</el-button>
-              <el-button @click="clickSubNumShoppingCarGood" class="caozuo-button" type="primary"  style="font-size: 30px!important;font-weight: bolder!important;">&nbsp;&nbsp;-&nbsp;&nbsp;</el-button>
-              <el-button @click="clickBtnXiugaishuliangShoppingCarGood" class="caozuo-button" type="primary">数量</el-button>
-              <el-button @click="clickBtnXiugaijiageShoppingCarGood" class="caozuo-button" type="primary">改价</el-button>
-              <el-button @click="clickDelShoppingCarGood" class="caozuo-button" type="primary">删除</el-button>
-              <el-button @click="chongzhiDialog.isShow = true" class="caozuo-button" type="primary">充值</el-button>
-              <el-button @click="huiyuanDialog.isShow = true" class="caozuo-button" type="primary">会员</el-button>
-              <el-button @click="goukaDialogShow" class="caozuo-button" type="primary">购卡</el-button>
+              <el-button @click="clickAddNumShoppingCarGood" class="caozuo-button">
+                <i class="el-icon-plus" style="font-weight: 900;"></i>
+              </el-button>
+              <el-button @click="clickSubNumShoppingCarGood" class="caozuo-button">
+                <i class="el-icon-minus"  style="font-weight: 900;"></i>
+              </el-button>
+              <el-button @click="clickBtnXiugaishuliangShoppingCarGood" class="caozuo-button">数量</el-button>
+              <el-button @click="clickBtnXiugaijiageShoppingCarGood" class="caozuo-button">改价</el-button>
+              <el-button @click="clickDelShoppingCarGood" class="caozuo-button">删除</el-button>
+              <el-button @click="chongzhiDialog.isShow = true" class="caozuo-button">充值</el-button>
+              <el-button @click="huiyuanDialog.isShow = true" class="caozuo-button">会员</el-button>
+              <el-button @click="goukaDialogShow" class="caozuo-button">购卡</el-button>
             </div>
           </div>
-          <div style="width: 636px;overflow: hidden;">
+          <div style="width: 636px;width:33.13%;overflow: hidden;">
             <div class="jiesuan-goods" >
               <div class="search">
                 <el-input class="goods-search" @keyup.native="getGoodByCondition" placeholder="商品名称/条形码"  v-model="sousuoshangpingDialog.title">
@@ -2344,7 +2348,7 @@ export default {
       }
       .page-fenlei-button{
         width:58px;
-        height:52px;
+        height:54px;
         background:rgba(107,210,244,1);
         border-radius:4px;
         border: 0;color:rgba(125,125,125,1);
@@ -2361,33 +2365,14 @@ export default {
       align-items: flex-start;
       flex-wrap:wrap;
       align-items:flex-start;
-      justify-content: flex-start;
+      justify-content: space-between;
       align-content:flex-start;
-      .el-scrollbar{
-        height: 100%;
-        width: 100%;
-        .el-scrollbar__wrap{
-          overflow: auto;
-        }
-        .el-scrollbar__view{
-          background: #000!important;
-          overflow: auto!important;
-          display: flex!important;
-          align-items: flex-start!important;
-          flex-wrap:wrap!important;
-          align-items:flex-start!important;
-          justify-content: space-between!important;
-          align-content:flex-start!important;
-          .goods{
-            margin: 0 30px 16px 0;
-            &:nth-child(3n) {
-              margin-right: 0;
-            }
-          }
-        }
+      &:after {
+        content: "";
+        width:326px;
       }
       .goods{
-        margin: 0 30px 16px 0;
+        margin: 0 0 16px 0;
         &:nth-child(3n) {
           margin-right: 0;
         }
@@ -2440,8 +2425,8 @@ export default {
     flex-direction:column;
     padding-bottom: 10px;
     .caozuo-button{
-      width: 154px!important;
       height: 60px!important;
+      width: 100%;
       background:rgba(245,245,245,1)!important;
       border: 0!important;
       border-radius:10px!important;

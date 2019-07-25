@@ -212,11 +212,11 @@ export default {
       .left{
         height: calc(100% - 68px);
         overflow-y:auto;
-        width:398px;
+        /*width:398px;*/
         background: #fff;
         text-align: center;
         list-style-type: none;
-        width:398px;
+        width:20.73%;
         li{
           clear: both;
           overflow-x: hidden;
@@ -248,7 +248,7 @@ export default {
       }
       .right{
         height: calc(100% - 68px);
-        width:1436px;
+        width:74.79%;
         overflow: auto;
         overflow-x: hidden;
         background: #fff;

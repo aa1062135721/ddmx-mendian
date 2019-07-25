@@ -123,6 +123,12 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   // console.log('全局路由守卫beforeEach', to)
   let isLogin = getStore('token')
+  // 如果登录了，跳转到首页
+  if (to.path === '/login' || to.path === '/') {
+    if (isLogin) {
+      next('/money')
+    }
+  }
   if (to.matched.length === 0) {
     // 没有匹配到当前路由
     next('/')
