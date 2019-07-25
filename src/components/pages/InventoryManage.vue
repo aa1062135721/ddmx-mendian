@@ -73,24 +73,34 @@
           <!-- 调拨单--新增调拨-->
           <el-dialog  :visible.sync="transferSlipPageData.addDialog.isShow" title="调拨"  width="968px" :center="true">
             <div>
-              <el-select  clearable placeholder="选择调入仓库" v-model="transferSlipPageData.addDialog.allot_in">
+              <el-select  clearable placeholder="选择调入仓库" v-model="transferSlipPageData.addDialog.responseData.allot_in">
                 <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
               </el-select>
               <el-button @click="transferSlipPageData.chooseGoodsDialog.isShow = true">选择商品</el-button>
             </div>
             <div style="margin-top: 15px;">
-              <el-table border style="width: 100%;">
-                <el-table-column prop="subtitle" label="序号"></el-table-column>
-                <el-table-column prop="num" label="商品名称"></el-table-column>
-                <el-table-column prop="real_price" label="条形码"></el-table-column>
-                <el-table-column prop="price" label="一级分类"></el-table-column>
-                <el-table-column prop="pay_all_price" label="二级分类"></el-table-column>
-                <el-table-column prop="pay_all_price" label="当前库存"></el-table-column>
-                <el-table-column prop="pay_all_price" label="调拨数量">
-                  <el-input placehoder="请输入调拨数量"></el-input>
+              <el-table :data="transferSlipPageData.addDialog.list" border style="width: 100%;">
+                <el-table-column type="index" label="序号"></el-table-column>
+                <el-table-column prop="title" label="商品名称"></el-table-column>
+                <el-table-column prop="title" label="条形码"></el-table-column>
+                <el-table-column prop="type_id" label="一级分类"></el-table-column>
+                <el-table-column prop="type" label="二级分类"></el-table-column>
+                <el-table-column prop="stock" label="当前库存"></el-table-column>
+                <el-table-column prop="selling_price" label="单价"></el-table-column>
+                <el-table-column label="调拨数量">
+                  <template slot-scope="scope">
+                    <el-input placehoder="请输入调拨数量" v-model="scope.row.num"></el-input>
+                  </template>
                 </el-table-column>
-                <el-table-column prop="pay_all_price" label="操作">
-                  <el-button type="text">删除</el-button>
+                <el-table-column label="备注">
+                  <template slot-scope="scope">
+                    <el-input placehoder="请输入调拨数量" v-model="scope.row.remark"></el-input>
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作">
+                  <template slot-scope="scope">
+                    <el-button type="text" @click="removeTransferSlipGood(scope.$index)">删除</el-button>
+                  </template>
                 </el-table-column>
               </el-table>
             </div>
@@ -99,14 +109,14 @@
                 <div class="float-left">
                   <el-form  label-width="110px">
                     <el-form-item label="合计调拨数量：">
-                      4
+                      {{transferSlipPageData.addDialog.list.length}}
                     </el-form-item>
                   </el-form>
                 </div>
                 <div class="float-right">
                   <el-form  label-width="80px">
                     <el-form-item label="备注：">
-                      <el-input placeholder="请输入备注信息"></el-input>
+                      <el-input placeholder="请输入备注信息" v-model="transferSlipPageData.addDialog.responseData.remarks"></el-input>
                     </el-form-item>
                   </el-form>
                 </div>
@@ -114,7 +124,7 @@
             </div>
             <div style="text-align: center;margin-top: 15px;">
               <el-button class="my-secondary-btn" @click="transferSlipPageData.addDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn">确定</el-button>
+              <el-button class="my-primary-btn" @click="addtransferSlipGoodOk">确定</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--新增调拨 选择商品-->
@@ -138,7 +148,7 @@
                   :value="item.id">
                 </el-option>
               </el-select>
-              <el-button>查询</el-button>
+              <el-button @click="clickTransferSlipSearchGoods">查询</el-button>
             </div>
             <div>
               <el-table
@@ -157,7 +167,7 @@
             </div>
             <div style="text-align: center;margin-top: 20px;">
               <el-button class="my-secondary-btn" @click="transferSlipPageData.chooseGoodsDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn">确定</el-button>
+              <el-button class="my-primary-btn" @click="clickTransferSlipChoosesGoods">确定</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--发货-->
@@ -697,7 +707,19 @@ export default {
             remark:['备注1','备注2'],//调拨商品的描述s
             remarks:'dfsgdasfads',//调拨单描述
             worker_id:1,//调拨人id
-          }
+          },
+          list:[
+            // {
+            //   id: 1738,     //商品id
+            //   title: "测试商品7/18",    //商品名称
+            //   type_id: "玩具童车",  //一级分类名称
+            //   type: "拼插积木", //二级分类名称
+            //   selling_price: "11000.00",    //销售价格
+            //   stock: 8,  //当前库存,
+            //   num:'',//调拨数量
+            //   remark:'',//备注
+            // }
+          ]
         },
         // 选择商品弹框
         chooseGoodsDialog: {
@@ -705,14 +727,14 @@ export default {
           title:'',
           multipleSelection: [],
           list: [
-            {
-              id: 1738,     //商品id
-              title: "测试商品7/18",    //商品名称
-              type_id: "玩具童车",  //一级分类名称
-              type: "拼插积木", //二级分类名称
-              selling_price: "11000.00",    //销售价格
-              stock: 8  //当前库存
-            }
+            // {
+            //   id: 1738,     //商品id
+            //   title: "测试商品7/18",    //商品名称
+            //   type_id: "玩具童车",  //一级分类名称
+            //   type: "拼插积木", //二级分类名称
+            //   selling_price: "11000.00",    //销售价格
+            //   stock: 8  //当前库存
+            // }
           ],
           // 一级分类
           topCategoryId: '', // 当前选中的一级分类,用来获取二级分类
@@ -1010,10 +1032,6 @@ export default {
       })
       this.transferSlipPageData.addDialog.isShow = true
     },
-    //新增调拨信息
-    addTransferSlip(){
-      let data = []
-    },
     // 新增调拨 获取商品列表对话框 获取二级分类列表
     clickTransferSlipAddTwoCategory () {
       this.transferSlipPageData.chooseGoodsDialog.twoCategoryId = ''
@@ -1035,6 +1053,100 @@ export default {
     clickTransferSlipAddGoodsChange (val) {
       console.log(val)
       this.transferSlipPageData.chooseGoodsDialog.multipleSelection = val
+    },
+    //新增调拨单，新增商品弹框，查询商品列表
+    clickTransferSlipSearchGoods(){
+      let data = {
+        stock_type:1,
+        title: this.transferSlipPageData.chooseGoodsDialog.title,
+        type_id: this.transferSlipPageData.chooseGoodsDialog.topCategoryId,
+        type: this.transferSlipPageData.chooseGoodsDialog.twoCategoryId
+      }
+      postCheckOrderAddGoodList(data).then(res => {
+        if (res.data.length) {
+          this.transferSlipPageData.chooseGoodsDialog.list = res.data
+        }
+      })
+    },
+    //选中商品后确认添加到本次调拨列表中
+    clickTransferSlipChoosesGoods(){
+      // {
+      //   id: 1738,     //商品id
+      //     title: "测试商品7/18",    //商品名称
+      //   type_id: "玩具童车",  //一级分类名称
+      //   type: "拼插积木", //二级分类名称
+      //   selling_price: "11000.00",    //销售价格
+      //   stock: 8,  //当前库存,
+      //   num:'',//调拨数量
+      //   remark:'',//备注
+      // }
+      // 数据格式化
+      let formatArr = []
+      this.transferSlipPageData.chooseGoodsDialog.multipleSelection.forEach((item) => {
+        let data = {
+          id:item.id,
+          title:item.title,
+          type_id:item.type_id,
+          type:item.type,
+          selling_price:item.selling_price,
+          stock:item.stock,
+          num:'',
+          remark:'',
+        }
+        formatArr.push(data)
+      })
+
+      // 数据拼接
+      let newArr = this.transferSlipPageData.addDialog.list.concat(formatArr)
+      // 去重
+      let obj = {}
+      newArr = newArr.reduce(function (item, next) {
+        obj[next.id] ? '' : obj[next.id] = true && item.push(next)
+        return item
+      }, [])
+      this.transferSlipPageData.addDialog.list = newArr
+      this.transferSlipPageData.chooseGoodsDialog.isShow = false
+    },
+    //新增调拨单中商品移除
+    removeTransferSlipGood(index){
+      this.transferSlipPageData.addDialog.list.splice(index, 1)
+    },
+    //新增调拨单
+    addtransferSlipGoodOk(){
+      // responseData:{
+      //     allot_in:'',//调入仓库id
+      //     count:1,//调拨商品总数
+      //     bar_code:['','fdadsfad'],//调拨商品的条形码s
+      //     item_id:[1,2],//调拨商品ids
+      //     item_name:['fasdfadf','dfadsfas'],//调拨商品名s
+      //     purchase_number:[1,2],//调拨数量s
+      //     remark:['备注1','备注2'],//调拨商品的描述s
+      //     remarks:'dfsgdasfads',//调拨单描述
+      //     worker_id:1,//调拨人id
+      // },
+      let data = {
+        allot_in:this.transferSlipPageData.addDialog.responseData.allot_in,
+        count:this.transferSlipPageData.addDialog.list.length,//调拨商品总数
+        bar_code:[],//调拨商品的条形码s
+        item_id:[],//调拨商品ids
+        item_name:[],//调拨商品名s
+        purchase_number:[],//调拨数量s
+        remark:[],//调拨商品的描述s
+        remarks:this.transferSlipPageData.addDialog.responseData.remarks,//调拨单描述
+        worker_id:1,//调拨人id //TODO
+      }
+      for (let i=0; i < this.transferSlipPageData.addDialog.list.length; i++) {
+        data.bar_code.push(this.transferSlipPageData.addDialog.list[i].title) //暂时没有返回条形码
+        data.item_id.push(this.transferSlipPageData.addDialog.list[i].id)
+        data.item_name.push(this.transferSlipPageData.addDialog.list[i].title)
+        if (!(Number.isInteger(this.transferSlipPageData.addDialog.list[i].num)) && (this.transferSlipPageData.addDialog.list[i].num <= this.transferSlipPageData.addDialog.list[i].stock)){
+          alert(`【${this.transferSlipPageData.addDialog.list[i].title}】调拨数量必须为整数，且小于库存`)
+          return
+        }
+        data.purchase_number.push(this.transferSlipPageData.addDialog.list[i].num)
+        data.remark.push(this.transferSlipPageData.addDialog.list[i].remark)
+      }
+      console.log(data)
     },
     //获取仓库列表
     getShopList(){
