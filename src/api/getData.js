@@ -363,6 +363,16 @@ export const postTransferSlipList = (data = null) => {
 }
 
 /**
+ * 订单管理-库存管理 - 调拨单 - 列表
+ 其他信息不允许编辑
+ * @param data
+ * @returns {*}
+ */
+export const postTransferSlipAdd = (data = null) => {
+  return Vue.prototype.$post('/allot/allot_add', data)
+}
+
+/**
  * 订单管理-库存管理 - 调拨单 - 调入，调出 仓库列表
  其他信息不允许编辑
  * @param data

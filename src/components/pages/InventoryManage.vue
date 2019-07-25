@@ -4,9 +4,9 @@
         <el-tab-pane label="调拨单" name="1">
           <div>
             <div class="search">
-              <el-select  clearable placeholder="选择调入仓库" v-model="transferSlipRequestData.in_shop">
-                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
-              </el-select>
+<!--              <el-select  clearable placeholder="选择调入仓库" v-model="transferSlipRequestData.in_shop">-->
+<!--                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>-->
+<!--              </el-select>-->
               <el-select  clearable placeholder="选择调出仓库" v-model="transferSlipRequestData.out_shop">
                 <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
               </el-select>
@@ -36,11 +36,26 @@
           <div style="margin-top: 15px;">
             <el-table  :data="transferSlipPageData.list" border style="width: 100%;" height="620">
               <el-table-column  label="调拨信息"></el-table-column>
-              <el-table-column prop="item" label="商品信息"></el-table-column>
+              <el-table-column  label="商品信息">
+                <template slot-scope="scope">
+                  <div v-html="scope.row.item">
+                  </div>
+                </template>
+              </el-table-column>
               <el-table-column prop="amount" label="单位成本"></el-table-column>
               <el-table-column  label="商品成本"></el-table-column>
-              <el-table-column prop="number" label="调拨数量"></el-table-column>
-              <el-table-column prop="out_message" label="发货信息"></el-table-column>
+              <el-table-column  label="调拨数量">
+                <template slot-scope="scope">
+                  <div v-html="scope.row.number">
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column label="发货信息">
+                <template slot-scope="scope">
+                  <div v-html="scope.row.out_message">
+                  </div>
+                </template>
+              </el-table-column>
               <el-table-column prop="in_message" label="入库信息"></el-table-column>
               <el-table-column label="状态">
                 <template slot-scope="scope">
@@ -657,7 +672,7 @@
 </template>
 
 <script>
-import { postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
+import { postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
 export default {
   name: 'InventoryManage', // 库存管理，进销存
   data () {
@@ -665,9 +680,9 @@ export default {
       type: '1', // 1=调拨单，2=盘点单，3=盘亏单，4=盘盈单
       //调出 或调出 仓库
       shopList:[
-        {id: 0, name: '总店'},
-        {id: 1, name: '江与城'},
-        {id: 2, name: '已完成'}
+        // {id: 0, name: '总店'},
+        // {id: 1, name: '江与城'},
+        // {id: 2, name: '已完成'}
       ],
       // 1=调拨单
       transferSlipPageData: {
@@ -684,15 +699,15 @@ export default {
         //数据总数
         count:0,
         list:[
-          {
-            message: "\r\n    \t\t<p>订单号：DB2019072300003</p>\r\n    \t\t<p>调拨人员：堕落嚣张</p>\r\n    \t\t<p>调出仓库：留云路店</p>\r\n    \t\t<p>调拨时间：2019-07-23 15:47:23</p>\t\r\n    \t\t",
-            out_message: "\r\n    \t\t<p>发货人员：堕落嚣张</p>\r\n    \t\t<p>发货时间：2019-07-23 15:47:29</p>\r\n    \t\t",
-            in_message: "未入库",
-            item: "<p>港版美素佳儿1段  1罐装</p>",
-            number: "<p>1</p>",
-            status: 1,
-            id: 3
-          }
+          // {
+          //   message: "\r\n    \t\t<p>订单号：DB2019072300003</p>\r\n    \t\t<p>调拨人员：堕落嚣张</p>\r\n    \t\t<p>调出仓库：留云路店</p>\r\n    \t\t<p>调拨时间：2019-07-23 15:47:23</p>\t\r\n    \t\t",
+          //   out_message: "\r\n    \t\t<p>发货人员：堕落嚣张</p>\r\n    \t\t<p>发货时间：2019-07-23 15:47:29</p>\r\n    \t\t",
+          //   in_message: "未入库",
+          //   item: "<p>港版美素佳儿1段  1罐装</p>",
+          //   number: "<p>1</p>",
+          //   status: 1,
+          //   id: 3
+          // }
         ],
         // 新增调拨单弹框
         addDialog: {
@@ -705,8 +720,8 @@ export default {
             item_name:['fasdfadf','dfadsfas'],//调拨商品名s
             purchase_number:[1,2],//调拨数量s
             remark:['备注1','备注2'],//调拨商品的描述s
-            remarks:'dfsgdasfads',//调拨单描述
-            worker_id:1,//调拨人id
+            remarks:'',//调拨单描述
+            worker_id:1,//调拨人id//TODO
           },
           list:[
             // {
@@ -978,6 +993,7 @@ export default {
     // this.getCheckOrderList()
     // this.getCheckLossOrWinOrderList(1)
     this.getShopList()
+    this.getTransferSlipList()
   },
   methods: {
     // tab切换
@@ -1016,10 +1032,8 @@ export default {
         end_time: this.transferSlipRequestData.start_end_time ? this.transferSlipRequestData.start_end_time[1] : '',
       }
       postTransferSlipList(data).then(res=>{
-        if (res.code === 0) {
           this.transferSlipPageData.count = res.count
-          this.transferSlipPageData.list = res.data
-        }
+          this.transferSlipPageData.list = res.data ? res.data : []
       })
     },
     //新增调拨单弹框显示
@@ -1133,20 +1147,34 @@ export default {
         purchase_number:[],//调拨数量s
         remark:[],//调拨商品的描述s
         remarks:this.transferSlipPageData.addDialog.responseData.remarks,//调拨单描述
-        worker_id:1,//调拨人id //TODO
+        worker_id:177,//调拨人id //TODO
+      }
+      if (!data.allot_in){
+        alert('请选择调入仓库')
+        return
       }
       for (let i=0; i < this.transferSlipPageData.addDialog.list.length; i++) {
         data.bar_code.push(this.transferSlipPageData.addDialog.list[i].title) //暂时没有返回条形码
         data.item_id.push(this.transferSlipPageData.addDialog.list[i].id)
         data.item_name.push(this.transferSlipPageData.addDialog.list[i].title)
-        if (!(Number.isInteger(this.transferSlipPageData.addDialog.list[i].num)) && (this.transferSlipPageData.addDialog.list[i].num <= this.transferSlipPageData.addDialog.list[i].stock)){
+        if (!(/^[0-9]*[1-9][0-9]*$/.test(this.transferSlipPageData.addDialog.list[i].num))){
+          alert(`【${this.transferSlipPageData.addDialog.list[i].title}】调拨数量必须为整数，且小于库存`)
+          return
+        }
+        if (!((this.transferSlipPageData.addDialog.list[i].num <= this.transferSlipPageData.addDialog.list[i].stock))){
+          alert(`【${this.transferSlipPageData.addDialog.list[i].title}】调拨数量必须为整数，且小于库存`)
+          return
+        }
+        if (!(this.transferSlipPageData.addDialog.list[i].num >= 1)){
           alert(`【${this.transferSlipPageData.addDialog.list[i].title}】调拨数量必须为整数，且小于库存`)
           return
         }
         data.purchase_number.push(this.transferSlipPageData.addDialog.list[i].num)
         data.remark.push(this.transferSlipPageData.addDialog.list[i].remark)
       }
-      console.log(data)
+      postTransferSlipAdd({data:data}).then(res=>{
+        console.log(res)
+      })
     },
     //获取仓库列表
     getShopList(){
