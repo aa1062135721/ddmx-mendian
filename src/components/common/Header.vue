@@ -17,45 +17,13 @@
     </div>
 </template>
 <script>
+import { mapGetters, mapActions } from 'vuex'
 import { removeStore } from '../../utils'
-import { postUserInfo } from '../../api/getData'
 export default {
   data () {
     return {
       fullscreen: false,
-      userInfo: {
-        id: 1, // 用户id
-        user_type: 1, //
-        sex: 1,
-        birthday: 1699200,
-        last_login_time: 1560496211,
-        score: 0,
-        coin: 0,
-        create_time: 1510561182,
-        user_status: 1,
-        user_login: 'admin', // 账号
-        user_pass: '###7f4613cc5b4b2a6d99069dbeca8335d9',
-        user_nickname: '', // 名称
-        user_email: '465497241@qq.com', // 邮箱
-        user_url: '',
-        shop_name:'',
-        avatar: '',
-        signature: '',
-        last_login_ip: '127.0.0.1',
-        user_activation_key: '',
-        mobile: '',
-        more: '',
-        shop_id: '18', // 用户的商铺id
-        balance: 89000000 // 余额
-      }
     }
-  },
-  beforeCreate () {
-    postUserInfo().then((res) => {
-      this.userInfo = res.data
-    }).catch((err) => {
-      console.log('获取登录信息失败', err)
-    })
   },
   methods: {
     // 跳转到页面
@@ -75,6 +43,7 @@ export default {
       }).then(() => {
         removeStore('token')
         this.$router.push('/login')
+        this.saveUserInfo({})
       }).catch(() => {
       });
     },
@@ -104,7 +73,11 @@ export default {
         }
       }
       this.fullscreen = !this.fullscreen
-    }
+    },
+    ...mapActions(['saveUserInfo'])
+  },
+  computed: {
+    ...mapGetters(['userInfo']),
   }
 }
 </script>

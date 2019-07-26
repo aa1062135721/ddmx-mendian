@@ -28,7 +28,8 @@
 </template>
 
 <script>
-import {postLogin} from '../api/getData'
+import { mapActions } from 'vuex'
+import {postLogin, postUserInfo} from '../api/getData'
 import {setStore} from '../utils'
 export default {
   data: function () {
@@ -44,20 +45,28 @@ export default {
         this.msg = '请输入用户名或密码'
         return
       }
+      // if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.username)) {
+      //   this.msg = '用户名应为手机号码'
+      //   return
+      // }
       let data = {username: this.username, password: this.password}
       let that = this
       postLogin(data).then((res) => {
         if (res.code === '200') {
           setStore('token', res.data.token)
-          that.$router.push({
-            path: '/money',
-            query: {}
+          postUserInfo().then((res) => {
+            that.saveUserInfo(res.data) // vuex保存登录后的登录数据
+            that.$router.push({
+              path: '/money',
+              query: {}
+            })
           })
         } else {
 
         }
       })
-    }
+    },
+    ...mapActions(['saveUserInfo'])
   }
 }
 </script>

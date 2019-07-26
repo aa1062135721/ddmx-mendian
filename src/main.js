@@ -7,6 +7,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import VueLazyload from 'vue-lazyload'
 import * as filters from './filter/index'
+import store from './store/store' // vuex
 
 // 导入 http请求 定义全局变量·
 import {fetch, post, patch, put} from './api/http'
@@ -32,6 +33,7 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })
