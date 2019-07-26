@@ -13,12 +13,15 @@
         </div>
         <div class="right-body">
           <p class="goods_price qrcode overflow-row1-ellipsis" v-if="ogood.is_service_goods === '0'" style="margin-bottom: 3px;">
-            条形码：{{ogood.bar_code}}
+            条形码：{{ogood.bar_code || '无'}}
           </p>
-          <p class="goods_price overflow-row1-ellipsis">
+          <p class="goods_price overflow-row1-ellipsis" v-if="ogood.is_service_goods === '0'">
             <span class="xianjia">现价: ¥ {{parseFloat(ogood.price).toFixed(2)}}</span>
             <span class="kucun" v-if="ogood.stock || ogood.stock >= 0"><img src="../../assets/icon/kucun.png" alt="库存"> {{parseInt(ogood.stock)}}</span>
             <span class="kucun" v-else><img src="../../assets/icon/kucun.png" alt="库存"> 99+</span>
+          </p>
+          <p class="goods_price overflow-row1-ellipsis" v-if="ogood.is_service_goods === '1'">
+            <span class="xianjia"> ¥ {{parseFloat(ogood.price).toFixed(2)}}</span>
           </p>
         </div>
       </div>
@@ -74,7 +77,7 @@ export default {
       display: flex;
       flex-direction: column;
       .right-title{
-        height: 39px;
+        height: 40px;
         color: #1A1A1A;
         font-size: 16px;
         margin-bottom: 43px;

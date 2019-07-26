@@ -3,7 +3,7 @@
     <div class="bg bg-blue">
       <v-head></v-head>
       <div class="get-money-content">
-          <div style="width: 1038px;width:54.0625%;max-width:1038px;overflow: hidden;">
+          <div style="width: 1038px;max-width:1038px;overflow: hidden;">
             <div class="all-goods">
               <div class="goods-type">
                 <div><el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button></div>
@@ -18,6 +18,10 @@
               <div style="overflow: hidden;width: 100%;flex: 1;margin-top: 28px;" ref="allGoodsScroll">
                 <div  ref="allGoodsScrollContent" class="flex-goods" >
                   <v-good v-for="(item) in goodsList" :key="item.id" :ogood="item" class="goods" @click.native="addShoppingCar(item)"></v-good>
+                  <div v-if="goodsList.length === 0" style="top: 50%;position: relative;left: 50%;width: 322px;height: 359px;margin-top: -179px;margin-left: -161px;">
+                    <img src="../../assets/images/no-goods.png" alt="暂无商品" style="width: 322px;">
+                    <p style="position: absolute;bottom:0;width: 100%;color: #1A1A1A;font-size: 24px;text-align: center;">暂无商品</p>
+                  </div>
                 </div>
               </div>
               <div class="page-buttons">
@@ -26,7 +30,7 @@
               </div>
             </div>
           </div>
-          <div style="width:100px;width:8.02%;overflow: hidden;">
+          <div style="max-width:100px;width:8.02%;overflow: hidden;">
             <div class="caozuo-buttons">
               <el-button @click="clickAddNumShoppingCarGood" class="caozuo-button">
                 <i class="el-icon-plus" style="font-weight: 900;"></i>
@@ -42,10 +46,10 @@
               <el-button @click="goukaDialogShow" class="caozuo-button">购卡</el-button>
             </div>
           </div>
-          <div style="width: 636px;width:33.13%;overflow: hidden;">
+          <div style="max-width: 636px;width:33.13%;overflow: hidden;">
             <div class="jiesuan-goods" >
               <div class="search">
-                <el-input class="goods-search" @keyup.native="getGoodByCondition" placeholder="商品名称/条形码"  v-model="sousuoshangpingDialog.title">
+                <el-input class="goods-search" @input="getGoodByCondition" placeholder="商品名称/条形码"  v-model="sousuoshangpingDialog.title">
                   <i slot="suffix" class="el-input__icon el-icon-search" @click="getGoodByConditionOk"></i>
                 </el-input>
               </div>
@@ -212,7 +216,7 @@
             <div class="three">
               <el-radio-group v-model="chongzhiDialog.payType">
 <!--                //支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
-                <el-radio label="5">现价</el-radio>
+                <el-radio label="5">现金</el-radio>
                 <el-radio label="1">微信</el-radio>
                 <el-radio label="2">支付宝</el-radio>
                 <el-radio label="4">银行卡</el-radio>
@@ -453,8 +457,18 @@
             <!-- 充值记录 -->
             <el-table v-show="!huiyuanDialog.showFuwuTable" :data="huiyuanDialog.chongzhijiluList" height="216" border style="width: 100%">
               <el-table-column prop="member_id" label="会员"></el-table-column>
-              <el-table-column prop="price" label="充值金额"></el-table-column>
-              <el-table-column prop="price" label="到账金额"></el-table-column>
+              <el-table-column label="充值金额">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.price < 0" class="font-red">{{scope.row.price}}</span>
+                  <span v-else>{{scope.row.price}}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="到账金额">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.price < 0" class="font-red">{{scope.row.price}}</span>
+                  <span v-else>{{scope.row.price}}</span>
+                </template>
+              </el-table-column>
               <el-table-column prop="waiter" label="服务人员"></el-table-column>
               <el-table-column label="状态">
                 <template slot-scope="scope">
@@ -1586,11 +1600,20 @@ export default {
               good.edit_price = good.price
               for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
                 if (this.chooeseGoods.goods[i].id === good.id) {
-                  this.$message.closeAll()
-                  this.$message({
-                    message: '该商品已经存在购物车了，请选中后再操作',
-                    type: 'error'
-                  })
+                  if (this.chooeseGoods.goods[i].num + 1 <=  good.stock) {
+                    this.$message.closeAll()
+                    this.$message({
+                      message: '该商品已经存在购物车了，购买数量加1',
+                      type: 'error'
+                    })
+                    this.chooeseGoods.goods[i].num ++
+                  } else {
+                    this.$message.closeAll()
+                    this.$message({
+                      message: '该商品已经存在购物车了，购买数量没有发生变化，因为购买数量等于库存数量',
+                      type: 'error'
+                    })
+                  }
                   return
                 }
               }
@@ -1915,7 +1938,7 @@ export default {
     huiyuanDialogSearchRechargeLog () {
       if (this.huiyuanDialog.huiyuanInfo.id) {
         this.huiyuanDialog.showFuwuTable = false
-        let requestData = {member_id: this.huiyuanDialog.huiyuanInfo.id, page: '1,5'}
+        let requestData = {member_id: this.huiyuanDialog.huiyuanInfo.id}
         postMemberVipRechargeLog(requestData).then(res => {
           this.huiyuanDialog.chongzhijiluList = res.data
         })
@@ -2279,7 +2302,7 @@ export default {
           this.jiezhangDialog.closedPayWay = []
         }
         if (this.chooeseGoods.cardList.length){
-          this.jiezhangDialog.closedPayWay = []
+          this.jiezhangDialog.closedPayWay = [7]
         }
       } else {//没有选择会员
         if (this.chooeseGoods.fuwuGoods.length){
