@@ -81,7 +81,7 @@ export default {
       postGetHelpList(requestData).then(res => {
         if (res.data.length) {
           if (requestData.content) {
-            res.data.forEach(item => {
+            res.data.map(item => {
               // 匹配关键字正则
               let replaceReg = new RegExp(requestData.content, 'gi')
               // 高亮替换v-html值
@@ -93,6 +93,7 @@ export default {
             })
             this.hepls = res.data
             this.hepls[0].is_checked = true
+            this.index = 0
           } else {
             res.data.map(item => {
               item.is_checked = false
@@ -101,6 +102,7 @@ export default {
               this.hepls = res.data
               this.noMore = false
               this.hepls[0].is_checked = true
+              this.index = 0
             } else{
               this.hepls.push(...res.data)
             }

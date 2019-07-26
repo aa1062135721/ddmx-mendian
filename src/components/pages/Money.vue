@@ -1920,9 +1920,19 @@ export default {
         })
         return
       }
+      if (requestData.nickname.length>10) {
+        this.$message.closeAll()
+        this.$message({
+          message: '会员昵称要求在10个汉字内',
+          type: 'error'
+        })
+        return
+      }
       postAddMemberVip(requestData).then(res => {
         if (res.code === '200') {
           this.huiyuanDialog.addHuiyuanDialog.isShow = false
+          this.huiyuanDialog.addHuiyuanDialog.mobile = ''
+          this.huiyuanDialog.addHuiyuanDialog.nickname = ''
           this.$message.closeAll()
           this.$message({
             message: res.msg,
@@ -1931,8 +1941,6 @@ export default {
           this.huiyuanDialog.mobile = requestData.mobile
           this.huiyuanDialogSearchMemberVip()
         }
-      }).catch(err => {
-        console.log('新增会员失败', err)
       })
     },
     huiyuanDialogSearchRechargeLog () {
