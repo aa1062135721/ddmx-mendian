@@ -66,7 +66,8 @@
                     <li class="title">
                       <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
                       <span class="red danjia" v-else>￥{{good.price}}</span>
-                      <span class="yuanjia" v-if="good.is_edit">原价￥{{good.price}}</span>
+                      <span style="width:28px;height:20px;background:rgba(243,88,88,1);border-radius:4px;color: #ffffff;padding:0 3px; " v-if="good.is_edit">改</span>
+                      <span class="yuanjia" v-if="good.is_edit">￥{{good.price}}</span>
   <!--                    <span class="huiyuanjia">会员价￥{{good.price}}</span>-->
                     </li>
                   </ul>
