@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createPersistedState from 'vuex-persistedstate' // vuex持久化存储的插件
 
 Vue.use(Vuex)
 
@@ -63,5 +64,6 @@ export default new Vuex.Store({
   state,
   getters,
   actions,
-  mutations
+  mutations,
+  plugins: [createPersistedState()] // vuex持久化存储的插件
 })

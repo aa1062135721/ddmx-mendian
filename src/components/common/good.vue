@@ -90,7 +90,7 @@ export default {
             font-size:16px;
             font-family:SourceHanSansCN-Regular;
             font-weight:400;
-            color:rgba(46,202,241,1);
+            color:#f83d3d;
             line-height:20px;
           }
           .kucun{

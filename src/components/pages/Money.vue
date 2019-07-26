@@ -356,10 +356,10 @@
               <el-table-column prop="title" label="名称" width="180"></el-table-column>
               <el-table-column prop="stock" label="库存"></el-table-column>
               <el-table-column prop="price" label="单价"></el-table-column>
-              <el-table-column prop="price" label="会员价"></el-table-column>
+<!--              <el-table-column prop="price" label="会员价"></el-table-column>-->
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button type="primary" @click="addShoppingCar(scope.row)">确定</el-button>
+                  <el-button type="primary" @click="addShoppingCar(scope.row)" v-if="scope.row.stock != 0">确定</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -966,7 +966,7 @@ export default {
           }
         }
         if (this.chooeseGoods.fuwuGoods.length || this.chooeseGoods.cardList.length) {
-          this.$confirm('您确认清空购物车中的商品，重新添加另一种商品吗？', '提示', {
+          this.$confirm('您已经添加了服务，如需购买商品，需清空添加的服务，是否确认？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
@@ -974,12 +974,14 @@ export default {
             this.chooeseGoods.fuwuGoods = []
             this.chooeseGoods.cardList = []
             this.chooeseGoods.goods.push(good)
+            this.sousuoshangpingDialog.isShow = false //当是从搜索商品弹框添加商品到购物车的时候，添加成功后需要关闭搜索商品弹框
           }).catch(() => {
           });
         } else {
           this.chooeseGoods.fuwuGoods = []
           this.chooeseGoods.cardList = []
           this.chooeseGoods.goods.push(good)
+          this.sousuoshangpingDialog.isShow = false //当是从搜索商品弹框添加商品到购物车的时候，添加成功后需要关闭搜索商品弹框
         }
       }
       this.sumChooseGoodsMoney()
@@ -1073,7 +1075,18 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if (this.chooeseGoods.goods[key].num < this.chooeseGoods.goods[key].stock) { this.chooeseGoods.goods[key].num++ }
+          if (this.chooeseGoods.goods[key].num < this.chooeseGoods.goods[key].stock) { this.chooeseGoods.goods[key].num++ } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '购买数量达到最大值',
+              type: 'error'
+            })}
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选择购物车里的商品',
+            type: 'error'
+          })
         }
       }
       if (this.chooeseGoods.fuwuGoods.length) {
@@ -1085,6 +1098,12 @@ export default {
         })
         if (key !== 'undefined') {
           this.chooeseGoods.fuwuGoods[key].num++
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选择购物车里的商品',
+            type: 'error'
+          })
         }
       }
       if (this.chooeseGoods.cardList.length) {
@@ -1096,6 +1115,12 @@ export default {
         })
         if (key !== 'undefined') {
           this.chooeseGoods.cardList[key].num++
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选择购物车里的商品',
+            type: 'error'
+          })
         }
       }
       this.sumChooseGoodsMoney()
@@ -1111,7 +1136,19 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if (this.chooeseGoods.goods[key].num > 1) { this.chooeseGoods.goods[key].num-- }
+          if (this.chooeseGoods.goods[key].num > 1) { this.chooeseGoods.goods[key].num-- } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '购买数量最少为1',
+              type: 'error'
+            })
+          }
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选择购物车里的商品',
+            type: 'error'
+          })
         }
       }
       if (this.chooeseGoods.fuwuGoods.length) {
@@ -1122,7 +1159,19 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if (this.chooeseGoods.fuwuGoods[key].num > 1) { this.chooeseGoods.fuwuGoods[key].num-- }
+          if (this.chooeseGoods.fuwuGoods[key].num > 1) { this.chooeseGoods.fuwuGoods[key].num-- } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '购买数量最少为1',
+              type: 'error'
+            })
+          }
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选择购物车里的商品',
+            type: 'error'
+          })
         }
       }
       if (this.chooeseGoods.cardList.length) {
@@ -1133,7 +1182,19 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if (this.chooeseGoods.cardList[key].num > 1) { this.chooeseGoods.cardList[key].num-- }
+          if (this.chooeseGoods.cardList[key].num > 1) { this.chooeseGoods.cardList[key].num-- } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '购买数量最少为1',
+              type: 'error'
+            })
+          }
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选择购物车里的商品',
+            type: 'error'
+          })
         }
       }
       this.sumChooseGoodsMoney()
@@ -1212,10 +1273,16 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if ((parseFloat(this.xiugaishuliangDialog.inputValue) <= parseFloat(this.chooeseGoods.goods[key].stock)) && (parseFloat(this.xiugaishuliangDialog.inputValue) >= 1)) {
+          if ((this.xiugaishuliangDialog.inputValue <= this.chooeseGoods.goods[key].stock) && (this.xiugaishuliangDialog.inputValue >= 1)) {
             this.chooeseGoods.goods[key].num = this.xiugaishuliangDialog.inputValue
             this.xiugaishuliangDialog.inputValue = ''
             this.xiugaishuliangDialog.isShow = false
+          } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '购买数量达到最大值或者小于1',
+              type: 'error'
+            })
           }
         }
       }
@@ -1227,10 +1294,16 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if (parseFloat(this.xiugaishuliangDialog.inputValue) >= 1) {
+          if (this.xiugaishuliangDialog.inputValue >= 1) {
             this.chooeseGoods.fuwuGoods[key].num = this.xiugaishuliangDialog.inputValue
             this.xiugaishuliangDialog.inputValue = ''
             this.xiugaishuliangDialog.isShow = false
+          } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '购买数量不能小于1',
+              type: 'error'
+            })
           }
         }
       }
@@ -1574,11 +1647,17 @@ export default {
       let data = {}
       data.title = `${this.sousuoshangpingDialog.title}`
       postGoods(data).then((res) => {
-        if (res.data.length)
+        if (res.data.length){
           this.sousuoshangpingDialog.goodsList = res.data
+        } else {
+          this.sousuoshangpingDialog.goodsList = []
+          this.$message.closeAll()
+          this.$message({
+            message: '无法找到该商品，请重新输入',
+            type: 'error'
+          })
+        }
         this.sousuoshangpingDialog.isShow = true
-      }).catch((err) => {
-        console.log(err, '搜索商品失败')
       })
     },
     // 搜索商品按商品条形码
@@ -1588,7 +1667,7 @@ export default {
       postGoodsByCode(data).then((res) => {
         if (res.data instanceof Object && !(res.data instanceof Array) && res.data.id) {
           if (this.chooeseGoods.cardList.length || this.chooeseGoods.fuwuGoods.length ) {
-            this.$confirm('您确认清空购物车中的商品，重新添加另一种商品吗？', '提示', {
+            this.$confirm('您已经添加了服务，如需购买商品，需清空添加的服务，是否确认？', '提示', {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
               type: 'warning'
