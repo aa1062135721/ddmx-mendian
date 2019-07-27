@@ -127,7 +127,7 @@
                     </span>
                   </li>
                   <li>
-                    <span class="float-left">会员&nbsp;<span class="font-blue">{{jiezhangDialog.memberVip.nickname ? jiezhangDialog.memberVip.nickname : '未选择'}}</span></span>
+                    <span class="float-left">会员&nbsp;<span class="font-blue" @click="xuanzehuiyuanDialog.isShow = true">{{jiezhangDialog.memberVip.nickname ? jiezhangDialog.memberVip.nickname : '未选择'}}</span></span>
                     <span class="float-right">余额￥{{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : 0}}</span>
                   </li>
                   <li>
@@ -262,7 +262,7 @@
                 <span class="float-right">¥ {{parseFloat(jiezhangDialog.modifyMoney - jiezhangDialog.sumMoney).toFixed(2)}}</span>
               </li>
               <li class="clear-both">
-                <span class="float-left"><span>会员</span> <span class="font-blue">{{jiezhangDialog.memberVip.nickname?jiezhangDialog.memberVip.nickname:'未选择'}}</span></span>
+                <span class="float-left"><span>会员</span> <span class="font-blue"  @click="xuanzehuiyuanDialog.isShow = true">{{jiezhangDialog.memberVip.nickname?jiezhangDialog.memberVip.nickname:'未选择'}}</span></span>
                 <span class="float-right">余额：¥ {{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : '0.00'}}</span>
               </li>
               <li class="clear-both">
@@ -380,24 +380,24 @@
               <div class="content">
                 <ul>
                   <li><span class="float-left">会员</span><span class="float-right font-blue">{{jiezhangDialog.memberVip.nickname}}</span></li>
-                  <li><span class="float-left">余额</span><span class="float-right font-red">￥{{jiezhangDialog.memberVip.money}}</span></li>
+                  <li><span class="float-left">余额</span><span class="float-right font-red">{{jiezhangDialog.memberVip.money ? `￥`+jiezhangDialog.memberVip.money:''}}</span></li>
                   <li><span class="float-left">会员等级</span><span class="float-right">{{jiezhangDialog.memberVip.level_name}}</span></li>
                   <li>
                     <span class="float-left">服务卡</span>
-<!--                    <span class="float-right">-->
-<!--                      <el-badge value="3">-->
-<!--                        <el-button size="mini">查看</el-button>-->
-<!--                      </el-badge>-->
-<!--                    </span>-->
+                    <span class="float-right" v-if="jiezhangDialog.memberVip.service_card || jiezhangDialog.memberVip.service_card === 0">
+                      <el-badge :value="jiezhangDialog.memberVip.service_card">
+                        <el-button size="mini">查看</el-button>
+                      </el-badge>
+                    </span>
                   </li>
-                  <li style="margin-top: 20px;">
-                    <span class="float-left">代金卷</span>
+<!--                  <li style="margin-top: 20px;">-->
+<!--                    <span class="float-left">代金卷</span>-->
 <!--                    <span class="float-right">-->
 <!--                      <el-badge value="无">-->
 <!--                        <el-button size="mini">查看</el-button>-->
 <!--                      </el-badge>-->
 <!--                    </span>-->
-                  </li>
+<!--                  </li>-->
                 </ul>
               </div>
             </div>
@@ -847,7 +847,7 @@ export default {
         },
         sumMoney: 0.00, // 所购商品的合计
         modifyMoney: 0.00, // 改价参数,
-        chooesePayWay: 1, // 支付方式
+        chooesePayWay: '', // 支付方式
         closedPayWay: [ // 被禁用的支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
         ],
         // 支付完成之后弹出的结账成功弹框
@@ -1977,6 +1977,8 @@ export default {
               message: res.msg,
               type: 'success'
             })
+            this.xuanzehuiyuanDialog.mobile =  this.chongzhiDialog.mobile
+            this.clickChoosesMemberByKeyboard('ok')
             this.jiezhangDialog.nowWaiter = {
               id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
               name: '请选择服务员', // 服务员名称
@@ -2340,9 +2342,7 @@ export default {
         })
         requestData.goods = arr
         delete requestData.service_goods
-        console.log(requestData)
         postNowPayGoods(requestData).then(res => {
-          console.log(res)
           if (res.code === '200') {
             this.jiezhangDialog.nowWaiter = {
               id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
@@ -2354,6 +2354,7 @@ export default {
             this.jiezhangDialog.isShow = false
             this.jiezhangDialog.sumMoney = 0
             this.jiezhangDialog.modifyMoney = 0
+            this.jiezhangDialog.chooesePayWay = ''
             this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
             if (this.requestGoodData.isChooeseFenleiGood){
               this.getGoods()
@@ -2363,8 +2364,6 @@ export default {
             }, this.jiezhangDialog.jiezhangSuccessDialog.seconds)
             this.$forceUpdate()
           }
-        }).catch(err => {
-          console.log(err)
         })
       }
       if (this.chooeseGoods.fuwuGoods.length) {
@@ -2382,9 +2381,7 @@ export default {
         })
         requestData.service_goods = arr
         delete requestData.goods
-        console.log(requestData)
         postNowPayGoods(requestData).then(res => {
-          console.log(res)
           if (res.code === '200') {
             this.jiezhangDialog.nowWaiter = {
               id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
@@ -2396,6 +2393,7 @@ export default {
             this.jiezhangDialog.isShow = false
             this.jiezhangDialog.sumMoney = 0
             this.jiezhangDialog.modifyMoney = 0
+            this.jiezhangDialog.chooesePayWay = ''
             this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
             if (this.requestGoodData.isChooeseFenleiGood){
               this.getGoods()
@@ -2405,8 +2403,6 @@ export default {
             }, this.jiezhangDialog.jiezhangSuccessDialog.seconds)
             this.$forceUpdate()
           }
-        }).catch(err => {
-          console.log(err)
         })
       }
       if (this.chooeseGoods.cardList.length) {
@@ -2429,6 +2425,7 @@ export default {
             this.jiezhangDialog.isShow = false
             this.jiezhangDialog.sumMoney = 0
             this.jiezhangDialog.modifyMoney = 0
+            this.jiezhangDialog.chooesePayWay = ''
             this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
             if (this.requestGoodData.isChooeseFenleiGood){
               this.getGoods()
@@ -2438,8 +2435,6 @@ export default {
             }, this.jiezhangDialog.jiezhangSuccessDialog.seconds)
             this.$forceUpdate()
           }
-        }).catch(err => {
-          console.log(err)
         })
       }
     },
