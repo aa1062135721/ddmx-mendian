@@ -41,7 +41,7 @@
               <el-button @click="clickBtnXiugaishuliangShoppingCarGood" class="caozuo-button">数量</el-button>
               <el-button @click="clickBtnXiugaijiageShoppingCarGood" class="caozuo-button">改价</el-button>
               <el-button @click="clickDelShoppingCarGood" class="caozuo-button">删除</el-button>
-              <el-button @click="chongzhiDialog.isShow = true" class="caozuo-button">充值</el-button>
+              <el-button @click="chongzhiDialogShow" class="caozuo-button">充值</el-button>
               <el-button @click="huiyuanDialog.isShow = true" class="caozuo-button">会员</el-button>
               <el-button @click="goukaDialogShow" class="caozuo-button">购卡</el-button>
             </div>
@@ -165,7 +165,7 @@
       <!--修改价格弹框-->
       <el-dialog class="gaijia-tanchuan" title="修改价格" :visible.sync="xiugaijiageDialog.isShow" width="434px" :center="true">
         <div>
-          <el-input class="gaijia-input" placeholder="请输入内容" clearable v-model="xiugaijiageDialog.inputValue"></el-input>
+          <el-input class="gaijia-input" placeholder="请输入内容" clearable v-model="xiugaijiageDialog.inputValue" type="number"  min="0"></el-input>
           <div class="clear-both" style="height: 290px;">
             <div class="float-left">
               <v-keyboard @getNumber="clickChangejiageShoppingCarGood"></v-keyboard>
@@ -179,10 +179,10 @@
       <!--修改数量弹框-->
       <el-dialog class="gaijia-tanchuan" title="修改数量" :visible.sync="xiugaishuliangDialog.isShow" width="434px" :center="true">
         <div>
-          <el-input class="gaijia-input" placeholder="请输入内容" clearable v-model="xiugaishuliangDialog.inputValue"></el-input>
+          <el-input class="gaijia-input" placeholder="请输入内容" clearable v-model="xiugaishuliangDialog.inputValue" type="number" min="1"></el-input>
           <div class="clear-both" style="height: 290px;">
             <div class="float-left">
-              <v-keyboard @getNumber="clickChangeNumShoppingCarGood"></v-keyboard>
+              <v-keyboard-without-point @getNumber="clickChangeNumShoppingCarGood"></v-keyboard-without-point>
             </div>
             <div class="float-right">
               <el-button @click="clickChangeNumShoppingCarGoodOk" class="gaijia-queding-btn">确定</el-button>
@@ -227,7 +227,7 @@
               </el-radio-group>
             </div>
             <div class="four">
-              <el-input @focus="chongzhiDialogInputFocus('money')" v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额，正整数" clearable></el-input>
+              <el-input @focus="chongzhiDialogInputFocus('money')" v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额" clearable></el-input>
             </div>
           </div>
           <div class="float-right right">
@@ -441,7 +441,8 @@
           <div class="my-table">
             <!-- 服务卡 -->
             <el-table v-show="huiyuanDialog.showFuwuTable" :data="huiyuanDialog.fuwukaList" height="216" border style="width: 100%">
-              <el-table-column prop="card_name" label="服务卡名称" width="180"></el-table-column>
+              <el-table-column type="index" label="序号" width="80"></el-table-column>
+              <el-table-column prop="card_name" label="服务卡名称"></el-table-column>
               <el-table-column prop="real_price" label="购买金额"></el-table-column>
               <el-table-column prop="" label="项目服务"></el-table-column>
               <el-table-column prop="type_card" label="类型"></el-table-column>
@@ -451,15 +452,16 @@
               <el-table-column prop="status_name" label="状态"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button v-if="scope.row.type === '0'" size="mini" @click="huiyuanDialogActiveServiceCard(scope.row)">激活</el-button>
-                  <el-button v-if="scope.row.type === '1'" size="mini" @click="huiyuanDialogUseServiceCardList(scope.row)">耗卡</el-button>
-                  <el-button v-if="scope.row.type === '2'" size="mini" @click="huiyuanDialogServiceCardUseRecords(scope.row)">使用记录</el-button>
-                  <el-button v-if="scope.row.type === '4'" size="mini" @click="huiyuanDialogServiceCardReturnCardsDetails(scope.row)">退卡详情</el-button>
+                  <el-button v-if="scope.row.type === '0'" type="text" size="mini" @click="huiyuanDialogActiveServiceCard(scope.row)">激活</el-button>
+                  <el-button v-if="scope.row.type === '1'" type="text" size="mini" @click="huiyuanDialogUseServiceCardList(scope.row)">耗卡</el-button>
+                  <el-button v-if="scope.row.type === '2'" type="text" size="mini" @click="huiyuanDialogServiceCardUseRecords(scope.row)">使用记录</el-button>
+                  <el-button v-if="scope.row.type === '4'" type="text" size="mini" @click="huiyuanDialogServiceCardReturnCardsDetails(scope.row)">退卡详情</el-button>
                 </template>
               </el-table-column>
             </el-table>
             <!-- 充值记录 -->
             <el-table v-show="!huiyuanDialog.showFuwuTable" :data="huiyuanDialog.chongzhijiluList" height="216" border style="width: 100%">
+              <el-table-column type="index" label="序号" width="80"></el-table-column>
               <el-table-column prop="member_id" label="会员"></el-table-column>
               <el-table-column label="充值金额">
                 <template slot-scope="scope">
@@ -482,7 +484,7 @@
                   <span v-if="scope.row.price < 0">{{ scope.row.create_time }}</span>
                 </template>
               </el-table-column>
-              <el-table-column prop="create_time" label="充值时间"></el-table-column>
+              <el-table-column prop="create_time" label="充值时间"  width="155"></el-table-column>
             </el-table>
           </div>
         </div>
@@ -1403,7 +1405,17 @@ export default {
       }
     },
     clickChangejiageShoppingCarGood (code) {
-        this.xiugaijiageDialog.inputValue += code
+      if (code !== '.')
+        this.xiugaijiageDialog.inputValue =  String(this.xiugaijiageDialog.inputValue) + code
+        // this.xiugaijiageDialog.inputValue += code
+      else {
+        if ( this.xiugaijiageDialog.inputValue.indexOf(code) === -1){
+          this.xiugaijiageDialog.inputValue =  String(this.xiugaijiageDialog.inputValue) + code
+        } else {
+
+        }
+      }
+
     },
     clickChangejiageShoppingCarGoodOk () {
       if (this.chooeseGoods.goods.length) {
@@ -1851,20 +1863,30 @@ export default {
       }
     },
     // 充值弹框
+    chongzhiDialogShow () {
+      if (this.jiezhangDialog.nowWaiter.id === -1) {
+        this.$message.closeAll()
+        this.$message({
+          message: '请先选择服务人员',
+          type: 'error'
+        })
+        return
+      }
+      this.chongzhiDialog.isShow = true
+    },
     chongzhiDialogInputFocus (str) {
       this.chongzhiDialog.chooeseWho = str
     },
     chongzhiDialogGetCode (code) {
       if (this.chongzhiDialog.chooeseWho === 'mobile') {
         if (this.chongzhiDialog.mobile.length<11)
-          this.chongzhiDialog.mobile += `${code}`
+          if (code != '.')
+            this.chongzhiDialog.mobile += `${code}`
         if (this.chongzhiDialog.mobile.length === 11)
           this.chongzhiDialogSearchMemberVip()
       }
       if (this.chongzhiDialog.chooeseWho === 'money') {
-        if (/^[1-9]\d*$/.test(this.chongzhiDialog.payMoney + `${code}`)) {
-          this.chongzhiDialog.payMoney += `${code}`
-        }
+        this.chongzhiDialog.payMoney += `${code}`
       }
     },
     chongzhiDialogSearchMemberVip () {
@@ -1896,14 +1918,6 @@ export default {
       })
     },
     chongzhiDialogBtnOk () {
-      if (this.jiezhangDialog.nowWaiter.id === -1) {
-        this.$message.closeAll()
-        this.$message({
-          message: '请先选择服务人员',
-          type: 'error'
-        })
-        return
-      }
       if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
         this.$message.closeAll()
         this.$message({
@@ -1920,10 +1934,10 @@ export default {
         })
         return
       }
-      if (!/^[1-9]\d*$/.test(this.chongzhiDialog.payMoney)) {
+      if ((!/^\d+(\.\d+)?$/.test(this.chongzhiDialog.payMoney)) || (parseFloat(this.chongzhiDialog.payMoney) <= 0)) {
         this.$message.closeAll()
         this.$message({
-          message: '充值金额为正整数哦',
+          message: '充值金额为正数哦',
           type: 'error'
         })
         return
