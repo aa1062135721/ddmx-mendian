@@ -412,7 +412,7 @@
           <div class="clear-both header">
             <div class="float-left left">
               <div class="search-btns">
-                <el-button type="primary" @click="huiyuanDialog.addHuiyuanDialog.isShow = true">新增会员</el-button>
+                <el-button type="primary" @click="huiyuanDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
                 <el-input style="width:392px;" @keyup.native="huiyuanDialogSearchMemberVip" v-model="huiyuanDialog.mobile" placeholder="请输入您需要查询的会员手机号码"  maxlength="11"></el-input>
                 <el-button  plain @click="huiyuanDialogSearchMemberVip">搜索</el-button>
               </div>
@@ -1414,7 +1414,7 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if ((parseFloat(this.xiugaijiageDialog.inputValue) > 0) && (parseFloat(this.xiugaijiageDialog.inputValue) >= parseFloat(this.chooeseGoods.goods[key].minimum_selling_price))) {
+          if (parseFloat(this.xiugaijiageDialog.inputValue) >= parseFloat(this.chooeseGoods.goods[key].minimum_selling_price)) {
             this.chooeseGoods.goods[key].is_edit = 1
             this.chooeseGoods.goods[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
             this.xiugaijiageDialog.inputValue = ''
@@ -1441,6 +1441,12 @@ export default {
             this.chooeseGoods.fuwuGoods[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
             this.xiugaijiageDialog.inputValue = ''
             this.xiugaijiageDialog.isShow = false
+          } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '修改的价格必须正数',
+              type: 'error'
+            })
           }
         }
       }
@@ -1457,6 +1463,12 @@ export default {
             this.chooeseGoods.cardList[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
             this.xiugaijiageDialog.inputValue = ''
             this.xiugaijiageDialog.isShow = false
+          } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '修改的价格必须正数',
+              type: 'error'
+            })
           }
         }
       }
@@ -1945,6 +1957,7 @@ export default {
       }).then(() => {
         postMemberVipRecharge(requestData).then(res => {
           if (res.code === '200') {
+            this.chongzhiDialog.isShow = false
             this.$message.closeAll()
             this.$message({
               message: res.msg,
@@ -1955,8 +1968,10 @@ export default {
               name: '请选择服务员', // 服务员名称
               type: '' // 服务类型
             }
+            this.chongzhiDialog.mobile = ''
+            this.chongzhiDialog.huiyuanInfo = {}
             this.chongzhiDialog.payType = ''
-            this.chongzhiDialogSearchMemberVip()
+            this.chongzhiDialog.payMoney = ''
           }
         })
       }).catch(() => {
@@ -2018,10 +2033,10 @@ export default {
         })
         return
       }
-      if (!/^[\u4e00-\u9fa5]+$/.test(requestData.nickname.replace(/(^\s*)|(\s*$)/g, ""))) {
+      if (!requestData.nickname) {
         this.$message.closeAll()
         this.$message({
-          message: '会员昵称要求为汉字哦',
+          message: '请输入会员昵称',
           type: 'error'
         })
         return
@@ -2041,16 +2056,17 @@ export default {
       }).then(() => {
         postAddMemberVip(requestData).then(res => {
           if (res.code === '200') {
+            this.$confirm(`新增会员成功，是否选择会员（${requestData.mobile}）结账?`, '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              this.xuanzehuiyuanDialog.mobile = requestData.mobile
+              this.clickChoosesMemberByKeyboard('ok')
+            }).catch(() =>{})
             this.huiyuanDialog.addHuiyuanDialog.isShow = false
             this.huiyuanDialog.addHuiyuanDialog.mobile = ''
             this.huiyuanDialog.addHuiyuanDialog.nickname = ''
-            this.$message.closeAll()
-            this.$message({
-              message: res.msg,
-              type: 'success'
-            })
-            this.huiyuanDialog.mobile = requestData.mobile
-            this.huiyuanDialogSearchMemberVip()
           }
         })
       }).catch(() => {
