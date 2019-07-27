@@ -195,7 +195,7 @@
         <div class="clear-both both">
           <div class="float-left left">
             <div class="one">
-              <el-input @keyup.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')" v-model="chongzhiDialog.mobile" placeholder="请输入会员手机号" clearable maxlength="11"></el-input>
+              <el-input v-model="chongzhiDialog.mobile" @input.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')"  placeholder="请输入会员手机号" clearable maxlength="11"></el-input>
             </div>
             <div class="two">
               <ul>
@@ -205,11 +205,11 @@
                 </li>
                 <li>
                   <span class="float-left">累积充值</span>
-                  <span class="float-right">￥{{chongzhiDialog.huiyuanInfo.amount}}</span>
+                  <span class="float-right">￥{{chongzhiDialog.huiyuanInfo.amount ? parseFloat(chongzhiDialog.huiyuanInfo.amount).toFixed(2) : ''}}</span>
                 </li>
                 <li>
                   <span class="float-left">余额</span>
-                  <span class="float-right font-red">￥{{ chongzhiDialog.huiyuanInfo.money }}</span>
+                  <span class="float-right font-red">￥{{chongzhiDialog.huiyuanInfo.money ? parseFloat(chongzhiDialog.huiyuanInfo.money).toFixed(2) : ''}}</span>
                 </li>
                 <li>
                   <span class="float-left">会员等级</span>
@@ -788,7 +788,7 @@ export default {
             // }
           ]
         },
-        payType: '5', // 充值方式
+        payType: '', // 充值方式
         payMoney: '' // 充值金额
       },
       // 选择会员弹框是否显示
@@ -1846,6 +1846,8 @@ export default {
       if (this.chongzhiDialog.chooeseWho === 'mobile') {
         if (this.chongzhiDialog.mobile.length<11)
           this.chongzhiDialog.mobile += `${code}`
+        if (this.chongzhiDialog.mobile.length === 11)
+          this.chongzhiDialogSearchMemberVip()
       }
       if (this.chongzhiDialog.chooeseWho === 'money') {
         if (/^[1-9]\d*$/.test(this.chongzhiDialog.payMoney + `${code}`)) {
@@ -1875,12 +1877,21 @@ export default {
             message: '没有查询到该会员的信息',
             type: 'error'
           })
+          this.chongzhiDialog.huiyuanInfo = {}
         }
       }).catch(err => {
         console.log(err)
       })
     },
     chongzhiDialogBtnOk () {
+      if (this.jiezhangDialog.nowWaiter.id === -1) {
+        this.$message.closeAll()
+        this.$message({
+          message: '请先选择服务人员',
+          type: 'error'
+        })
+        return
+      }
       if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
         this.$message.closeAll()
         this.$message({
@@ -1924,19 +1935,31 @@ export default {
       let requestData = {
         member_id: this.chongzhiDialog.huiyuanInfo.id,
         price: this.chongzhiDialog.payMoney,
-        pay_way: this.chongzhiDialog.payType
+        pay_way: this.chongzhiDialog.payType,
+        waiter_id: this.jiezhangDialog.nowWaiter.id
       }
-      postMemberVipRecharge(requestData).then(res => {
-        if (res.code === '200') {
-          this.$message.closeAll()
-          this.$message({
-            message: res.msg,
-            type: 'success'
-          })
-          this.chongzhiDialogSearchMemberVip()
-        }
-      }).catch(err => {
-        console.log('充值失败', err)
+      this.$confirm(`是否确认给${this.chongzhiDialog.huiyuanInfo.mobile}充值，充值金额为：${requestData.price}元？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        postMemberVipRecharge(requestData).then(res => {
+          if (res.code === '200') {
+            this.$message.closeAll()
+            this.$message({
+              message: res.msg,
+              type: 'success'
+            })
+            this.jiezhangDialog.nowWaiter = {
+              id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
+              name: '请选择服务员', // 服务员名称
+              type: '' // 服务类型
+            }
+            this.chongzhiDialog.payType = ''
+            this.chongzhiDialogSearchMemberVip()
+          }
+        })
+      }).catch(() => {
       })
     },
     // 会员查询弹框中的事件
@@ -2011,20 +2034,27 @@ export default {
         })
         return
       }
-      postAddMemberVip(requestData).then(res => {
-        if (res.code === '200') {
-          this.huiyuanDialog.addHuiyuanDialog.isShow = false
-          this.huiyuanDialog.addHuiyuanDialog.mobile = ''
-          this.huiyuanDialog.addHuiyuanDialog.nickname = ''
-          this.$message.closeAll()
-          this.$message({
-            message: res.msg,
-            type: 'success'
-          })
-          this.huiyuanDialog.mobile = requestData.mobile
-          this.huiyuanDialogSearchMemberVip()
-        }
-      })
+      this.$confirm(`是否选择新增加该会员（${requestData.mobile}）?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        postAddMemberVip(requestData).then(res => {
+          if (res.code === '200') {
+            this.huiyuanDialog.addHuiyuanDialog.isShow = false
+            this.huiyuanDialog.addHuiyuanDialog.mobile = ''
+            this.huiyuanDialog.addHuiyuanDialog.nickname = ''
+            this.$message.closeAll()
+            this.$message({
+              message: res.msg,
+              type: 'success'
+            })
+            this.huiyuanDialog.mobile = requestData.mobile
+            this.huiyuanDialogSearchMemberVip()
+          }
+        })
+      }).catch(() => {
+      });
     },
     huiyuanDialogSearchRechargeLog () {
       if (this.huiyuanDialog.huiyuanInfo.id) {
