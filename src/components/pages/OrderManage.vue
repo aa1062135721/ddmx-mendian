@@ -74,7 +74,8 @@
               <el-table-column prop="sn" label="订单号"></el-table-column>
               <el-table-column label="会员账号">
                 <template slot-scope="scope">
-                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)">{{scope.row.mobile}}</el-button>
+                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)" v-if="scope.row.member_id === '0'">{{scope.row.mobile}}</el-button>
+                  <span v-else>非会员</span>
                 </template>
               </el-table-column>
               <el-table-column prop="amount" label="付款金额"></el-table-column>
@@ -113,7 +114,7 @@
               background
               layout="total, sizes, prev, pager, next, jumper"
               @size-change="pageSizeChange"
-              :page-sizes="[1,10, 20, 30, 40]"
+              :page-sizes="[10, 20, 30, 40]"
               :page-size="requestData.limit"
               @current-change="responseDataOnePageCurrentChange"
               :current-page.sync="requestData.page"
@@ -223,7 +224,7 @@
               </el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button size="mini">订单详情</el-button>
+                  <el-button size="mini"  @click="showOrderDetails(requestData.type, scope.row.id)">订单详情</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -233,7 +234,7 @@
               background
               layout="total, sizes, prev, pager, next, jumper"
               @size-change="pageSizeChange"
-              :page-sizes="[1,10, 20, 30, 40]"
+              :page-sizes="[10, 20, 30, 40]"
               :page-size="requestData.limit"
               @current-change="responseDataOnePageCurrentChange"
               :current-page.sync="requestData.page"
@@ -318,7 +319,7 @@
               <el-table-column prop="remake" label="备注"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button size="mini">订单详情</el-button>
+                  <el-button size="mini"   @click="showOrderDetails(requestData.type, scope.row.id)">订单详情</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -328,7 +329,7 @@
               background
               layout="total, sizes, prev, pager, next, jumper"
               @size-change="pageSizeChange"
-              :page-sizes="[1,10, 20, 30, 40]"
+              :page-sizes="[10, 20, 30, 40]"
               :page-size="requestData.limit"
               @current-change="responseDataOnePageCurrentChange"
               :current-page.sync="requestData.page"
@@ -339,40 +340,156 @@
       </el-tabs>
 
       <!-- 商品订单--订单详情弹框-->
-      <el-dialog class="order-details-dialog" title="订单详情" :visible.sync="orderDetailsDialog1.isShow" width="968px" :center="true">
+      <el-dialog class="order-details-dialog" title="商品订单详情" :visible.sync="orderDetailsDialog1.isShow" width="968px" :center="true">
         <div>
           <div>
             <div class="title">订单信息</div>
             <div class="content clear-both">
-                <div class="float-left">交易时间：{{orderDetailsDialog1.time}}</div>
-                <div class="float-right">交易门店：{{orderDetailsDialog1.is_online}}</div>
+                <div class="float-left">交易时间：{{orderDetailsDialog1.responseData.time}}</div>
+                <div class="float-right">交易门店：{{orderDetailsDialog1.responseData.is_online}}</div>
             </div>
           </div>
           <div>
             <div class="title">收款信息</div>
             <div class="content clear-both">
-              <div class="float-left">应收金额：{{orderDetailsDialog1.old_amount}}</div>
-              <div class="float-right">实收金额：{{orderDetailsDialog1.amount}}</div>
+              <div class="float-left">应收金额：{{orderDetailsDialog1.responseData.old_amount}}</div>
+              <div class="float-right">实收金额：{{orderDetailsDialog1.responseData.amount}}</div>
             </div>
             <div class="content clear-both">
-              <div class="float-left">收款方式：{{orderDetailsDialog1.pay_way}}</div>
+              <div class="float-left">收款方式：{{orderDetailsDialog1.responseData.pay_way}}</div>
             </div>
           </div>
           <div>
             <div class="title">会员信息</div>
             <div class="content clear-both">
-              <div class="float-left">会员账号：{{orderDetailsDialog1.member.mobile || ''}}</div>
-              <div class="float-right">会员昵称：{{orderDetailsDialog1.member.nickname || ''}}</div>
+              <div class="float-left">会员账号：{{orderDetailsDialog1.responseData.member.mobile || ''}}</div>
+              <div class="float-right">会员昵称：{{orderDetailsDialog1.responseData.member.nickname || ''}}</div>
             </div>
             <div class="content clear-both">
-              <div class="float-left">会员等级：{{orderDetailsDialog1.member.level || ''}}</div>
-              <div class="float-right">会员余额：{{orderDetailsDialog1.member.money || ''}}</div>
+              <div class="float-left">会员等级：{{orderDetailsDialog1.responseData.member.level || ''}}</div>
+              <div class="float-right">会员余额：{{orderDetailsDialog1.responseData.member.money || ''}}</div>
             </div>
           </div>
           <div>
             <div class="title">商品信息</div>
             <div>
-              <el-table :data="orderDetailsDialog1.goods" border style="width: 100%;" height="142">
+              <el-table :data="orderDetailsDialog1.responseGoodList" border style="width: 100%;" height="142">
+                <el-table-column prop="subtitle" label="商品名称" width="180"></el-table-column>
+                <el-table-column prop="num" label="数量" width="180"></el-table-column>
+                <el-table-column prop="real_price" label="成本价"></el-table-column>
+                <el-table-column prop="price" label="单价" width="180"></el-table-column>
+                <el-table-column prop="pay_all_price" label="付款价格"></el-table-column>
+              </el-table>
+            </div>
+          </div>
+          <div>
+            <div class="title">退单信息</div>
+            <div>
+              <el-table  border style="width: 100%;" height="142">
+                <el-table-column prop="id" label="订单号" width="180"></el-table-column>
+                <el-table-column prop="mobile" label="会员账号" width="180"></el-table-column>
+                <el-table-column prop="price" label="付款金额"></el-table-column>
+                <el-table-column prop="id" label="订单号" width="180"></el-table-column>
+                <el-table-column prop="mobile" label="会员账号" width="180"></el-table-column>
+                <el-table-column prop="price" label="付款金额"></el-table-column>
+              </el-table>
+            </div>
+          </div>
+        </div>
+      </el-dialog>
+      <!-- 服务订单--订单详情弹框-->
+      <el-dialog class="order-details-dialog" title="服务订单详情" :visible.sync="orderDetailsDialog2.isShow" width="968px" :center="true">
+        <div>
+          <div>
+            <div class="title">订单信息</div>
+            <div class="content clear-both">
+              <div class="float-left">交易时间：{{orderDetailsDialog2.responseData.time}}</div>
+              <div class="float-right">交易门店：{{orderDetailsDialog2.responseData.is_online}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="title">收款信息</div>
+            <div class="content clear-both">
+              <div class="float-left">应收金额：{{orderDetailsDialog2.responseData.old_amount}}</div>
+              <div class="float-right">实收金额：{{orderDetailsDialog2.responseData.amount}}</div>
+            </div>
+            <div class="content clear-both">
+              <div class="float-left">收款方式：{{orderDetailsDialog2.responseData.pay_way}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="title">会员信息</div>
+            <div class="content clear-both">
+              <div class="float-left">会员账号：{{orderDetailsDialog2.responseData.member.mobile || ''}}</div>
+              <div class="float-right">会员昵称：{{orderDetailsDialog2.responseData.member.nickname || ''}}</div>
+            </div>
+            <div class="content clear-both">
+              <div class="float-left">会员等级：{{orderDetailsDialog2.responseData.member.level || ''}}</div>
+              <div class="float-right">会员余额：{{orderDetailsDialog2.responseData.member.money || ''}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="title">商品信息</div>
+            <div>
+              <el-table :data="orderDetailsDialog2.responseGoodList" border style="width: 100%;" height="142">
+                <el-table-column prop="subtitle" label="商品名称" width="180"></el-table-column>
+                <el-table-column prop="num" label="数量" width="180"></el-table-column>
+                <el-table-column prop="real_price" label="成本价"></el-table-column>
+                <el-table-column prop="price" label="单价" width="180"></el-table-column>
+                <el-table-column prop="pay_all_price" label="付款价格"></el-table-column>
+              </el-table>
+            </div>
+          </div>
+          <div>
+            <div class="title">退单信息</div>
+            <div>
+              <el-table  border style="width: 100%;" height="142">
+                <el-table-column prop="id" label="订单号" width="180"></el-table-column>
+                <el-table-column prop="mobile" label="会员账号" width="180"></el-table-column>
+                <el-table-column prop="price" label="付款金额"></el-table-column>
+                <el-table-column prop="id" label="订单号" width="180"></el-table-column>
+                <el-table-column prop="mobile" label="会员账号" width="180"></el-table-column>
+                <el-table-column prop="price" label="付款金额"></el-table-column>
+              </el-table>
+            </div>
+          </div>
+        </div>
+      </el-dialog>
+      <!-- 充值订单--订单详情弹框-->
+      <el-dialog class="order-details-dialog" title="服务订单详情" :visible.sync="orderDetailsDialog3.isShow" width="968px" :center="true">
+        <div>
+          <div>
+            <div class="title">订单信息</div>
+            <div class="content clear-both">
+              <div class="float-left">交易时间：{{orderDetailsDialog3.responseData.time}}</div>
+              <div class="float-right">交易门店：{{orderDetailsDialog3.responseData.is_online}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="title">收款信息</div>
+            <div class="content clear-both">
+              <div class="float-left">应收金额：{{orderDetailsDialog3.responseData.old_amount}}</div>
+              <div class="float-right">实收金额：{{orderDetailsDialog3.responseData.amount}}</div>
+            </div>
+            <div class="content clear-both">
+              <div class="float-left">收款方式：{{orderDetailsDialog3.responseData.pay_way}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="title">会员信息</div>
+            <div class="content clear-both">
+              <div class="float-left">会员账号：{{orderDetailsDialog3.responseData.member.mobile || ''}}</div>
+              <div class="float-right">会员昵称：{{orderDetailsDialog3.responseData.member.nickname || ''}}</div>
+            </div>
+            <div class="content clear-both">
+              <div class="float-left">会员等级：{{orderDetailsDialog3.responseData.member.level || ''}}</div>
+              <div class="float-right">会员余额：{{orderDetailsDialog3.responseData.member.money || ''}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="title">商品信息</div>
+            <div>
+              <el-table :data="orderDetailsDialog3.responseGoodList" border style="width: 100%;" height="142">
                 <el-table-column prop="subtitle" label="商品名称" width="180"></el-table-column>
                 <el-table-column prop="num" label="数量" width="180"></el-table-column>
                 <el-table-column prop="real_price" label="成本价"></el-table-column>
@@ -553,21 +670,24 @@ export default {
       // 商品订单-订单详情弹窗内容
       orderDetailsDialog1: {
         isShow: false,
-        id: 2,
-        sn: 'XM155937958663',
-        time: '2019-06-02 18:49:46',
-        shop_code: '总店',
-        is_online: '门店收银',
-        waiter: '测试员工2',
-        old_amount: '136.00',
-        amount: '130.00',
-        member: {
-          mobile: '17723582121',
-          nickname: '罗文2222',
-          level: '普通会员',
-          money: '29.01'
+        responseData:{
+          id: 2,
+          sn: 'XM155937958663',
+          time: '2019-06-02 18:49:46',
+          shop_code: '总店',
+          is_online: '门店收银',
+          waiter: '测试员工2',
+          old_amount: '136.00',
+          amount: '130.00',
+          member: {
+            mobile: '17723582121',
+            nickname: '罗文2222',
+            level: '普通会员',
+            money: '29.01'
+          },
+          pay_way: '现金支付'
         },
-        goods: [
+        responseGoodList: [
           {
             id: 1, // 订单商品表的id
             subtitle: '新西兰S-26惠氏婴幼儿奶粉2段900g/罐', // 商品购买时的商品名称
@@ -587,7 +707,88 @@ export default {
             pay_all_price: 302
           }
         ],
-        pay_way: '现金支付'
+      },
+      // 服务订单-订单详情弹窗内容
+      orderDetailsDialog2: {
+        isShow: false,
+        responseData:{
+          id: 2,
+          sn: 'XM155937958663',
+          time: '2019-06-02 18:49:46',
+          shop_code: '总店',
+          is_online: '门店收银',
+          waiter: '测试员工2',
+          old_amount: '136.00',
+          amount: '130.00',
+          member: {
+            mobile: '17723582121',
+            nickname: '罗文2222',
+            level: '普通会员',
+            money: '29.01'
+          },
+          pay_way: '现金支付'
+        },
+        responseGoodList: [
+          {
+            id: 1, // 订单商品表的id
+            subtitle: '新西兰S-26惠氏婴幼儿奶粉2段900g/罐', // 商品购买时的商品名称
+            num: 2, // 数量
+            refund: 0, // 退货数量
+            price: '179.00', // 原价
+            real_price: '179.00', // 实际
+            pay_all_price: 358 // 付款总数
+          },
+          {
+            id: 2,
+            subtitle: '安琪憨贝洁婴儿柔湿巾80片1包装',
+            num: 2,
+            refund: 2,
+            price: '151.00',
+            real_price: '151.00',
+            pay_all_price: 302
+          }
+        ],
+      },
+      // 充值订单-订单详情弹窗内容
+      orderDetailsDialog3: {
+        isShow: false,
+        responseData:{
+          id: 2,
+          sn: 'XM155937958663',
+          time: '2019-06-02 18:49:46',
+          shop_code: '总店',
+          is_online: '门店收银',
+          waiter: '测试员工2',
+          old_amount: '136.00',
+          amount: '130.00',
+          member: {
+            mobile: '17723582121',
+            nickname: '罗文2222',
+            level: '普通会员',
+            money: '29.01'
+          },
+          pay_way: '现金支付'
+        },
+        responseGoodList: [
+          {
+            id: 1, // 订单商品表的id
+            subtitle: '新西兰S-26惠氏婴幼儿奶粉2段900g/罐', // 商品购买时的商品名称
+            num: 2, // 数量
+            refund: 0, // 退货数量
+            price: '179.00', // 原价
+            real_price: '179.00', // 实际
+            pay_all_price: 358 // 付款总数
+          },
+          {
+            id: 2,
+            subtitle: '安琪憨贝洁婴儿柔湿巾80片1包装',
+            num: 2,
+            refund: 2,
+            price: '151.00',
+            real_price: '151.00',
+            pay_all_price: 302
+          }
+        ],
       },
       // 选择服务人员
       waiter: [
@@ -662,24 +863,51 @@ export default {
         type,
         id
       }
-      await postOrderDetails(data).then(res => {
-        if (res.code === '200') {
-          // this.orderDetailsDialog = res.data
-          this.orderDetailsDialog1.isShow = true
-        }
-      }).catch(err => {
-        console.log(err)
-      })
-
       let data2 = {
         order_id: id,
         type: type
       }
-      await postOrderDetailsGoods(data2).then(res => {
-        if (res.code === '200') {
-          this.orderDetailsDialog1.goodList = res.data
-        }
-      })
+      switch (type) {
+        case "1":
+          await postOrderDetails(data).then(res => {
+            if (res.code === '200') {
+              this.orderDetailsDialog1.responseData = res.data
+            }
+          })
+          await postOrderDetailsGoods(data2).then(res => {
+            if (res.code === '200') {
+              this.orderDetailsDialog1.responseGoodList = res.data
+              this.orderDetailsDialog1.isShow = true
+            }
+          })
+          break
+        case "2":
+          await postOrderDetails(data).then(res => {
+            if (res.code === '200') {
+              this.orderDetailsDialog2.responseData = res.data
+            }
+          })
+          await postOrderDetailsGoods(data2).then(res => {
+            if (res.code === '200') {
+              this.orderDetailsDialog2.responseGoodList = res.data
+              this.orderDetailsDialog2.isShow = true
+            }
+          })
+          break
+        case "3":
+          await postOrderDetails(data).then(res => {
+            if (res.code === '200') {
+              this.orderDetailsDialog3.responseData = res.data
+            }
+          })
+          await postOrderDetailsGoods(data2).then(res => {
+            if (res.code === '200') {
+              this.orderDetailsDialog3.responseGoodList = res.data
+              this.orderDetailsDialog3.isShow = true
+            }
+          })
+          break
+      }
     },
     // 商品订单 页码操作
     responseDataOnePageCurrentChange (val) {
@@ -741,7 +969,7 @@ export default {
     getMemberInfo (id = 1) {
       this.memberInfoDialog.isShow = true
       let data = {
-        id: id
+        member_id: id
       }
       postMemberInfo(data).then(res => {
         this.memberInfoDialog.memberInfo = res.data
