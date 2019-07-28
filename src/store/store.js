@@ -7,7 +7,7 @@ Vue.use(Vuex)
 // root state object.
 // each Vuex instance is just a single state tree.
 const state = {
-  userInfo:{
+  userInfo: {
     id: 1, // 用户id
     user_type: 1, //
     sex: 1,
@@ -22,7 +22,7 @@ const state = {
     user_nickname: '', // 名称
     user_email: '465497241@qq.com', // 邮箱
     user_url: '',
-    shop_name:'',
+    shop_name: '',
     avatar: '',
     signature: '',
     last_login_ip: '127.0.0.1',
@@ -49,13 +49,13 @@ const mutations = {
 // asynchronous operations.
 const actions = {
   saveUserInfo ({ commit }, saveData = {}) {
-    commit('setUserInfo',saveData)
+    commit('setUserInfo', saveData)
   }
 }
 
 // getters are functions
 const getters = {
-  userInfo: state => state.userInfo,
+  userInfo: state => state.userInfo
 }
 
 // A Vuex instance is created by combining the state, mutations, actions,

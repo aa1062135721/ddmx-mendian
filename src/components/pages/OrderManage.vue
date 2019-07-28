@@ -654,18 +654,18 @@ export default {
       },
       // 商品订单
       responseData1: {
-        data:[],
-        count:10,
+        data: [],
+        count: 10
       },
       // 服务订单
       responseData2: {
-        data:[],
-        count:10,
+        data: [],
+        count: 10
       },
       // 充值订单
       responseData3: {
-        data:[],
-        count:10,
+        data: [],
+        count: 10
       },
       // 商品订单-退单弹框
       returnOrderDialog1: {
@@ -674,7 +674,7 @@ export default {
       // 商品订单-订单详情弹窗内容
       orderDetailsDialog1: {
         isShow: false,
-        responseData:{
+        responseData: {
           id: 2,
           sn: 'XM155937958663',
           time: '2019-06-02 18:49:46',
@@ -710,12 +710,12 @@ export default {
             real_price: '151.00',
             pay_all_price: 302
           }
-        ],
+        ]
       },
       // 服务订单-订单详情弹窗内容
       orderDetailsDialog2: {
         isShow: false,
-        responseData:{
+        responseData: {
           id: 2,
           sn: 'XM155937958663',
           time: '2019-06-02 18:49:46',
@@ -751,12 +751,12 @@ export default {
             real_price: '151.00',
             pay_all_price: 302
           }
-        ],
+        ]
       },
       // 充值订单-订单详情弹窗内容
       orderDetailsDialog3: {
         isShow: false,
-        responseData:{
+        responseData: {
           id: 2,
           sn: 'XM155937958663',
           time: '2019-06-02 18:49:46',
@@ -792,7 +792,7 @@ export default {
             real_price: '151.00',
             pay_all_price: 302
           }
-        ],
+        ]
       },
       // 选择服务人员
       waiter: [
@@ -872,7 +872,7 @@ export default {
         type: type
       }
       switch (type) {
-        case "1":
+        case '1':
           await postOrderDetails(data).then(res => {
             if (res.code === '200') {
               this.orderDetailsDialog1.responseData = res.data
@@ -885,7 +885,7 @@ export default {
             }
           })
           break
-        case "2":
+        case '2':
           await postOrderDetails(data).then(res => {
             if (res.code === '200') {
               this.orderDetailsDialog2.responseData = res.data
@@ -898,7 +898,7 @@ export default {
             }
           })
           break
-        case "3":
+        case '3':
           await postOrderDetails(data).then(res => {
             if (res.code === '200') {
               this.orderDetailsDialog3.responseData = res.data

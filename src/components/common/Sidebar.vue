@@ -62,7 +62,7 @@ export default {
           title: '支出管理',
           icon: 'expenditure-manage',
           index: '/home/expenditure'
-        },
+        }
         // {
         //   title: '系统设置',
         //   icon: 'system-setting',

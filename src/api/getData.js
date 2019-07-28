@@ -416,7 +416,6 @@ export const postTransferSlipSendGoodsCancel = (data = null) => {
   return Vue.prototype.$post('/allot/shop_cancel', data)
 }
 
-
 /**
  * 订单管理-库存管理 - 调拨单 - 详情
  * @param data

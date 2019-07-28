@@ -667,15 +667,15 @@
 </template>
 
 <script>
-import { mapGetters } from  'vuex'
+import { mapGetters } from 'vuex'
 import { postTransferSlipConfirmGoods, postTransferSlipSendGoodsGetInfo, postTransferSlipSendGoodsGetGoodList, postTransferSlipGoodsDetails, postTransferSlipDetails, postTransferSlipSendGoods, postTransferSlipSendGoodsCancel, postTransferSlipDel, postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
 export default {
   name: 'InventoryManage', // 库存管理，进销存
   data () {
     return {
       type: '1', // 1=调拨单，2=盘点单，3=盘亏单，4=盘盈单
-      //调出 或调出 仓库
-      shopList:[
+      // 调出 或调出 仓库
+      shopList: [
         // {id: 0, name: '总店'},
         // {id: 1, name: '江与城'},
         // {id: 2, name: '已完成'}
@@ -692,9 +692,9 @@ export default {
           {id: 'out_time', name: '发货时间'},
           {id: 'in_time', name: '入库时间'}
         ],
-        //数据总数
-        count:0,
-        list:[
+        // 数据总数
+        count: 0,
+        list: [
           // {
           //   message: "\r\n    \t\t<p>订单号：DB2019072300003</p>\r\n    \t\t<p>调拨人员：堕落嚣张</p>\r\n    \t\t<p>调出仓库：留云路店</p>\r\n    \t\t<p>调拨时间：2019-07-23 15:47:23</p>\t\r\n    \t\t",
           //   out_message: "\r\n    \t\t<p>发货人员：堕落嚣张</p>\r\n    \t\t<p>发货时间：2019-07-23 15:47:29</p>\r\n    \t\t",
@@ -708,18 +708,18 @@ export default {
         // 新增调拨单弹框
         addDialog: {
           isShow: false,
-          responseData:{
-            allot_in:'',//调入仓库id
-            count:1,//调拨商品总数
-            bar_code:['','fdadsfad'],//调拨商品的条形码s
-            item_id:[1,2],//调拨商品ids
-            item_name:['fasdfadf','dfadsfas'],//调拨商品名s
-            purchase_number:[1,2],//调拨数量s
-            remark:['备注1','备注2'],//调拨商品的描述s
-            remarks:'',//调拨单描述
-            worker_id:'',//调拨人id//数据来源vuex
+          responseData: {
+            allot_in: '', // 调入仓库id
+            count: 1, // 调拨商品总数
+            bar_code: ['', 'fdadsfad'], // 调拨商品的条形码s
+            item_id: [1, 2], // 调拨商品ids
+            item_name: ['fasdfadf', 'dfadsfas'], // 调拨商品名s
+            purchase_number: [1, 2], // 调拨数量s
+            remark: ['备注1', '备注2'], // 调拨商品的描述s
+            remarks: '', // 调拨单描述
+            worker_id: ''// 调拨人id//数据来源vuex
           },
-          list:[
+          list: [
             // {
             //   id: 1738,     //商品id
             //   title: "测试商品7/18",    //商品名称
@@ -735,7 +735,7 @@ export default {
         // 选择商品弹框
         chooseGoodsDialog: {
           isShow: false,
-          title:'',
+          title: '',
           multipleSelection: [],
           list: [
             // {
@@ -756,23 +756,23 @@ export default {
           twoCategoryId: '',
           twoCategory: [
             // {cname:'奶粉',id:1,pid:0}
-          ],
+          ]
         },
         // 发货弹框
         sendGoodsDialog: {
           isShow: false,
-          id:0,//需要发货的调拨单id
+          id: 0, // 需要发货的调拨单id
           // 调拨单信息
-          responseData:{
-           // sn: "DB2019072300001",
-           // shop_name: "留云路店",
-           // creator: "堕落嚣张",
-           // time: "2019-07-23 15:38:57",
-           // remark: "",
-           // id: 1
+          responseData: {
+            // sn: "DB2019072300001",
+            // shop_name: "留云路店",
+            // creator: "堕落嚣张",
+            // time: "2019-07-23 15:38:57",
+            // remark: "",
+            // id: 1
           },
-          //发货商品列表
-          responseGoodList:[
+          // 发货商品列表
+          responseGoodList: [
             {
               // item_id: 27,
               // item: "港版美素佳儿1段  1罐装",
@@ -780,7 +780,7 @@ export default {
               // bar_code: "暂无条形码",
               // stock: 0
             }
-          ],
+          ]
         },
         // 打印
         printingDialog: {
@@ -789,7 +789,7 @@ export default {
         // 调拨详情
         detailsDialog: {
           isShow: false,
-          responseData:{
+          responseData: {
             // amount: null,
             // create_time: "2019-07-25 14:45:26",
             // creator: "公司帐户",
@@ -811,7 +811,7 @@ export default {
             // type: 1,
             // union_code: null,
           },
-          responseGoodList:[
+          responseGoodList: [
             {
               // item_id: 27,
               // item: "港版美素佳儿1段  1罐装",
@@ -823,8 +823,8 @@ export default {
         }
       },
       transferSlipRequestData: {
-        out_shop:'',
-        in_shop:'',
+        out_shop: '',
+        in_shop: '',
         page: 1,
         limit: 10,
         time: '',
@@ -932,7 +932,7 @@ export default {
       },
       // 2=盘点单请求需要的数据
       checkOrderRequestData: {
-        shop:'',//盘点仓库
+        shop: '', // 盘点仓库
         status: '', // 状态：1盘点待确定,2库存待确认(已确认盘点单),3已完成
         name: '', // 盘点单单号(目前仅支持单号搜索)
         page: 1, // 页码
@@ -979,7 +979,7 @@ export default {
         }
       },
       checkLossOrderRequestData: {
-        shop:'',
+        shop: '',
         status: '',
         time: null,
         page: 1,
@@ -1026,7 +1026,7 @@ export default {
         }
       },
       checkWinOrderRequestData: {
-        shop:'',
+        shop: '',
         status: '',
         time: null,
         page: 1,
@@ -1065,108 +1065,107 @@ export default {
       }
     },
 
-    //调拨单获取列表
-    getTransferSlipList() {
+    // 调拨单获取列表
+    getTransferSlipList () {
       let data = {
-        page:this.transferSlipRequestData.page,
-        limit:this.transferSlipRequestData.limit,
-        status:this.transferSlipRequestData.status,
-        search:this.transferSlipRequestData.search,
-        out_shop:this.transferSlipRequestData.out_shop,
-        in_shop:this.transferSlipRequestData.out_shop,
-        time:this.transferSlipRequestData.time,
+        page: this.transferSlipRequestData.page,
+        limit: this.transferSlipRequestData.limit,
+        status: this.transferSlipRequestData.status,
+        search: this.transferSlipRequestData.search,
+        out_shop: this.transferSlipRequestData.out_shop,
+        in_shop: this.transferSlipRequestData.out_shop,
+        time: this.transferSlipRequestData.time,
         start_time: this.transferSlipRequestData.start_end_time ? this.transferSlipRequestData.start_end_time[0] : '',
-        end_time: this.transferSlipRequestData.start_end_time ? this.transferSlipRequestData.start_end_time[1] : '',
+        end_time: this.transferSlipRequestData.start_end_time ? this.transferSlipRequestData.start_end_time[1] : ''
       }
-      postTransferSlipList(data).then(res=>{
-          this.transferSlipPageData.count = res.count
-          this.transferSlipPageData.list = res.data ? res.data : []
+      postTransferSlipList(data).then(res => {
+        this.transferSlipPageData.count = res.count
+        this.transferSlipPageData.list = res.data ? res.data : []
       })
     },
-    //删除调拨单
-    clickTransferSlipDel(id){
+    // 删除调拨单
+    clickTransferSlipDel (id) {
       this.$confirm('您确认删除本条调拨信息吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        postTransferSlipDel({id:id}).then(res=>{
+        postTransferSlipDel({id: id}).then(res => {
           if (res.result) {
             this.getTransferSlipList()
           }
         })
       }).catch(() => {
-      });
+      })
     },
-    //调拨单取消发货操作
-    clickTransferSlipSendGoodsCancel(id){
+    // 调拨单取消发货操作
+    clickTransferSlipSendGoodsCancel (id) {
       this.$confirm('您确认取消发货操作吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        postTransferSlipSendGoodsCancel({id}).then(res=>{
-          if (res.result){
+        postTransferSlipSendGoodsCancel({id}).then(res => {
+          if (res.result) {
             this.getTransferSlipList()
           }
         })
       }).catch(() => {
-      });
-
+      })
     },
-    //调拨单发货弹框展示操作
-    async clickTransferSlipSendGoods(id){
+    // 调拨单发货弹框展示操作
+    async clickTransferSlipSendGoods (id) {
       this.transferSlipPageData.sendGoodsDialog.id = id
-      await postTransferSlipSendGoodsGetGoodList({id}).then(res=>{
+      await postTransferSlipSendGoodsGetGoodList({id}).then(res => {
         this.transferSlipPageData.sendGoodsDialog.responseGoodList = res.data
       })
-      await postTransferSlipSendGoodsGetInfo({id}).then(res=>{
+      await postTransferSlipSendGoodsGetInfo({id}).then(res => {
         this.transferSlipPageData.sendGoodsDialog.responseData = res.data
       })
       this.transferSlipPageData.sendGoodsDialog.isShow = true
     },
-    //调拨单确认发货
-    clickTransferSlipSendGoodsOk(id){
+    // 调拨单确认发货
+    clickTransferSlipSendGoodsOk (id) {
       this.$confirm('您确认进行发货操作吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        postTransferSlipSendGoods({id}).then(res=>{
-          if (res.result){
+        postTransferSlipSendGoods({id}).then(res => {
+          if (res.result) {
             this.getTransferSlipList()
             this.transferSlipPageData.sendGoodsDialog.isShow = true
           }
         })
       }).catch(() => {
-      });
+      })
     },
-    //调拨单详情
-    async clickTransferSlipDetails(id){
-      await postTransferSlipDetails({id}).then(res=>{
+    // 调拨单详情
+    async clickTransferSlipDetails (id) {
+      await postTransferSlipDetails({id}).then(res => {
         this.transferSlipPageData.detailsDialog.responseData = res.data
       })
-      await postTransferSlipGoodsDetails({id}).then(res=>{
+      await postTransferSlipGoodsDetails({id}).then(res => {
         this.transferSlipPageData.detailsDialog.responseGoodList = res.data
         this.transferSlipPageData.detailsDialog.isShow = true
       })
     },
-    //调拨单确认收货
-    clickTransferSlipConfirmGoods(id){
+    // 调拨单确认收货
+    clickTransferSlipConfirmGoods (id) {
       this.$confirm('您正在进行确认收货操作？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        postTransferSlipConfirmGoods({id}).then(res=>{
+        postTransferSlipConfirmGoods({id}).then(res => {
           this.getTransferSlipList()
           this.transferSlipPageData.detailsDialog.isShow = false
         })
       }).catch(() => {
       })
     },
-    //新增调拨单弹框显示
-    transferSlipAddDialogShow(){
+    // 新增调拨单弹框显示
+    transferSlipAddDialogShow () {
       // 获取一级分类
       postTwotype().then(res => {
         if (res.data.length) {
@@ -1197,10 +1196,10 @@ export default {
       console.log(val)
       this.transferSlipPageData.chooseGoodsDialog.multipleSelection = val
     },
-    //新增调拨单，新增商品弹框，查询商品列表
-    clickTransferSlipSearchGoods(){
+    // 新增调拨单，新增商品弹框，查询商品列表
+    clickTransferSlipSearchGoods () {
       let data = {
-        stock_type:1,
+        stock_type: 1,
         title: this.transferSlipPageData.chooseGoodsDialog.title,
         type_id: this.transferSlipPageData.chooseGoodsDialog.topCategoryId,
         type: this.transferSlipPageData.chooseGoodsDialog.twoCategoryId
@@ -1211,8 +1210,8 @@ export default {
         }
       })
     },
-    //选中商品后确认添加到本次调拨列表中
-    clickTransferSlipChoosesGoods(){
+    // 选中商品后确认添加到本次调拨列表中
+    clickTransferSlipChoosesGoods () {
       // {
       //   id: 1738,     //商品id
       //     title: "测试商品7/18",    //商品名称
@@ -1227,14 +1226,14 @@ export default {
       let formatArr = []
       this.transferSlipPageData.chooseGoodsDialog.multipleSelection.forEach((item) => {
         let data = {
-          id:item.id,
-          title:item.title,
-          type_id:item.type_id,
-          type:item.type,
-          selling_price:item.selling_price,
-          stock:item.stock,
-          num:'',
-          remark:'',
+          id: item.id,
+          title: item.title,
+          type_id: item.type_id,
+          type: item.type,
+          selling_price: item.selling_price,
+          stock: item.stock,
+          num: '',
+          remark: ''
         }
         formatArr.push(data)
       })
@@ -1250,12 +1249,12 @@ export default {
       this.transferSlipPageData.addDialog.list = newArr
       this.transferSlipPageData.chooseGoodsDialog.isShow = false
     },
-    //新增调拨单中商品移除
-    removeTransferSlipGood(index){
+    // 新增调拨单中商品移除
+    removeTransferSlipGood (index) {
       this.transferSlipPageData.addDialog.list.splice(index, 1)
     },
-    //新增调拨单
-    addtransferSlipGoodOk(){
+    // 新增调拨单
+    addtransferSlipGoodOk () {
       // responseData:{
       //     allot_in:'',//调入仓库id
       //     count:1,//调拨商品总数
@@ -1268,49 +1267,49 @@ export default {
       //     worker_id:1,//调拨人id
       // },
       let data = {
-        allot_in:this.transferSlipPageData.addDialog.responseData.allot_in,
-        count:this.transferSlipPageData.addDialog.list.length,//调拨商品总数
-        bar_code:[],//调拨商品的条形码s
-        item_id:[],//调拨商品ids
-        item_name:[],//调拨商品名s
-        purchase_number:[],//调拨数量s
-        remark:[],//调拨商品的描述s
-        remarks:this.transferSlipPageData.addDialog.responseData.remarks,//调拨单描述
-        worker_id:this.userInfo.id,//调拨人id //数据来源vuex
+        allot_in: this.transferSlipPageData.addDialog.responseData.allot_in,
+        count: this.transferSlipPageData.addDialog.list.length, // 调拨商品总数
+        bar_code: [], // 调拨商品的条形码s
+        item_id: [], // 调拨商品ids
+        item_name: [], // 调拨商品名s
+        purchase_number: [], // 调拨数量s
+        remark: [], // 调拨商品的描述s
+        remarks: this.transferSlipPageData.addDialog.responseData.remarks, // 调拨单描述
+        worker_id: this.userInfo.id// 调拨人id //数据来源vuex
       }
-      if (!data.allot_in){
+      if (!data.allot_in) {
         alert('请选择调入仓库')
         return
       }
-      for (let i=0; i < this.transferSlipPageData.addDialog.list.length; i++) {
-        data.bar_code.push(this.transferSlipPageData.addDialog.list[i].title) //暂时没有返回条形码
+      for (let i = 0; i < this.transferSlipPageData.addDialog.list.length; i++) {
+        data.bar_code.push(this.transferSlipPageData.addDialog.list[i].title) // 暂时没有返回条形码
         data.item_id.push(this.transferSlipPageData.addDialog.list[i].id)
         data.item_name.push(this.transferSlipPageData.addDialog.list[i].title)
-        if (!(/^[0-9]*[1-9][0-9]*$/.test(this.transferSlipPageData.addDialog.list[i].num))){
+        if (!(/^[0-9]*[1-9][0-9]*$/.test(this.transferSlipPageData.addDialog.list[i].num))) {
           alert(`【${this.transferSlipPageData.addDialog.list[i].title}】调拨数量必须为整数，且小于库存`)
           return
         }
-        if (!((this.transferSlipPageData.addDialog.list[i].num <= this.transferSlipPageData.addDialog.list[i].stock))){
+        if (!((this.transferSlipPageData.addDialog.list[i].num <= this.transferSlipPageData.addDialog.list[i].stock))) {
           alert(`【${this.transferSlipPageData.addDialog.list[i].title}】调拨数量必须为整数，且小于库存`)
           return
         }
-        if (!(this.transferSlipPageData.addDialog.list[i].num >= 1)){
+        if (!(this.transferSlipPageData.addDialog.list[i].num >= 1)) {
           alert(`【${this.transferSlipPageData.addDialog.list[i].title}】调拨数量必须为整数，且小于库存`)
           return
         }
         data.purchase_number.push(this.transferSlipPageData.addDialog.list[i].num)
         data.remark.push(this.transferSlipPageData.addDialog.list[i].remark)
       }
-      postTransferSlipAdd({data:data}).then(res=>{
+      postTransferSlipAdd({data: data}).then(res => {
         this.transferSlipPageData.addDialog.isShow = false
         this.transferSlipRequestData.page = 1
         this.getTransferSlipList()
       })
     },
-    //获取仓库列表
-    getShopList(){
-      postShopList().then(res=>{
-        if (res.code === 200){
+    // 获取仓库列表
+    getShopList () {
+      postShopList().then(res => {
+        if (res.code === 200) {
           this.shopList = res.data
         }
       })
@@ -1334,7 +1333,7 @@ export default {
         page: `${this.checkOrderRequestData.page},${this.checkOrderRequestData.limit}`,
         start_time: this.checkOrderRequestData.time ? this.checkOrderRequestData.time[0] : '',
         end_time: this.checkOrderRequestData.time ? this.checkOrderRequestData.time[1] : '',
-        shop: this.checkOrderRequestData.shop,
+        shop: this.checkOrderRequestData.shop
       }
       postCheckOrderList(data).then(res => {
         if (res.code === 200) {
@@ -1518,7 +1517,7 @@ export default {
             start_time: this.checkWinOrderRequestData.time ? this.checkWinOrderRequestData.time[0] : '',
             end_time: this.checkWinOrderRequestData.time ? this.checkWinOrderRequestData.time[1] : '',
             name: this.checkWinOrderRequestData.name,
-            shop:this.checkWinOrderRequestData.shop,
+            shop: this.checkWinOrderRequestData.shop
           }
           postCheckLossOrWinOrderList(requestData).then(res => {
             if (res.code === 200) {
@@ -1535,7 +1534,7 @@ export default {
             start_time: this.checkLossOrderRequestData.time ? this.checkLossOrderRequestData.time[0] : '',
             end_time: this.checkLossOrderRequestData.time ? this.checkLossOrderRequestData.time[1] : '',
             name: this.checkLossOrderRequestData.name,
-            shop: this.checkLossOrderRequestData.shop,
+            shop: this.checkLossOrderRequestData.shop
           }
           postCheckLossOrWinOrderList(data).then(res => {
             if (res.code === 200) {

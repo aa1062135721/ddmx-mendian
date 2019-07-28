@@ -239,7 +239,7 @@
       <!--会员等级说明弹框-->
       <el-dialog class="huiyuandengjishuoming-tanchuan" title="会员等级说明" :visible.sync="chongzhiDialog.isShowHuiyuanDengjiDialog.isShow" width="480px" :center="true">
         <div class="content">
-          <span class="overflow-row2-ellipsis" v-for="item in chongzhiDialog.isShowHuiyuanDengjiDialog.responseData">{{item.level_name}}：充值{{item.price}}</span>
+          <span class="overflow-row2-ellipsis" v-for="(item, index) in chongzhiDialog.isShowHuiyuanDengjiDialog.responseData" :key="index">{{item.level_name}}：充值{{item.price}}</span>
         </div>
       </el-dialog>
       <!--结账弹框-->
@@ -570,7 +570,7 @@
        </div>
       </el-dialog>
       <!-- 结账成功弹框-->
-      <el-dialog class="jiezhang-chenggong-tanchuan":visible.sync="jiezhangDialog.jiezhangSuccessDialog.isShow" width="298px">
+      <el-dialog class="jiezhang-chenggong-tanchuan" :visible.sync="jiezhangDialog.jiezhangSuccessDialog.isShow" width="298px">
         <div class="box">
           <img  src="../../assets/images/alert-logo.png" alt="图片">
           <div class="txt">
@@ -613,8 +613,8 @@ export default {
       },
 
       // 上一页，下一页是否禁用
-      prePageBtnDisabled:false,
-      nextPageBtnDisabled:false,
+      prePageBtnDisabled: false,
+      nextPageBtnDisabled: false,
 
       // 结账中的商品
       chooeseGoods: {
@@ -777,9 +777,9 @@ export default {
           // amount: '0.05', // 累积充值
           // regtime: '1970-01-01 08:33:37'// 加入时间
         },
-        isShowHuiyuanDengjiDialog:{
-          isShow:false,// 等级说明弹框显示与否
-          responseData:[
+        isShowHuiyuanDengjiDialog: {
+          isShow: false, // 等级说明弹框显示与否
+          responseData: [
             // {
             //   price: "80.00",   //充值金额
             //   level_name: "五级会员"    //会员名称
@@ -897,9 +897,9 @@ export default {
     this.getWaiterList()
   },
   methods: {
-    //获取会员等级说明
-    async getMemberLevelInfo(){
-      await postMemberLevelInfo().then(res=>{
+    // 获取会员等级说明
+    async getMemberLevelInfo () {
+      await postMemberLevelInfo().then(res => {
         if (res.code === '200') {
           this.chongzhiDialog.isShowHuiyuanDengjiDialog.responseData = res.data
           this.chongzhiDialog.isShowHuiyuanDengjiDialog.isShow = true
@@ -937,7 +937,7 @@ export default {
             this.chooeseGoods.fuwuGoods.push(good)
           }).catch(() => {
 
-          });
+          })
         } else {
           this.chooeseGoods.goods = []
           this.chooeseGoods.cardList = []
@@ -980,14 +980,14 @@ export default {
             this.chooeseGoods.fuwuGoods = []
             this.chooeseGoods.cardList = []
             this.chooeseGoods.goods.push(good)
-            this.sousuoshangpingDialog.isShow = false //当是从搜索商品弹框添加商品到购物车的时候，添加成功后需要关闭搜索商品弹框
+            this.sousuoshangpingDialog.isShow = false // 当是从搜索商品弹框添加商品到购物车的时候，添加成功后需要关闭搜索商品弹框
           }).catch(() => {
-          });
+          })
         } else {
           this.chooeseGoods.fuwuGoods = []
           this.chooeseGoods.cardList = []
           this.chooeseGoods.goods.push(good)
-          this.sousuoshangpingDialog.isShow = false //当是从搜索商品弹框添加商品到购物车的时候，添加成功后需要关闭搜索商品弹框
+          this.sousuoshangpingDialog.isShow = false // 当是从搜索商品弹框添加商品到购物车的时候，添加成功后需要关闭搜索商品弹框
         }
       }
       this.sumChooseGoodsMoney()
@@ -1086,7 +1086,8 @@ export default {
             this.$message({
               message: '购买数量达到最大值',
               type: 'error'
-            })}
+            })
+          }
         } else {
           this.$message.closeAll()
           this.$message({
@@ -1405,17 +1406,14 @@ export default {
       }
     },
     clickChangejiageShoppingCarGood (code) {
-      if (code !== '.')
-        this.xiugaijiageDialog.inputValue =  String(this.xiugaijiageDialog.inputValue) + code
-        // this.xiugaijiageDialog.inputValue += code
-      else {
-        if ( this.xiugaijiageDialog.inputValue.indexOf(code) === -1){
-          this.xiugaijiageDialog.inputValue =  String(this.xiugaijiageDialog.inputValue) + code
+      // this.xiugaijiageDialog.inputValue += code
+      if (code !== '.') { this.xiugaijiageDialog.inputValue = String(this.xiugaijiageDialog.inputValue) + code } else {
+        if (this.xiugaijiageDialog.inputValue.indexOf(code) === -1) {
+          this.xiugaijiageDialog.inputValue = String(this.xiugaijiageDialog.inputValue) + code
         } else {
 
         }
       }
-
     },
     clickChangejiageShoppingCarGoodOk () {
       if (this.chooeseGoods.goods.length) {
@@ -1522,7 +1520,7 @@ export default {
           this.goodsList = res.data
         }
 
-        if (this.requestGoodData.page === 1){
+        if (this.requestGoodData.page === 1) {
           this.prePageBtnDisabled = true
           if (res.data.length < this.requestGoodData.num) {
             this.nextPageBtnDisabled = true
@@ -1554,7 +1552,7 @@ export default {
         } else {
           this.goodsList = res.data
         }
-        if (this.requestFuwuGoodData.page === 1){
+        if (this.requestFuwuGoodData.page === 1) {
           this.prePageBtnDisabled = true
           if (res.data.length < this.requestFuwuGoodData.num) {
             this.nextPageBtnDisabled = true
@@ -1665,17 +1663,16 @@ export default {
         }
       }
     },
-    getGoodByConditionOk(){
+    getGoodByConditionOk () {
       this.sousuoshangpingDialog.isShow = true
-      if (this.sousuoshangpingDialog.title.length!==0)
-        this.searchGoodsByGoodName()
+      if (this.sousuoshangpingDialog.title.length !== 0) { this.searchGoodsByGoodName() }
     },
     // 搜索商品按商品名
     searchGoodsByGoodName () {
       let data = {}
       data.title = `${this.sousuoshangpingDialog.title}`
       postGoods(data).then((res) => {
-        if (res.data.length){
+        if (res.data.length) {
           this.sousuoshangpingDialog.goodsList = res.data
         } else {
           this.sousuoshangpingDialog.goodsList = []
@@ -1694,7 +1691,7 @@ export default {
       data.bar_code = `${this.sousuoshangpingDialog.title}`
       postGoodsByCode(data).then((res) => {
         if (res.data instanceof Object && !(res.data instanceof Array) && res.data.id) {
-          if (this.chooeseGoods.cardList.length || this.chooeseGoods.fuwuGoods.length ) {
+          if (this.chooeseGoods.cardList.length || this.chooeseGoods.fuwuGoods.length) {
             this.$confirm('您已经添加了服务，如需购买商品，需清空添加的服务，是否确认？', '提示', {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
@@ -1707,13 +1704,13 @@ export default {
               good.edit_price = good.price
               for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
                 if (this.chooeseGoods.goods[i].id === good.id) {
-                  if (this.chooeseGoods.goods[i].num + 1 <=  good.stock) {
+                  if (this.chooeseGoods.goods[i].num + 1 <= good.stock) {
                     this.$message.closeAll()
                     this.$message({
                       message: '该商品已经存在购物车了，购买数量加1',
                       type: 'error'
                     })
-                    this.chooeseGoods.goods[i].num ++
+                    this.chooeseGoods.goods[i].num++
                   } else {
                     this.$message.closeAll()
                     this.$message({
@@ -1724,7 +1721,7 @@ export default {
                   return
                 }
               }
-              if(good.stock <= 0){
+              if (good.stock <= 0) {
                 this.$message.closeAll()
                 this.$message({
                   message: '该商品库存不足，无法添加购物车',
@@ -1736,35 +1733,35 @@ export default {
               this.chooeseGoods.cardList = []
               this.chooeseGoods.fuwuGoods = []
             }).catch(() => {
-              return
-            });
+
+            })
           } else {
-              let good = res.data
-              good.num = 1
-              good.is_checked = false
-              good.is_edit = 0
-              good.edit_price = good.price
-              for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
-                if (this.chooeseGoods.goods[i].id === good.id) {
-                  this.$message.closeAll()
-                  this.$message({
-                    message: '该商品已经存在购物车了，请选中后再操作',
-                    type: 'error'
-                  })
-                  return
-                }
-              }
-              if(good.stock <= 0){
+            let good = res.data
+            good.num = 1
+            good.is_checked = false
+            good.is_edit = 0
+            good.edit_price = good.price
+            for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
+              if (this.chooeseGoods.goods[i].id === good.id) {
                 this.$message.closeAll()
                 this.$message({
-                  message: '该商品库存不足，无法添加购物车',
+                  message: '该商品已经存在购物车了，请选中后再操作',
                   type: 'error'
                 })
                 return
               }
-              this.chooeseGoods.goods.push(good)
-              this.chooeseGoods.cardList = []
-              this.chooeseGoods.fuwuGoods = []
+            }
+            if (good.stock <= 0) {
+              this.$message.closeAll()
+              this.$message({
+                message: '该商品库存不足，无法添加购物车',
+                type: 'error'
+              })
+              return
+            }
+            this.chooeseGoods.goods.push(good)
+            this.chooeseGoods.cardList = []
+            this.chooeseGoods.fuwuGoods = []
           }
         } else {
           this.$message.closeAll()
@@ -1824,12 +1821,12 @@ export default {
               if (res.data.id) {
                 this.jiezhangDialog.memberVip = res.data
                 this.xuanzehuiyuanDialog.isShow = false
-                //选择了会员，根据会员的等级，服务商品有会员价 刷新接口
+                // 选择了会员，根据会员的等级，服务商品有会员价 刷新接口
                 if (this.requestFuwuGoodData.isChooeseFuwuGood) {
                   this.getServiceItemList()
                 }
-                //选择了会员，根据会员的等级，服务商品有会员价 刷新接口
-                if (this.chooeseGoods.fuwuGoods.length){
+                // 选择了会员，根据会员的等级，服务商品有会员价 刷新接口
+                if (this.chooeseGoods.fuwuGoods.length) {
                   this.getServiceItemList()
                   this.requestFuwuGoodData.isChooeseFuwuGood = true
                   this.requestGoodData.isChooeseFenleiGood = false
@@ -1858,8 +1855,7 @@ export default {
           this.jiezhangDialog.memberVip = {}
         }
       } else {
-        if (this.xuanzehuiyuanDialog.mobile.length<11)
-          this.xuanzehuiyuanDialog.mobile += code
+        if (this.xuanzehuiyuanDialog.mobile.length < 11) { this.xuanzehuiyuanDialog.mobile += code }
       }
     },
     // 充值弹框
@@ -1879,18 +1875,17 @@ export default {
     },
     chongzhiDialogGetCode (code) {
       if (this.chongzhiDialog.chooeseWho === 'mobile') {
-        if (this.chongzhiDialog.mobile.length<11)
-          if (code != '.')
-            this.chongzhiDialog.mobile += `${code}`
-        if (this.chongzhiDialog.mobile.length === 11)
-          this.chongzhiDialogSearchMemberVip()
+        if (this.chongzhiDialog.mobile.length < 11) {
+          if (code !== '.') { this.chongzhiDialog.mobile += `${code}` }
+        }
+        if (this.chongzhiDialog.mobile.length === 11) { this.chongzhiDialogSearchMemberVip() }
       }
       if (this.chongzhiDialog.chooeseWho === 'money') {
         this.chongzhiDialog.payMoney += `${code}`
       }
     },
     chongzhiDialogSearchMemberVip () {
-      if (this.chongzhiDialog.mobile.length!==11){
+      if (this.chongzhiDialog.mobile.length !== 11) {
         return
       }
       if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
@@ -1977,7 +1972,7 @@ export default {
               message: res.msg,
               type: 'success'
             })
-            this.xuanzehuiyuanDialog.mobile =  this.chongzhiDialog.mobile
+            this.xuanzehuiyuanDialog.mobile = this.chongzhiDialog.mobile
             this.clickChoosesMemberByKeyboard('ok')
             this.jiezhangDialog.nowWaiter = {
               id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
@@ -1995,12 +1990,12 @@ export default {
     },
     // 会员查询弹框中的事件
     huiyuanDialogGetCode (code) {
-      if (this.huiyuanDialog.mobile.length<11){
+      if (this.huiyuanDialog.mobile.length < 11) {
         this.huiyuanDialog.mobile += `${code}`
       }
     },
     huiyuanDialogSearchMemberVip () {
-      if (this.huiyuanDialog.mobile.length === 11){
+      if (this.huiyuanDialog.mobile.length === 11) {
         if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.huiyuanDialog.mobile)) {
           this.$message.closeAll()
           this.$message({
@@ -2014,19 +2009,19 @@ export default {
         this.huiyuanDialog.chongzhijiluList = []
         let requestData = {mobile: this.huiyuanDialog.mobile}
         postSearchVip(requestData).then(res => {
-        if (res.data.id) {
-          this.huiyuanDialog.huiyuanInfo = res.data
-          this.huiyuanDialogSearchRechargeLog()
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '没有查询到会员信息',
-            type: 'error'
-          })
-        }
-      }).catch(err => {
-        console.log(err)
-      })
+          if (res.data.id) {
+            this.huiyuanDialog.huiyuanInfo = res.data
+            this.huiyuanDialogSearchRechargeLog()
+          } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '没有查询到会员信息',
+              type: 'error'
+            })
+          }
+        }).catch(err => {
+          console.log(err)
+        })
       }
     },
     huiyuanDialogAddMemberGetCode (code) {
@@ -2057,7 +2052,7 @@ export default {
         })
         return
       }
-      if (requestData.nickname.length>10) {
+      if (requestData.nickname.length > 10) {
         this.$message.closeAll()
         this.$message({
           message: '会员昵称要求在10个汉字内',
@@ -2079,14 +2074,14 @@ export default {
             }).then(() => {
               this.xuanzehuiyuanDialog.mobile = requestData.mobile
               this.clickChoosesMemberByKeyboard('ok')
-            }).catch(() =>{})
+            }).catch(() => {})
             this.huiyuanDialog.addHuiyuanDialog.isShow = false
             this.huiyuanDialog.addHuiyuanDialog.mobile = ''
             this.huiyuanDialog.addHuiyuanDialog.nickname = ''
           }
         })
       }).catch(() => {
-      });
+      })
     },
     huiyuanDialogSearchRechargeLog () {
       if (this.huiyuanDialog.huiyuanInfo.id) {
@@ -2276,7 +2271,7 @@ export default {
             this.sumChooseGoodsMoney()
             this.$forceUpdate()
           }).catch(() => {
-          });
+          })
         } else {
           this.chooeseGoods.cardList = []
           this.chooeseGoods.fuwuGoods = []
@@ -2312,7 +2307,7 @@ export default {
         })
         return
       }
-      //这人需要确定用户的支付方式
+      // 这人需要确定用户的支付方式
       this.confirmPayWay()
       this.jiezhangDialog.isShow = true
     },
@@ -2356,7 +2351,7 @@ export default {
             this.jiezhangDialog.modifyMoney = 0
             this.jiezhangDialog.chooesePayWay = ''
             this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
-            if (this.requestGoodData.isChooeseFenleiGood){
+            if (this.requestGoodData.isChooeseFenleiGood) {
               this.getGoods()
             }
             setTimeout(() => {
@@ -2395,7 +2390,7 @@ export default {
             this.jiezhangDialog.modifyMoney = 0
             this.jiezhangDialog.chooesePayWay = ''
             this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
-            if (this.requestGoodData.isChooeseFenleiGood){
+            if (this.requestGoodData.isChooeseFenleiGood) {
               this.getGoods()
             }
             setTimeout(() => {
@@ -2427,7 +2422,7 @@ export default {
             this.jiezhangDialog.modifyMoney = 0
             this.jiezhangDialog.chooesePayWay = ''
             this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
-            if (this.requestGoodData.isChooeseFenleiGood){
+            if (this.requestGoodData.isChooeseFenleiGood) {
               this.getGoods()
             }
             setTimeout(() => {
@@ -2438,30 +2433,30 @@ export default {
         })
       }
     },
-    //结账时可选支付方式
+    // 结账时可选支付方式
     confirmPayWay () {
-      if (this.jiezhangDialog.memberVip.id) {//选择了会员
-        if (this.chooeseGoods.fuwuGoods.length){
+      if (this.jiezhangDialog.memberVip.id) { // 选择了会员
+        if (this.chooeseGoods.fuwuGoods.length) {
           this.jiezhangDialog.closedPayWay = [8]
         }
-        if (this.chooeseGoods.goods.length){
+        if (this.chooeseGoods.goods.length) {
           this.jiezhangDialog.closedPayWay = []
         }
-        if (this.chooeseGoods.cardList.length){
+        if (this.chooeseGoods.cardList.length) {
           this.jiezhangDialog.closedPayWay = [7]
         }
-      } else {//没有选择会员
-        if (this.chooeseGoods.fuwuGoods.length){
-          this.jiezhangDialog.closedPayWay = [3,7,8]
+      } else { // 没有选择会员
+        if (this.chooeseGoods.fuwuGoods.length) {
+          this.jiezhangDialog.closedPayWay = [3, 7, 8]
         }
-        if (this.chooeseGoods.goods.length){
-          this.jiezhangDialog.closedPayWay = [3,7]
+        if (this.chooeseGoods.goods.length) {
+          this.jiezhangDialog.closedPayWay = [3, 7]
         }
-        if (this.chooeseGoods.cardList.length){
-          this.jiezhangDialog.closedPayWay = [3,7]
+        if (this.chooeseGoods.cardList.length) {
+          this.jiezhangDialog.closedPayWay = [3, 7]
         }
       }
-    },
+    }
   }
 }
 </script>

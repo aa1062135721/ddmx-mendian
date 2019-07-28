@@ -45,7 +45,7 @@ export default {
   name: 'Index',
   data () {
     return {
-      noMore:false,
+      noMore: false,
       content: '', // 搜索的内容
       index: 0, // 当前被选中的
       requestData: { // page: '1,20'
@@ -103,7 +103,7 @@ export default {
               this.noMore = false
               this.hepls[0].is_checked = true
               this.index = 0
-            } else{
+            } else {
               this.hepls.push(...res.data)
             }
           }
@@ -114,13 +114,13 @@ export default {
         console.log(err)
       })
     },
-    goSearchHelp(){
+    goSearchHelp () {
       this.noMore = false
       this.requestData.page = 1
       this.searchHelp()
     },
-    loadMoreHelps(){
-      if (this.noMore){
+    loadMoreHelps () {
+      if (this.noMore) {
         return
       }
       this.requestData.page += 1
@@ -129,7 +129,7 @@ export default {
     // 跳转到页面
     goToUrl (url) {
       this.$router.push(url)
-    },
+    }
   },
   beforeDestroy () {
   }

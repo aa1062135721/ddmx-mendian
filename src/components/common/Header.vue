@@ -1,13 +1,13 @@
 <template>
     <div class="header clear-both">
       <div class="logo float-left">
-        <img class="img" src="../../assets/images/logo.png" alt="logo"  @click="goToUrl('/home')">
+        <img class="img" src="../../assets/images/logo.png" alt="logo"  @click="goToUrl('/home/order')">
         <span class="title">{{userInfo.shop_name}}</span>
       </div>
       <div class="tabs float-right">
           <ul>
             <li @click="goToUrl('/money')" v-if="$route.path !== '/money'">前台收银</li>
-            <li @click="goToUrl('/home')" v-else>进入后台</li>
+            <li @click="goToUrl('/home/order')" v-else>进入后台</li>
             <li @click="goToUrl('/help')" :class="{'active' : $route.path === '/help'}"><i class="el-icon-question"></i> 帮助中心</li>
             <li @click="handleFullScreen" :class="{'active' : fullscreen}"><i class="el-icon-rank"></i> {{fullscreen ? `取消全屏` : `全屏模式`}}</li>
             <li>{{userInfo.user_nickname}}</li>
@@ -22,14 +22,14 @@ import { removeStore } from '../../utils'
 export default {
   data () {
     return {
-      fullscreen: false,
+      fullscreen: false
     }
   },
   methods: {
     // 跳转到页面
     goToUrl (url) {
-      if (url === '/help'){
-        window.open("#/help");
+      if (url === '/help') {
+        window.open('#/help')
         return
       }
       this.$router.push(url)
@@ -45,7 +45,7 @@ export default {
         this.$router.push('/login')
         this.saveUserInfo({})
       }).catch(() => {
-      });
+      })
     },
     // 全屏事件
     handleFullScreen () {
@@ -77,7 +77,7 @@ export default {
     ...mapActions(['saveUserInfo'])
   },
   computed: {
-    ...mapGetters(['userInfo']),
+    ...mapGetters(['userInfo'])
   }
 }
 </script>
