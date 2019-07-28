@@ -107,7 +107,7 @@
 </template>
 
 <script>
-// TODO 这儿需要用到vuex里的数据 shop_id
+import { mapGetters } from 'vuex'//  这儿需要用到vuex里的数据 shop_id
 import { postExpenditureList, postExpenditureTypeNameList, postAddExpenditure, postDelExpenditure } from '../../api/getData'
 export default {
   name: 'ExpenditureManage', // 支出管理
@@ -124,7 +124,7 @@ export default {
         start_time: '',
         type_id: '',
         count: 10, // 数据总数
-        shop_id: 18 // TODO
+        shop_id: '' // vuex里获取shop_id
       },
       tableData: [
         // {type_id: "水费",          shop_id: "重庆城口店",          user_id: "admin",          price: "30.00",          remarks: "重庆城口的水费！！",          create_time: "2019-06-22 13:59:50"}
@@ -134,7 +134,7 @@ export default {
         addRequestData: {
           type_id: '',
           price: '',
-          shop_id: '18',
+          shop_id: '', // vuex里获取shop_id
           remarks: ''
         }
       }
@@ -147,6 +147,7 @@ export default {
   methods: {
     getExpenditureList () {
       this.requestData.page = `${this.requestData.my_page},${this.requestData.my_limit}`
+      this.requestData.shop_id = this.userInfo.shop_id
       postExpenditureList(this.requestData).then(res => {
         if (res.data.length) {
           this.tableData = res.data
@@ -188,6 +189,7 @@ export default {
         })
         return
       }
+      this.addExpenditureDialog.addRequestData.shop_id = this.userInfo.shop_id
       postAddExpenditure(this.addExpenditureDialog.addRequestData).then(res => {
         if (res.code === '200') {
           this.addExpenditureDialog.isShow = false
@@ -232,6 +234,9 @@ export default {
       this.requestData.my_page = val
       this.getExpenditureList()
     }
+  },
+  computed: {
+    ...mapGetters(['userInfo'])
   }
 }
 </script>

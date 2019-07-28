@@ -667,6 +667,7 @@
 </template>
 
 <script>
+import { mapGetters } from  'vuex'
 import { postTransferSlipConfirmGoods, postTransferSlipSendGoodsGetInfo, postTransferSlipSendGoodsGetGoodList, postTransferSlipGoodsDetails, postTransferSlipDetails, postTransferSlipSendGoods, postTransferSlipSendGoodsCancel, postTransferSlipDel, postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
 export default {
   name: 'InventoryManage', // 库存管理，进销存
@@ -716,7 +717,7 @@ export default {
             purchase_number:[1,2],//调拨数量s
             remark:['备注1','备注2'],//调拨商品的描述s
             remarks:'',//调拨单描述
-            worker_id:1,//调拨人id//TODO
+            worker_id:'',//调拨人id//数据来源vuex
           },
           list:[
             // {
@@ -1275,7 +1276,7 @@ export default {
         purchase_number:[],//调拨数量s
         remark:[],//调拨商品的描述s
         remarks:this.transferSlipPageData.addDialog.responseData.remarks,//调拨单描述
-        worker_id:177,//调拨人id //TODO
+        worker_id:this.userInfo.id,//调拨人id //数据来源vuex
       }
       if (!data.allot_in){
         alert('请选择调入仓库')
@@ -1594,6 +1595,9 @@ export default {
         }
       })
     }
+  },
+  computed: {
+    ...mapGetters(['userInfo'])
   }
 }
 </script>

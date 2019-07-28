@@ -195,7 +195,8 @@
               <el-table-column prop="sn" label="订单号"></el-table-column>
               <el-table-column label="会员账号">
                 <template slot-scope="scope">
-                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)">{{scope.row.mobile}}</el-button>
+                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)" v-if="scope.row.member_id === '0'">{{scope.row.mobile}}</el-button>
+                  <span v-else>非会员</span>
                 </template>
               </el-table-column>
               <el-table-column prop="amount" label="付款金额"></el-table-column>
@@ -628,7 +629,7 @@ export default {
         // 分页
         page: 1,
         // 每页的条数
-        limit: 1,
+        limit: 10,
         // 当前选中的服务人员
         nowWaiter: '',
         // 当前选中的支付方式
@@ -653,15 +654,18 @@ export default {
       },
       // 商品订单
       responseData1: {
-
+        data:[],
+        count:10,
       },
       // 服务订单
       responseData2: {
-
+        data:[],
+        count:10,
       },
       // 充值订单
       responseData3: {
-
+        data:[],
+        count:10,
       },
       // 商品订单-退单弹框
       returnOrderDialog1: {
@@ -969,6 +973,7 @@ export default {
     getMemberInfo (id = 1) {
       this.memberInfoDialog.isShow = true
       let data = {
+        id,
         member_id: id
       }
       postMemberInfo(data).then(res => {
