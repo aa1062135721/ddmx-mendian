@@ -295,14 +295,9 @@
         <el-tab-pane label="盘点单" name="2">
           <div>
             <div class="search">
-              <el-select  clearable placeholder="选择盘点仓库"  v-model="checkOrderRequestData.shop">
-                <el-option
-                  v-for="item in shopList"
-                  :label="item.name"
-                  :key="item.id"
-                  :value="item.id">
-                </el-option>
-              </el-select>
+<!--              <el-select  clearable placeholder="选择盘点仓库"  v-model="checkOrderRequestData.shop">-->
+<!--                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>-->
+<!--              </el-select>-->
               <el-select  clearable placeholder="选择状态" v-model="checkOrderRequestData.status">
                 <el-option
                   v-for="item in checkOrderPageData.status"
@@ -510,9 +505,9 @@
         <el-tab-pane label="盘亏单" name="3">
           <div>
             <div class="search">
-              <el-select  clearable placeholder="选择盘点仓库"  v-model="checkLossOrderRequestData.shop">
-                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
-              </el-select>
+<!--              <el-select  clearable placeholder="选择盘点仓库"  v-model="checkLossOrderRequestData.shop">-->
+<!--                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>-->
+<!--              </el-select>-->
               <el-select  clearable placeholder="选择状态" v-model="checkLossOrderRequestData.status">
                 <el-option v-for="item in checkLossOrderPageData.status" :label="item.name" :key="item.id" :value="item.id"></el-option>
               </el-select>
@@ -588,9 +583,9 @@
         <el-tab-pane label="盘盈单" name="4">
           <div>
             <div class="search">
-              <el-select  clearable placeholder="选择盘点仓库"  v-model="checkWinOrderRequestData.shop">
-                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
-              </el-select>
+<!--              <el-select  clearable placeholder="选择盘点仓库"  v-model="checkWinOrderRequestData.shop">-->
+<!--                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>-->
+<!--              </el-select>-->
               <el-select  clearable placeholder="选择状态" v-model="checkWinOrderRequestData.status">
                 <el-option v-for="item in checkWinOrderPageData.status" :label="item.name" :key="item.id" :value="item.id"></el-option>
               </el-select>

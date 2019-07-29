@@ -1730,6 +1730,7 @@ export default {
                 return
               }
               this.chooeseGoods.goods.push(good)
+              this.sumChooseGoodsMoney()
               this.chooeseGoods.cardList = []
               this.chooeseGoods.fuwuGoods = []
             }).catch(() => {
@@ -1821,17 +1822,18 @@ export default {
               if (res.data.id) {
                 this.jiezhangDialog.memberVip = res.data
                 this.xuanzehuiyuanDialog.isShow = false
+                this.choosesGoodsShowMemberPrice()
                 // 选择了会员，根据会员的等级，服务商品有会员价 刷新接口
-                if (this.requestFuwuGoodData.isChooeseFuwuGood) {
-                  this.getServiceItemList()
-                }
+                // if (this.requestFuwuGoodData.isChooeseFuwuGood) {
+                //   this.getServiceItemList()
+                // }
                 // 选择了会员，根据会员的等级，服务商品有会员价 刷新接口
-                if (this.chooeseGoods.fuwuGoods.length) {
-                  this.getServiceItemList()
-                  this.requestFuwuGoodData.isChooeseFuwuGood = true
-                  this.requestGoodData.isChooeseFenleiGood = false
-                  this.chooeseGoods.fuwuGoods = []
-                }
+                // if (this.chooeseGoods.fuwuGoods.length) {
+                //   this.getServiceItemList()
+                //   this.requestFuwuGoodData.isChooeseFuwuGood = true
+                //   this.requestGoodData.isChooeseFenleiGood = false
+                //   this.chooeseGoods.fuwuGoods = []
+                // }
               } else {
                 this.$message.closeAll()
                 this.$message({
@@ -1856,6 +1858,38 @@ export default {
         }
       } else {
         if (this.xuanzehuiyuanDialog.mobile.length < 11) { this.xuanzehuiyuanDialog.mobile += code }
+      }
+    },
+    // 选择会员后时，如果购物车里有服务商品，或服务卡，就要显示他的会员价
+    choosesGoodsShowMemberPrice () {
+      // 当前页面中，被选中的是服务商品 刷新接口展示出会员价来
+      if (this.requestFuwuGoodData.isChooeseFuwuGood) {
+        this.getServiceItemList()
+      }
+      //购物车里有服务商品
+      if (this.chooeseGoods.fuwuGoods.length){
+        let requestData = {
+          member_id : this.jiezhangDialog.memberVip.id,
+          ids:[]
+        }
+        for (let i = 0; i < this.chooeseGoods.fuwuGoods.length; i++){
+          requestData.ids.push(this.chooeseGoods.fuwuGoods[i].id)
+        }
+        postServiceItemList(requestData).then(res => {
+          if (res.data.length){
+            for(let i = 0;i<res.data.length;i++){
+              for (let j = 0; j < this.chooeseGoods.fuwuGoods.length; j++){
+               if(this.chooeseGoods.fuwuGoods[j].id === res.data[i].id) {
+                 this.chooeseGoods.fuwuGoods[j].price = res.data[i].price
+               }
+              }
+            }
+          }
+        })
+      }
+      //购物车里有服务卡商品
+      if (this.chooeseGoods.cardList.length) {
+
       }
     },
     // 充值弹框

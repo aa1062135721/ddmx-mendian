@@ -363,12 +363,12 @@
           <div>
             <div class="title">会员信息</div>
             <div class="content clear-both">
-              <div class="float-left">会员账号：{{orderDetailsDialog1.responseData.member.mobile || ''}}</div>
-              <div class="float-right">会员昵称：{{orderDetailsDialog1.responseData.member.nickname || ''}}</div>
+              <div class="float-left">会员账号：{{orderDetailsDialog1.responseData.member ? orderDetailsDialog1.responseData.member.mobile : ''}}</div>
+              <div class="float-right">会员昵称：{{orderDetailsDialog1.responseData.member  ? orderDetailsDialog1.responseData.member.nickname : ''}}</div>
             </div>
             <div class="content clear-both">
-              <div class="float-left">会员等级：{{orderDetailsDialog1.responseData.member.level || ''}}</div>
-              <div class="float-right">会员余额：{{orderDetailsDialog1.responseData.member.money || ''}}</div>
+              <div class="float-left">会员等级：{{orderDetailsDialog1.responseData.member ? orderDetailsDialog1.responseData.member.level : ''}}</div>
+              <div class="float-right">会员余额：{{orderDetailsDialog1.responseData.member ? orderDetailsDialog1.responseData.member.money : ''}}</div>
             </div>
           </div>
           <div>
@@ -421,12 +421,12 @@
           <div>
             <div class="title">会员信息</div>
             <div class="content clear-both">
-              <div class="float-left">会员账号：{{orderDetailsDialog2.responseData.member.mobile || ''}}</div>
-              <div class="float-right">会员昵称：{{orderDetailsDialog2.responseData.member.nickname || ''}}</div>
+              <div class="float-left">会员账号：{{orderDetailsDialog2.responseData.member ? orderDetailsDialog2.responseData.member.mobile : ''}}</div>
+              <div class="float-right">会员昵称：{{orderDetailsDialog2.responseData.member  ? orderDetailsDialog2.responseData.member.nickname : ''}}</div>
             </div>
             <div class="content clear-both">
-              <div class="float-left">会员等级：{{orderDetailsDialog2.responseData.member.level || ''}}</div>
-              <div class="float-right">会员余额：{{orderDetailsDialog2.responseData.member.money || ''}}</div>
+              <div class="float-left">会员等级：{{orderDetailsDialog2.responseData.member ? orderDetailsDialog2.responseData.member.level : ''}}</div>
+              <div class="float-right">会员余额：{{orderDetailsDialog2.responseData.member ? orderDetailsDialog2.responseData.member.money : ''}}</div>
             </div>
           </div>
           <div>
@@ -457,7 +457,7 @@
         </div>
       </el-dialog>
       <!-- 充值订单--订单详情弹框-->
-      <el-dialog class="order-details-dialog" title="服务订单详情" :visible.sync="orderDetailsDialog3.isShow" width="968px" :center="true">
+      <el-dialog class="order-details-dialog" title="充值订单详情" :visible.sync="orderDetailsDialog3.isShow" width="968px" :center="true">
         <div>
           <div>
             <div class="title">订单信息</div>
@@ -479,24 +479,12 @@
           <div>
             <div class="title">会员信息</div>
             <div class="content clear-both">
-              <div class="float-left">会员账号：{{orderDetailsDialog3.responseData.member.mobile || ''}}</div>
-              <div class="float-right">会员昵称：{{orderDetailsDialog3.responseData.member.nickname || ''}}</div>
+              <div class="float-left">会员账号：{{orderDetailsDialog3.responseData.member ? orderDetailsDialog3.responseData.member.mobile : ''}}</div>
+              <div class="float-right">会员昵称：{{orderDetailsDialog3.responseData.member  ? orderDetailsDialog3.responseData.member.nickname : ''}}</div>
             </div>
             <div class="content clear-both">
-              <div class="float-left">会员等级：{{orderDetailsDialog3.responseData.member.level || ''}}</div>
-              <div class="float-right">会员余额：{{orderDetailsDialog3.responseData.member.money || ''}}</div>
-            </div>
-          </div>
-          <div>
-            <div class="title">商品信息</div>
-            <div>
-              <el-table :data="orderDetailsDialog3.responseGoodList" border style="width: 100%;" height="142">
-                <el-table-column prop="subtitle" label="商品名称" width="180"></el-table-column>
-                <el-table-column prop="num" label="数量" width="180"></el-table-column>
-                <el-table-column prop="real_price" label="成本价"></el-table-column>
-                <el-table-column prop="price" label="单价" width="180"></el-table-column>
-                <el-table-column prop="pay_all_price" label="付款价格"></el-table-column>
-              </el-table>
+              <div class="float-left">会员等级：{{orderDetailsDialog3.responseData.member ? orderDetailsDialog3.responseData.member.level : ''}}</div>
+              <div class="float-right">会员余额：{{orderDetailsDialog3.responseData.member ? orderDetailsDialog3.responseData.member.money : ''}}</div>
             </div>
           </div>
           <div>
@@ -904,12 +892,13 @@ export default {
               this.orderDetailsDialog3.responseData = res.data
             }
           })
-          await postOrderDetailsGoods(data2).then(res => {
-            if (res.code === '200') {
-              this.orderDetailsDialog3.responseGoodList = res.data
-              this.orderDetailsDialog3.isShow = true
-            }
-          })
+          // await postOrderDetailsGoods(data2).then(res => {
+          //   if (res.code === '200') {
+          //     this.orderDetailsDialog3.responseGoodList = res.data
+          //     this.orderDetailsDialog3.isShow = true
+          //   }
+          // })
+          this.orderDetailsDialog3.isShow = true
           break
       }
     },

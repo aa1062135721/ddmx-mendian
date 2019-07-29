@@ -8,7 +8,7 @@
                     <p>门店管理系统</p>
                 </div>
 
-                <el-input  class="urser-name"  placeholder="请输入用户名称" v-model="username" @keyup.enter.native="submitForm" prefix-icon="el-icon-user">
+                <el-input  class="urser-name"  placeholder="请输入用户手机号码" v-model="username" @keyup.enter.native="submitForm" prefix-icon="el-icon-user">
                 </el-input>
 
                 <el-input class="password" type="password"  placeholder="请输入登录密码" v-model="password" @keyup.enter.native="submitForm" prefix-icon="el-icon-lock">
@@ -45,10 +45,10 @@ export default {
         this.msg = '请输入用户名或密码'
         return
       }
-      // if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.username)) {
-      //   this.msg = '用户名应为手机号码'
-      //   return
-      // }
+      if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.username)) {
+        this.msg = '用户名应为手机号码'
+        return
+      }
       let data = {username: this.username, password: this.password}
       let that = this
       postLogin(data).then((res) => {
