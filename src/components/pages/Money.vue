@@ -41,7 +41,7 @@
               <el-button @click="clickBtnXiugaishuliangShoppingCarGood" class="caozuo-button">数量</el-button>
               <el-button @click="clickBtnXiugaijiageShoppingCarGood" class="caozuo-button">改价</el-button>
               <el-button @click="clickDelShoppingCarGood" class="caozuo-button">删除</el-button>
-              <el-button @click="chongzhiDialogShow" class="caozuo-button">充值</el-button>
+              <el-button @click="chongzhiDialog.isShow = true" class="caozuo-button">充值</el-button>
               <el-button @click="huiyuanDialog.isShow = true" class="caozuo-button">会员</el-button>
               <el-button @click="goukaDialogShow" class="caozuo-button">购卡</el-button>
             </div>
@@ -229,6 +229,20 @@
             <div class="four">
               <el-input @focus="chongzhiDialogInputFocus('money')" v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额" clearable></el-input>
             </div>
+            <el-form>
+              <el-form-item label="请选择服务人员">
+                <el-select v-model="chongzhiDialog.nowWaiter" placeholder="请选择" @focus="getWaiterList()">
+                  <el-option
+                    v-for="item in chongzhiDialog.waiter"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
+                    <span style="float: left" class="font-blue">{{ item.name }}</span>
+                    <span style="float: right;color: #ccc;" >({{ item.type }})</span>
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </el-form>
           </div>
           <div class="float-right right">
             <v-keyboard @getNumber="chongzhiDialogGetCode"></v-keyboard>
@@ -791,7 +805,16 @@ export default {
           ]
         },
         payType: '', // 充值方式
-        payMoney: '' // 充值金额
+        payMoney: '', // 充值金额
+        nowWaiter: '',
+        // 服务人员列表
+        waiter: [
+          {
+            id: 0, // 服务员id  当服务员的id为0师表示为当前登录的店长
+            name: '管理员', // 服务员名称
+            type: '店长' // 服务类型
+          }
+        ],
       },
       // 选择会员弹框是否显示
       xuanzehuiyuanDialog: {
@@ -1647,8 +1670,7 @@ export default {
     getWaiterList () {
       postWaiter().then((res) => {
         this.jiezhangDialog.waiter = res.data
-      }).catch((err) => {
-        console.log(err, '服务人员获取失败')
+        this.chongzhiDialog.waiter = res.data
       })
     },
     clickWaiter (e) {
@@ -1893,17 +1915,6 @@ export default {
       }
     },
     // 充值弹框
-    chongzhiDialogShow () {
-      if (this.jiezhangDialog.nowWaiter.id === -1) {
-        this.$message.closeAll()
-        this.$message({
-          message: '请先选择服务人员',
-          type: 'error'
-        })
-        return
-      }
-      this.chongzhiDialog.isShow = true
-    },
     chongzhiDialogInputFocus (str) {
       this.chongzhiDialog.chooeseWho = str
     },
@@ -1987,11 +1998,19 @@ export default {
         })
         return
       }
+      if (!this.chongzhiDialog.nowWaiter) {
+        this.$message.closeAll()
+        this.$message({
+          message: '选择服务人员',
+          type: 'error'
+        })
+        return
+      }
       let requestData = {
         member_id: this.chongzhiDialog.huiyuanInfo.id,
         price: this.chongzhiDialog.payMoney,
         pay_way: this.chongzhiDialog.payType,
-        waiter_id: this.jiezhangDialog.nowWaiter.id
+        waiter_id: this.chongzhiDialog.nowWaiter
       }
       this.$confirm(`是否确认给${this.chongzhiDialog.huiyuanInfo.mobile}充值，充值金额为：${requestData.price}元？`, '提示', {
         confirmButtonText: '确定',
@@ -2008,15 +2027,11 @@ export default {
             })
             this.xuanzehuiyuanDialog.mobile = this.chongzhiDialog.mobile
             this.clickChoosesMemberByKeyboard('ok')
-            this.jiezhangDialog.nowWaiter = {
-              id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
-              name: '请选择服务员', // 服务员名称
-              type: '' // 服务类型
-            }
             this.chongzhiDialog.mobile = ''
             this.chongzhiDialog.huiyuanInfo = {}
             this.chongzhiDialog.payType = ''
             this.chongzhiDialog.payMoney = ''
+            this.chongzhiDialog.nowWaiter = ''
           }
         })
       }).catch(() => {
