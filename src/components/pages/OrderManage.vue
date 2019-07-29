@@ -74,7 +74,7 @@
               <el-table-column prop="sn" label="订单号"></el-table-column>
               <el-table-column label="会员账号">
                 <template slot-scope="scope">
-                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)" v-if="scope.row.member_id === '0'">{{scope.row.mobile}}</el-button>
+                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)" v-if="scope.row.member_id">{{scope.row.mobile}}</el-button>
                   <span v-else>非会员</span>
                 </template>
               </el-table-column>
@@ -195,7 +195,7 @@
               <el-table-column prop="sn" label="订单号"></el-table-column>
               <el-table-column label="会员账号">
                 <template slot-scope="scope">
-                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)" v-if="scope.row.member_id === '0'">{{scope.row.mobile}}</el-button>
+                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)" v-if="scope.row.member_id">{{scope.row.mobile}}</el-button>
                   <span v-else>非会员</span>
                 </template>
               </el-table-column>

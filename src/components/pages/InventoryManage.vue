@@ -35,15 +35,20 @@
           </div>
           <div style="margin-top: 15px;">
             <el-table  :data="transferSlipPageData.list" border style="width: 100%;" height="620">
-              <el-table-column  label="调拨信息"></el-table-column>
+              <el-table-column  label="调拨信息">
+                <template slot-scope="scope">
+                  <div v-html="scope.row.message">
+                  </div>
+                </template>
+              </el-table-column>
               <el-table-column  label="商品信息">
                 <template slot-scope="scope">
                   <div v-html="scope.row.item">
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column prop="amount" label="单位成本"></el-table-column>
-              <el-table-column  label="商品成本"></el-table-column>
+<!--              <el-table-column prop="amount" label="单位成本"></el-table-column>-->
+<!--              <el-table-column  label="商品成本"></el-table-column>-->
               <el-table-column  label="调拨数量">
                 <template slot-scope="scope">
                   <div v-html="scope.row.number">
@@ -67,9 +72,9 @@
               <el-table-column label="操作">
                 <template slot-scope="scope">
                   <el-button type="text" size="mini" v-if="scope.row.status === 0" @click="clickTransferSlipSendGoods(scope.row.id)">发货</el-button>
-                  <el-button type="text" size="mini" v-if="scope.row.status === 1" @click="clickTransferSlipSendGoodsCancel(scope.row.id)">取消发货</el-button>
+                  <el-button type="text" size="mini" v-if="scope.row.status === 1 && scope.row.out_shop === userInfo.shop_id" @click="clickTransferSlipSendGoodsCancel(scope.row.id)">取消发货</el-button>
                   <el-button type="text" size="mini" @click="transferSlipPageData.printingDialog.isShow = true">打印</el-button>
-                  <el-button type="text" size="mini" v-if="scope.row.status === 1" @click="clickTransferSlipDetails(scope.row.id)">确认收货</el-button>
+                  <el-button type="text" size="mini" v-if="scope.row.status === 1  && scope.row.in_shop === userInfo.shop_id" @click="clickTransferSlipDetails(scope.row.id)">确认收货</el-button>
                   <el-button type="text" size="mini" v-if="scope.row.status === 0" @click="clickTransferSlipDel(scope.row.id)">删除</el-button>
                   <el-button type="text" size="mini" @click="clickTransferSlipDetails(scope.row.id)">详情</el-button>
                 </template>
@@ -356,8 +361,8 @@
           <el-dialog :visible.sync="checkOrderPageData.addDialog.isShow"  title="新增盘点"  width="968px" :center="true">
             <div style="margin-bottom: 15px;">
               <el-radio-group v-model="checkOrderPageData.addDialog.stock_type">
-                <el-radio :label="1">只看未盘点商品</el-radio>
-                <el-radio :label="2">全部</el-radio>
+                <el-radio :label="2">只看未盘点商品</el-radio>
+                <el-radio :label="1">全部</el-radio>
               </el-radio-group>
             </div>
             <div style="margin-bottom: 15px;">
