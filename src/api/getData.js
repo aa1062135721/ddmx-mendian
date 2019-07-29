@@ -444,6 +444,15 @@ export const postTransferSlipConfirmGoods = (data = null) => {
 }
 
 /**
+ * 订单管理-库存管理 - 调拨单 - 新增调拨，选择商品，获取商品列表
+ * @param data
+ * @returns {*}
+ */
+export const postTransferSlipGetGoodList = (data = null) => {
+  return Vue.prototype.$post('/allot/allot_item', data)
+}
+
+/**
  * 订单管理-库存管理 - 调拨单 - 调入，调出 仓库列表
  * @param data
  * @returns {*}

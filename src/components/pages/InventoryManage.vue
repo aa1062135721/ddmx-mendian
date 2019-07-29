@@ -4,12 +4,12 @@
         <el-tab-pane label="调拨单" name="1">
           <div>
             <div class="search">
-<!--              <el-select  clearable placeholder="选择调入仓库" v-model="transferSlipRequestData.in_shop">-->
-<!--                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>-->
-<!--              </el-select>-->
-              <el-select  clearable placeholder="选择调出仓库" v-model="transferSlipRequestData.out_shop">
+              <el-select  clearable placeholder="选择调入仓库" v-model="transferSlipRequestData.in_shop">
                 <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
               </el-select>
+<!--              <el-select  clearable placeholder="选择调出仓库" v-model="transferSlipRequestData.out_shop">-->
+<!--                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>-->
+<!--              </el-select>-->
               <el-select  clearable placeholder="选择状态" v-model="transferSlipRequestData.status">
                 <el-option v-for="item in transferSlipPageData.status" :label="item.name" :key="item.id" :value="item.id"></el-option>
               </el-select>
@@ -104,11 +104,11 @@
               <el-table :data="transferSlipPageData.addDialog.list" border style="width: 100%;">
                 <el-table-column type="index" label="序号"></el-table-column>
                 <el-table-column prop="title" label="商品名称"></el-table-column>
-                <el-table-column prop="title" label="条形码"></el-table-column>
-                <el-table-column prop="type_id" label="一级分类"></el-table-column>
-                <el-table-column prop="type" label="二级分类"></el-table-column>
+                <el-table-column prop="bar_code" label="条形码"></el-table-column>
+                <el-table-column prop="p_type" label="一级分类"></el-table-column>
+                <el-table-column prop="cname" label="二级分类"></el-table-column>
                 <el-table-column prop="stock" label="当前库存"></el-table-column>
-                <el-table-column prop="selling_price" label="单价"></el-table-column>
+                <el-table-column prop="price" label="单价"></el-table-column>
                 <el-table-column label="调拨数量">
                   <template slot-scope="scope">
                     <el-input placehoder="请输入调拨数量" v-model="scope.row.num"></el-input>
@@ -152,8 +152,8 @@
           <!-- 调拨单--新增调拨 选择商品-->
           <el-dialog  :visible.sync="transferSlipPageData.chooseGoodsDialog.isShow" title="选择商品" width="968px" :center="true">
             <div style="margin-bottom: 15px;">
-              <el-input placeholder="请输入商品名称" style="width: 180px;" v-model="transferSlipPageData.chooseGoodsDialog.title"></el-input>
-              <el-input placeholder="请输入条形码" style="width: 180px;"  v-model="transferSlipPageData.chooseGoodsDialog.title"></el-input>
+              <el-input placeholder="请输入商品名称" style="width: 180px;" v-model="transferSlipPageData.chooseGoodsDialog.code"></el-input>
+              <el-input placeholder="请输入条形码" style="width: 180px;"  v-model="transferSlipPageData.chooseGoodsDialog.name"></el-input>
               <el-select  clearable placeholder="选择一级分类" v-model="transferSlipPageData.chooseGoodsDialog.topCategoryId" @change="clickTransferSlipAddTwoCategory">
                 <el-option
                   v-for="item in transferSlipPageData.chooseGoodsDialog.topCategory"
@@ -170,22 +170,34 @@
                   :value="item.id">
                 </el-option>
               </el-select>
-              <el-button @click="clickTransferSlipSearchGoods">查询</el-button>
+              <el-button @click="transferSlipPageData.chooseGoodsDialog.page = 1; clickTransferSlipSearchGoods()">查询</el-button>
             </div>
             <div>
               <el-table
-                :data="transferSlipPageData.chooseGoodsDialog.list"
+                :data="transferSlipPageData.chooseGoodsDialog.responseData.data"
                 tooltip-effect="dark"
                 @selection-change="clickTransferSlipAddGoodsChange"
                 border style="width: 100%;">
                 <el-table-column type="selection" width="55"></el-table-column>
-                <el-table-column prop="title" label="条形码"></el-table-column>
+                <el-table-column prop="bar_code" label="条形码"></el-table-column>
                 <el-table-column prop="title" label="商品名称"></el-table-column>
-                <el-table-column prop="type_id" label="一级分类"></el-table-column>
-                <el-table-column prop="type" label="二级分类"></el-table-column>
+                <el-table-column prop="p_type" label="一级分类"></el-table-column>
+                <el-table-column prop="cname" label="二级分类"></el-table-column>
                 <el-table-column prop="stock" label="库存"></el-table-column>
-                <el-table-column prop="selling_price" label="单价"></el-table-column>
+                <el-table-column prop="price" label="单价"></el-table-column>
               </el-table>
+            </div>
+            <div  style="text-align: right;margin-top: 20px;">
+              <el-pagination
+                background
+                layout="total, sizes, prev, pager, next, jumper"
+                :page-sizes="[1,5, 10, 20, 30]"
+                @size-change="clickTransferSlipSearchGoodsPageSizeChange"
+                @current-change="clickTransferSlipSearchGoodsPageCurrentChange"
+                :page-size="transferSlipPageData.chooseGoodsDialog.limit"
+                :current-page.sync="transferSlipPageData.chooseGoodsDialog.page"
+                :total="transferSlipPageData.chooseGoodsDialog.responseData.count">
+              </el-pagination>
             </div>
             <div style="text-align: center;margin-top: 20px;">
               <el-button class="my-secondary-btn" @click="transferSlipPageData.chooseGoodsDialog.isShow = false">取消</el-button>
@@ -668,7 +680,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { postTransferSlipConfirmGoods, postTransferSlipSendGoodsGetInfo, postTransferSlipSendGoodsGetGoodList, postTransferSlipGoodsDetails, postTransferSlipDetails, postTransferSlipSendGoods, postTransferSlipSendGoodsCancel, postTransferSlipDel, postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
+import { postTransferSlipGetGoodList, postTransferSlipConfirmGoods, postTransferSlipSendGoodsGetInfo, postTransferSlipSendGoodsGetGoodList, postTransferSlipGoodsDetails, postTransferSlipDetails, postTransferSlipSendGoods, postTransferSlipSendGoodsCancel, postTransferSlipDel, postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
 export default {
   name: 'InventoryManage', // 库存管理，进销存
   data () {
@@ -735,18 +747,27 @@ export default {
         // 选择商品弹框
         chooseGoodsDialog: {
           isShow: false,
-          title: '',
+          name: '',
+          code: '',
           multipleSelection: [],
-          list: [
-            // {
-            //   id: 1738,     //商品id
-            //   title: "测试商品7/18",    //商品名称
-            //   type_id: "玩具童车",  //一级分类名称
-            //   type: "拼插积木", //二级分类名称
-            //   selling_price: "11000.00",    //销售价格
-            //   stock: 8  //当前库存
-            // }
-          ],
+          responseData:{
+            code: 0,
+            count: 4,
+            data: [
+              {
+                bar_code: "26",
+                cname: "米粉",
+                id: 1746,
+                p_type: "营养辅食",
+                pid: 36,
+                price: "0.00",
+                status: 1,
+                stock: 21,
+                title: "测试前端",
+                type: 97
+              }
+            ],
+          },
           // 一级分类
           topCategoryId: '', // 当前选中的一级分类,用来获取二级分类
           topCategory: [
@@ -756,7 +777,9 @@ export default {
           twoCategoryId: '',
           twoCategory: [
             // {cname:'奶粉',id:1,pid:0}
-          ]
+          ],
+          page:1,
+          limit:10,
         },
         // 发货弹框
         sendGoodsDialog: {
@@ -1199,47 +1222,43 @@ export default {
     // 新增调拨单，新增商品弹框，查询商品列表
     clickTransferSlipSearchGoods () {
       let data = {
-        stock_type: 1,
-        title: this.transferSlipPageData.chooseGoodsDialog.title,
-        type_id: this.transferSlipPageData.chooseGoodsDialog.topCategoryId,
-        type: this.transferSlipPageData.chooseGoodsDialog.twoCategoryId
+        page:this.transferSlipPageData.chooseGoodsDialog.page,
+        limit:this.transferSlipPageData.chooseGoodsDialog.limit,
+        name:this.transferSlipPageData.chooseGoodsDialog.name,
+        code:this.transferSlipPageData.chooseGoodsDialog.code,
+        parent: this.transferSlipPageData.chooseGoodsDialog.topCategoryId,
+        child: this.transferSlipPageData.chooseGoodsDialog.twoCategoryId
       }
-      postCheckOrderAddGoodList(data).then(res => {
-        if (res.data.length) {
-          this.transferSlipPageData.chooseGoodsDialog.list = res.data
-        }
+      postTransferSlipGetGoodList(data).then(res => {
+        this.transferSlipPageData.chooseGoodsDialog.responseData = res
       })
+    },
+    clickTransferSlipSearchGoodsPageSizeChange(val){
+      this.transferSlipPageData.chooseGoodsDialog.limit = val
+      this.clickTransferSlipSearchGoods()
+    },
+    clickTransferSlipSearchGoodsPageCurrentChange (val) {
+      this.transferSlipPageData.chooseGoodsDialog.page = val
+      this.clickTransferSlipSearchGoods()
     },
     // 选中商品后确认添加到本次调拨列表中
     clickTransferSlipChoosesGoods () {
-      // {
-      //   id: 1738,     //商品id
-      //     title: "测试商品7/18",    //商品名称
-      //   type_id: "玩具童车",  //一级分类名称
-      //   type: "拼插积木", //二级分类名称
-      //   selling_price: "11000.00",    //销售价格
-      //   stock: 8,  //当前库存,
-      //   num:'',//调拨数量
-      //   remark:'',//备注
-      // }
-      // 数据格式化
       let formatArr = []
       this.transferSlipPageData.chooseGoodsDialog.multipleSelection.forEach((item) => {
-        let data = {
-          id: item.id,
-          title: item.title,
-          type_id: item.type_id,
-          type: item.type,
-          selling_price: item.selling_price,
-          stock: item.stock,
+        formatArr.push({
+          id:item.id,
+          title: item.title, // 商品
+          bar_code: item.bar_code, // 商品名称
+          p_type: item.p_type, // 一级分类
+          cname: item.cname, // 二级分类
+          stock: item.stock, // 当前库存
+          price: item.price,
           num: '',
-          remark: ''
-        }
-        formatArr.push(data)
+          remark: '',
+        })
       })
-
-      // 数据拼接
       let newArr = this.transferSlipPageData.addDialog.list.concat(formatArr)
+      console.log(newArr)
       // 去重
       let obj = {}
       newArr = newArr.reduce(function (item, next) {
@@ -1282,7 +1301,7 @@ export default {
         return
       }
       for (let i = 0; i < this.transferSlipPageData.addDialog.list.length; i++) {
-        data.bar_code.push(this.transferSlipPageData.addDialog.list[i].title) // 暂时没有返回条形码
+        data.bar_code.push(this.transferSlipPageData.addDialog.list[i].bar_code)
         data.item_id.push(this.transferSlipPageData.addDialog.list[i].id)
         data.item_name.push(this.transferSlipPageData.addDialog.list[i].title)
         if (!(/^[0-9]*[1-9][0-9]*$/.test(this.transferSlipPageData.addDialog.list[i].num))) {
