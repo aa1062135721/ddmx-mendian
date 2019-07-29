@@ -61,7 +61,12 @@
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column prop="in_message" label="入库信息"></el-table-column>
+              <el-table-column  label="入库信息">
+                <template slot-scope="scope">
+                  <div v-html="scope.row.in_message">
+                  </div>
+                </template>
+              </el-table-column>
               <el-table-column label="状态">
                 <template slot-scope="scope">
                  <span v-if="scope.row.status === 1">调拨中</span>
@@ -71,11 +76,11 @@
               </el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button type="text" size="mini" v-if="scope.row.status === 0" @click="clickTransferSlipSendGoods(scope.row.id)">发货</el-button>
+                  <el-button type="text" size="mini" v-if="scope.row.status === 0 && scope.row.out_shop === userInfo.shop_id" @click="clickTransferSlipSendGoods(scope.row.id)">发货</el-button>
                   <el-button type="text" size="mini" v-if="scope.row.status === 1 && scope.row.out_shop === userInfo.shop_id" @click="clickTransferSlipSendGoodsCancel(scope.row.id)">取消发货</el-button>
                   <el-button type="text" size="mini" @click="transferSlipPageData.printingDialog.isShow = true">打印</el-button>
                   <el-button type="text" size="mini" v-if="scope.row.status === 1  && scope.row.in_shop === userInfo.shop_id" @click="clickTransferSlipDetails(scope.row.id)">确认收货</el-button>
-                  <el-button type="text" size="mini" v-if="scope.row.status === 0" @click="clickTransferSlipDel(scope.row.id)">删除</el-button>
+                  <el-button type="text" size="mini" v-if="scope.row.status === 0 && scope.row.out_shop === userInfo.shop_id" @click="clickTransferSlipDel(scope.row.id)">删除</el-button>
                   <el-button type="text" size="mini" @click="clickTransferSlipDetails(scope.row.id)">详情</el-button>
                 </template>
               </el-table-column>
@@ -87,6 +92,8 @@
               background
               layout="total, sizes, prev, pager, next, jumper"
               :page-sizes="[10, 20, 30, 40]"
+              @size-change="TransferSlipPageSizeChange "
+              @current-change="TransferSlipOnePageCurrentChange"
               :page-size="transferSlipRequestData.limit"
               :current-page.sync="transferSlipRequestData.page"
               :total="transferSlipPageData.count">
@@ -191,7 +198,7 @@
               <el-pagination
                 background
                 layout="total, sizes, prev, pager, next, jumper"
-                :page-sizes="[1,5, 10, 20, 30]"
+                :page-sizes="[5, 10, 20, 30]"
                 @size-change="clickTransferSlipSearchGoodsPageSizeChange"
                 @current-change="clickTransferSlipSearchGoodsPageCurrentChange"
                 :page-size="transferSlipPageData.chooseGoodsDialog.limit"
@@ -371,34 +378,35 @@
           </div>
           <!-- 盘点单--新增盘点-->
           <el-dialog :visible.sync="checkOrderPageData.addDialog.isShow"  title="新增盘点"  width="968px" :center="true">
+<!--            <div style="margin-bottom: 15px;">-->
+<!--              <el-radio-group v-model="checkOrderPageData.addDialog.stock_type">-->
+<!--                <el-radio :label="2">只看未盘点商品</el-radio>-->
+<!--                <el-radio :label="1">全部</el-radio>-->
+<!--              </el-radio-group>-->
+<!--            </div>-->
             <div style="margin-bottom: 15px;">
-              <el-radio-group v-model="checkOrderPageData.addDialog.stock_type">
-                <el-radio :label="2">只看未盘点商品</el-radio>
-                <el-radio :label="1">全部</el-radio>
-              </el-radio-group>
-            </div>
-            <div style="margin-bottom: 15px;">
-              <el-select  clearable placeholder="选择一级分类" v-model="checkOrderPageData.addDialog.topCategoryId"  @change="clickAddCheckOrderTwoCategory">
-                <el-option
-                  v-for="item in checkOrderPageData.addDialog.topCategory"
-                  :label="item.cname"
-                  :key="item.id"
-                  :value="item.id">
-                </el-option>
-              </el-select>
-              <el-select  clearable placeholder="选择二级分类" v-model="checkOrderPageData.addDialog.twoCategoryId">
-                <el-option
-                  v-for="item in checkOrderPageData.addDialog.twoCategory"
-                  :label="item.cname"
-                  :key="item.id"
-                  :value="item.id">
-                </el-option>
-              </el-select>
-              <el-input placeholder="请输入需查询的商品名称" v-model="checkOrderPageData.addDialog.title" style="width: 300px;"></el-input>
-              <el-button  @click="getCheckOrderGoodList">查询</el-button>
+<!--              <el-select style="width: 200px;" clearable placeholder="选择一级分类" v-model="checkOrderPageData.addDialog.topCategoryId"  @change="clickAddCheckOrderTwoCategory">-->
+<!--                <el-option-->
+<!--                  v-for="item in checkOrderPageData.addDialog.topCategory"-->
+<!--                  :label="item.cname"-->
+<!--                  :key="item.id"-->
+<!--                  :value="item.id">-->
+<!--                </el-option>-->
+<!--              </el-select>-->
+<!--              <el-select style="width: 200px;" clearable placeholder="选择二级分类" v-model="checkOrderPageData.addDialog.twoCategoryId">-->
+<!--                <el-option-->
+<!--                  v-for="item in checkOrderPageData.addDialog.twoCategory"-->
+<!--                  :label="item.cname"-->
+<!--                  :key="item.id"-->
+<!--                  :value="item.id">-->
+<!--                </el-option>-->
+<!--              </el-select>-->
+<!--              <el-input placeholder="请输入需查询的商品名称" v-model="checkOrderPageData.addDialog.title" style="width: 300px;"></el-input>-->
+<!--              <el-button  @click="clickAddCheckOrderDialogSearchBtn">查询</el-button>-->
+              <el-button  @click="checkOrderPageData.addGoodsDialog.isShow = true">新增商品</el-button>
             </div>
             <div>
-              <el-table :data="checkOrderPageData.addDialog.list" border style="width: 100%;">
+              <el-table :data="checkOrderPageData.addDialog.list" border style="width: 100%;" height="400px">
                 <el-table-column type="index" label="序号"></el-table-column>
                 <el-table-column prop="item_title" label="商品名称"></el-table-column>
                 <el-table-column prop="top_category" label="一级分类"></el-table-column>
@@ -752,20 +760,20 @@ export default {
           multipleSelection: [],
           responseData:{
             code: 0,
-            count: 4,
+            count: 0,
             data: [
-              {
-                bar_code: "26",
-                cname: "米粉",
-                id: 1746,
-                p_type: "营养辅食",
-                pid: 36,
-                price: "0.00",
-                status: 1,
-                stock: 21,
-                title: "测试前端",
-                type: 97
-              }
+              // {
+              //   bar_code: "26",
+              //   cname: "米粉",
+              //   id: 1746,
+              //   p_type: "营养辅食",
+              //   pid: 36,
+              //   price: "0.00",
+              //   status: 1,
+              //   stock: 21,
+              //   title: "测试前端",
+              //   type: 97
+              // }
             ],
           },
           // 一级分类
@@ -779,7 +787,7 @@ export default {
             // {cname:'奶粉',id:1,pid:0}
           ],
           page:1,
-          limit:10,
+          limit:5,
         },
         // 发货弹框
         sendGoodsDialog: {
@@ -1106,6 +1114,16 @@ export default {
         this.transferSlipPageData.list = res.data ? res.data : []
       })
     },
+    // 调拨单 页码操作
+    TransferSlipOnePageCurrentChange (val) {
+      this.transferSlipRequestData.page = val
+      this.getTransferSlipList()
+    },
+    // 调拨单，每页数据条数操作
+    TransferSlipPageSizeChange (val) {
+      this.transferSlipRequestData.limit = val
+      this.getTransferSlipList()
+    },
     // 删除调拨单
     clickTransferSlipDel (id) {
       this.$confirm('您确认删除本条调拨信息吗？', '提示', {
@@ -1370,6 +1388,29 @@ export default {
           this.checkOrderPageData.addDialog.topCategory = res.data
         }
       })
+      this.clickAddCheckOrderDialogSearchBtn()
+    },
+    clickAddCheckOrderDialogSearchBtn () {
+      let data = {
+        stock_type: this.checkOrderPageData.addDialog.stock_type,
+        title: this.checkOrderPageData.addDialog.title,
+        type_id: this.checkOrderPageData.addDialog.topCategoryId,
+        type: this.checkOrderPageData.addDialog.twoCategoryId
+      }
+      postCheckOrderAddGoodList(data).then(res => {
+        let formatArr = []
+        res.data.forEach((item) => {
+          formatArr.push({
+            item_id: item.id, // 商品id
+            item_title: item.title, // 商品名称
+            top_category: item.type_id, // 一级分类
+            two_category: item.type, // 二级分类
+            stock_reality: item.stock, // 当前库存
+            stock_now: ''// 盘点库存
+          })
+        })
+        this.checkOrderPageData.addDialog.list = formatArr
+      })
     },
     // 新增盘点单对话框获取二级分类列表
     clickAddCheckOrderTwoCategory () {
@@ -1397,7 +1438,7 @@ export default {
     getCheckOrderGoodList () {
       this.checkOrderPageData.addGoodsDialog.isShow = true
       let data = {
-        stock_type: this.checkOrderPageData.addDialog.stock_type,
+        stock_type: 2,
         title: this.checkOrderPageData.addDialog.title,
         type_id: this.checkOrderPageData.addDialog.topCategoryId,
         type: this.checkOrderPageData.addDialog.twoCategoryId
@@ -1427,18 +1468,18 @@ export default {
           top_category: item.type_id, // 一级分类
           two_category: item.type, // 二级分类
           stock_reality: item.stock, // 当前库存
-          stock_now: 0// 盘点库存
+          stock_now: ''// 盘点库存
         })
       })
 
       // 数据拼接
       let newArr = this.checkOrderPageData.addDialog.list.concat(formatArr)
       // 去重
-      // let obj = {}
-      // newArr = newArr.reduce(function (item, next) {
-      //   obj[next.item_id] ? '' : obj[next.item_id] = true && item.push(next)
-      //   return item
-      // }, [])
+      let obj = {}
+      newArr = newArr.reduce(function (item, next) {
+        obj[next.item_id] ? '' : obj[next.item_id] = true && item.push(next)
+        return item
+      }, [])
       this.checkOrderPageData.addDialog.list = newArr
       this.checkOrderPageData.addGoodsDialog.isShow = false
     },
@@ -1486,10 +1527,15 @@ export default {
     },
     // 盘点单删除
     clickCheckOrderDel (id) {
-      postCheckOrderDel({id}).then(res => {
-        if (res.code === 200) {
+      this.$confirm('您确认删除本条盘点信息吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        postCheckOrderDel({id}).then(() => {
           this.getCheckOrderList()
-        }
+        })
+      }).catch(() => {
       })
     },
     // 盘点单 确认盘点
