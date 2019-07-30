@@ -460,3 +460,12 @@ export const postTransferSlipGetGoodList = (data = null) => {
 export const postShopList = (data = null) => {
   return Vue.prototype.$post('/index/shop_list', data)
 }
+
+/**
+ * 订单管理-库存管理 - 库存查询 - 获取列表
+ * @param data
+ * @returns {*}
+ */
+export const postCheckStockGoodsList = (data = null) => {
+  return Vue.prototype.$post('/Check/stock_about', data)
+}

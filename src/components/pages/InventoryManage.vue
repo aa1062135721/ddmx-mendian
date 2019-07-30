@@ -1,6 +1,52 @@
 <template>
     <div class="inventory-manage">
       <el-tabs v-model="type" @tab-click="handleClick">
+        <el-tab-pane label="库存查询" name="0">
+          <div>
+            <div class="search">
+              <el-select  clearable placeholder="选择一级分类" v-model="stockCheck.requestData.type_id" @change="stockCheckTwoCategory">
+                <el-option
+                  v-for="item in stockCheck.topCategory"
+                  :label="item.cname"
+                  :key="item.id"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+              <el-select  clearable placeholder="选择二级分类" v-model="stockCheck.requestData.type">
+                <el-option
+                  v-for="item in stockCheck.twoCategory"
+                  :label="item.cname"
+                  :key="item.id"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+              <el-input placeholder="商品名/条形码" style="width: 180px;"  v-model="stockCheck.requestData.title"></el-input>
+              <el-button @click="getStockCheckList">搜索</el-button>
+            </div>
+            <div style="margin-top: 15px;">
+              <el-table  :data="stockCheck.responseData.data" border style="width: 100%;" height="620">
+                <el-table-column prop="id" label="ID"></el-table-column>
+                <el-table-column prop="bar_code" label="条形码"></el-table-column>
+                <el-table-column prop="title" label="商品名称"></el-table-column>
+                <el-table-column prop="type_id" label="一级分类"></el-table-column>
+                <el-table-column prop="type" label="二级分类"></el-table-column>
+                <el-table-column prop="stock" label="剩余库存"></el-table-column>
+              </el-table>
+            </div>
+            <div class="footer" style="text-align: right;margin-top: 15px;">
+              <el-pagination
+                background
+                layout="total, sizes, prev, pager, next, jumper"
+                :page-sizes="[10, 20, 30, 40]"
+                @size-change="stockCheckPageSizeChange "
+                @current-change="stockCheckPageCurrentChange"
+                :page-size="stockCheck.requestData.limit"
+                :current-page.sync="stockCheck.requestData.page"
+                :total="stockCheck.responseData.count">
+              </el-pagination>
+            </div>
+          </div>
+        </el-tab-pane>
         <el-tab-pane label="调拨单" name="1">
           <div>
             <div class="search">
@@ -688,18 +734,49 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { postTransferSlipGetGoodList, postTransferSlipConfirmGoods, postTransferSlipSendGoodsGetInfo, postTransferSlipSendGoodsGetGoodList, postTransferSlipGoodsDetails, postTransferSlipDetails, postTransferSlipSendGoods, postTransferSlipSendGoodsCancel, postTransferSlipDel, postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
+import { postCheckStockGoodsList, postTransferSlipGetGoodList, postTransferSlipConfirmGoods, postTransferSlipSendGoodsGetInfo, postTransferSlipSendGoodsGetGoodList, postTransferSlipGoodsDetails, postTransferSlipDetails, postTransferSlipSendGoods, postTransferSlipSendGoodsCancel, postTransferSlipDel, postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
 export default {
   name: 'InventoryManage', // 库存管理，进销存
   data () {
     return {
-      type: '1', // 1=调拨单，2=盘点单，3=盘亏单，4=盘盈单
+      type: '0', // 0=库存查询 1=调拨单，2=盘点单，3=盘亏单，4=盘盈单
       // 调出 或调出 仓库
       shopList: [
         // {id: 0, name: '总店'},
         // {id: 1, name: '江与城'},
         // {id: 2, name: '已完成'}
       ],
+      // 0=库存查询
+      stockCheck:{
+        topCategory:[
+
+        ],
+        twoCategory:[
+
+        ],
+        requestData:{
+          page:1,
+          limit:10,
+          type_id:'',
+          type:'',
+          title:'',
+        },
+        responseData:{
+          count:0,
+          data:[
+            {
+              id: 1752, //商品id
+              title: "商品新增hhh",//商品名称
+              type_id: "26",    //一级分类名称
+              type: "测试分类11",   //二级分类名称
+              bar_code: "123123",   //商品条形码
+              shop_id: 60,  //门店id（暂时无用）
+              stock: 20 //剩余库存
+            },
+          ]
+        }
+      },
+
       // 1=调拨单
       transferSlipPageData: {
         status: [
@@ -1068,16 +1145,23 @@ export default {
     }
   },
   mounted () {
-    // this.getCheckOrderList()
-    // this.getCheckLossOrWinOrderList(1)
+    postTwotype().then(res => {
+      if (res.data.length) {
+        this.stockCheck.topCategory = res.data
+      }
+    })
     this.getShopList()
-    this.getTransferSlipList()
+    this.getStockCheckList()
   },
   methods: {
     // tab切换
     handleClick (tab, event) {
       // 1=调拨单，2=盘点单，3=盘亏单，4=盘盈单
       switch (tab.name) {
+        case '0':
+          this.stockCheck.requestData.page = 1
+          this.getStockCheckList()
+          break
         case '1':
           this.getTransferSlipList()
           break
@@ -1094,6 +1178,46 @@ export default {
           this.getCheckLossOrWinOrderList(1)
           break
       }
+    },
+
+    //库存查询
+    getStockCheckList(){
+      let data = {
+        type_id:this.stockCheck.requestData.type_id,
+        type:this.stockCheck.requestData.type,
+        title:this.stockCheck.requestData.title,
+        page:`${this.stockCheck.requestData.page},${this.stockCheck.requestData.limit}`,
+      }
+      postCheckStockGoodsList(data).then(res => {
+        this.stockCheck.responseData = res
+      })
+    },
+    // 库存查询 页码操作
+    stockCheckPageCurrentChange (val) {
+      this.stockCheck.requestData.page = val
+      this.getStockCheckList()
+    },
+    //库存查询，每页数据条数操作
+    stockCheckPageSizeChange (val) {
+      this.stockCheck.requestData.limit = val
+      this.getStockCheckList()
+    },
+    // 库存查询 获取二级分类列表
+    stockCheckTwoCategory () {
+      this.stockCheck.requestData.type = ''
+      this.stockCheck.twoCategory = []
+      if (!this.stockCheck.requestData.type_id) {
+        // 没有选择一级分类
+        return
+      }
+      let data = {
+        type: this.stockCheck.requestData.type_id
+      }
+      postTwotype(data).then(res => {
+        if (res.data.length) {
+          this.stockCheck.twoCategory = res.data
+        }
+      })
     },
 
     // 调拨单获取列表
@@ -1172,7 +1296,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        postTransferSlipSendGoods({id}).then(res => {
+        postTransferSlipSendGoods({id, worker_id:this.userInfo.id}).then(res => {
           if (res.result) {
             this.getTransferSlipList()
             this.transferSlipPageData.sendGoodsDialog.isShow = true
