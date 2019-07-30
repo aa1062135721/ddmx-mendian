@@ -424,31 +424,7 @@
           </div>
           <!-- 盘点单--新增盘点-->
           <el-dialog :visible.sync="checkOrderPageData.addDialog.isShow"  title="新增盘点"  width="968px" :center="true">
-<!--            <div style="margin-bottom: 15px;">-->
-<!--              <el-radio-group v-model="checkOrderPageData.addDialog.stock_type">-->
-<!--                <el-radio :label="2">只看未盘点商品</el-radio>-->
-<!--                <el-radio :label="1">全部</el-radio>-->
-<!--              </el-radio-group>-->
-<!--            </div>-->
             <div style="margin-bottom: 15px;">
-<!--              <el-select style="width: 200px;" clearable placeholder="选择一级分类" v-model="checkOrderPageData.addDialog.topCategoryId"  @change="clickAddCheckOrderTwoCategory">-->
-<!--                <el-option-->
-<!--                  v-for="item in checkOrderPageData.addDialog.topCategory"-->
-<!--                  :label="item.cname"-->
-<!--                  :key="item.id"-->
-<!--                  :value="item.id">-->
-<!--                </el-option>-->
-<!--              </el-select>-->
-<!--              <el-select style="width: 200px;" clearable placeholder="选择二级分类" v-model="checkOrderPageData.addDialog.twoCategoryId">-->
-<!--                <el-option-->
-<!--                  v-for="item in checkOrderPageData.addDialog.twoCategory"-->
-<!--                  :label="item.cname"-->
-<!--                  :key="item.id"-->
-<!--                  :value="item.id">-->
-<!--                </el-option>-->
-<!--              </el-select>-->
-<!--              <el-input placeholder="请输入需查询的商品名称" v-model="checkOrderPageData.addDialog.title" style="width: 300px;"></el-input>-->
-<!--              <el-button  @click="clickAddCheckOrderDialogSearchBtn">查询</el-button>-->
               <el-button  @click="checkOrderPageData.addGoodsDialog.isShow = true">新增商品</el-button>
             </div>
             <div>
@@ -480,19 +456,25 @@
           <!-- 盘点单--新增调拨 新增商品-->
           <el-dialog  title="选择商品" :visible.sync="checkOrderPageData.addGoodsDialog.isShow" width="968px" :center="true">
             <div style="margin-bottom: 15px;">
-              <el-input placeholder="请输入商品名称" v-model="checkOrderPageData.addDialog.title"  style="width: 180px;"></el-input>
+              <el-radio-group v-model="checkOrderPageData.addGoodsDialog.stock_type">
+                <el-radio :label="2">只看未盘点商品</el-radio>
+                <el-radio :label="1">全部</el-radio>
+              </el-radio-group>
+            </div>
+            <div style="margin-bottom: 15px;">
+              <el-input placeholder="请输入商品名称" v-model="checkOrderPageData.addGoodsDialog.title"  style="width: 180px;"></el-input>
               <el-input placeholder="请输入条形码" style="width: 180px;"></el-input>
-              <el-select  clearable placeholder="选择一级分类" v-model="checkOrderPageData.addDialog.topCategoryId" @change="clickAddCheckOrderTwoCategory">
+              <el-select  clearable placeholder="选择一级分类" v-model="checkOrderPageData.addGoodsDialog.topCategoryId" @change="clickAddCheckOrderTwoCategory">
                 <el-option
-                  v-for="item in checkOrderPageData.addDialog.topCategory"
+                  v-for="item in checkOrderPageData.addGoodsDialog.topCategory"
                   :label="item.cname"
                   :key="item.id"
                   :value="item.id">
                 </el-option>
               </el-select>
-              <el-select  clearable placeholder="选择二级分类" v-model="checkOrderPageData.addDialog.twoCategoryId">
+              <el-select  clearable placeholder="选择二级分类" v-model="checkOrderPageData.addGoodsDialog.twoCategoryId">
                 <el-option
-                  v-for="item in checkOrderPageData.addDialog.twoCategory"
+                  v-for="item in checkOrderPageData.addGoodsDialog.twoCategory"
                   :label="item.cname"
                   :key="item.id"
                   :value="item.id">
@@ -965,18 +947,6 @@ export default {
         // 新增盘点单弹框
         addDialog: {
           isShow: false,
-          // 一级分类
-          topCategoryId: '', // 当前选中的一级分类,用来获取二级分类
-          topCategory: [
-            // {cname:'奶粉',id:1,pid:0}
-          ],
-          // 二级分类
-          twoCategoryId: '',
-          twoCategory: [
-            // {cname:'奶粉',id:1,pid:0}
-          ],
-          title: '', // 商品名称
-          stock_type: 1, // 获取商品的类型：1获取库存不为0的列表,2获取库存为0的列表
           list: [
             // {
             //   item_id: 1768,    //商品id
@@ -993,6 +963,18 @@ export default {
         // 新增商品弹框
         addGoodsDialog: {
           isShow: false,
+          // 一级分类
+          topCategoryId: '', // 当前选中的一级分类,用来获取二级分类
+          topCategory: [
+            // {cname:'奶粉',id:1,pid:0}
+          ],
+          // 二级分类
+          twoCategoryId: '',
+          twoCategory: [
+            // {cname:'奶粉',id:1,pid:0}
+          ],
+          title: '', // 商品名称
+          stock_type: 1, // 获取商品的类型：1获取库存不为0的列表,2获取库存为0的列表
           multipleSelection: [],
           list: [
             // {
@@ -1509,17 +1491,17 @@ export default {
       // 获取一级分类
       postTwotype().then(res => {
         if (res.data.length) {
-          this.checkOrderPageData.addDialog.topCategory = res.data
+          this.checkOrderPageData.addGoodsDialog.topCategory = res.data
         }
       })
       this.clickAddCheckOrderDialogSearchBtn()
     },
     clickAddCheckOrderDialogSearchBtn () {
       let data = {
-        stock_type: this.checkOrderPageData.addDialog.stock_type,
-        title: this.checkOrderPageData.addDialog.title,
-        type_id: this.checkOrderPageData.addDialog.topCategoryId,
-        type: this.checkOrderPageData.addDialog.twoCategoryId
+        stock_type: 1,
+        title: '',
+        type_id: '',
+        type: ''
       }
       postCheckOrderAddGoodList(data).then(res => {
         let formatArr = []
@@ -1538,18 +1520,18 @@ export default {
     },
     // 新增盘点单对话框获取二级分类列表
     clickAddCheckOrderTwoCategory () {
-      this.checkOrderPageData.addDialog.twoCategoryId = ''
-      this.checkOrderPageData.addDialog.twoCategory = []
-      if (!this.checkOrderPageData.addDialog.topCategoryId) {
+      this.checkOrderPageData.addGoodsDialog.twoCategoryId = ''
+      this.checkOrderPageData.addGoodsDialog.twoCategory = []
+      if (!this.checkOrderPageData.addGoodsDialog.topCategoryId) {
         // 没有选择一级分类
         return
       }
       let data = {
-        type: this.checkOrderPageData.addDialog.topCategoryId
+        type: this.checkOrderPageData.addGoodsDialog.topCategoryId
       }
       postTwotype(data).then(res => {
         if (res.data.length) {
-          this.checkOrderPageData.addDialog.twoCategory = res.data
+          this.checkOrderPageData.addGoodsDialog.twoCategory = res.data
         }
       })
     },
@@ -1562,10 +1544,10 @@ export default {
     getCheckOrderGoodList () {
       this.checkOrderPageData.addGoodsDialog.isShow = true
       let data = {
-        stock_type: 2,
-        title: this.checkOrderPageData.addDialog.title,
-        type_id: this.checkOrderPageData.addDialog.topCategoryId,
-        type: this.checkOrderPageData.addDialog.twoCategoryId
+        stock_type: this.checkOrderPageData.addGoodsDialog.stock_type,
+        title: this.checkOrderPageData.addGoodsDialog.title,
+        type_id: this.checkOrderPageData.addGoodsDialog.topCategoryId,
+        type: this.checkOrderPageData.addGoodsDialog.twoCategoryId
       }
       postCheckOrderAddGoodList(data).then(res => {
         if (res.data.length) {
