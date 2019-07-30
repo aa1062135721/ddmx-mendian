@@ -179,7 +179,7 @@
       <!--修改数量弹框-->
       <el-dialog class="gaijia-tanchuan" title="修改数量" :visible.sync="xiugaishuliangDialog.isShow" width="434px" :center="true">
         <div>
-          <el-input class="gaijia-input" placeholder="请输入内容" clearable v-model="xiugaishuliangDialog.inputValue" type="number" min="1"></el-input>
+          <el-input class="gaijia-input" placeholder="请输入内容" clearable v-model="xiugaishuliangDialog.inputValue" type="number" min="1" @keydown.native="inputNumShoppingCarGood"></el-input>
           <div class="clear-both" style="height: 290px;">
             <div class="float-left">
               <v-keyboard-without-point @getNumber="clickChangeNumShoppingCarGood"></v-keyboard-without-point>
@@ -1285,6 +1285,11 @@ export default {
             type: 'error'
           })
         }
+      }
+    },
+    inputNumShoppingCarGood(){
+      if (isNaN(this.xiugaishuliangDialog.inputValue)||this.xiugaishuliangDialog.inputValue<=0||!(/^\d+$/.test(this.xiugaishuliangDialog.inputValue))) {
+        this.xiugaishuliangDialog.inputValue = this.xiugaishuliangDialog.inputValue.replace(/\D+/g,'')
       }
     },
     clickChangeNumShoppingCarGood (code) {

@@ -449,14 +449,14 @@
               <el-button class="my-primary-btn" @click="clickAddCheckOrderDialogOk">确定</el-button>
             </div>
           </el-dialog>
-          <!-- 盘点单--新增调拨 新增商品-->
+          <!-- 盘点单-- 新增商品-->
           <el-dialog  title="选择商品" :visible.sync="checkOrderPageData.addGoodsDialog.isShow" width="968px" :center="true">
-            <div style="margin-bottom: 15px;">
-              <el-radio-group v-model="checkOrderPageData.addGoodsDialog.stock_type">
-                <el-radio :label="2">只看未盘点商品</el-radio>
-                <el-radio :label="1">全部</el-radio>
-              </el-radio-group>
-            </div>
+<!--            <div style="margin-bottom: 15px;">-->
+<!--              <el-radio-group v-model="checkOrderPageData.addGoodsDialog.stock_type">-->
+<!--                <el-radio :label="2">只看未盘点商品</el-radio>-->
+<!--                <el-radio :label="1">全部</el-radio>-->
+<!--              </el-radio-group>-->
+<!--            </div>-->
             <div style="margin-bottom: 15px;">
               <el-input placeholder="请输入商品名称" v-model="checkOrderPageData.addGoodsDialog.title"  style="width: 180px;"></el-input>
 <!--              <el-input placeholder="请输入条形码" style="width: 180px;"></el-input>-->
@@ -495,6 +495,36 @@
               <el-button class="my-primary-btn" @click="clickAddGoodsDialogOk">确定</el-button>
             </div>
           </el-dialog>
+          <!-- 盘点单--确认盘点-->
+          <el-dialog :visible.sync="checkOrderPageData.confirmDialog.isShow"  title="确认盘点"  width="968px" :center="true">
+            <div>
+              <el-table :data="checkOrderPageData.confirmDialog.data.item" border style="width: 100%;">
+                <el-table-column type="index" label="序号"></el-table-column>
+                <el-table-column prop="title" label="商品名称"></el-table-column>
+                <el-table-column prop="type" label="一级分类"></el-table-column>
+                <el-table-column prop="type_id" label="二级分类"></el-table-column>
+                <el-table-column prop="stock_reality" label="当前库存"></el-table-column>
+                <el-table-column label="盘点库存">
+                  <template slot-scope="scope">
+                    <span class="font-red" v-if="scope.row.stock_now<scope.row.stock_reality">{{scope.row.stock_now}}</span>
+                    <span v-if="scope.row.stock_now===scope.row.stock_reality">{{scope.row.stock_now}}</span>
+                    <span class="font-blue" v-if="scope.row.stock_now>scope.row.stock_reality">{{scope.row.stock_now}}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+            <div style="margin-top: 15px;">
+              <el-form>
+                <el-form-item label="备注：" label-width="55px">
+                  <el-input  v-model="checkOrderPageData.confirmDialog.data.remarks"></el-input>
+                </el-form-item>
+              </el-form>
+            </div>
+            <div style="text-align: center;">
+              <el-button class="my-secondary-btn" @click="checkOrderPageData.confirmDialog.isShow = false">取消</el-button>
+              <el-button class="my-primary-btn" @click="clickCheckOrderConfirmOk">确认盘点</el-button>
+            </div>
+          </el-dialog>
           <!-- 盘点单--详情-->
           <el-dialog :visible.sync="checkOrderPageData.detailsDialog.isShow"  title="盘点详情"  width="968px" :center="true">
             <div>
@@ -507,7 +537,8 @@
                 <el-table-column label="盘点库存">
                   <template slot-scope="scope">
                     <span class="font-red" v-if="scope.row.stock_now<scope.row.stock_reality">{{scope.row.stock_now}}</span>
-                    <span class="font-blue" v-else>{{scope.row.stock_now}}</span>
+                    <span v-if="scope.row.stock_now===scope.row.stock_reality">{{scope.row.stock_now}}</span>
+                    <span class="font-blue" v-if="scope.row.stock_now>scope.row.stock_reality">{{scope.row.stock_now}}</span>
                   </template>
                 </el-table-column>
               </el-table>
@@ -520,7 +551,7 @@
               </el-form>
             </div>
           </el-dialog>
-          <!-- 盘点单--编辑 只允许 编辑 备注信息，其他信息不允许编辑 -->
+          <!-- 盘点单--编辑-->
           <el-dialog :visible.sync="checkOrderPageData.editDialog.isShow"  title="编辑盘点单"  width="968px" :center="true">
             <div>
               <el-table :data="checkOrderPageData.editDialog.responseData.item" border style="width: 100%;">
@@ -531,8 +562,10 @@
                 <el-table-column prop="stock_reality" label="当前库存"></el-table-column>
                 <el-table-column label="盘点库存">
                   <template slot-scope="scope">
-                    <span class="font-red" v-if="scope.row.stock_now<scope.row.stock_reality">{{scope.row.stock_now}}</span>
-                    <span class="font-blue" v-else>{{scope.row.stock_now}}</span>
+<!--                    <span class="font-red" v-if="scope.row.stock_now<scope.row.stock_reality">{{scope.row.stock_now}}</span>-->
+<!--                    <span v-if="scope.row.stock_now===scope.row.stock_reality">{{scope.row.stock_now}}</span>-->
+<!--                    <span class="font-blue" v-if="scope.row.stock_now>scope.row.stock_reality">{{scope.row.stock_now}}</span>-->
+                    <el-input placehoder="请输入盘点库存" v-model="scope.row.stock_now"></el-input>
                   </template>
                 </el-table-column>
               </el-table>
@@ -612,8 +645,9 @@
                 <el-table-column prop="stock" label="当前库存"></el-table-column>
                 <el-table-column prop="pay_all_price" label="盘点库存">
                   <template slot-scope="scope">
-                    <span class="font-blue" v-if="scope.row.stock>scope.row.num">{{scope.row.num}}</span>
-                    <span class="font-red" v-else>{{scope.row.num}}</span>
+                    <span class="font-red" v-if="scope.row.stock>scope.row.num">{{scope.row.num}}</span>
+                    <span v-if="scope.row.stock===scope.row.num">{{scope.row.num}}</span>
+                    <span class="font-blue" v-if="scope.row.stock<scope.row.num">{{scope.row.num}}</span>
                   </template>
                 </el-table-column>
                 <el-table-column porp="remarks" label="备注"></el-table-column>
@@ -689,8 +723,9 @@
                 <el-table-column prop="stock" label="当前库存"></el-table-column>
                 <el-table-column prop="pay_all_price" label="盘点库存">
                   <template slot-scope="scope">
-                    <span class="font-blue" v-if="scope.row.stock>scope.row.num">{{scope.row.num}}</span>
-                    <span class="font-red" v-else>{{scope.row.num}}</span>
+                    <span class="font-red" v-if="scope.row.stock>scope.row.num">{{scope.row.num}}</span>
+                    <span  v-if="scope.row.stock===scope.row.num">{{scope.row.num}}</span>
+                    <span class="font-blue" v-if="scope.row.stock<scope.row.num">{{scope.row.num}}</span>
                   </template>
                 </el-table-column>
                 <el-table-column porp="remarks" label="备注"></el-table-column>
@@ -1013,6 +1048,15 @@ export default {
               // }
             ]
           }
+        },
+        // 确认盘点弹框
+        confirmDialog:{
+          isShow: false,
+          data:{
+            id: 63,
+            item: [],
+            remarks: null,
+          }
         }
       },
       // 2=盘点单请求需要的数据
@@ -1251,9 +1295,13 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        postTransferSlipSendGoodsCancel({id}).then(res => {
-          if (res.result) {
-            this.getTransferSlipList()
+        postTransferSlipSendGoodsCancel({id, worker_id:this.userInfo.id}).then(res => {
+          if (res.code === '200') {
+            this.$message({
+              message: res.msg,
+              type: 'success'
+            });
+            setTimeout(() => {this.getTransferSlipList()}, 1000)
           }
         })
       }).catch(() => {
@@ -1278,9 +1326,13 @@ export default {
         type: 'warning'
       }).then(() => {
         postTransferSlipSendGoods({id, worker_id:this.userInfo.id}).then(res => {
-          if (res.result) {
-            this.getTransferSlipList()
-            this.transferSlipPageData.sendGoodsDialog.isShow = true
+          this.transferSlipPageData.sendGoodsDialog.isShow = false
+          if (res.code === '200') {
+            this.$message({
+              message: res.msg,
+              type: 'success'
+            });
+            setTimeout(() => {this.getTransferSlipList()}, 1000)
           }
         })
       }).catch(() => {
@@ -1303,7 +1355,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        postTransferSlipConfirmGoods({id}).then(res => {
+        postTransferSlipConfirmGoods({id, worker_id:this.userInfo.id}).then(res => {
           this.getTransferSlipList()
           this.transferSlipPageData.detailsDialog.isShow = false
         })
@@ -1486,7 +1538,6 @@ export default {
     },
     // 新增盘点单对话框显示
     clickAddCheckOrder () {
-      this.checkOrderPageData.addDialog.isShow = true
       // 获取一级分类
       postTwotype().then(res => {
         if (res.data.length) {
@@ -1503,18 +1554,21 @@ export default {
         type: ''
       }
       postCheckOrderAddGoodList(data).then(res => {
-        let formatArr = []
-        res.data.forEach((item) => {
-          formatArr.push({
-            item_id: item.id, // 商品id
-            item_title: item.title, // 商品名称
-            top_category: item.type_id, // 一级分类
-            two_category: item.type, // 二级分类
-            stock_reality: item.stock, // 当前库存
-            stock_now: ''// 盘点库存
+        if (res.data.length) {
+          this.checkOrderPageData.addDialog.isShow = true
+          let formatArr = []
+          res.data.forEach((item) => {
+            formatArr.push({
+              item_id: item.id, // 商品id
+              item_title: item.title, // 商品名称
+              top_category: item.type_id, // 一级分类
+              two_category: item.type, // 二级分类
+              stock_reality: item.stock, // 当前库存
+              stock_now: ''// 盘点库存
+            })
           })
-        })
-        this.checkOrderPageData.addDialog.list = formatArr
+          this.checkOrderPageData.addDialog.list = formatArr
+        }
       })
     },
     // 新增盘点单对话框获取二级分类列表
@@ -1543,7 +1597,7 @@ export default {
     getCheckOrderGoodList () {
       this.checkOrderPageData.addGoodsDialog.isShow = true
       let data = {
-        stock_type: this.checkOrderPageData.addGoodsDialog.stock_type,
+        stock_type: 2,
         title: this.checkOrderPageData.addGoodsDialog.title,
         type_id: this.checkOrderPageData.addGoodsDialog.topCategoryId,
         type: this.checkOrderPageData.addGoodsDialog.twoCategoryId
@@ -1645,20 +1699,26 @@ export default {
     },
     // 盘点单 确认盘点
     async clickCheckOrderConfirm (id) {
-      let responseData = null
       await postCheckOrderInfo({id: id}).then(res => {
         if (res.code === 200) {
-          responseData = res.data
+          this.checkOrderPageData.confirmDialog.data = res.data
+          this.checkOrderPageData.confirmDialog.isShow = true
         }
       })
-      if (responseData) {
-        await postCheckOrderConfirm(responseData).then(res => {
+    },
+    // 盘点单 确认盘点
+    async clickCheckOrderConfirmOk(){
+        await postCheckOrderConfirm(this.checkOrderPageData.confirmDialog.data).then(res => {
+          this.checkOrderPageData.confirmDialog.isShow = false
           if (res.code === 200) {
-            this.getCheckOrderList()
+              this.$message({
+                message: res.msg,
+                type: 'success'
+              });
+              setTimeout(() => { this.getCheckOrderList()}, 1000)
           }
         })
-      }
-    },
+      },
     // 盘点单 编辑
     async clickCheckOrderEdit (id) {
       await postCheckOrderInfo({id: id}).then(res => {
@@ -1670,8 +1730,32 @@ export default {
     },
     // 盘点单 确认编辑
     async clickCheckOrderEditOk () {
-      postCheckOrderEdit(this.checkOrderPageData.editDialog.responseData).then(res => {
-
+      for (let i = 0; i < this.checkOrderPageData.editDialog.responseData.item.length; i++) {
+        if (!Number.isInteger(Number.parseFloat(this.checkOrderPageData.editDialog.responseData.item[i].stock_now)) || Number.parseFloat(this.checkOrderPageData.editDialog.responseData.item[i].stock_now)<0) {
+          this.$message({
+            showClose: true,
+            message: `请正确输入【${this.checkOrderPageData.editDialog.responseData.item[i].title}】商品的盘点库存。`,
+            type: 'error'
+          })
+          return
+        }
+      }
+      this.$confirm('您确认编辑该盘点吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        postCheckOrderEdit(this.checkOrderPageData.editDialog.responseData).then(res => {
+          this.checkOrderPageData.editDialog.isShow = false
+          if (res.code === 200) {
+            this.$message({
+              message: res.msg,
+              type: 'success'
+            });
+            setTimeout(() => { this.getCheckOrderList()}, 1000)
+          }
+        })
+      }).catch(() => {
       })
     },
 
