@@ -125,7 +125,7 @@
                   <el-button type="text" size="mini" v-if="scope.row.status === 0 && scope.row.out_shop === userInfo.shop_id" @click="clickTransferSlipSendGoods(scope.row.id)">发货</el-button>
                   <el-button type="text" size="mini" v-if="scope.row.status === 1 && scope.row.out_shop === userInfo.shop_id" @click="clickTransferSlipSendGoodsCancel(scope.row.id)">取消发货</el-button>
                   <el-button type="text" size="mini" @click="transferSlipPageData.printingDialog.isShow = true">打印</el-button>
-                  <el-button type="text" size="mini" v-if="scope.row.status === 1  && scope.row.in_shop === userInfo.shop_id" @click="clickTransferSlipDetails(scope.row.id)">确认收货</el-button>
+                  <el-button type="text" size="mini" v-if="scope.row.status === 1  && scope.row.in_shop === userInfo.shop_id" @click="clickTransferSlipConfirmGoods(scope.row.id)">确认收货</el-button>
                   <el-button type="text" size="mini" v-if="scope.row.status === 0 && scope.row.out_shop === userInfo.shop_id" @click="clickTransferSlipDel(scope.row.id)">删除</el-button>
                   <el-button type="text" size="mini" @click="clickTransferSlipDetails(scope.row.id)">详情</el-button>
                 </template>
@@ -356,10 +356,6 @@
                 <el-table-column prop="num" label="调拨数量"></el-table-column>
               </el-table>
             </div>
-            <div style="text-align: center;margin-top: 20px;"  v-if="transferSlipPageData.detailsDialog.responseData.status === 1">
-              <el-button class="my-secondary-btn" @click="transferSlipPageData.detailsDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn" @click="clickTransferSlipConfirmGoods(transferSlipPageData.detailsDialog.responseData.id)">确认收货</el-button>
-            </div>
           </el-dialog>
         </el-tab-pane>
         <el-tab-pane label="盘点单" name="2">
@@ -463,7 +459,7 @@
             </div>
             <div style="margin-bottom: 15px;">
               <el-input placeholder="请输入商品名称" v-model="checkOrderPageData.addGoodsDialog.title"  style="width: 180px;"></el-input>
-              <el-input placeholder="请输入条形码" style="width: 180px;"></el-input>
+<!--              <el-input placeholder="请输入条形码" style="width: 180px;"></el-input>-->
               <el-select  clearable placeholder="选择一级分类" v-model="checkOrderPageData.addGoodsDialog.topCategoryId" @change="clickAddCheckOrderTwoCategory">
                 <el-option
                   v-for="item in checkOrderPageData.addGoodsDialog.topCategory"
@@ -492,7 +488,6 @@
                 <el-table-column prop="type_id" label="一级分类"></el-table-column>
                 <el-table-column prop="type" label="二级分类"></el-table-column>
                 <el-table-column prop="stock" label="库存"></el-table-column>
-                <el-table-column prop="selling_price" label="单价"></el-table-column>
               </el-table>
             </div>
             <div style="text-align: center;margin-top: 20px;">
@@ -1238,8 +1233,12 @@ export default {
         type: 'warning'
       }).then(() => {
         postTransferSlipDel({id: id}).then(res => {
-          if (res.result) {
-            this.getTransferSlipList()
+          if (res.code === '200') {
+            this.$message({
+              message: res.msg,
+              type: 'success'
+            });
+            setTimeout(() => {this.getTransferSlipList()}, 1000)
           }
         })
       }).catch(() => {

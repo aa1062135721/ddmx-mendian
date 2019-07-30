@@ -71,12 +71,20 @@ axios.interceptors.response.use(
       router.push('/login')
       return
     }
-    if (response.data.code !== '200' && response.data.code !== 200 && response.data.code !== '1' && response.data.code !== 1) {
-      Vue.prototype.$message({
-        message: response.data.msg,
-        type: 'error'
-      })
+    if (response.data.code === '500' || response.data.code === 500){
+      if ( response.data.msg){
+        Vue.prototype.$message({
+          message: response.data.msg,
+          type: 'error'
+        })
+      }
     }
+    // if (response.data.code !== '200' && response.data.code !== 200 && response.data.code !== '1' && response.data.code !== 1) {
+    //   Vue.prototype.$message({
+    //     message: response.data.msg,
+    //     type: 'error'
+    //   })
+    // }
     return response
   },
   error => {

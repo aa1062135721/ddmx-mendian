@@ -38,11 +38,11 @@
       </div>
       <div>
         <el-table :data="tableData" border style="width: 100%;" height="650px">
-          <el-table-column prop="shop_id" label="门店名称"></el-table-column>
+          <el-table-column label="门店名称">{{userInfo.shop_name}}</el-table-column>
           <el-table-column prop="type_id" label="类型名称"></el-table-column>
           <el-table-column prop="price" label="金额"></el-table-column>
           <el-table-column prop="remarks" label="备注"></el-table-column>
-          <el-table-column prop="user_id" label="操作人"></el-table-column>
+          <el-table-column  label="操作人">{{userInfo.user_nickname}}</el-table-column>
           <el-table-column prop="create_time" label="新增时间"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
@@ -208,21 +208,29 @@ export default {
       })
     },
     clickDelExpenditureBtn (id) {
-      let requestData = {
-        id: id
-      }
-      postDelExpenditure(requestData).then(res => {
-        if (res.code === '200') {
-          this.$message({
-            showClose: true,
-            message: '删除成功',
-            type: 'success'
-          })
-          this.getExpenditureList()
+      this.$confirm('您确认删除吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let requestData = {
+          id: id
         }
-      }).catch(err => {
-        console.log(err)
+        postDelExpenditure(requestData).then(res => {
+          if (res.code === '200') {
+            this.$message({
+              showClose: true,
+              message: '删除成功',
+              type: 'success'
+            })
+            this.getExpenditureList()
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+      }).catch(() => {
       })
+
     },
     pageSizeChange (val) {
       // console.log(`每页 ${val} 条`)
