@@ -7,17 +7,9 @@
             <div class="all-goods">
               <div class="goods-type">
                 <div v-for="item in serviceCategoryList" :key="item.id" class="my-div" @click="getFuwuGoods(item.id)">
-                  <button class="fenlei-button"  :class="{'fenlei-button-active':requestFuwuGoodData.who === item.id}" >{{item.cname}}</button>
+                  <button class="fenlei-button"  :class="{'fenlei-button-active':requestFuwuGoodData.who === item.id}">{{item.cname}}</button>
+                  <div class="after" :class="{'after-active':requestFuwuGoodData.who === item.id}"></div>
                 </div>
-
-<!--                <div><el-button class="fenlei-button float-left" :class="{'fenlei-button-active':requestFuwuGoodData.isChooeseFuwuGood}" @click="clickFuwuGood">服务项目</el-button></div>-->
-<!--                <div><el-button class="page-fenlei-button float-left" icon="el-icon-arrow-left" @click="clickFenleiBtnPre"></el-button></div>-->
-<!--                <div class="type-btns-wrapper" style="width:700px;overflow: hidden;" ref="typeBtnsScroll">-->
-<!--                  <div class='type-btns-content type-btn' ref="typeBtnsScrollContent" >-->
-<!--                      <el-button v-for="(item) in requestGoodData.typeNameList"  :key="item.id" class="fenlei-button" :class="{'fenlei-button-active':(requestGoodData.isChooeseFenleiGood && requestGoodData.who === item.id)}" @click="clickFenleiBtn(item.id)">{{ item.cname }}</el-button>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--                <div><el-button class="page-fenlei-button float-right" icon="el-icon-arrow-right" @click="clickFenleiBtnNext"></el-button></div>-->
               </div>
               <div style="overflow: hidden;width: 100%;flex: 1;margin-top: 28px;" ref="allGoodsScroll">
                 <div  ref="allGoodsScrollContent" class="flex-goods" >
@@ -90,23 +82,6 @@
                       </span>
                     </li>
                   </ul>
-<!--                  <ul v-if="chooeseGoods.fuwuGoods.length" v-for="(good, key) in chooeseGoods.fuwuGoods" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">-->
-<!--                    <li class="title clear-both">-->
-<!--                      <span class="float-left">{{good.title}}</span>-->
-<!--                      <span class="float-right">X {{good.num}}</span>-->
-<!--                    </li>-->
-<!--                    <li class="title code clear-both">-->
-<!--                      <span class="float-left"></span>-->
-<!--                      <span class="float-right red">￥{{good.is_edit ? parseFloat(good.edit_price * good.num).toFixed(2) : parseFloat(good.price * good.num).toFixed(2)}}</span>-->
-<!--                    </li>-->
-<!--                    <li class="title">-->
-<!--                      <span class="yuanjia" v-if="good.is_edit">￥{{good.price}}</span>-->
-<!--                      <span style="width:28px;height:20px;background:rgba(243,88,88,1);border-radius:4px;color: #ffffff;padding:0 3px; " v-if="good.is_edit">改</span>-->
-<!--                      <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>-->
-<!--                      <span class="red danjia" v-else>￥{{good.price}}</span>-->
-<!--                      <span class="huiyuanjia" v-if="jiezhangDialog.memberVip.id">会员价￥{{good.price}}</span>-->
-<!--                    </li>-->
-<!--                  </ul>-->
                   <ul v-if="chooeseGoods.cardList.length" v-for="(good, key) in chooeseGoods.cardList" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
                   <li class="title clear-both">
                     <span class="float-left">{{good.card_name}}</span>
@@ -136,7 +111,7 @@
                           <span v-else> <span class="font-blue">请选择商品服务人员</span> <i class="el-icon-arrow-down"></i></span>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                          <el-dropdown-item v-for="(item) in jiezhangDialog.waiter" :key="item.id" :command="item">
+                          <el-dropdown-item v-for="(item) in waiterList" :key="item.id" :command="item">
                             <span class="font-blue">{{item.name}}</span>
                             [{{item.type}}]
                           </el-dropdown-item>
@@ -156,14 +131,6 @@
                     <span class="float-left">改价</span>
                     <span  class="float-right">￥{{parseFloat(jiezhangDialog.modifyMoney - jiezhangDialog.sumMoney).toFixed(2)}}</span>
                   </li>
-<!--                  <li>-->
-<!--                    <span class="float-left">折扣</span>-->
-<!--                    <span  class="float-right">100%</span>-->
-<!--                  </li>-->
-<!--                  <li>-->
-<!--                    <span class="float-left">优惠</span>-->
-<!--                    <span  class="float-right font-blue">-￥5.00</span>-->
-<!--                  </li>-->
                   <li>
                     <span class="float-left">结算</span>
                     <!-- 支付方式为赠送，需要支付的钱为0-->
@@ -251,7 +218,7 @@
               <el-form-item label="请选择服务人员">
                 <el-select v-model="chongzhiDialog.nowWaiter" placeholder="请选择" @focus="getWaiterList()">
                   <el-option
-                    v-for="item in chongzhiDialog.waiter"
+                    v-for="item in waiterList"
                     :key="item.id"
                     :label="item.name"
                     :value="item.id">
@@ -376,32 +343,6 @@
           </div>
         </div>
       </el-dialog>
-      <!-- 搜索商品弹框 -->
-<!--       <el-dialog class="sousuoshangping-tanchuan" title="搜索商品" :visible.sync="sousuoshangpingDialog.isShow" width="660px" :center="true">-->
-<!--        <div class="content">-->
-<!--          <div class="clear-both" style="width:100%;height:52px;margin-bottom: 20px;">-->
-<!--            <div class="float-left" style="width:80%;">-->
-<!--              <el-input  placeholder="请输入您需要查询的商品名字" v-model="sousuoshangpingDialog.title" @keyup.enter.native="searchGoodsByGoodName" ></el-input>-->
-<!--            </div>-->
-<!--            <div class="float-right"  style="width: 20%;text-align: right;">-->
-<!--              <el-button type="primary" plain @click="searchGoodsByGoodName">搜索</el-button>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div>-->
-<!--            <el-table :data="sousuoshangpingDialog.goodsList" height="250" border style="width: 100%">-->
-<!--              <el-table-column prop="title" label="名称" width="180"></el-table-column>-->
-<!--              <el-table-column prop="stock" label="库存"></el-table-column>-->
-<!--              <el-table-column prop="price" label="单价"></el-table-column>-->
-<!--&lt;!&ndash;              <el-table-column prop="price" label="会员价"></el-table-column>&ndash;&gt;-->
-<!--              <el-table-column label="操作">-->
-<!--                <template slot-scope="scope">-->
-<!--                  <el-button type="primary" @click="addShoppingCar(scope.row)" v-if="scope.row.stock != 0">确定</el-button>-->
-<!--                </template>-->
-<!--              </el-table-column>-->
-<!--            </el-table>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </el-dialog>-->
       <!-- 选择会员弹框 -->
       <el-dialog class="xuanzehuiyuan-tanchuan" title="选择会员" :visible.sync="xuanzehuiyuanDialog.isShow" width="810px" :center="true">
         <div class="clear-both div">
@@ -646,7 +587,6 @@ export default {
       ],
       // 服务商品
       requestFuwuGoodData: {
-        isChooeseFuwuGood: true, // 是否选择服务商品
         page: 1, // 当前页码
         num: 15,// 每页的数据
         service_type:'',//根据服务商品分类id获取服务商品
@@ -656,8 +596,6 @@ export default {
       // 普通商品
       requestGoodData: {// 请求商品列表中的页数，页码服务器数据
         title:'',
-        typeNameList: [], // 分类列表
-        isChooeseFenleiGood: false, // 是否选择分类商品
         page: 1, // 当前页码
         num: 15, // 每页的数据
         who: 0, // 当前选中的分类名id
@@ -670,36 +608,8 @@ export default {
 
       // 结账中的商品
       chooeseGoods: {
-        // 选择的普通商品
+        // 选择的商品
         goods: [
-          // {
-          //   bar_code: "4897097930084",
-          //   id: 1617,
-          //   is_service_goods: "0",
-          //   pics: "http://picture.ddxm661.com/9a47a20190318164340290",
-          //   price: "198.00",
-          //   stock: 8,
-          //   title: "芮欧轻奢婴儿纸尿裤NB68片",
-          //   is_checked: false,//是否被选中
-          //   num: 3,         //商品数量
-          //   is_edit: "1",     //此商品是否修改了单价：1是，0否
-          //   edit_price: "10.00"   //修改的单价，如果edit_price=1，则必填此参数
-          // }
-        ],
-        // 选择的服务商品
-        fuwuGoods: [
-          // {
-          //     bar_code: "4897097930084",
-          //     id: 1617,
-          //     is_service_goods: "1",
-          //     pics: "http://picture.ddxm661.com/9a47a20190318164340290",
-          //     price: "198.00",
-          //     stock: 8,
-          //     title: "芮欧轻奢婴儿纸尿裤NB68片",
-          //     num: 3,         //商品数量
-          //     is_edit: "1",     //此商品是否修改了单价：1是，0否
-          //     edit_price: "10.00"   //修改的单价，如果edit_price=1，则必填此参数
-          // }
         ],
         // 购卡弹窗选择的卡片列表
         cardList: []
@@ -715,21 +625,6 @@ export default {
         isShow: false, // 修改数量弹窗显示与否
         inputValue: '' // 修改数量的值
       },
-      // 搜索商品弹窗
-      // sousuoshangpingDialog: {
-      //   isShow: false, // 搜索商品弹窗显示与否
-      //   title: '', // 搜索商品标题，这里是标题，不是条形码，如果是条形码，点击按钮直接添加到购物车
-      //   goodsList: [
-      //     // {
-      //     //   id: 1730, // 商品id
-      //     //   title: '美杰紫色毛巾', // 商品名称
-      //     //   price: '7.00', // 商品的原价，现价
-      //     //   bar_code: '2300201800208', // 商品条形码
-      //     //   pics: 'http://picture.ddxm661.com/9a47a20190318164340290', // 商品的图片
-      //     //   stock: 10// 商品的库存
-      //     // }
-      //   ] // 按标题搜索商品后得到的结果
-      // },
       //  会员查询 - 单击会员按钮后的弹窗所需要的数据
       huiyuanDialog: {
         isShow: false, // 是否显示会员查询对话框
@@ -845,14 +740,6 @@ export default {
         payType: '', // 充值方式
         payMoney: '', // 充值金额
         nowWaiter: '',
-        // 服务人员列表
-        waiter: [
-          {
-            id: 0, // 服务员id  当服务员的id为0师表示为当前登录的店长
-            name: '管理员', // 服务员名称
-            type: '店长' // 服务类型
-          }
-        ],
       },
       // 选择会员弹框是否显示
       xuanzehuiyuanDialog: {
@@ -892,14 +779,6 @@ export default {
           // amount: '0.05', // 累积充值
           // regtime: '1970-01-01 08:33:37' // 加入时间
         },
-        // 服务人员列表
-        waiter: [
-          // {
-          //   id: 0, // 服务员id  当服务员的id为0师表示为当前登录的店长
-          //   name: '管理员', // 服务员名称
-          //   type: '店长' // 服务类型
-          // }
-        ],
         // 当前选中的服务人员
         nowWaiter: {
           id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
@@ -925,21 +804,7 @@ export default {
   },
   mounted () {
    this.getServiceCatgoryList()
-    // this.getGoodsType()
     this.$nextTick(() => {
-      // if (!this.typeBtnsScroll) {
-      //   this.typeBtnsScroll = new BScroll(this.$refs.typeBtnsScroll, {
-      //     startX: 0,
-      //     click: true,
-      //     scrollX: true,
-      //     // 忽略竖直方向的滚动
-      //     scrollY: false,
-      //     mouseWheel: true
-      //     // eventPassthrough: 'vertical'
-      //   })
-      // } else {
-      //   this.typeBtnsScroll.refresh()
-      // }
       if (!this.allGoodsScroll) {
         this.allGoodsScroll = new BScroll(this.$refs.allGoodsScroll, {
           startY: 0,
@@ -1068,12 +933,6 @@ export default {
         })
         this.chooeseGoods.goods[key].is_checked = true
       }
-      // if (this.chooeseGoods.fuwuGoods.length) {
-      //   this.chooeseGoods.fuwuGoods.map((good, index) => {
-      //     good.is_checked = false
-      //   })
-      //   this.chooeseGoods.fuwuGoods[key].is_checked = true
-      // }
       if (this.chooeseGoods.cardList.length) {
         this.chooeseGoods.cardList.map((good, index) => {
           good.is_checked = false
@@ -1101,23 +960,6 @@ export default {
           })
         }
       }
-      // if (this.chooeseGoods.fuwuGoods.length) {
-      //   let key = 'undefined'
-      //   this.chooeseGoods.fuwuGoods.map((good, index) => {
-      //     if (good.is_checked === true) {
-      //       key = index
-      //     }
-      //   })
-      //   if (key !== 'undefined') {
-      //     this.chooeseGoods.fuwuGoods.splice(key, 1)
-      //   } else {
-      //     this.$message.closeAll()
-      //     this.$message({
-      //       message: '请选中要删除的商品',
-      //       type: 'error'
-      //     })
-      //   }
-      // }
       if (this.chooeseGoods.cardList.length) {
         let key = 'undefined'
         this.chooeseGoods.cardList.map((good, index) => {
@@ -1168,23 +1010,6 @@ export default {
           })
         }
       }
-      // if (this.chooeseGoods.fuwuGoods.length) {
-      //   let key = 'undefined'
-      //   this.chooeseGoods.fuwuGoods.map((good, index) => {
-      //     if (good.is_checked === true) {
-      //       key = index
-      //     }
-      //   })
-      //   if (key !== 'undefined') {
-      //     this.chooeseGoods.fuwuGoods[key].num++
-      //   } else {
-      //     this.$message.closeAll()
-      //     this.$message({
-      //       message: '请选择购物车里的商品',
-      //       type: 'error'
-      //     })
-      //   }
-      // }
       if (this.chooeseGoods.cardList.length) {
         let key = 'undefined'
         this.chooeseGoods.cardList.map((good, index) => {
@@ -1215,7 +1040,9 @@ export default {
           }
         })
         if (key !== 'undefined') {
-          if (this.chooeseGoods.goods[key].num > 1) { this.chooeseGoods.goods[key].num-- } else {
+          if (this.chooeseGoods.goods[key].num > 1) {
+            this.chooeseGoods.goods[key].num--
+          } else {
             this.$message.closeAll()
             this.$message({
               message: '购买数量最少为1',
@@ -1230,29 +1057,6 @@ export default {
           })
         }
       }
-      // if (this.chooeseGoods.fuwuGoods.length) {
-      //   let key = 'undefined'
-      //   this.chooeseGoods.fuwuGoods.map((good, index) => {
-      //     if (good.is_checked === true) {
-      //       key = index
-      //     }
-      //   })
-      //   if (key !== 'undefined') {
-      //     if (this.chooeseGoods.fuwuGoods[key].num > 1) { this.chooeseGoods.fuwuGoods[key].num-- } else {
-      //       this.$message.closeAll()
-      //       this.$message({
-      //         message: '购买数量最少为1',
-      //         type: 'error'
-      //       })
-      //     }
-      //   } else {
-      //     this.$message.closeAll()
-      //     this.$message({
-      //       message: '请选择购物车里的商品',
-      //       type: 'error'
-      //     })
-      //   }
-      // }
       if (this.chooeseGoods.cardList.length) {
         let key = 'undefined'
         this.chooeseGoods.cardList.map((good, index) => {
@@ -1299,24 +1103,6 @@ export default {
           })
         }
       }
-      // if (this.chooeseGoods.fuwuGoods.length) {
-      //   let key = 'undefined'
-      //   this.chooeseGoods.fuwuGoods.map((good, index) => {
-      //     if (good.is_checked === true) {
-      //       key = index
-      //     }
-      //   })
-      //   if (key !== 'undefined') {
-      //     this.xiugaishuliangDialog.inputValue = this.chooeseGoods.fuwuGoods[key].num
-      //     this.xiugaishuliangDialog.isShow = true
-      //   } else {
-      //     this.$message.closeAll()
-      //     this.$message({
-      //       message: '请选中购物车里的商品',
-      //       type: 'error'
-      //     })
-      //   }
-      // }
       if (this.chooeseGoods.cardList.length) {
         let key = 'undefined'
         this.chooeseGoods.cardList.map((good, index) => {
@@ -1450,29 +1236,6 @@ export default {
           })
         }
       }
-      // if (this.chooeseGoods.fuwuGoods.length) {
-      //   // 显示弹窗
-      //   let key = 'undefined'
-      //   this.chooeseGoods.fuwuGoods.map((good, index) => {
-      //     if (good.is_checked === true) {
-      //       key = index
-      //     }
-      //   })
-      //   if (key !== 'undefined') {
-      //     if (this.chooeseGoods.fuwuGoods[key].is_edit === 1) {
-      //       this.xiugaijiageDialog.inputValue = this.chooeseGoods.fuwuGoods[key].edit_price
-      //     } else {
-      //       this.xiugaijiageDialog.inputValue = this.chooeseGoods.fuwuGoods[key].price
-      //     }
-      //     this.xiugaijiageDialog.isShow = true
-      //   } else {
-      //     this.$message.closeAll()
-      //     this.$message({
-      //       message: '请选中购物车里的商品',
-      //       type: 'error'
-      //     })
-      //   }
-      // }
       if (this.chooeseGoods.cardList.length) {
         // 显示弹窗
         let key = 'undefined'
@@ -1546,28 +1309,6 @@ export default {
           }
         }
       }
-      // if (this.chooeseGoods.fuwuGoods.length) {
-      //   let key = 'undefined'
-      //   this.chooeseGoods.fuwuGoods.map((good, index) => {
-      //     if (good.is_checked === true) {
-      //       key = index
-      //     }
-      //   })
-      //   if (key !== 'undefined') {
-      //     if (parseFloat(this.xiugaijiageDialog.inputValue) > 0) {
-      //       this.chooeseGoods.fuwuGoods[key].is_edit = 1
-      //       this.chooeseGoods.fuwuGoods[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
-      //       this.xiugaijiageDialog.inputValue = ''
-      //       this.xiugaijiageDialog.isShow = false
-      //     } else {
-      //       this.$message.closeAll()
-      //       this.$message({
-      //         message: '修改的价格必须正数',
-      //         type: 'error'
-      //       })
-      //     }
-      //   }
-      // }
       if (this.chooeseGoods.cardList.length) {
         let key = 'undefined'
         this.chooeseGoods.cardList.map((good, index) => {
@@ -1594,16 +1335,7 @@ export default {
       this.$forceUpdate()
     },
 
-    // 获取分类
-    // getGoodsType () {
-    //   postTwotype().then((res) => {
-    //     this.requestGoodData.typeNameList = res.data
-    //     let width = this.requestGoodData.typeNameList.length * 138 // 分类列表初始化长度
-    //     this.$refs.typeBtnsScrollContent.style.width = width + 'px' // 分类列表初始化长度
-    //   }).catch((err) => {
-    //     console.log(err, '分类列表获取失败')
-    //   })
-    // },
+
     // 获取商品列表
     getGoods () {
       let data = {}
@@ -1676,60 +1408,12 @@ export default {
             this.nextPageBtnDisabled = false
           }
         }
-      }).catch((err) => {
-        console.log(err, '服务商品获取失败')
       })
     },
-    // 是否选择服务商品
-    // clickFuwuGood () {
-    //   this.requestGoodData.isChooeseFenleiGood = false
-    //   this.requestFuwuGoodData.isChooeseFuwuGood = true
-    //   this.requestFuwuGoodData.page = 1
-    //   this.getServiceItemList()
-    // },
-    // 点击了分类商品按钮
-    // clickFenleiBtn (id) {
-    //   this.requestGoodData.page = 1
-    //   this.requestGoodData.who = id
-    //   this.requestGoodData.type_category = 1
-    //   this.requestFuwuGoodData.isChooeseFuwuGood = false
-    //   this.requestGoodData.isChooeseFenleiGood = true
-    //   this.getGoods()
-    // },
-    // 点击了分类按钮中的上一个
-    // clickFenleiBtnPre () {
-    //   // this.$refs.personWrap.scrollTo(-138, 0)
-    //   for (let i = 0; i < this.requestGoodData.typeNameList.length; i++) {
-    //     if (this.requestGoodData.typeNameList[i].id === this.requestGoodData.who) {
-    //       if (i === 0) {
-    //         this.requestGoodData.who = this.requestGoodData.typeNameList[this.requestGoodData.typeNameList.length - 1].id
-    //       } else {
-    //         this.requestGoodData.who = this.requestGoodData.typeNameList[i - 1].id
-    //       }
-    //       this.clickFenleiBtn(this.requestGoodData.who)
-    //       break
-    //     }
-    //   }
-    // },
-    // 点击了分类按钮中的下一个
-    // clickFenleiBtnNext () {
-    //   // this.$refs.personWrap.scrollTo(138, 0)
-    //   for (let i = 0; i < this.requestGoodData.typeNameList.length; i++) {
-    //     if (this.requestGoodData.typeNameList[i].id === this.requestGoodData.who) {
-    //       if (i === this.requestGoodData.typeNameList.length - 1) {
-    //         this.requestGoodData.who = this.requestGoodData.typeNameList[0].id
-    //       } else {
-    //         this.requestGoodData.who = this.requestGoodData.typeNameList[i + 1].id
-    //       }
-    //       this.clickFenleiBtn(this.requestGoodData.who)
-    //       break
-    //     }
-    //   }
-    // },
     // 点击了上一页
     clickPrePageBtn () {
       // 服务商品
-      if (this.requestFuwuGoodData.isChooeseFuwuGood) {
+      if (this.requestFuwuGoodData.who !== -1) {
         if (this.requestFuwuGoodData.page > 1) {
           this.requestFuwuGoodData.page = this.requestFuwuGoodData.page - 1
           this.getServiceItemList()
@@ -1744,7 +1428,7 @@ export default {
     // 点击了下一页
     clickNextPageBtn () {
       // 服务商品
-      if (this.requestFuwuGoodData.isChooeseFuwuGood) {
+      if (this.requestFuwuGoodData.who !== -1) {
         this.requestFuwuGoodData.page = this.requestFuwuGoodData.page + 1
         this.getServiceItemList()
       } else {
@@ -1756,11 +1440,9 @@ export default {
     getWaiterList () {
       postWaiter().then((res) => {
         this.waiterList = res.data
-        this.jiezhangDialog.waiter = res.data
-        this.chongzhiDialog.waiter = res.data
       })
     },
-    // 选择服务人员
+    // 购物车里有普通商品，选择服务人员
     clickWaiter (e) {
       this.jiezhangDialog.nowWaiter = e
     },
@@ -1773,28 +1455,6 @@ export default {
         }
       }
     },
-    // getGoodByConditionOk () {
-      // this.sousuoshangpingDialog.isShow = true
-      // if (this.requestGoodData.title.length !== 0) { this.searchGoodsByGoodName() }
-    // },
-    // 搜索商品按商品名
-    // searchGoodsByGoodName () {
-    //   let data = {}
-    //   data.title = `${this.sousuoshangpingDialog.title}`
-    //   postGoods(data).then((res) => {
-    //     if (res.data.length) {
-    //       this.sousuoshangpingDialog.goodsList = res.data
-    //     } else {
-    //       this.sousuoshangpingDialog.goodsList = []
-    //       this.$message.closeAll()
-    //       this.$message({
-    //         message: '无法找到该商品，请重新输入',
-    //         type: 'error'
-    //       })
-    //     }
-    //     this.sousuoshangpingDialog.isShow = true
-    //   })
-    // },
     // 搜索商品按商品条形码
     searchGoodsByGoodCode () {
       let data = {}
@@ -1813,6 +1473,7 @@ export default {
               good.is_edit = 0
               good.edit_price = parseFloat(good.price).toFixed(2)
               good.price = parseFloat(good.price).toFixed(2)
+              good.is_service_goods = '0'
               for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
                 if ((this.chooeseGoods.goods[i].id === good.id) && (this.chooeseGoods.goods[i].is_service_goods === good.is_service_goods)) {
                   if (this.chooeseGoods.goods[i].num + 1 <= good.stock) {
@@ -1851,6 +1512,7 @@ export default {
             good.is_edit = 0
             good.edit_price = parseFloat(good.price).toFixed(2)
             good.price = parseFloat(good.price).toFixed(2)
+            good.is_service_goods = '0'
             for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
               if ((this.chooeseGoods.goods[i].id === good.id) && (this.chooeseGoods.goods[i].is_service_goods === good.is_service_goods)) {
                 this.$message.closeAll()
@@ -1895,16 +1557,6 @@ export default {
           }
         }
       }
-      // if (this.chooeseGoods.fuwuGoods.length) {
-      //   for (let i = 0; i < this.chooeseGoods.fuwuGoods.length; i++) {
-      //     sumMoney += this.chooeseGoods.fuwuGoods[i].num * this.chooeseGoods.fuwuGoods[i].price
-      //     if (this.chooeseGoods.fuwuGoods[i].is_edit === 1) {
-      //       modifyMoney += this.chooeseGoods.fuwuGoods[i].num * this.chooeseGoods.fuwuGoods[i].edit_price
-      //     } else {
-      //       modifyMoney += this.chooeseGoods.fuwuGoods[i].num * this.chooeseGoods.fuwuGoods[i].price
-      //     }
-      //   }
-      // }
       if (this.chooeseGoods.cardList.length) {
         for (let i = 0; i < this.chooeseGoods.cardList.length; i++) {
           sumMoney += this.chooeseGoods.cardList[i].num * this.chooeseGoods.cardList[i].price
@@ -1929,17 +1581,6 @@ export default {
                 this.jiezhangDialog.memberVip = res.data
                 this.xuanzehuiyuanDialog.isShow = false
                 this.choosesGoodsShowMemberPrice()
-                // 选择了会员，根据会员的等级，服务商品有会员价 刷新接口
-                // if (this.requestFuwuGoodData.isChooeseFuwuGood) {
-                //   this.getServiceItemList()
-                // }
-                // 选择了会员，根据会员的等级，服务商品有会员价 刷新接口
-                // if (this.chooeseGoods.fuwuGoods.length) {
-                //   this.getServiceItemList()
-                //   this.requestFuwuGoodData.isChooeseFuwuGood = true
-                //   this.requestGoodData.isChooeseFenleiGood = false
-                //   this.chooeseGoods.fuwuGoods = []
-                // }
               } else {
                 this.$message.closeAll()
                 this.$message({
@@ -1969,9 +1610,7 @@ export default {
     // 选择会员后时，如果购物车里有服务商品，或服务卡，就要显示他的会员价
     choosesGoodsShowMemberPrice () {
       // 当前页面中，被选中的是服务商品 刷新接口展示出会员价来
-      // if (this.requestFuwuGoodData.isChooeseFuwuGood) {
-        this.getServiceItemList()
-      // }
+      this.getServiceItemList()
       //购物车里有服务商品
       if (this.chooeseGoods.goods.length){
         let requestData = {
@@ -2243,8 +1882,6 @@ export default {
           } else {
             this.huiyuanDialog.fuwukaList = []
           }
-        }).catch(err => {
-          console.log(err)
         })
       } else {
         this.$message.closeAll()
@@ -2255,7 +1892,6 @@ export default {
       }
     },
     huiyuanDialogActiveServiceCard (card) {
-      console.log(card)
       let requestData = {
         card_id: card.id,
         waiter: 1
@@ -2276,8 +1912,6 @@ export default {
         if (res.data) {
           this.huiyuanDialog.haokaDialog.tableData = res.data
         }
-      }).catch(err => {
-        console.log(err)
       })
       this.huiyuanDialog.haokaDialog.isShow = true
     },
@@ -2312,7 +1946,6 @@ export default {
     // 退卡详情
     huiyuanDialogServiceCardReturnCardsDetails (card) {
       this.huiyuanDialog.tuikaDialog.isShow = true
-      console.log(card)
     },
 
     // 购卡弹框
@@ -2349,8 +1982,6 @@ export default {
         } else {
           this.goukaDialog.cardsList = []
         }
-      }).catch(err => {
-        console.log(err)
       })
     },
     goukaDialogSearchCardsNext () {
@@ -2386,7 +2017,7 @@ export default {
         })
       } else {
         // 添加服务卡进购物车
-        if (this.chooeseGoods.goods.length || this.chooeseGoods.fuwuGoods.length) {
+        if (this.chooeseGoods.goods.length) {
           this.$confirm('您确认清空购物车中的商品，重新添加另一种商品吗？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
@@ -2426,7 +2057,7 @@ export default {
 
     // 结账操作
     jiezhangDialogClickBtn () {
-      if (!(this.chooeseGoods.goods.length !== 0 || this.chooeseGoods.cardList.length !== 0 || this.chooeseGoods.fuwuGoods.length !== 0)) {
+      if (!(this.chooeseGoods.goods.length !== 0 || this.chooeseGoods.cardList.length !== 0)) {
         this.$message.closeAll()
         this.$message({
           message: '购物车为空，请选择商品',
@@ -2632,7 +2263,7 @@ export default {
         justify-content: flex-start;
       }
       .my-div{
-        width: 160px;
+        width: 150px;
         height:54px;
         position: relative;
         margin-right: 20px;
@@ -2655,16 +2286,20 @@ export default {
           background:rgba(245,86,86,1);
           color:rgba(255,255,255,1);
         }
-        /*&:after{*/
-        /*  position: absolute;*/
-        /*  right: 0;*/
-        /*  bottom: 0;*/
-        /*  content: '';*/
-        /*  height: 20px;*/
-        /*  width: 20px;*/
-        /*  background-color: #000;*/
-        /*  background: url("../../assets/icon/jiaodu.png") no-repeat bottom right;*/
-        /*}*/
+        .after{
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          content: '';
+          width: 0;
+          height: 0;
+          border-top: 8px solid transparent;
+          border-bottom: 0 solid transparent;
+          border-left: 10px solid #6BD2F4;
+        }
+        .after-active{
+          border-left: 10px solid rgba(245,86,86,1);
+        }
       }
       .page-fenlei-button{
         width:58px;
@@ -2675,10 +2310,6 @@ export default {
       }
     }
     .flex-goods{
-      /*height: 700px;*/
-      /*max-height: 824px;*/
-      /*width: 100%;*/
-      /*margin-top: 28px;*/
       flex: 1;
       overflow: hidden;
       display: flex;
@@ -2712,24 +2343,6 @@ export default {
       text-align: center;
       width: 100%;
       height: 42px;
-      .page-button{
-        /*width:84px;*/
-        /*height:32px;*/
-        /*background:rgba(245,245,245,1)!important;*/
-        /*border-radius:4px;*/
-        /*font-size:18px!important;*/
-        /*border: 0;*/
-        /*font-family:SourceHanSansCN-Regular;*/
-        /*font-weight:400;*/
-        /*color:rgba(26,26,26,1)!important;*/
-        /*margin-left: 20px;*/
-        /*margin-right: 20px;*/
-      }
-      .page-button:active{
-        /*border: none;*/
-        /*background:rgba(0,0,0,1)!important;*/
-        /*color:rgba(255,255,255,1)!important;*/
-      }
     }
   }
   .caozuo-buttons{
