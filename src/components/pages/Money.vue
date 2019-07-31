@@ -13,7 +13,7 @@
               </div>
               <div style="overflow: hidden;width: 100%;flex: 1;margin-top: 28px;" ref="allGoodsScroll">
                 <div  ref="allGoodsScrollContent" class="flex-goods" >
-                  <v-good v-for="(item) in goodsList" :key="item.id" :ogood="item" class="goods" @click.native="addShoppingCar(item)"></v-good>
+                  <v-good v-for="(item) in goodsList" :key="item.id" :ogood="item" class="goods" @click.native="checkGoodsTypeAndAddShoppingCar(item)"></v-good>
                   <div v-if="goodsList.length === 0" style="top: 50%;position: relative;left: 50%;width: 322px;height: 359px;margin-top: -179px;margin-left: -161px;">
                     <img src="../../assets/images/no-goods.png" alt="暂无商品" style="width: 322px;">
                     <p style="position: absolute;bottom:0;width: 100%;color: #1A1A1A;font-size: 24px;text-align: center;">暂无商品</p>
@@ -82,7 +82,39 @@
                       </span>
                     </li>
                   </ul>
-                  <ul v-if="chooeseGoods.cardList.length" v-for="(good, key) in chooeseGoods.cardList" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
+                <ul v-if="chooeseGoods.outsourcing_goods.length" v-for="(good, key) in chooeseGoods.outsourcing_goods" :key="key" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
+                  <li class="title clear-both">
+                    <span class="float-left">{{good.title}}</span>
+                    <span class="float-right">X {{good.num}}</span>
+                  </li>
+                  <li class="title code clear-both">
+                    <span class="float-left">{{good.bar_code}}</span>
+                    <span class="float-right red">￥{{good.is_edit ? parseFloat(good.edit_price * good.num).toFixed(2) : parseFloat(good.price * good.num).toFixed(2)}}</span>
+                  </li>
+                  <li class="title code clear-both">
+                    <span class="yuanjia" v-if="good.is_edit">￥{{good.price}}</span>
+                    <span style="width:28px;height:20px;background:rgba(243,88,88,1);border-radius:4px;color: #ffffff;padding:0 3px; " v-if="good.is_edit">改</span>
+                    <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
+                    <span class="red danjia" v-else>￥{{good.price}}</span>
+                    <span v-if="good.is_edit && good.is_service_goods === '0'" style="color:#f5960c;font-size: 12px;">不低于{{good.minimum_selling_price}}</span>
+                    <!--                    <span class="huiyuanjia">会员价￥{{good.price}}</span>-->
+                    <span class="float-right" v-if="good.is_service_goods === '1'">
+                        <el-dropdown class="user-name" trigger="click" @command="serviceGoodsChoosesWaiter">
+                          <span class="el-dropdown-link"  @click="getWaiterList()">
+                            <span v-if="good.nowWaiter.id != -1"><span class="font-blue">{{good.nowWaiter.name}}</span> [{{good.nowWaiter.type}}]  <i class="el-icon-arrow-down"></i></span>
+                            <span v-else> <span class="font-blue">请选择服务人员</span> <i class="el-icon-arrow-down"></i></span>
+                          </span>
+                          <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item v-for="(item) in waiterList" :key="item.id" :command="{key:key,value:item}">
+                              <span class="font-blue">{{item.name}}</span>
+                              [{{item.type}}]
+                            </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </el-dropdown>
+                      </span>
+                  </li>
+                </ul>
+                <ul v-if="chooeseGoods.cardList.length" v-for="(good, key) in chooeseGoods.cardList" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
                   <li class="title clear-both">
                     <span class="float-left">{{good.card_name}}</span>
                     <span class="float-right">X {{good.num}}</span>
@@ -102,7 +134,7 @@
               </div>
               <div class="queren-xinxi">
                 <ul>
-                  <li>
+                  <li v-if="jiezhangDialog.isShowChooeseWaiterBlock">
                     <span class="float-left">商品服务人员</span>
                     <span class="float-right select">
                       <el-dropdown class="user-name" trigger="click" @command="clickWaiter">
@@ -264,14 +296,10 @@
                 <span class="float-left"><span>会员</span> <span class="font-blue"  @click="xuanzehuiyuanDialog.isShow = true">{{jiezhangDialog.memberVip.nickname?jiezhangDialog.memberVip.nickname:'未选择'}}</span></span>
                 <span class="float-right">余额：¥ {{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : '0.00'}}</span>
               </li>
-              <li class="clear-both">
-                <span class="float-left"><span>服务人员</span> <span class="font-blue">{{jiezhangDialog.nowWaiter.name}}</span></span>
-                <span class="float-right"></span>
-              </li>
             </ul>
-            <div class="div">
-              <button @click="jiezhangDialog.isShow = false">取消</button>
-              <button @click="jiezhangDialogClickOk">确认结账</button>
+            <div class="div clear-both">
+              <button @click="jiezhangDialog.isShow = false" class="float-left">取消</button>
+              <button @click="jiezhangDialogClickOk" class="float-right active">确认结账</button>
             </div>
           </div>
           <div class="float-right my-right">
@@ -598,8 +626,8 @@ export default {
         title:'',
         page: 1, // 当前页码
         num: 15, // 每页的数据
-        who: 0, // 当前选中的分类名id
-        type_category: 0
+        who: '', // 当前选中的分类名id
+        type_category: ''
       },
 
       // 上一页，下一页是否禁用
@@ -608,9 +636,10 @@ export default {
 
       // 结账中的商品
       chooeseGoods: {
-        // 选择的商品
-        goods: [
-        ],
+        // 选择的 非外包商品，包括 非外包服务商品 和 非外包普通商品
+        goods: [],
+        // 选择的 外包商品 包括 外包服务商品 和 外包普通商品
+        outsourcing_goods:[],
         // 购卡弹窗选择的卡片列表
         cardList: []
       },
@@ -779,6 +808,8 @@ export default {
           // amount: '0.05', // 累积充值
           // regtime: '1970-01-01 08:33:37' // 加入时间
         },
+        // 当购物车里有 普通商品，这时候需要选择普通商品的服务人员
+        isShowChooeseWaiterBlock: false,
         // 当前选中的服务人员
         nowWaiter: {
           id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
@@ -855,9 +886,18 @@ export default {
         }
       })
     },
-    // 将商品加入购物车
+    //判断商品是否为外包商品
+    checkGoodsTypeAndAddShoppingCar(good){
+      if (good.is_outsourcing_goods === '1') { //外包普通商品或外包服务
+        this.addShoppingCarOut(good)
+      }
+      if (good.is_outsourcing_goods === '0') { //非外包普通商品或外包服务
+        this.addShoppingCar(good)
+      }
+    },
+    // 将非外包的 服务或普通商品加入购物车
     addShoppingCar (good) {
-      // 服务商品
+      // 非外包服务商品
       if (good.is_service_goods === '1') {
         good.num = 1
         good.is_checked = false
@@ -880,7 +920,7 @@ export default {
           }
         }
       }
-      // 普通商品
+      // 非外包普通商品
       if (good.is_service_goods === '0') {
         // 检查库存是否为0
         if (good.stock > 0) {
@@ -908,23 +948,100 @@ export default {
           }
         }
       }
-      if (this.chooeseGoods.cardList.length) {
-        this.$confirm('您购物车里已经存在服务卡，此操作会清空购物车，是否确认？', '提示', {
+      if (this.chooeseGoods.cardList.length || this.chooeseGoods.outsourcing_goods.length) {
+        this.$confirm('您购物车里已经存在其他类型的商品，此操作会清空购物车，是否确认？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.chooeseGoods.cardList = []
+          this.chooeseGoods.outsourcing_goods = []
           this.chooeseGoods.goods.push(good)
         }).catch(() => {
         })
       } else {
         this.chooeseGoods.cardList = []
+        this.chooeseGoods.outsourcing_goods = []
         this.chooeseGoods.goods.push(good)
       }
       this.sumChooseGoodsMoney()
+      this.isShowChooeseWaiterBlock()
       this.$forceUpdate()
     },
+    // 将外包的 服务或者普通商品加入购物车
+    addShoppingCarOut (good) {
+      // 外包服务商品
+      if (good.is_service_goods === '1') {
+        good.num = 1
+        good.is_checked = false
+        good.is_edit = 0
+        good.edit_price = parseFloat(good.price).toFixed(2)
+        good.price = parseFloat(good.price).toFixed(2)
+        good.nowWaiter = {
+          id: -1,
+          name: '请选择服务员',
+          type: ''
+        }
+        for (let i = 0; i < this.chooeseGoods.outsourcing_goods.length; i++) {
+          if ((this.chooeseGoods.outsourcing_goods[i].id === good.id) && (this.chooeseGoods.outsourcing_goods[i].is_service_goods === good.is_service_goods)) {
+            this.$message.closeAll()
+            this.$message({
+              message: '该服务商品已经存在购物车了,请在购物车里选择它后编辑它',
+              type: 'error'
+            })
+            return
+          }
+        }
+      }
+      // 外包普通商品
+      if (good.is_service_goods === '0') {
+        // 检查库存是否为0
+        if (good.stock > 0) {
+          good.num = 1
+          good.is_checked = false
+          good.is_edit = 0
+          good.edit_price = parseFloat(good.price).toFixed(2)
+          good.price = parseFloat(good.price).toFixed(2)
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '该商品的库存不足，不能加入购物车',
+            type: 'error'
+          })
+          return
+        }
+        for (let i = 0; i < this.chooeseGoods.outsourcing_goods.length; i++) {
+          if ((this.chooeseGoods.outsourcing_goods[i].id === good.id) && (good.is_service_goods === this.chooeseGoods.outsourcing_goods[i].is_service_goods)) {
+            this.$message.closeAll()
+            this.$message({
+              message: '该商品已经存在购物车了,请在购物车里选择它后编辑它',
+              type: 'error'
+            })
+            return
+          }
+        }
+      }
+      if (this.chooeseGoods.goods.length || this.chooeseGoods.cardList.length) {
+        this.$confirm('您购物车里已经存在其他类型的商品，此操作会清空购物车，是否确认？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.chooeseGoods.cardList = []
+          this.chooeseGoods.goods = []
+          this.chooeseGoods.outsourcing_goods.push(good)
+        }).catch(() => {
+        })
+      } else {
+        this.chooeseGoods.cardList = []
+        this.chooeseGoods.goods = []
+        this.chooeseGoods.outsourcing_goods.push(good)
+      }
+      this.sumChooseGoodsMoney()
+      this.isShowChooeseWaiterBlock()
+      this.$forceUpdate()
+    },
+
     // 购物车里的商品被单击后处于选中状态，然后进行修改操作，比如加数量、减数量、修改价格、删除
     clickShoppingCarGood (key) {
       if (this.chooeseGoods.goods.length) {
@@ -932,6 +1049,12 @@ export default {
           good.is_checked = false
         })
         this.chooeseGoods.goods[key].is_checked = true
+      }
+      if (this.chooeseGoods.outsourcing_goods.length) {
+        this.chooeseGoods.outsourcing_goods.map((good, index) => {
+          good.is_checked = false
+        })
+        this.chooeseGoods.outsourcing_goods[key].is_checked = true
       }
       if (this.chooeseGoods.cardList.length) {
         this.chooeseGoods.cardList.map((good, index) => {
@@ -952,6 +1075,25 @@ export default {
         })
         if (key !== 'undefined') {
           this.chooeseGoods.goods.splice(key, 1)
+          this.isShowChooeseWaiterBlock()
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选中要删除的商品',
+            type: 'error'
+          })
+        }
+      }
+      if (this.chooeseGoods.outsourcing_goods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.outsourcing_goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          this.chooeseGoods.outsourcing_goods.splice(key, 1)
+          this.isShowChooeseWaiterBlock()
         } else {
           this.$message.closeAll()
           this.$message({
@@ -995,6 +1137,34 @@ export default {
           }
           if (this.chooeseGoods.goods[key].is_service_goods === '0') {
             if (this.chooeseGoods.goods[key].num < this.chooeseGoods.goods[key].stock) { this.chooeseGoods.goods[key].num++ } else {
+              this.$message.closeAll()
+              this.$message({
+                message: '购买数量达到最大值',
+                type: 'error'
+              })
+            }
+          }
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选择购物车里的商品',
+            type: 'error'
+          })
+        }
+      }
+      if (this.chooeseGoods.outsourcing_goods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.outsourcing_goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (this.chooeseGoods.outsourcing_goods[key].is_service_goods === '1') {
+            this.chooeseGoods.outsourcing_goods[key].num++
+          }
+          if (this.chooeseGoods.outsourcing_goods[key].is_service_goods === '0') {
+            if (this.chooeseGoods.outsourcing_goods[key].num < this.chooeseGoods.outsourcing_goods[key].stock) { this.chooeseGoods.outsourcing_goods[key].num++ } else {
               this.$message.closeAll()
               this.$message({
                 message: '购买数量达到最大值',
@@ -1057,6 +1227,31 @@ export default {
           })
         }
       }
+      if (this.chooeseGoods.outsourcing_goods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.outsourcing_goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (this.chooeseGoods.outsourcing_goods[key].num > 1) {
+            this.chooeseGoods.outsourcing_goods[key].num--
+          } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '购买数量最少为1',
+              type: 'error'
+            })
+          }
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选择购物车里的商品',
+            type: 'error'
+          })
+        }
+      }
       if (this.chooeseGoods.cardList.length) {
         let key = 'undefined'
         this.chooeseGoods.cardList.map((good, index) => {
@@ -1094,6 +1289,24 @@ export default {
         })
         if (key !== 'undefined') {
           this.xiugaishuliangDialog.inputValue = this.chooeseGoods.goods[key].num
+          this.xiugaishuliangDialog.isShow = true
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选中购物车里的商品',
+            type: 'error'
+          })
+        }
+      }
+      if (this.chooeseGoods.outsourcing_goods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.outsourcing_goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          this.xiugaishuliangDialog.inputValue = this.chooeseGoods.outsourcing_goods[key].num
           this.xiugaishuliangDialog.isShow = true
         } else {
           this.$message.closeAll()
@@ -1171,27 +1384,42 @@ export default {
           }
         }
       }
-      // if (this.chooeseGoods.fuwuGoods.length) {
-      //   let key = 'undefined'
-      //   this.chooeseGoods.fuwuGoods.map((good, index) => {
-      //     if (good.is_checked === true) {
-      //       key = index
-      //     }
-      //   })
-      //   if (key !== 'undefined') {
-      //     if (this.xiugaishuliangDialog.inputValue >= 1) {
-      //       this.chooeseGoods.fuwuGoods[key].num = this.xiugaishuliangDialog.inputValue
-      //       this.xiugaishuliangDialog.inputValue = ''
-      //       this.xiugaishuliangDialog.isShow = false
-      //     } else {
-      //       this.$message.closeAll()
-      //       this.$message({
-      //         message: '购买数量不能小于1',
-      //         type: 'error'
-      //       })
-      //     }
-      //   }
-      // }
+      if (this.chooeseGoods.outsourcing_goods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.outsourcing_goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (this.chooeseGoods.outsourcing_goods[key].is_service_goods === '1') {
+            if (this.xiugaishuliangDialog.inputValue >= 1) {
+                    this.chooeseGoods.outsourcing_goods[key].num = this.xiugaishuliangDialog.inputValue
+                    this.xiugaishuliangDialog.inputValue = ''
+                    this.xiugaishuliangDialog.isShow = false
+            } else {
+                    this.$message.closeAll()
+                    this.$message({
+                      message: '购买数量不能小于1',
+                      type: 'error'
+                    })
+            }
+          }
+          if (this.chooeseGoods.outsourcing_goods[key].is_service_goods === '0') {
+            if ((this.xiugaishuliangDialog.inputValue <= this.chooeseGoods.outsourcing_goods[key].stock) && (this.xiugaishuliangDialog.inputValue >= 1)) {
+              this.chooeseGoods.outsourcing_goods[key].num = this.xiugaishuliangDialog.inputValue
+              this.xiugaishuliangDialog.inputValue = ''
+              this.xiugaishuliangDialog.isShow = false
+            } else {
+              this.$message.closeAll()
+              this.$message({
+                message: '购买数量达到最大值或者小于1',
+                type: 'error'
+              })
+            }
+          }
+        }
+      }
       if (this.chooeseGoods.cardList.length) {
         let key = 'undefined'
         this.chooeseGoods.cardList.map((good, index) => {
@@ -1211,10 +1439,9 @@ export default {
       this.$forceUpdate()
     },
 
-    // 选中购物车里的商品，后点击改价按钮
+    // 选中购物车里的商品，后点击改价按钮  显示弹窗
     clickBtnXiugaijiageShoppingCarGood () {
       if (this.chooeseGoods.goods.length) {
-        // 显示弹窗
         let key = 'undefined'
         this.chooeseGoods.goods.map((good, index) => {
           if (good.is_checked === true) {
@@ -1236,8 +1463,29 @@ export default {
           })
         }
       }
+      if (this.chooeseGoods.outsourcing_goods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.outsourcing_goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (this.chooeseGoods.outsourcing_goods[key].is_edit === 1) {
+            this.xiugaijiageDialog.inputValue = this.chooeseGoods.outsourcing_goods[key].edit_price
+          } else {
+            this.xiugaijiageDialog.inputValue = this.chooeseGoods.outsourcing_goods[key].price
+          }
+          this.xiugaijiageDialog.isShow = true
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选中购物车里的商品',
+            type: 'error'
+          })
+        }
+      }
       if (this.chooeseGoods.cardList.length) {
-        // 显示弹窗
         let key = 'undefined'
         this.chooeseGoods.cardList.map((good, index) => {
           if (good.is_checked === true) {
@@ -1261,7 +1509,6 @@ export default {
       }
     },
     clickChangejiageShoppingCarGood (code) {
-      // this.xiugaijiageDialog.inputValue += code
       if (code !== '.') { this.xiugaijiageDialog.inputValue = String(this.xiugaijiageDialog.inputValue) + code } else {
         if (this.xiugaijiageDialog.inputValue.indexOf(code) === -1) {
           this.xiugaijiageDialog.inputValue = String(this.xiugaijiageDialog.inputValue) + code
@@ -1309,6 +1556,44 @@ export default {
           }
         }
       }
+      if (this.chooeseGoods.outsourcing_goods.length) {
+        let key = 'undefined'
+        this.chooeseGoods.outsourcing_goods.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          if (this.chooeseGoods.outsourcing_goods[key].is_service_goods === '1'){
+                if (parseFloat(this.xiugaijiageDialog.inputValue) > 0) {
+                  this.chooeseGoods.outsourcing_goods[key].is_edit = 1
+                  this.chooeseGoods.outsourcing_goods[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
+                  this.xiugaijiageDialog.inputValue = ''
+                  this.xiugaijiageDialog.isShow = false
+                } else {
+                  this.$message.closeAll()
+                  this.$message({
+                    message: '修改的价格必须正数',
+                    type: 'error'
+                  })
+                }
+          }
+          if (this.chooeseGoods.outsourcing_goods[key].is_service_goods === '0'){
+            if (parseFloat(this.xiugaijiageDialog.inputValue) >= parseFloat(this.chooeseGoods.outsourcing_goods[key].minimum_selling_price)) {
+              this.chooeseGoods.outsourcing_goods[key].is_edit = 1
+              this.chooeseGoods.outsourcing_goods[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
+              this.xiugaijiageDialog.inputValue = ''
+              this.xiugaijiageDialog.isShow = false
+            } else {
+              this.$message.closeAll()
+              this.$message({
+                message: '修改的价格不能低于设置的最低售价',
+                type: 'error'
+              })
+            }
+          }
+        }
+      }
       if (this.chooeseGoods.cardList.length) {
         let key = 'undefined'
         this.chooeseGoods.cardList.map((good, index) => {
@@ -1340,15 +1625,9 @@ export default {
     getGoods () {
       let data = {}
       data.page = `${this.requestGoodData.page},${this.requestGoodData.num}`
-      if (this.requestGoodData.who) {
-        data.type = this.requestGoodData.who
-      }
-      if (this.requestGoodData.title) {
-        data.title = this.requestGoodData.title
-      }
-      if (this.requestGoodData.type_category) {
-        data.type_category = this.requestGoodData.type_category
-      }
+      data.type = this.requestGoodData.who
+      data.title = this.requestGoodData.title
+      data.type_category = this.requestGoodData.type_category
       postGoods(data).then((res) => {
         if (res.data.length === 0) {
           if (this.requestGoodData.page === 1) {
@@ -1460,86 +1739,74 @@ export default {
       let data = {}
       data.bar_code = `${this.requestGoodData.title}`
       postGoodsByCode(data).then((res) => {
-        if (res.data instanceof Object && !(res.data instanceof Array) && res.data.id) {
-          if (this.chooeseGoods.cardList.length) {
-            this.$confirm('您购物车里已经存在服务卡，此操作会清空购物车，是否确认？', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).then(() => {
-              let good = res.data
-              good.num = 1
-              good.is_checked = false
-              good.is_edit = 0
-              good.edit_price = parseFloat(good.price).toFixed(2)
-              good.price = parseFloat(good.price).toFixed(2)
-              good.is_service_goods = '0'
-              for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
-                if ((this.chooeseGoods.goods[i].id === good.id) && (this.chooeseGoods.goods[i].is_service_goods === good.is_service_goods)) {
-                  if (this.chooeseGoods.goods[i].num + 1 <= good.stock) {
-                    this.$message.closeAll()
-                    this.$message({
-                      message: '该商品已经存在购物车了，购买数量加1',
-                      type: 'error'
-                    })
-                    this.chooeseGoods.goods[i].num++
-                  } else {
-                    this.$message.closeAll()
-                    this.$message({
-                      message: '该商品已经存在购物车了，购买数量没有发生变化，因为购买数量等于库存数量',
-                      type: 'error'
-                    })
-                  }
-                  return
+        if (res.code === '200') {
+          let good = res.data
+          good.num = 1
+          good.is_checked = false
+          good.is_edit = 0
+          good.edit_price = parseFloat(good.price).toFixed(2)
+          good.price = parseFloat(good.price).toFixed(2)
+          if (good.stock <= 0) {
+            this.$message.closeAll()
+            this.$message({
+              message: '该商品库存不足，无法添加购物车',
+              type: 'error'
+            })
+            return
+          }
+          if (good.is_outsourcing_goods === '1') { //外包普通商品或外包服务
+            let flag = true
+            for (let i = 0; i < this.chooeseGoods.outsourcing_goods.length; i++) {
+              if(this.chooeseGoods.outsourcing_goods[i].id === good.id && this.chooeseGoods.outsourcing_goods[i].is_service_goods === good.is_service_goods){
+                flag = false
+                if (this.chooeseGoods.outsourcing_goods[i].num + 1 <= good.stock) {
+                  this.$message.closeAll()
+                  this.$message({
+                    message: '该商品已经存在购物车了，购买数量加1',
+                    type: 'error'
+                  })
+                  this.chooeseGoods.outsourcing_goods[i].num++
+                } else {
+                  this.$message.closeAll()
+                  this.$message({
+                    message: '该商品已经存在购物车了，购买数量没有发生变化，因为购买数量等于库存数量',
+                    type: 'error'
+                  })
                 }
               }
-              if (good.stock <= 0) {
-                this.$message.closeAll()
-                this.$message({
-                  message: '该商品库存不足，无法添加购物车',
-                  type: 'error'
-                })
-                return
-              }
-              this.chooeseGoods.goods.push(good)
-              this.sumChooseGoodsMoney()
-              this.chooeseGoods.cardList = []
-            }).catch(() => {})
-          } else {
-            let good = res.data
-            good.num = 1
-            good.is_checked = false
-            good.is_edit = 0
-            good.edit_price = parseFloat(good.price).toFixed(2)
-            good.price = parseFloat(good.price).toFixed(2)
-            good.is_service_goods = '0'
-            for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
-              if ((this.chooeseGoods.goods[i].id === good.id) && (this.chooeseGoods.goods[i].is_service_goods === good.is_service_goods)) {
-                this.$message.closeAll()
-                this.$message({
-                  message: '该商品已经存在购物车了，请选中后再操作',
-                  type: 'error'
-                })
-                return
-              }
             }
-            if (good.stock <= 0) {
-              this.$message.closeAll()
-              this.$message({
-                message: '该商品库存不足，无法添加购物车',
-                type: 'error'
-              })
-              return
+            if (flag) {
+              this.checkGoodsTypeAndAddShoppingCar(good)
             }
-            this.chooeseGoods.goods.push(good)
-            this.chooeseGoods.cardList = []
           }
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '没有检索到该商品',
-            type: 'error'
-          })
+          if (good.is_outsourcing_goods === '0') { //非外包普通商品或外包服务
+            let flag = true
+            for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
+              if(this.chooeseGoods.goods[i].id === good.id && this.chooeseGoods.goods[i].is_service_goods === good.is_service_goods){
+                flag = false
+                if (this.chooeseGoods.goods[i].num + 1 <= good.stock) {
+                  this.$message.closeAll()
+                  this.$message({
+                    message: '该商品已经存在购物车了，购买数量加1',
+                    type: 'error'
+                  })
+                  this.chooeseGoods.goods[i].num++
+                } else {
+                  this.$message.closeAll()
+                  this.$message({
+                    message: '该商品已经存在购物车了，购买数量没有发生变化，因为购买数量等于库存数量',
+                    type: 'error'
+                  })
+                }
+              }
+            }
+            if (flag) {
+              this.checkGoodsTypeAndAddShoppingCar(good)
+            }
+          }
+          this.chooeseGoods.cardList = []
+          this.isShowChooeseWaiterBlock()
+          this.sumChooseGoodsMoney()
         }
       })
     },
@@ -1557,6 +1824,16 @@ export default {
           }
         }
       }
+      if (this.chooeseGoods.outsourcing_goods.length) {
+        for (let i = 0; i < this.chooeseGoods.outsourcing_goods.length; i++) {
+          sumMoney += this.chooeseGoods.outsourcing_goods[i].num * this.chooeseGoods.outsourcing_goods[i].price
+          if (this.chooeseGoods.outsourcing_goods[i].is_edit === 1) {
+            modifyMoney += this.chooeseGoods.outsourcing_goods[i].num * this.chooeseGoods.outsourcing_goods[i].edit_price
+          } else {
+            modifyMoney += this.chooeseGoods.outsourcing_goods[i].num * this.chooeseGoods.outsourcing_goods[i].price
+          }
+        }
+      }
       if (this.chooeseGoods.cardList.length) {
         for (let i = 0; i < this.chooeseGoods.cardList.length; i++) {
           sumMoney += this.chooeseGoods.cardList[i].num * this.chooeseGoods.cardList[i].price
@@ -1570,6 +1847,7 @@ export default {
       this.jiezhangDialog.sumMoney = sumMoney.toFixed(2)
       this.jiezhangDialog.modifyMoney = modifyMoney.toFixed(2)
     },
+
     // 选择会员
     clickChoosesMemberByKeyboard (code) {
       if (code === 'ok') {
@@ -1639,6 +1917,7 @@ export default {
 
       }
     },
+
     // 充值弹框
     chongzhiDialogInputFocus (str) {
       this.chongzhiDialog.chooeseWho = str
@@ -1762,6 +2041,7 @@ export default {
       }).catch(() => {
       })
     },
+
     // 会员查询弹框中的事件
     huiyuanDialogGetCode (code) {
       if (this.huiyuanDialog.mobile.length < 11) {
@@ -2057,112 +2337,93 @@ export default {
 
     // 结账操作
     jiezhangDialogClickBtn () {
-      if (!(this.chooeseGoods.goods.length !== 0 || this.chooeseGoods.cardList.length !== 0)) {
+      if (!(this.chooeseGoods.goods.length !== 0 || this.chooeseGoods.outsourcing_goods.length !== 0 || this.chooeseGoods.cardList.length !== 0)) {
         this.$message.closeAll()
         this.$message({
-          message: '购物车为空，请选择商品',
+          message: '购物车为空',
           type: 'error'
         })
         return
       }
-      if (this.jiezhangDialog.nowWaiter.id === -1) {
-        this.$message.closeAll()
-        this.$message({
-          message: '请先选择服务人员',
-          type: 'error'
-        })
-        return
+      for (let i =0; i < this.chooeseGoods.goods.length; i++) {
+        if(this.chooeseGoods.goods[i].is_service_goods === '1'){
+          if(this.chooeseGoods.goods[i].nowWaiter.id === -1) {
+            this.$message.closeAll()
+            this.$message({
+              message: `请选择【${this.chooeseGoods.goods[i].title}】服务的服务人员`,
+              type: 'error'
+            })
+            return
+          }
+        }
+      }
+      for (let i =0; i < this.chooeseGoods.outsourcing_goods.length; i++) {
+        if(this.chooeseGoods.outsourcing_goods[i].is_service_goods === '1'){
+          if(this.chooeseGoods.outsourcing_goods[i].nowWaiter.id === -1) {
+            this.$message.closeAll()
+            this.$message({
+              message: `请选择【${this.chooeseGoods.outsourcing_goods[i].title}】服务的服务人员`,
+              type: 'error'
+            })
+            return
+          }
+        }
+      }
+      if (this.jiezhangDialog.isShowChooeseWaiterBlock) {
+        if (this.jiezhangDialog.nowWaiter.id === -1) {
+          this.$message.closeAll()
+          this.$message({
+            message: '您购物车里有普通商品，请选择商品的服务人员',
+            type: 'error'
+          })
+          return
+        }
       }
       // 这人需要确定用户的支付方式
       this.confirmPayWay()
       this.jiezhangDialog.isShow = true
     },
+    //选择支付方式
     jiezhangDialogChoosesPayWay (way) {
       this.jiezhangDialog.chooesePayWay = way
     },
+    //确认结账
     jiezhangDialogClickOk () {
-      let requestData = {
-        member: this.jiezhangDialog.memberVip.id, // 会员id
-        waiter: this.jiezhangDialog.nowWaiter.id, // 服务员id
-        pay_way: this.jiezhangDialog.chooesePayWay,
-        goods: [],
-        service_goods: []
+      if (!this.jiezhangDialog.chooesePayWay) {
+        this.$message.closeAll()
+        this.$message({
+          message: '请选择支付方式',
+          type: 'error'
+        })
+        return
       }
       if (this.chooeseGoods.goods.length) {
+        let requestData = {
+          member: this.jiezhangDialog.memberVip ? this.jiezhangDialog.memberVip.id : '', // 会员id
+          waiter: this.jiezhangDialog.isShowChooeseWaiterBlock ? this.jiezhangDialog.nowWaiter.id : '', // 普通商品服务员id
+          pay_way: this.jiezhangDialog.chooesePayWay,
+          goods: []
+        }
         let arr = []
         this.chooeseGoods.goods.map((item, index) => {
           let obj = {}
           obj.id = item.id
           obj.num = item.num
-          obj.price = item.price
           obj.is_edit = item.is_edit
+          obj.is_service_goods = item.is_service_goods
           if (item.is_edit) {
             obj.edit_price = item.edit_price
+          }
+          if(item.is_service_goods === '1') {
+            obj.waiter_id = item.nowWaiter.id
           }
           arr.push(obj)
         })
         requestData.goods = arr
-        delete requestData.service_goods
+        console.log(requestData)
         postNowPayGoods(requestData).then(res => {
           if (res.code === '200') {
-            this.jiezhangDialog.nowWaiter = {
-              id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
-              name: '请选择服务员', // 服务员名称
-              type: '' // 服务类型
-            }
-            this.jiezhangDialog.memberVip = {}
-            this.chooeseGoods.goods = []
-            this.jiezhangDialog.isShow = false
-            this.jiezhangDialog.sumMoney = 0
-            this.jiezhangDialog.modifyMoney = 0
-            this.jiezhangDialog.chooesePayWay = ''
-            this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
-            if (this.requestGoodData.isChooeseFenleiGood) {
-              this.getGoods()
-            }
-            setTimeout(() => {
-              this.jiezhangDialog.jiezhangSuccessDialog.isShow = false
-            }, this.jiezhangDialog.jiezhangSuccessDialog.seconds)
-            this.$forceUpdate()
-          }
-        })
-      }
-      if (this.chooeseGoods.fuwuGoods.length) {
-        let arr = []
-        this.chooeseGoods.fuwuGoods.map((item, index) => {
-          let obj = {}
-          obj.id = item.id
-          obj.num = item.num
-          obj.price = item.price
-          obj.is_edit = item.is_edit
-          if (item.is_edit) {
-            obj.edit_price = item.edit_price
-          }
-          arr.push(obj)
-        })
-        requestData.service_goods = arr
-        delete requestData.goods
-        postNowPayGoods(requestData).then(res => {
-          if (res.code === '200') {
-            this.jiezhangDialog.nowWaiter = {
-              id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
-              name: '请选择服务员', // 服务员名称
-              type: '未知' // 服务类型
-            }
-            this.jiezhangDialog.memberVip = {}
-            this.chooeseGoods.fuwuGoods = []
-            this.jiezhangDialog.isShow = false
-            this.jiezhangDialog.sumMoney = 0
-            this.jiezhangDialog.modifyMoney = 0
-            this.jiezhangDialog.chooesePayWay = ''
-            this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
-            if (this.requestGoodData.isChooeseFenleiGood) {
-              this.getGoods()
-            }
-            setTimeout(() => {
-              this.jiezhangDialog.jiezhangSuccessDialog.isShow = false
-            }, this.jiezhangDialog.jiezhangSuccessDialog.seconds)
-            this.$forceUpdate()
+            this.clearJiezhangDialogData()
           }
         })
       }
@@ -2176,25 +2437,7 @@ export default {
         }
         postNowPayServiceCards(requestData).then(res => {
           if (res.code === '200') {
-            this.jiezhangDialog.nowWaiter = {
-              id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
-              name: '请选择服务员', // 服务员名称
-              type: '未知' // 服务类型
-            }
-            this.jiezhangDialog.memberVip = {}
-            this.chooeseGoods.cardList = []
-            this.jiezhangDialog.isShow = false
-            this.jiezhangDialog.sumMoney = 0
-            this.jiezhangDialog.modifyMoney = 0
-            this.jiezhangDialog.chooesePayWay = ''
-            this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
-            if (this.requestGoodData.isChooeseFenleiGood) {
-              this.getGoods()
-            }
-            setTimeout(() => {
-              this.jiezhangDialog.jiezhangSuccessDialog.isShow = false
-            }, this.jiezhangDialog.jiezhangSuccessDialog.seconds)
-            this.$forceUpdate()
+            this.clearJiezhangDialogData()
           }
         })
       }
@@ -2202,9 +2445,9 @@ export default {
     // 结账时可选支付方式
     confirmPayWay () {
       if (this.jiezhangDialog.memberVip.id) { // 选择了会员
-        if (this.chooeseGoods.fuwuGoods.length) {
-          this.jiezhangDialog.closedPayWay = [8]
-        }
+        // if (this.chooeseGoods.fuwuGoods.length) {
+        //   this.jiezhangDialog.closedPayWay = [8]
+        // }
         if (this.chooeseGoods.goods.length) {
           this.jiezhangDialog.closedPayWay = []
         }
@@ -2212,9 +2455,9 @@ export default {
           this.jiezhangDialog.closedPayWay = [7]
         }
       } else { // 没有选择会员
-        if (this.chooeseGoods.fuwuGoods.length) {
-          this.jiezhangDialog.closedPayWay = [3, 7, 8]
-        }
+        // if (this.chooeseGoods.fuwuGoods.length) {
+        //   this.jiezhangDialog.closedPayWay = [3, 7, 8]
+        // }
         if (this.chooeseGoods.goods.length) {
           this.jiezhangDialog.closedPayWay = [3, 7]
         }
@@ -2222,6 +2465,45 @@ export default {
           this.jiezhangDialog.closedPayWay = [3, 7]
         }
       }
+    },
+    //添加商品（服务商品，普通商品）进购物车，普通商品要选择商品服务人员
+    isShowChooeseWaiterBlock(){
+      let flag = false
+      for (let i =0; i < this.chooeseGoods.goods.length; i++) {
+        if(this.chooeseGoods.goods[i].is_service_goods === '0'){
+          flag = true
+        }
+      }
+      for (let i =0; i < this.chooeseGoods.outsourcing_goods.length; i++) {
+        if(this.chooeseGoods.outsourcing_goods[i].is_service_goods === '0'){
+          flag = true
+        }
+      }
+      this.jiezhangDialog.isShowChooeseWaiterBlock = flag
+      return flag
+    },
+    // 结账成功后需要清空的上一次结账需要的数据
+    clearJiezhangDialogData (){
+      this.jiezhangDialog.isShow = false
+      this.jiezhangDialog.jiezhangSuccessDialog.isShow = true
+      setTimeout(() => {
+        this.jiezhangDialog.jiezhangSuccessDialog.isShow = false
+      }, this.jiezhangDialog.jiezhangSuccessDialog.seconds)
+      this.jiezhangDialog.isShowChooeseWaiterBlock = false
+      this.jiezhangDialog.nowWaiter = {id: -1, name: '请选择服务员', type: ''}
+      //刷新接口
+      if (this.requestFuwuGoodData.who !== -1) {
+        this.getServiceItemList()
+      } else {
+        this.getGoods()
+      }
+      this.jiezhangDialog.memberVip = {}
+      this.chooeseGoods.goods = []
+      this.chooeseGoods.cardList = []
+      this.jiezhangDialog.sumMoney = 0.00
+      this.jiezhangDialog.modifyMoney = 0.00
+      this.jiezhangDialog.chooesePayWay = ''
+      this.$forceUpdate()
     }
   }
 }
@@ -2654,7 +2936,8 @@ export default {
           }
         }
         .div {
-          text-align: center;
+          width: 100%;
+          padding: 0 12px;
           button{
             width:148px;
             height:44px;
@@ -2663,11 +2946,12 @@ export default {
             font-size:20px;
             border:1px solid rgba(46,202,241,1);
             border-radius:8px;
-            &:active{
-              border:none;
-              background:rgba(45,194,243,1);
-              color:rgba(255,255,255,1);
-            }
+            outline: none;    //消除默认点击蓝色边框效果
+          }
+          .active{
+            border:none;
+            background:rgba(45,194,243,1);
+            color:rgba(255,255,255,1);
           }
         }
       }
