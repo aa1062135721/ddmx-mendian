@@ -26,6 +26,15 @@ export const postTwotype = (data = null) => {
 }
 
 /**
+ * 收银大屏-服务商品分类列表
+ * @param data
+ * @returns {*}
+ */
+export const postServiceCategory = (data = null) => {
+  return Vue.prototype.$post('/index/getServiceCategory', data)
+}
+
+/**
  * 收银大屏-获取商品
  * @param data
  * @returns {*}

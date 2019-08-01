@@ -9,7 +9,7 @@
             <img v-if="ocard.type === '2'" src="../../assets/icon/card-month.png" alt="月卡图标">
             <img v-if="ocard.type === '1'" src="../../assets/icon/card-times.png" alt="次卡图标">
             <img v-if="ocard.type === '4'" src="../../assets/icon/card-year.png" alt="年卡图标">
-            <span>{{ocard.card_name}}（<span class="font-red">{{ocard.month}}</span>个月）</span>
+            <span>{{ocard.card_name}}<span class="font-red">{{ocard.month}}</span></span>
           </div>
           <div class="body1">
             <span class="font-red float-left" style="font-size: 16px;">￥</span>
