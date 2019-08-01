@@ -1,4 +1,3 @@
-<!--suppress ALL -->
 <template>
     <div class="bg bg-blue">
       <v-head></v-head>
@@ -198,7 +197,7 @@
                   <li>
                     <span class="float-left">结算</span>
                     <!-- 支付方式为赠送，需要支付的钱为0-->
-                    <span class="float-right" v-if="jiezhangDialog.chooesePayWay === 7">￥0</span>
+                    <span class="float-right" v-if="jiezhangDialog.chooesePayWay === 7">￥0.00</span>
                     <span class="float-right" v-else>￥{{jiezhangDialog.modifyMoney}}</span>
                   </li>
                 </ul>
@@ -622,7 +621,7 @@ import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-o
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
 import BScroll from 'better-scroll' // 滚动插件
-import { postServiceCategory, postMemberLevelInfo, postTwotype, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords } from '../../api/getData'
+import { postServiceCategory, postMemberLevelInfo, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords } from '../../api/getData'
 
 export default {
   name: 'Money',
@@ -2302,13 +2301,13 @@ export default {
         })
         return
       }
+      let requestData = {
+        member: this.jiezhangDialog.memberVip ? this.jiezhangDialog.memberVip.id : '', // 会员id
+        waiter: this.jiezhangDialog.isShowChooeseWaiterBlock ? this.jiezhangDialog.nowWaiter.id : '', // 普通商品服务员id
+        pay_way: this.jiezhangDialog.chooesePayWay,
+        goods: []
+      }
       if (this.chooeseGoods.goods.length) {
-        let requestData = {
-          member: this.jiezhangDialog.memberVip ? this.jiezhangDialog.memberVip.id : '', // 会员id
-          waiter: this.jiezhangDialog.isShowChooeseWaiterBlock ? this.jiezhangDialog.nowWaiter.id : '', // 普通商品服务员id
-          pay_way: this.jiezhangDialog.chooesePayWay,
-          goods: []
-        }
         let arr = []
         this.chooeseGoods.goods.map((item, index) => {
           let obj = {}
@@ -2325,13 +2324,45 @@ export default {
           arr.push(obj)
         })
         requestData.goods = arr
-        console.log(requestData)
-        postNowPayGoods(requestData).then(res => {
-          if (res.code === '200') {
-            this.clearJiezhangDialogData()
-          }
-        })
       }
+      if (this.chooeseGoods.outOrdinaryGoods.length) {
+        let arr = []
+        this.chooeseGoods.outOrdinaryGoods.map((item, index) => {
+          let obj = {}
+          obj.id = item.id
+          obj.num = item.num
+          obj.is_edit = item.is_edit
+          obj.is_service_goods = item.is_service_goods
+          if (item.is_edit) {
+            obj.edit_price = item.edit_price
+          }
+          arr.push(obj)
+        })
+        requestData.goods = arr
+      }
+      if (this.chooeseGoods.outServiceGoods.length) {
+        let arr = []
+        this.chooeseGoods.outServiceGoods.map((item, index) => {
+          let obj = {}
+          obj.id = item.id
+          obj.num = item.num
+          obj.is_edit = item.is_edit
+          obj.is_service_goods = item.is_service_goods
+          if (item.is_edit) {
+            obj.edit_price = item.edit_price
+          }
+          if(item.is_service_goods === '1') {
+            obj.waiter_id = item.nowWaiter.id
+          }
+          arr.push(obj)
+        })
+        requestData.goods = arr
+      }
+      postNowPayGoods(requestData).then(res => {
+        if (res.code === '200') {
+          this.clearJiezhangDialogData()
+        }
+      })
       if (this.chooeseGoods.cardList.length) {
         let requestData = {
           member_id: this.jiezhangDialog.memberVip.id, // 会员id
@@ -2379,6 +2410,10 @@ export default {
         }
         if (this.chooeseGoods.cardList.length) {
           this.jiezhangDialog.closedPayWay = [8,7]
+        }
+        // 余额不足，不能使用会员卡支付
+        if (this.jiezhangDialog.memberVip.money < this.jiezhangDialog.modifyMoney){
+          this.jiezhangDialog.closedPayWay.push(3)
         }
       } else {
         if (this.chooeseGoods.goods.length) {
@@ -2443,6 +2478,8 @@ export default {
       }
       this.jiezhangDialog.memberVip = {}
       this.chooeseGoods.goods = []
+      this.chooeseGoods.outServiceGoods = []
+      this.chooeseGoods.outOrdinaryGoods = []
       this.chooeseGoods.cardList = []
       this.jiezhangDialog.sumMoney = 0.00
       this.jiezhangDialog.modifyMoney = 0.00
@@ -2469,12 +2506,8 @@ export default {
   .all-goods{
     height: calc(100vh - 110px);
     width: 100%;
-    /*overflow: hidden;*/
     display: flex;
-    /*justify-content: space-between;*/
-    /*flex-wrap:wrap;*/
     flex-direction:column;
-
     .goods-type{
       height: 54px;
       width: 100%;
@@ -2482,12 +2515,6 @@ export default {
       align-items: center;
       flex-wrap: nowrap;
       justify-content: flex-start;
-      .type-btn{
-        /*width:700px;*/
-        display: flex;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-      }
       .my-div{
         width: 150px;
         height:54px;
@@ -2607,11 +2634,8 @@ export default {
   .jiesuan-goods{
     overflow: hidden;
     height: calc(100vh - 110px);
-    /*padding-bottom: 10px;*/
     width: 100%;
     display: flex;
-    /*justify-content: space-between;*/
-    /*flex-wrap:nowrap;*/
     flex-direction:column;
     .search{
       display: flex;
