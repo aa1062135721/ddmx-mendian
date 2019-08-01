@@ -82,7 +82,39 @@
                       </span>
                     </li>
                   </ul>
-                <ul v-if="chooeseGoods.outsourcing_goods.length" v-for="(good, key) in chooeseGoods.outsourcing_goods" :key="key" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(chooeseGoods.outsourcing_goods,key)">
+                <ul v-if="chooeseGoods.outServiceGoods.length" v-for="(good, key) in chooeseGoods.outServiceGoods" :key="key" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(chooeseGoods.outServiceGoods,key)">
+                  <li class="title clear-both">
+                    <span class="float-left">{{good.title}}</span>
+                    <span class="float-right">X {{good.num}}</span>
+                  </li>
+                  <li class="title code clear-both">
+                    <span class="float-left">{{good.bar_code}}</span>
+                    <span class="float-right red">￥{{good.is_edit ? parseFloat(good.edit_price * good.num).toFixed(2) : parseFloat(good.price * good.num).toFixed(2)}}</span>
+                  </li>
+                  <li class="title code clear-both">
+                    <span class="yuanjia" v-if="good.is_edit">￥{{good.price}}</span>
+                    <span style="width:28px;height:20px;background:rgba(243,88,88,1);border-radius:4px;color: #ffffff;padding:0 3px; " v-if="good.is_edit">改</span>
+                    <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
+                    <span class="red danjia" v-else>￥{{good.price}}</span>
+                    <span v-if="good.is_edit && good.is_service_goods === '0'" style="color:#f5960c;font-size: 12px;">不低于{{good.minimum_selling_price}}</span>
+                    <!--                    <span class="huiyuanjia">会员价￥{{good.price}}</span>-->
+                    <span class="float-right" v-if="good.is_service_goods === '1'">
+                        <el-dropdown class="user-name" trigger="click" @command="serviceGoodsChoosesWaiter">
+                          <span class="el-dropdown-link"  @click="getWaiterList()">
+                            <span v-if="good.nowWaiter.id != -1"><span class="font-blue">{{good.nowWaiter.name}}</span> [{{good.nowWaiter.type}}]  <i class="el-icon-arrow-down"></i></span>
+                            <span v-else> <span class="font-blue">请选择服务人员</span> <i class="el-icon-arrow-down"></i></span>
+                          </span>
+                          <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item v-for="(item) in waiterList" :key="item.id" :command="{key:key,value:item}">
+                              <span class="font-blue">{{item.name}}</span>
+                              [{{item.type}}]
+                            </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </el-dropdown>
+                      </span>
+                  </li>
+                </ul>
+                <ul v-if="chooeseGoods.outOrdinaryGoods.length" v-for="(good, key) in chooeseGoods.outOrdinaryGoods" :key="key" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(chooeseGoods.outOrdinaryGoods,key)">
                   <li class="title clear-both">
                     <span class="float-left">{{good.title}}</span>
                     <span class="float-right">X {{good.num}}</span>
@@ -638,8 +670,12 @@ export default {
       chooeseGoods: {
         // 选择的 非外包商品，包括 非外包服务商品 和 非外包普通商品
         goods: [],
-        // 选择的 外包商品 包括 外包服务商品 和 外包普通商品
-        outsourcing_goods:[],
+        // // 选择的 外包商品 包括 外包服务商品 和 外包普通商品
+        // outsourcing_goods:[],
+        //外包服务
+        outServiceGoods: [],
+        //外包普通商品
+        outOrdinaryGoods:[],
         // 购卡弹窗选择的卡片列表
         cardList: []
       },
@@ -854,9 +890,14 @@ export default {
     this.getWaiterList()
   },
   methods: {
-    // 服务商品选择服务人员
+    // 购物车里的每个服务商品选择服务人员
     serviceGoodsChoosesWaiter (e) {
-      this.chooeseGoods.goods[e.key].nowWaiter = e.value
+      if (this.chooeseGoods.goods.length) {
+        this.chooeseGoods.goods[e.key].nowWaiter = e.value
+      }
+      if (this.chooeseGoods.outServiceGoods.length) {
+        this.chooeseGoods.outServiceGoods[e.key].nowWaiter = e.value
+      }
       this.$forceUpdate()
     },
     // 获取服务分类列表
@@ -888,10 +929,19 @@ export default {
     },
     //判断商品是否为外包商品
     checkGoodsTypeAndAddShoppingCar(good){
-      if (good.is_outsourcing_goods === '1') { //外包普通商品或外包服务
-        this.addShoppingCarOut(good)
+      //外包普通商品或外包服务
+      if (good.is_outsourcing_goods === '1') {
+        //外包服务
+        if (good.is_service_goods === '1'){
+          this.addShoppingCarOutServiceGoods(good)
+        }
+        //外包普通商品
+        if (good.is_service_goods === '0'){
+          this.addShoppingCarOutOrdinaryGoods(good)
+        }
       }
-      if (good.is_outsourcing_goods === '0') { //非外包普通商品或外包服务
+      //非外包普通商品或外包服务
+      if (good.is_outsourcing_goods === '0') {
         this.addShoppingCar(good)
       }
     },
@@ -948,28 +998,30 @@ export default {
           }
         }
       }
-      if (this.chooeseGoods.cardList.length || this.chooeseGoods.outsourcing_goods.length) {
+      if (this.chooeseGoods.cardList.length || this.chooeseGoods.outOrdinaryGoods.length || this.chooeseGoods.outServiceGoods.length) {
         this.$confirm('您购物车里已经存在其他类型的商品，此操作会清空购物车，是否确认？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.chooeseGoods.cardList = []
-          this.chooeseGoods.outsourcing_goods = []
+          this.chooeseGoods.outOrdinaryGoods = []
+          this.chooeseGoods.outServiceGoods = []
           this.chooeseGoods.goods.push(good)
         }).catch(() => {
         })
       } else {
         this.chooeseGoods.cardList = []
-        this.chooeseGoods.outsourcing_goods = []
+        this.chooeseGoods.outOrdinaryGoods = []
+        this.chooeseGoods.outServiceGoods = []
         this.chooeseGoods.goods.push(good)
       }
       this.sumChooseGoodsMoney()
       this.isShowChooeseWaiterBlock()
       this.$forceUpdate()
     },
-    // 将外包的 服务或者普通商品加入购物车
-    addShoppingCarOut (good) {
+    // 将外包的 服务商品加入购物车
+    addShoppingCarOutServiceGoods (good) {
       // 外包服务商品
       if (good.is_service_goods === '1') {
         good.num = 1
@@ -982,17 +1034,41 @@ export default {
           name: '请选择服务员',
           type: ''
         }
-        for (let i = 0; i < this.chooeseGoods.outsourcing_goods.length; i++) {
-          if ((this.chooeseGoods.outsourcing_goods[i].id === good.id) && (this.chooeseGoods.outsourcing_goods[i].is_service_goods === good.is_service_goods)) {
+        for (let i = 0; i < this.chooeseGoods.outServiceGoods.length; i++) {
+          if ((this.chooeseGoods.outServiceGoods[i].id === good.id) && (this.chooeseGoods.outServiceGoods[i].is_service_goods === good.is_service_goods)) {
             this.$message.closeAll()
             this.$message({
-              message: '该服务商品已经存在购物车了,请在购物车里选择它后编辑它',
+              message: '该外包服务商品已经存在购物车了,请在购物车里选择它后编辑它',
               type: 'error'
             })
             return
           }
         }
       }
+      if (this.chooeseGoods.goods.length || this.chooeseGoods.cardList.length || this.chooeseGoods.outOrdinaryGoods.length) {
+        this.$confirm('您购物车里已经存在其他类型的商品，此操作会清空购物车，是否确认？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.chooeseGoods.cardList = []
+          this.chooeseGoods.goods = []
+          this.chooeseGoods.outOrdinaryGoods = []
+          this.chooeseGoods.outServiceGoods.push(good)
+        }).catch(() => {
+        })
+      } else {
+        this.chooeseGoods.cardList = []
+        this.chooeseGoods.goods = []
+        this.chooeseGoods.outOrdinaryGoods = []
+        this.chooeseGoods.outServiceGoods.push(good)
+      }
+      this.sumChooseGoodsMoney()
+      this.isShowChooeseWaiterBlock()
+      this.$forceUpdate()
+    },
+    // 将外包的 普通商品加入购物车
+    addShoppingCarOutOrdinaryGoods (good) {
       // 外包普通商品
       if (good.is_service_goods === '0') {
         // 检查库存是否为0
@@ -1010,18 +1086,18 @@ export default {
           })
           return
         }
-        for (let i = 0; i < this.chooeseGoods.outsourcing_goods.length; i++) {
-          if ((this.chooeseGoods.outsourcing_goods[i].id === good.id) && (good.is_service_goods === this.chooeseGoods.outsourcing_goods[i].is_service_goods)) {
+        for (let i = 0; i < this.chooeseGoods.outOrdinaryGoods.length; i++) {
+          if ((this.chooeseGoods.outOrdinaryGoods[i].id === good.id) && (good.is_service_goods === this.chooeseGoods.outOrdinaryGoods[i].is_service_goods)) {
             this.$message.closeAll()
             this.$message({
-              message: '该商品已经存在购物车了,请在购物车里选择它后编辑它',
+              message: '该外包商品已经存在购物车了,请在购物车里选择它后编辑它',
               type: 'error'
             })
             return
           }
         }
       }
-      if (this.chooeseGoods.goods.length || this.chooeseGoods.cardList.length) {
+      if (this.chooeseGoods.goods.length || this.chooeseGoods.cardList.length || this.chooeseGoods.outServiceGoods.length) {
         this.$confirm('您购物车里已经存在其他类型的商品，此操作会清空购物车，是否确认？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -1029,16 +1105,17 @@ export default {
         }).then(() => {
           this.chooeseGoods.cardList = []
           this.chooeseGoods.goods = []
-          this.chooeseGoods.outsourcing_goods.push(good)
+          this.chooeseGoods.outServiceGoods = []
+          this.chooeseGoods.outOrdinaryGoods.push(good)
         }).catch(() => {
         })
       } else {
         this.chooeseGoods.cardList = []
         this.chooeseGoods.goods = []
-        this.chooeseGoods.outsourcing_goods.push(good)
+        this.chooeseGoods.outServiceGoods = []
+        this.chooeseGoods.outOrdinaryGoods.push(good)
       }
       this.sumChooseGoodsMoney()
-      this.isShowChooeseWaiterBlock()
       this.$forceUpdate()
     },
 
@@ -1058,8 +1135,11 @@ export default {
       if (this.chooeseGoods.goods.length){
         this.clickDelShoppingCarGoodWho(this.chooeseGoods.goods)
       }
-      if (this.chooeseGoods.outsourcing_goods.length){
-        this.clickDelShoppingCarGoodWho(this.chooeseGoods.outsourcing_goods)
+      if (this.chooeseGoods.outServiceGoods.length){
+        this.clickDelShoppingCarGoodWho(this.chooeseGoods.outServiceGoods)
+      }
+      if (this.chooeseGoods.outOrdinaryGoods.length){
+        this.clickDelShoppingCarGoodWho(this.chooeseGoods.outOrdinaryGoods)
       }
       if (this.chooeseGoods.cardList.length){
         this.clickDelShoppingCarGoodWho(this.chooeseGoods.cardList)
@@ -1074,6 +1154,8 @@ export default {
         })
         if (key !== 'undefined') {
           arr.splice(key, 1)
+          this.sumChooseGoodsMoney()
+          this.isShowChooeseWaiterBlock()
         } else {
           this.$message.closeAll()
           this.$message({
@@ -1081,8 +1163,6 @@ export default {
             type: 'error'
           })
         }
-        this.isShowChooeseWaiterBlock()
-        this.sumChooseGoodsMoney()
         this.$forceUpdate()
     },
 
@@ -1097,16 +1177,10 @@ export default {
         })
         if (key !== 'undefined') {
           if (this.chooeseGoods.goods[key].is_service_goods === '1') {
-            this.chooeseGoods.goods[key].num++
+            this.clickAddNumShoppingCarGoodToAdd(this.chooeseGoods.goods, false)
           }
           if (this.chooeseGoods.goods[key].is_service_goods === '0') {
-            if (this.chooeseGoods.goods[key].num < this.chooeseGoods.goods[key].stock) { this.chooeseGoods.goods[key].num++ } else {
-              this.$message.closeAll()
-              this.$message({
-                message: '购买数量达到最大值',
-                type: 'error'
-              })
-            }
+            this.clickAddNumShoppingCarGoodToAdd(this.chooeseGoods.goods, true)
           }
         } else {
           this.$message.closeAll()
@@ -1116,50 +1190,48 @@ export default {
           })
         }
       }
-      if (this.chooeseGoods.outsourcing_goods.length) {
-        let key = 'undefined'
-        this.chooeseGoods.outsourcing_goods.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          if (this.chooeseGoods.outsourcing_goods[key].is_service_goods === '1') {
-            this.chooeseGoods.outsourcing_goods[key].num++
-          }
-          if (this.chooeseGoods.outsourcing_goods[key].is_service_goods === '0') {
-            if (this.chooeseGoods.outsourcing_goods[key].num < this.chooeseGoods.outsourcing_goods[key].stock) { this.chooeseGoods.outsourcing_goods[key].num++ } else {
-              this.$message.closeAll()
-              this.$message({
-                message: '购买数量达到最大值',
-                type: 'error'
-              })
-            }
-          }
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选择购物车里的商品',
-            type: 'error'
-          })
-        }
+      if (this.chooeseGoods.outServiceGoods.length) {
+        this.clickAddNumShoppingCarGoodToAdd(this.chooeseGoods.outServiceGoods, false)
+      }
+      if (this.chooeseGoods.outOrdinaryGoods.length) {
+        this.clickAddNumShoppingCarGoodToAdd(this.chooeseGoods.outOrdinaryGoods, true)
       }
       if (this.chooeseGoods.cardList.length) {
-        let key = 'undefined'
-        this.chooeseGoods.cardList.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          this.chooeseGoods.cardList[key].num++
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选择购物车里的商品',
-            type: 'error'
-          })
+        this.clickAddNumShoppingCarGoodToAdd(this.chooeseGoods.cardList, false)
+      }
+    },
+    /**
+     * 选择购物车里的商品，单击增加数量按钮，更改数量
+     * @param arr
+     * @param isCheckStock 是否检出库存
+     */
+    clickAddNumShoppingCarGoodToAdd (arr = [], isCheckStock = false){
+      let key = 'undefined'
+      arr.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
         }
+      })
+      if (key !== 'undefined') {
+        if (isCheckStock) {
+          if (arr[key].num < arr[key].stock) {
+            arr[key].num ++
+          } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '购买数量达到最大值',
+              type: 'error'
+            })
+          }
+        } else {
+          arr[key].num ++
+        }
+      } else {
+        this.$message.closeAll()
+        this.$message({
+          message: '请选择购物车里的商品',
+          type: 'error'
+        })
       }
       this.sumChooseGoodsMoney()
       this.$forceUpdate()
@@ -1170,8 +1242,11 @@ export default {
       if (this.chooeseGoods.goods.length){
         this.clickSubNumShoppingCarGoodWho(this.chooeseGoods.goods)
       }
-      if (this.chooeseGoods.outsourcing_goods.length){
-        this.clickSubNumShoppingCarGoodWho(this.chooeseGoods.outsourcing_goods)
+      if (this.chooeseGoods.outServiceGoods.length){
+        this.clickSubNumShoppingCarGoodWho(this.chooeseGoods.outServiceGoods)
+      }
+      if (this.chooeseGoods.outOrdinaryGoods.length){
+        this.clickSubNumShoppingCarGoodWho(this.chooeseGoods.outOrdinaryGoods)
       }
       if (this.chooeseGoods.cardList.length){
         this.clickSubNumShoppingCarGoodWho(this.chooeseGoods.cardList)
@@ -1185,16 +1260,17 @@ export default {
         }
       })
       if (key !== 'undefined') {
-        this.$message.closeAll()
         if (arr[key].num > 1) {
           arr[key].num--
         } else {
+          this.$message.closeAll()
           this.$message({
             message: '购买数量最少为1',
             type: 'error'
           })
         }
       } else {
+        this.$message.closeAll()
         this.$message({
           message: '请选择购物车里的商品',
           type: 'error'
@@ -1209,8 +1285,11 @@ export default {
       if (this.chooeseGoods.goods.length) {
         this.clickBtnXiugaishuliangShoppingCarGoodShowXiugaishuliangDialog(this.chooeseGoods.goods)
       }
-      if (this.chooeseGoods.outsourcing_goods.length) {
-        this.clickBtnXiugaishuliangShoppingCarGoodShowXiugaishuliangDialog(this.chooeseGoods.outsourcing_goods)
+      if (this.chooeseGoods.outServiceGoods.length) {
+        this.clickBtnXiugaishuliangShoppingCarGoodShowXiugaishuliangDialog(this.chooeseGoods.outServiceGoods)
+      }
+      if (this.chooeseGoods.outOrdinaryGoods.length) {
+        this.clickBtnXiugaishuliangShoppingCarGoodShowXiugaishuliangDialog(this.chooeseGoods.outOrdinaryGoods)
       }
       if (this.chooeseGoods.cardList.length) {
         this.clickBtnXiugaishuliangShoppingCarGoodShowXiugaishuliangDialog(this.chooeseGoods.cardList)
@@ -1257,81 +1336,59 @@ export default {
         })
         if (key !== 'undefined') {
           if (this.chooeseGoods.goods[key].is_service_goods === '1') {
-            if (this.xiugaishuliangDialog.inputValue >= 1) {
-                    this.chooeseGoods.goods[key].num = this.xiugaishuliangDialog.inputValue
-                    this.xiugaishuliangDialog.inputValue = ''
-                    this.xiugaishuliangDialog.isShow = false
-            } else {
-                    this.$message.closeAll()
-                    this.$message({
-                      message: '购买数量不能小于1',
-                      type: 'error'
-                    })
-            }
+            this.clickChangeNumShoppingCarGoodOkOk(this.chooeseGoods.goods, false)
           }
           if (this.chooeseGoods.goods[key].is_service_goods === '0') {
-            if ((this.xiugaishuliangDialog.inputValue <= this.chooeseGoods.goods[key].stock) && (this.xiugaishuliangDialog.inputValue >= 1)) {
-              this.chooeseGoods.goods[key].num = this.xiugaishuliangDialog.inputValue
-              this.xiugaishuliangDialog.inputValue = ''
-              this.xiugaishuliangDialog.isShow = false
-            } else {
-              this.$message.closeAll()
-              this.$message({
-                message: '购买数量达到最大值或者小于1',
-                type: 'error'
-              })
-            }
+            this.clickChangeNumShoppingCarGoodOkOk(this.chooeseGoods.goods, true)
           }
         }
       }
-      if (this.chooeseGoods.outsourcing_goods.length) {
-        let key = 'undefined'
-        this.chooeseGoods.outsourcing_goods.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          if (this.chooeseGoods.outsourcing_goods[key].is_service_goods === '1') {
-            if (this.xiugaishuliangDialog.inputValue >= 1) {
-                    this.chooeseGoods.outsourcing_goods[key].num = this.xiugaishuliangDialog.inputValue
-                    this.xiugaishuliangDialog.inputValue = ''
-                    this.xiugaishuliangDialog.isShow = false
-            } else {
-                    this.$message.closeAll()
-                    this.$message({
-                      message: '购买数量不能小于1',
-                      type: 'error'
-                    })
-            }
-          }
-          if (this.chooeseGoods.outsourcing_goods[key].is_service_goods === '0') {
-            if ((this.xiugaishuliangDialog.inputValue <= this.chooeseGoods.outsourcing_goods[key].stock) && (this.xiugaishuliangDialog.inputValue >= 1)) {
-              this.chooeseGoods.outsourcing_goods[key].num = this.xiugaishuliangDialog.inputValue
-              this.xiugaishuliangDialog.inputValue = ''
-              this.xiugaishuliangDialog.isShow = false
-            } else {
-              this.$message.closeAll()
-              this.$message({
-                message: '购买数量达到最大值或者小于1',
-                type: 'error'
-              })
-            }
-          }
-        }
+      if (this.chooeseGoods.outServiceGoods.length) {
+        this.clickChangeNumShoppingCarGoodOkOk(this.chooeseGoods.outServiceGoods, false)
+      }
+      if (this.chooeseGoods.outOrdinaryGoods.length) {
+        this.clickChangeNumShoppingCarGoodOkOk(this.chooeseGoods.outOrdinaryGoods, true)
       }
       if (this.chooeseGoods.cardList.length) {
-        let key = 'undefined'
-        this.chooeseGoods.cardList.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          if (parseFloat(this.xiugaishuliangDialog.inputValue) >= 1) {
-            this.chooeseGoods.cardList[key].num = this.xiugaishuliangDialog.inputValue
+        this.clickChangeNumShoppingCarGoodOkOk(this.chooeseGoods.cardList, false)
+      }
+    },
+    /**
+     * 从输入框中更改数量
+     * @param arr
+     * @param isCheckStock 是否检查库存
+     */
+    clickChangeNumShoppingCarGoodOkOk(arr = [], isCheckStock = false) {
+      let key = 'undefined'
+      arr.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
+        }
+      })
+      if (key !== 'undefined') {
+        if (isCheckStock) {
+          if ((parseInt(this.xiugaishuliangDialog.inputValue) <= parseInt(arr[key].stock)) && (parseInt(this.xiugaishuliangDialog.inputValue) >= 1)) {
+            arr[key].num = parseInt(this.xiugaishuliangDialog.inputValue)
             this.xiugaishuliangDialog.inputValue = ''
             this.xiugaishuliangDialog.isShow = false
+          } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '购买数量达到最大值或者小于1',
+              type: 'error'
+            })
+          }
+        } else {
+          if (parseInt(this.xiugaishuliangDialog.inputValue) >= 1) {
+            arr[key].num = parseInt(this.xiugaishuliangDialog.inputValue)
+            this.xiugaishuliangDialog.inputValue = ''
+            this.xiugaishuliangDialog.isShow = false
+          } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '购买数量不能小于1',
+              type: 'error'
+            })
           }
         }
       }
@@ -1344,8 +1401,11 @@ export default {
       if (this.chooeseGoods.goods.length) {
         this.clickBtnXiugaijiageShoppingCarGoodShowXiugaijiageDialog(this.chooeseGoods.goods)
       }
-      if (this.chooeseGoods.outsourcing_goods.length) {
-        this.clickBtnXiugaijiageShoppingCarGoodShowXiugaijiageDialog(this.chooeseGoods.outsourcing_goods)
+      if (this.chooeseGoods.outServiceGoods.length) {
+        this.clickBtnXiugaijiageShoppingCarGoodShowXiugaijiageDialog(this.chooeseGoods.outServiceGoods)
+      }
+      if (this.chooeseGoods.outOrdinaryGoods.length) {
+        this.clickBtnXiugaijiageShoppingCarGoodShowXiugaijiageDialog(this.chooeseGoods.outOrdinaryGoods)
       }
       if (this.chooeseGoods.cardList.length) {
         this.clickBtnXiugaijiageShoppingCarGoodShowXiugaijiageDialog(this.chooeseGoods.cardList)
@@ -1393,84 +1453,53 @@ export default {
         })
         if (key !== 'undefined') {
           if (this.chooeseGoods.goods[key].is_service_goods === '1'){
-                if (parseFloat(this.xiugaijiageDialog.inputValue) > 0) {
-                  this.chooeseGoods.goods[key].is_edit = 1
-                  this.chooeseGoods.goods[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
-                  this.xiugaijiageDialog.inputValue = ''
-                  this.xiugaijiageDialog.isShow = false
-                } else {
-                  this.$message.closeAll()
-                  this.$message({
-                    message: '修改的价格必须正数',
-                    type: 'error'
-                  })
-                }
+            this.clickChangejiageShoppingCarGoodOkOk(this.chooeseGoods.goods, false)
           }
           if (this.chooeseGoods.goods[key].is_service_goods === '0'){
-            if (parseFloat(this.xiugaijiageDialog.inputValue) >= parseFloat(this.chooeseGoods.goods[key].minimum_selling_price)) {
-              this.chooeseGoods.goods[key].is_edit = 1
-              this.chooeseGoods.goods[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
-              this.xiugaijiageDialog.inputValue = ''
-              this.xiugaijiageDialog.isShow = false
-            } else {
-              this.$message.closeAll()
-              this.$message({
-                message: '修改的价格不能低于设置的最低售价',
-                type: 'error'
-              })
-            }
+            this.clickChangejiageShoppingCarGoodOkOk(this.chooeseGoods.goods, true)
           }
         }
       }
-      if (this.chooeseGoods.outsourcing_goods.length) {
-        let key = 'undefined'
-        this.chooeseGoods.outsourcing_goods.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          if (this.chooeseGoods.outsourcing_goods[key].is_service_goods === '1'){
-                if (parseFloat(this.xiugaijiageDialog.inputValue) > 0) {
-                  this.chooeseGoods.outsourcing_goods[key].is_edit = 1
-                  this.chooeseGoods.outsourcing_goods[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
-                  this.xiugaijiageDialog.inputValue = ''
-                  this.xiugaijiageDialog.isShow = false
-                } else {
-                  this.$message.closeAll()
-                  this.$message({
-                    message: '修改的价格必须正数',
-                    type: 'error'
-                  })
-                }
-          }
-          if (this.chooeseGoods.outsourcing_goods[key].is_service_goods === '0'){
-            if (parseFloat(this.xiugaijiageDialog.inputValue) >= parseFloat(this.chooeseGoods.outsourcing_goods[key].minimum_selling_price)) {
-              this.chooeseGoods.outsourcing_goods[key].is_edit = 1
-              this.chooeseGoods.outsourcing_goods[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
-              this.xiugaijiageDialog.inputValue = ''
-              this.xiugaijiageDialog.isShow = false
-            } else {
-              this.$message.closeAll()
-              this.$message({
-                message: '修改的价格不能低于设置的最低售价',
-                type: 'error'
-              })
-            }
-          }
-        }
+      if (this.chooeseGoods.outServiceGoods.length) {
+        this.clickChangejiageShoppingCarGoodOkOk(this.chooeseGoods.outServiceGoods, false)
+      }
+      if (this.chooeseGoods.outOrdinaryGoods.length) {
+        this.clickChangejiageShoppingCarGoodOkOk(this.chooeseGoods.outOrdinaryGoods, true)
       }
       if (this.chooeseGoods.cardList.length) {
-        let key = 'undefined'
-        this.chooeseGoods.cardList.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
+        this.clickChangejiageShoppingCarGoodOkOk(this.chooeseGoods.cardList, true)
+      }
+    },
+    /**
+     * 选中购物车里的商品，单击修改价格按钮
+     * @param arr
+     * @param isCheckMinimumSellingPrice 是否检查修改的商品价格和设置的最低价不符合
+     */
+    clickChangejiageShoppingCarGoodOkOk (arr = [], isCheckMinimumSellingPrice = false) {
+      let key = 'undefined'
+      arr.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
+        }
+      })
+      if (key !== 'undefined') {
+        if (isCheckMinimumSellingPrice){
+          if (parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2) >= parseFloat(arr[key].minimum_selling_price).toFixed(2)) {
+            arr[key].is_edit = 1
+            arr[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
+            this.xiugaijiageDialog.inputValue = ''
+            this.xiugaijiageDialog.isShow = false
+          } else {
+            this.$message.closeAll()
+            this.$message({
+              message: '修改的价格不能低于设置的最低售价',
+              type: 'error'
+            })
           }
-        })
-        if (key !== 'undefined') {
-          if (parseFloat(this.xiugaijiageDialog.inputValue) > 0) {
-            this.chooeseGoods.cardList[key].is_edit = 1
-            this.chooeseGoods.cardList[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
+        } else {
+          if (parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2) > 0.0) {
+            arr[key].is_edit = 1
+            arr[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
             this.xiugaijiageDialog.inputValue = ''
             this.xiugaijiageDialog.isShow = false
           } else {
@@ -1690,13 +1719,23 @@ export default {
           }
         }
       }
-      if (this.chooeseGoods.outsourcing_goods.length) {
-        for (let i = 0; i < this.chooeseGoods.outsourcing_goods.length; i++) {
-          sumMoney += this.chooeseGoods.outsourcing_goods[i].num * this.chooeseGoods.outsourcing_goods[i].price
-          if (this.chooeseGoods.outsourcing_goods[i].is_edit === 1) {
-            modifyMoney += this.chooeseGoods.outsourcing_goods[i].num * this.chooeseGoods.outsourcing_goods[i].edit_price
+      if (this.chooeseGoods.outServiceGoods.length) {
+        for (let i = 0; i < this.chooeseGoods.outServiceGoods.length; i++) {
+          sumMoney += this.chooeseGoods.outServiceGoods[i].num * this.chooeseGoods.outServiceGoods[i].price
+          if (this.chooeseGoods.outServiceGoods[i].is_edit === 1) {
+            modifyMoney += this.chooeseGoods.outServiceGoods[i].num * this.chooeseGoods.outServiceGoods[i].edit_price
           } else {
-            modifyMoney += this.chooeseGoods.outsourcing_goods[i].num * this.chooeseGoods.outsourcing_goods[i].price
+            modifyMoney += this.chooeseGoods.outServiceGoods[i].num * this.chooeseGoods.outServiceGoods[i].price
+          }
+        }
+      }
+      if (this.chooeseGoods.outOrdinaryGoods.length) {
+        for (let i = 0; i < this.chooeseGoods.outOrdinaryGoods.length; i++) {
+          sumMoney += this.chooeseGoods.outOrdinaryGoods[i].num * this.chooeseGoods.outOrdinaryGoods[i].price
+          if (this.chooeseGoods.outOrdinaryGoods[i].is_edit === 1) {
+            modifyMoney += this.chooeseGoods.outOrdinaryGoods[i].num * this.chooeseGoods.outOrdinaryGoods[i].edit_price
+          } else {
+            modifyMoney += this.chooeseGoods.outOrdinaryGoods[i].num * this.chooeseGoods.outOrdinaryGoods[i].price
           }
         }
       }
@@ -2203,7 +2242,7 @@ export default {
 
     // 结账操作
     jiezhangDialogClickBtn () {
-      if (!(this.chooeseGoods.goods.length !== 0 || this.chooeseGoods.outsourcing_goods.length !== 0 || this.chooeseGoods.cardList.length !== 0)) {
+      if (!(this.chooeseGoods.goods.length !== 0 || this.chooeseGoods.outServiceGoods.length !== 0 || this.chooeseGoods.outOrdinaryGoods.length !== 0 || this.chooeseGoods.cardList.length !== 0)) {
         this.$message.closeAll()
         this.$message({
           message: '购物车为空',
@@ -2223,12 +2262,12 @@ export default {
           }
         }
       }
-      for (let i =0; i < this.chooeseGoods.outsourcing_goods.length; i++) {
-        if(this.chooeseGoods.outsourcing_goods[i].is_service_goods === '1'){
-          if(this.chooeseGoods.outsourcing_goods[i].nowWaiter.id === -1) {
+      for (let i =0; i < this.chooeseGoods.outServiceGoods.length; i++) {
+        if(this.chooeseGoods.outServiceGoods[i].is_service_goods === '1'){
+          if(this.chooeseGoods.outServiceGoods[i].nowWaiter.id === -1) {
             this.$message.closeAll()
             this.$message({
-              message: `请选择【${this.chooeseGoods.outsourcing_goods[i].title}】服务的服务人员`,
+              message: `请选择【${this.chooeseGoods.outServiceGoods[i].title}】服务的服务人员`,
               type: 'error'
             })
             return
@@ -2310,25 +2349,66 @@ export default {
     },
     // 结账时可选支付方式
     confirmPayWay () {
+      // 1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值
       if (this.jiezhangDialog.memberVip.id) { // 选择了会员
-        // if (this.chooeseGoods.fuwuGoods.length) {
-        //   this.jiezhangDialog.closedPayWay = [8]
-        // }
         if (this.chooeseGoods.goods.length) {
-          this.jiezhangDialog.closedPayWay = []
+          let onlyOrdinaryGoods = 0, onlyServiceGoods = 0
+          for (let i = 0; i < this.chooeseGoods.goods.length; i++){
+            if (this.chooeseGoods.goods[i].is_service_goods === '1') {
+              onlyServiceGoods ++
+            }
+            if (this.chooeseGoods.goods[i].is_service_goods === '0') {
+              onlyOrdinaryGoods ++
+            }
+          }
+          if (onlyOrdinaryGoods === this.chooeseGoods.goods.length){
+            this.jiezhangDialog.closedPayWay = [8]
+          }
+          if (onlyServiceGoods === this.chooeseGoods.goods.length){
+            this.jiezhangDialog.closedPayWay = [8]
+          }
+          if (onlyServiceGoods > 0 && onlyServiceGoods > 0){
+            this.jiezhangDialog.closedPayWay = [8]
+          }
+        }
+        if (this.chooeseGoods.outServiceGoods.length) {
+          this.jiezhangDialog.closedPayWay = [8]
+        }
+        if (this.chooeseGoods.outOrdinaryGoods.length) {
+          this.jiezhangDialog.closedPayWay = [8]
         }
         if (this.chooeseGoods.cardList.length) {
-          this.jiezhangDialog.closedPayWay = [7]
+          this.jiezhangDialog.closedPayWay = [8,7]
         }
-      } else { // 没有选择会员
-        // if (this.chooeseGoods.fuwuGoods.length) {
-        //   this.jiezhangDialog.closedPayWay = [3, 7, 8]
-        // }
+      } else {
         if (this.chooeseGoods.goods.length) {
-          this.jiezhangDialog.closedPayWay = [3, 7]
+          let onlyOrdinaryGoods = 0, onlyServiceGoods = 0
+          for (let i = 0; i < this.chooeseGoods.goods.length; i++){
+            if (this.chooeseGoods.goods[i].is_service_goods === '1') {
+              onlyServiceGoods ++
+            }
+            if (this.chooeseGoods.goods[i].is_service_goods === '0') {
+              onlyOrdinaryGoods ++
+            }
+          }
+          if (onlyOrdinaryGoods === this.chooeseGoods.goods.length){
+            this.jiezhangDialog.closedPayWay = [3]
+          }
+          if (onlyServiceGoods === this.chooeseGoods.goods.length){
+            this.jiezhangDialog.closedPayWay = [3]
+          }
+          if (onlyServiceGoods > 0 && onlyServiceGoods > 0){
+            this.jiezhangDialog.closedPayWay = [3]
+          }
+        }
+        if (this.chooeseGoods.outServiceGoods.length) {
+          this.jiezhangDialog.closedPayWay = [3]
+        }
+        if (this.chooeseGoods.outOrdinaryGoods.length) {
+          this.jiezhangDialog.closedPayWay = [3]
         }
         if (this.chooeseGoods.cardList.length) {
-          this.jiezhangDialog.closedPayWay = [3, 7]
+          this.jiezhangDialog.closedPayWay = [3,7]
         }
       }
     },
@@ -2340,10 +2420,8 @@ export default {
           flag = true
         }
       }
-      for (let i =0; i < this.chooeseGoods.outsourcing_goods.length; i++) {
-        if(this.chooeseGoods.outsourcing_goods[i].is_service_goods === '0'){
-          flag = true
-        }
+      if (this.chooeseGoods.outOrdinaryGoods.length) {
+        flag = true
       }
       this.jiezhangDialog.isShowChooeseWaiterBlock = flag
       return flag
