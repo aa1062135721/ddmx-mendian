@@ -27,8 +27,8 @@
               <el-table  :data="stockCheck.responseData.data" border style="width: 100%;" height="620">
                 <el-table-column prop="title" label="商品名称"></el-table-column>
                 <el-table-column prop="bar_code" label="条形码"></el-table-column>
-                <el-table-column prop="type_id" label="一级分类"></el-table-column>
-                <el-table-column prop="type" label="二级分类"></el-table-column>
+                <el-table-column prop="type_ids" label="一级分类"></el-table-column>
+                <el-table-column prop="types" label="二级分类"></el-table-column>
                 <el-table-column prop="stock" label="剩余库存"></el-table-column>
               </el-table>
             </div>
