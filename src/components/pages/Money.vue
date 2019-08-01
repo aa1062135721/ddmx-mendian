@@ -50,7 +50,7 @@
                 </el-input>
               </div>
               <div class="pay-goods-box">
-                  <ul v-if="chooeseGoods.goods.length" v-for="(good, key) in chooeseGoods.goods" :key="key" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
+                <ul v-if="chooeseGoods.goods.length" v-for="(good, key) in chooeseGoods.goods" :key="key" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(chooeseGoods.goods,key)">
                     <li class="title clear-both">
                       <span class="float-left">{{good.title}}</span>
                       <span class="float-right">X {{good.num}}</span>
@@ -82,7 +82,7 @@
                       </span>
                     </li>
                   </ul>
-                <ul v-if="chooeseGoods.outsourcing_goods.length" v-for="(good, key) in chooeseGoods.outsourcing_goods" :key="key" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
+                <ul v-if="chooeseGoods.outsourcing_goods.length" v-for="(good, key) in chooeseGoods.outsourcing_goods" :key="key" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(chooeseGoods.outsourcing_goods,key)">
                   <li class="title clear-both">
                     <span class="float-left">{{good.title}}</span>
                     <span class="float-right">X {{good.num}}</span>
@@ -114,7 +114,7 @@
                       </span>
                   </li>
                 </ul>
-                <ul v-if="chooeseGoods.cardList.length" v-for="(good, key) in chooeseGoods.cardList" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(key)">
+                <ul v-if="chooeseGoods.cardList.length" v-for="(good, key) in chooeseGoods.cardList" :key="good.id" :class="{'active':good.is_checked}" @click="clickShoppingCarGood(chooeseGoods.cardList,key)">
                   <li class="title clear-both">
                     <span class="float-left">{{good.card_name}}</span>
                     <span class="float-right">X {{good.num}}</span>
@@ -1043,85 +1043,49 @@ export default {
     },
 
     // 购物车里的商品被单击后处于选中状态，然后进行修改操作，比如加数量、减数量、修改价格、删除
-    clickShoppingCarGood (key) {
-      if (this.chooeseGoods.goods.length) {
-        this.chooeseGoods.goods.map((good, index) => {
-          good.is_checked = false
-        })
-        this.chooeseGoods.goods[key].is_checked = true
+    clickShoppingCarGood (arr = [], key = 0) {
+      arr.map((good) => {
+        good.is_checked = false
+      })
+      if (arr.length){
+        arr[key].is_checked = true
+        this.$forceUpdate()
       }
-      if (this.chooeseGoods.outsourcing_goods.length) {
-        this.chooeseGoods.outsourcing_goods.map((good, index) => {
-          good.is_checked = false
-        })
-        this.chooeseGoods.outsourcing_goods[key].is_checked = true
-      }
-      if (this.chooeseGoods.cardList.length) {
-        this.chooeseGoods.cardList.map((good, index) => {
-          good.is_checked = false
-        })
-        this.chooeseGoods.cardList[key].is_checked = true
-      }
-      this.$forceUpdate()
     },
+
     // 购物车里的商品被删除
     clickDelShoppingCarGood () {
-      if (this.chooeseGoods.goods.length) {
-        let key = 'undefined'
-        this.chooeseGoods.goods.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          this.chooeseGoods.goods.splice(key, 1)
-          this.isShowChooeseWaiterBlock()
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选中要删除的商品',
-            type: 'error'
-          })
-        }
+      if (this.chooeseGoods.goods.length){
+        this.clickDelShoppingCarGoodWho(this.chooeseGoods.goods)
       }
-      if (this.chooeseGoods.outsourcing_goods.length) {
-        let key = 'undefined'
-        this.chooeseGoods.outsourcing_goods.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          this.chooeseGoods.outsourcing_goods.splice(key, 1)
-          this.isShowChooeseWaiterBlock()
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选中要删除的商品',
-            type: 'error'
-          })
-        }
+      if (this.chooeseGoods.outsourcing_goods.length){
+        this.clickDelShoppingCarGoodWho(this.chooeseGoods.outsourcing_goods)
       }
-      if (this.chooeseGoods.cardList.length) {
-        let key = 'undefined'
-        this.chooeseGoods.cardList.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          this.chooeseGoods.cardList.splice(key, 1)
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选中要删除的商品',
-            type: 'error'
-          })
-        }
+      if (this.chooeseGoods.cardList.length){
+        this.clickDelShoppingCarGoodWho(this.chooeseGoods.cardList)
       }
-      this.sumChooseGoodsMoney()
-      this.$forceUpdate()
     },
+    clickDelShoppingCarGoodWho(arr = []){
+        let key = 'undefined'
+        arr.map((good, index) => {
+          if (good.is_checked === true) {
+            key = index
+          }
+        })
+        if (key !== 'undefined') {
+          arr.splice(key, 1)
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选中要删除的商品',
+            type: 'error'
+          })
+        }
+        this.isShowChooeseWaiterBlock()
+        this.sumChooseGoodsMoney()
+        this.$forceUpdate()
+    },
+
     // 购物车里的商品增加数量
     clickAddNumShoppingCarGood () {
       if (this.chooeseGoods.goods.length) {
@@ -1200,141 +1164,77 @@ export default {
       this.sumChooseGoodsMoney()
       this.$forceUpdate()
     },
+
     // 购物车里的商品减少数量
     clickSubNumShoppingCarGood () {
-      if (this.chooeseGoods.goods.length) {
-        let key = 'undefined'
-        this.chooeseGoods.goods.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          if (this.chooeseGoods.goods[key].num > 1) {
-            this.chooeseGoods.goods[key].num--
-          } else {
-            this.$message.closeAll()
-            this.$message({
-              message: '购买数量最少为1',
-              type: 'error'
-            })
-          }
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选择购物车里的商品',
-            type: 'error'
-          })
-        }
+      if (this.chooeseGoods.goods.length){
+        this.clickSubNumShoppingCarGoodWho(this.chooeseGoods.goods)
       }
-      if (this.chooeseGoods.outsourcing_goods.length) {
-        let key = 'undefined'
-        this.chooeseGoods.outsourcing_goods.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          if (this.chooeseGoods.outsourcing_goods[key].num > 1) {
-            this.chooeseGoods.outsourcing_goods[key].num--
-          } else {
-            this.$message.closeAll()
-            this.$message({
-              message: '购买数量最少为1',
-              type: 'error'
-            })
-          }
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选择购物车里的商品',
-            type: 'error'
-          })
-        }
+      if (this.chooeseGoods.outsourcing_goods.length){
+        this.clickSubNumShoppingCarGoodWho(this.chooeseGoods.outsourcing_goods)
       }
-      if (this.chooeseGoods.cardList.length) {
-        let key = 'undefined'
-        this.chooeseGoods.cardList.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          if (this.chooeseGoods.cardList[key].num > 1) { this.chooeseGoods.cardList[key].num-- } else {
-            this.$message.closeAll()
-            this.$message({
-              message: '购买数量最少为1',
-              type: 'error'
-            })
-          }
+      if (this.chooeseGoods.cardList.length){
+        this.clickSubNumShoppingCarGoodWho(this.chooeseGoods.cardList)
+      }
+    },
+    clickSubNumShoppingCarGoodWho (arr = []) {
+      let key = 'undefined'
+      arr.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
+        }
+      })
+      if (key !== 'undefined') {
+        this.$message.closeAll()
+        if (arr[key].num > 1) {
+          arr[key].num--
         } else {
-          this.$message.closeAll()
           this.$message({
-            message: '请选择购物车里的商品',
+            message: '购买数量最少为1',
             type: 'error'
           })
         }
+      } else {
+        this.$message({
+          message: '请选择购物车里的商品',
+          type: 'error'
+        })
       }
       this.sumChooseGoodsMoney()
       this.$forceUpdate()
     },
+
     // 选中购物车里的商品，后点修改数量
     clickBtnXiugaishuliangShoppingCarGood () {
       if (this.chooeseGoods.goods.length) {
-        let key = 'undefined'
-        this.chooeseGoods.goods.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          this.xiugaishuliangDialog.inputValue = this.chooeseGoods.goods[key].num
-          this.xiugaishuliangDialog.isShow = true
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选中购物车里的商品',
-            type: 'error'
-          })
-        }
+        this.clickBtnXiugaishuliangShoppingCarGoodShowXiugaishuliangDialog(this.chooeseGoods.goods)
       }
       if (this.chooeseGoods.outsourcing_goods.length) {
-        let key = 'undefined'
-        this.chooeseGoods.outsourcing_goods.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          this.xiugaishuliangDialog.inputValue = this.chooeseGoods.outsourcing_goods[key].num
-          this.xiugaishuliangDialog.isShow = true
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选中购物车里的商品',
-            type: 'error'
-          })
-        }
+        this.clickBtnXiugaishuliangShoppingCarGoodShowXiugaishuliangDialog(this.chooeseGoods.outsourcing_goods)
       }
       if (this.chooeseGoods.cardList.length) {
-        let key = 'undefined'
-        this.chooeseGoods.cardList.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          this.xiugaishuliangDialog.inputValue = this.chooeseGoods.cardList[key].num
-          this.xiugaishuliangDialog.isShow = true
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选中购物车里的商品',
-            type: 'error'
-          })
-        }
+        this.clickBtnXiugaishuliangShoppingCarGoodShowXiugaishuliangDialog(this.chooeseGoods.cardList)
       }
     },
+    clickBtnXiugaishuliangShoppingCarGoodShowXiugaishuliangDialog (arr = []){
+      let key = 'undefined'
+      arr.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
+        }
+      })
+      if (key !== 'undefined') {
+        this.xiugaishuliangDialog.inputValue = arr[key].num
+        this.xiugaishuliangDialog.isShow = true
+      } else {
+        this.$message.closeAll()
+        this.$message({
+          message: '请选中购物车里的商品',
+          type: 'error'
+        })
+      }
+    },
+
     inputNumShoppingCarGood(){
       if (isNaN(this.xiugaishuliangDialog.inputValue)||this.xiugaishuliangDialog.inputValue<=0||!(/^\d+$/.test(this.xiugaishuliangDialog.inputValue))) {
         this.xiugaishuliangDialog.inputValue = this.xiugaishuliangDialog.inputValue.replace(/\D+/g,'')
@@ -1442,72 +1342,38 @@ export default {
     // 选中购物车里的商品，后点击改价按钮  显示弹窗
     clickBtnXiugaijiageShoppingCarGood () {
       if (this.chooeseGoods.goods.length) {
-        let key = 'undefined'
-        this.chooeseGoods.goods.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          if (this.chooeseGoods.goods[key].is_edit === 1) {
-            this.xiugaijiageDialog.inputValue = this.chooeseGoods.goods[key].edit_price
-          } else {
-            this.xiugaijiageDialog.inputValue = this.chooeseGoods.goods[key].price
-          }
-          this.xiugaijiageDialog.isShow = true
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选中购物车里的商品',
-            type: 'error'
-          })
-        }
+        this.clickBtnXiugaijiageShoppingCarGoodShowXiugaijiageDialog(this.chooeseGoods.goods)
       }
       if (this.chooeseGoods.outsourcing_goods.length) {
-        let key = 'undefined'
-        this.chooeseGoods.outsourcing_goods.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          if (this.chooeseGoods.outsourcing_goods[key].is_edit === 1) {
-            this.xiugaijiageDialog.inputValue = this.chooeseGoods.outsourcing_goods[key].edit_price
-          } else {
-            this.xiugaijiageDialog.inputValue = this.chooeseGoods.outsourcing_goods[key].price
-          }
-          this.xiugaijiageDialog.isShow = true
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选中购物车里的商品',
-            type: 'error'
-          })
-        }
+        this.clickBtnXiugaijiageShoppingCarGoodShowXiugaijiageDialog(this.chooeseGoods.outsourcing_goods)
       }
       if (this.chooeseGoods.cardList.length) {
-        let key = 'undefined'
-        this.chooeseGoods.cardList.map((good, index) => {
-          if (good.is_checked === true) {
-            key = index
-          }
-        })
-        if (key !== 'undefined') {
-          if (this.chooeseGoods.cardList[key].is_edit === 1) {
-            this.xiugaijiageDialog.inputValue = this.chooeseGoods.cardList[key].edit_price
-          } else {
-            this.xiugaijiageDialog.inputValue = this.chooeseGoods.cardList[key].price
-          }
-          this.xiugaijiageDialog.isShow = true
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请选中购物车里的商品',
-            type: 'error'
-          })
-        }
+        this.clickBtnXiugaijiageShoppingCarGoodShowXiugaijiageDialog(this.chooeseGoods.cardList)
       }
     },
+    clickBtnXiugaijiageShoppingCarGoodShowXiugaijiageDialog (arr = []){
+      let key = 'undefined'
+      arr.map((good, index) => {
+        if (good.is_checked === true) {
+          key = index
+        }
+      })
+      if (key !== 'undefined') {
+        if (arr[key].is_edit === 1) {
+          this.xiugaijiageDialog.inputValue = arr[key].edit_price
+        } else {
+          this.xiugaijiageDialog.inputValue = arr[key].price
+        }
+        this.xiugaijiageDialog.isShow = true
+      } else {
+        this.$message.closeAll()
+        this.$message({
+          message: '请选中购物车里的商品',
+          type: 'error'
+        })
+      }
+    },
+
     clickChangejiageShoppingCarGood (code) {
       if (code !== '.') { this.xiugaijiageDialog.inputValue = String(this.xiugaijiageDialog.inputValue) + code } else {
         if (this.xiugaijiageDialog.inputValue.indexOf(code) === -1) {
