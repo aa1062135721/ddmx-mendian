@@ -501,10 +501,11 @@
               <el-table-column prop="status_name" label="状态"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button v-if="scope.row.type === '0'" type="text" size="mini" @click="huiyuanDialogActiveServiceCard(scope.row)">激活</el-button>
-                  <el-button v-if="scope.row.type === '1'" type="text" size="mini" @click="huiyuanDialogUseServiceCardList(scope.row)">耗卡</el-button>
-                  <el-button v-if="scope.row.type === '2'" type="text" size="mini" @click="huiyuanDialogServiceCardUseRecords(scope.row)">使用记录</el-button>
-                  <el-button v-if="scope.row.type === '4'" type="text" size="mini" @click="huiyuanDialogServiceCardReturnCardsDetails(scope.row)">退卡详情</el-button>
+                  <!-- 状态 0未激活  1待使用 2为已使用 3为已过期 4 已退卡-->
+                  <el-button v-if="scope.row.status === 0" type="text" size="mini" @click="huiyuanDialogActiveServiceCard(scope.row.id)">激活</el-button>
+                  <el-button v-if="scope.row.status === 1" type="text" size="mini" @click="huiyuanDialogUseServiceCardList(scope.row)">耗卡</el-button>
+                  <el-button v-if="scope.row.status === 2" type="text" size="mini" @click="huiyuanDialogServiceCardUseRecords(scope.row)">使用记录</el-button>
+                  <el-button v-if="scope.row.status === 4" type="text" size="mini" @click="huiyuanDialogServiceCardReturnCardsDetails(scope.row)">退卡详情</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -570,6 +571,23 @@
             </el-table-column>
           </el-table>
         </div>
+      </el-dialog>
+      <!--会员查询-服务卡列表-激活服务卡-->
+      <el-dialog title="是否激活服务卡" :visible.sync="huiyuanDialog.activeServiceCardDialog.isShow" width="500px">
+        <el-form>
+          <el-form-item label="请选择服务人员">
+            <el-select v-model="huiyuanDialog.activeServiceCardDialog.waiter_id" placeholder="请选择服务人员" @focus="getWaiterList()">
+              <el-option v-for="item in waiterList" :label="item.name" :key="item.id" :value="item.id">
+                <span style="float: left" class="font-blue">{{ item.name }}</span>
+                <span style="float: right;color: #ccc;" >({{ item.type }})</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="huiyuanDialog.activeServiceCardDialog.isShow = false">取 消</el-button>
+          <el-button type="primary" @click="huiyuanDialogActiveServiceCardToGo">确 定</el-button>
+        </span>
       </el-dialog>
       <!-- 会员查询-使用记录  -->
       <el-dialog title="使用记录" :visible.sync="huiyuanDialog.shiyongjiluDialog.isShow" width="648px" :center="true">
@@ -787,6 +805,12 @@ export default {
             {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了', reg: '无'},
             {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了', reg: '无'}
           ]
+        },
+        //激活服务卡弹框
+        activeServiceCardDialog: {
+          card_id: '',
+          isShow: false,
+          waiter_id: ''
         }
       },
       // 单击充值按钮后的弹窗所需要的数据
@@ -2167,16 +2191,31 @@ export default {
         })
       }
     },
-    huiyuanDialogActiveServiceCard (card) {
+    // 激活服务卡
+    huiyuanDialogActiveServiceCard (card_id) {
+      this.huiyuanDialog.activeServiceCardDialog.card_id = card_id
+      this.huiyuanDialog.activeServiceCardDialog.isShow = true
+    },
+    //激活服务卡
+    huiyuanDialogActiveServiceCardToGo(){
       let requestData = {
-        card_id: card.id,
-        waiter: 1
+        card_id: this.huiyuanDialog.activeServiceCardDialog.card_id,
+        waiter: this.huiyuanDialog.activeServiceCardDialog.waiter_id
       }
-      postMemberServiceCardsActive(requestData).then(res => {
-
-      }).catch(err => {
-        console.log(err)
-      })
+      if (requestData.waiter){
+        postMemberServiceCardsActive(requestData).then(res => {
+          this.huiyuanDialog.activeServiceCardDialog.card_id = ''
+          this.huiyuanDialog.activeServiceCardDialog.waiter_id = ''
+          this.huiyuanDialog.activeServiceCardDialog.isShow = false
+        })
+      } else {
+        this.$message.closeAll()
+        this.$message({
+          message: '请选择服务人员',
+          type: 'error'
+        })
+        return
+      }
     },
     // 耗卡列表
     huiyuanDialogUseServiceCardList (card) {
