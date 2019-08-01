@@ -182,9 +182,26 @@
                       </el-dropdown>
                     </span>
                   </li>
+                  <li v-if="chooeseGoods.cardList.length">
+                    <span class="float-left">服务人员</span>
+                    <span class="float-right select">
+                      <el-dropdown class="user-name" trigger="click" @command="clickWaiterServiceCard">
+                        <span class="el-dropdown-link"  @click="getWaiterList()">
+                          <span v-if="jiezhangDialog.serviceCardNowWaiter.id != -1"><span class="font-blue">{{jiezhangDialog.serviceCardNowWaiter.name}}</span> [{{jiezhangDialog.serviceCardNowWaiter.type}}]  <i class="el-icon-arrow-down"></i></span>
+                          <span v-else> <span class="font-blue">请选择服务人员</span> <i class="el-icon-arrow-down"></i></span>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                          <el-dropdown-item v-for="(item) in waiterList" :key="item.id" :command="item">
+                            <span class="font-blue">{{item.name}}</span>
+                            [{{item.type}}]
+                          </el-dropdown-item>
+                        </el-dropdown-menu>
+                      </el-dropdown>
+                    </span>
+                  </li>
                   <li>
                     <span class="float-left">会员&nbsp;<span class="font-blue" @click="xuanzehuiyuanDialog.isShow = true">{{jiezhangDialog.memberVip.nickname ? jiezhangDialog.memberVip.nickname : '未选择'}}</span></span>
-                    <span class="float-right">余额￥{{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : 0}}</span>
+                    <span class="float-right">余额￥{{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : '0.00'}}</span>
                   </li>
                   <li>
                     <span class="float-left">合计</span>
@@ -407,17 +424,17 @@
         <div class="clear-both div">
             <div class="float-left left">
               <div class="search">
-                <el-input @keyup.native="clickChoosesMemberByKeyboard('ok')" v-model="xuanzehuiyuanDialog.mobile" placeholder="请输入会员手机号" maxlength="11"></el-input>
+                <el-input @keyup.native="searchMember()" @keyup.enter.native="searchMember()" v-model="xuanzehuiyuanDialog.mobile" placeholder="请输入会员手机号" maxlength="11"></el-input>
               </div>
               <div class="content">
                 <ul>
-                  <li><span class="float-left">会员</span><span class="float-right font-blue">{{jiezhangDialog.memberVip.nickname}}</span></li>
-                  <li><span class="float-left">余额</span><span class="float-right font-red">{{jiezhangDialog.memberVip.money ? `￥`+jiezhangDialog.memberVip.money:''}}</span></li>
-                  <li><span class="float-left">会员等级</span><span class="float-right">{{jiezhangDialog.memberVip.level_name}}</span></li>
+                  <li><span class="float-left">会员</span><span class="float-right font-blue">{{xuanzehuiyuanDialog.memberVip.nickname}}</span></li>
+                  <li><span class="float-left">余额</span><span class="float-right font-red">{{xuanzehuiyuanDialog.memberVip.money ? `￥`+xuanzehuiyuanDialog.memberVip.money:''}}</span></li>
+                  <li><span class="float-left">会员等级</span><span class="float-right">{{xuanzehuiyuanDialog.memberVip.level_name}}</span></li>
                   <li>
                     <span class="float-left">服务卡</span>
-                    <span class="float-right" v-if="jiezhangDialog.memberVip.service_card || jiezhangDialog.memberVip.service_card === 0">
-                      <el-badge :value="jiezhangDialog.memberVip.service_card">
+                    <span class="float-right" v-if="xuanzehuiyuanDialog.memberVip.service_card || xuanzehuiyuanDialog.memberVip.service_card === 0">
+                      <el-badge :value="xuanzehuiyuanDialog.memberVip.service_card">
                         <el-button size="mini">查看</el-button>
                       </el-badge>
                     </span>
@@ -808,7 +825,19 @@ export default {
       // 选择会员弹框是否显示
       xuanzehuiyuanDialog: {
         isShow: false,
-        mobile: ''
+        mobile: '',
+        memberVip: {
+          id: '', // 会员id
+          mobile: '', // 会员电话
+          shop_code: '', // 所属门店的门店编号
+          level_id: '', // 会员等级id
+          nickname: '', // 姓名
+          level_name: '', // 会员等级名称
+          money: '', // 余额
+          amount: '', // 累积充值
+          regtime: '', // 加入时间
+          service_card:''
+        },
       },
 
       // 购卡弹窗
@@ -845,8 +874,14 @@ export default {
         },
         // 当购物车里有 普通商品，这时候需要选择普通商品的服务人员
         isShowChooeseWaiterBlock: false,
-        // 当前选中的服务人员
+        // 当前选中的服务人员 当购物车里有 普通商品，这时候需要选择普通商品的服务人员
         nowWaiter: {
+          id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
+          name: '请选择服务员', // 服务员名称
+          type: '' // 服务类型
+        },
+        //当购物车里是服务卡的时候，也需要选中服务人员
+        serviceCardNowWaiter: {
           id: -1, // 服务员id  当服务员的id为0师表示为当前登录的店长
           name: '请选择服务员', // 服务员名称
           type: '' // 服务类型
@@ -861,7 +896,8 @@ export default {
           isShow: false,
           content: '结账成功',
           seconds: 1500// 多少毫秒之后自动关闭
-        }
+        },
+        //
       }
     }
   },
@@ -1517,6 +1553,7 @@ export default {
 
     // 获取商品列表
     getGoods () {
+      this.requestFuwuGoodData.who = -1
       let data = {}
       data.page = `${this.requestGoodData.page},${this.requestGoodData.num}`
       data.type = this.requestGoodData.who
@@ -1548,8 +1585,6 @@ export default {
             this.nextPageBtnDisabled = false
           }
         }
-      }).catch((err) => {
-        console.log(err, '商品获取失败')
       })
     },
     // 获取服务商品
@@ -1619,6 +1654,10 @@ export default {
     clickWaiter (e) {
       this.jiezhangDialog.nowWaiter = e
     },
+    // 购物车里只有服务卡商品，选择服务人员
+    clickWaiterServiceCard (e) {
+      this.jiezhangDialog.serviceCardNowWaiter = e
+    },
     // 按搜索商品(商品标题和条形码)
     getGoodByCondition (str) {
       if (/^[0-9]+$/.test(this.requestGoodData.title)) {
@@ -1648,18 +1687,19 @@ export default {
             })
             return
           }
-          if (good.is_outsourcing_goods === '1') { //外包普通商品或外包服务
+          //外包普通商品
+          if (good.is_outsourcing_goods === '1') {
             let flag = true
-            for (let i = 0; i < this.chooeseGoods.outsourcing_goods.length; i++) {
-              if(this.chooeseGoods.outsourcing_goods[i].id === good.id && this.chooeseGoods.outsourcing_goods[i].is_service_goods === good.is_service_goods){
+            for (let i = 0; i < this.chooeseGoods.outOrdinaryGoods.length; i++) {
+              if(this.chooeseGoods.outOrdinaryGoods[i].id === good.id && this.chooeseGoods.outOrdinaryGoods[i].is_service_goods === good.is_service_goods){
                 flag = false
-                if (this.chooeseGoods.outsourcing_goods[i].num + 1 <= good.stock) {
+                if (parseInt(this.chooeseGoods.outOrdinaryGoods[i].num) + 1 <= parseInt(good.stock)) {
                   this.$message.closeAll()
                   this.$message({
                     message: '该商品已经存在购物车了，购买数量加1',
                     type: 'error'
                   })
-                  this.chooeseGoods.outsourcing_goods[i].num++
+                  this.chooeseGoods.outOrdinaryGoods[i].num++
                 } else {
                   this.$message.closeAll()
                   this.$message({
@@ -1673,7 +1713,8 @@ export default {
               this.checkGoodsTypeAndAddShoppingCar(good)
             }
           }
-          if (good.is_outsourcing_goods === '0') { //非外包普通商品或外包服务
+          //非外包普通商品
+          if (good.is_outsourcing_goods === '0') {
             let flag = true
             for (let i = 0; i < this.chooeseGoods.goods.length; i++) {
               if(this.chooeseGoods.goods[i].id === good.id && this.chooeseGoods.goods[i].is_service_goods === good.is_service_goods){
@@ -1699,6 +1740,7 @@ export default {
             }
           }
           this.chooeseGoods.cardList = []
+          this.chooeseGoods.outServiceGoods = []
           this.isShowChooeseWaiterBlock()
           this.sumChooseGoodsMoney()
         }
@@ -1753,6 +1795,34 @@ export default {
     },
 
     // 选择会员
+    searchMember(){
+      if (this.xuanzehuiyuanDialog.mobile.length === 11) {
+        if (/^[1][3,4,5,7,8][0-9]{9}$/.test(this.xuanzehuiyuanDialog.mobile)) {
+          let requestData = {mobile: this.xuanzehuiyuanDialog.mobile}
+          postSearchVip(requestData).then(res => {
+            if (res.data.id) {
+              this.xuanzehuiyuanDialog.memberVip = res.data
+            } else {
+              this.$message.closeAll()
+              this.$message({
+                message: '没有查询到该会员的信息',
+                type: 'error'
+              })
+              this.xuanzehuiyuanDialog.memberVip = {}
+            }
+          }).catch(err => {
+            console.log(err)
+          })
+        } else {
+          this.$message.closeAll()
+          this.$message({
+            message: '请输入正确的手机号',
+            type: 'error'
+          })
+          this.xuanzehuiyuanDialog.memberVip = {}
+        }
+      }
+    },
     clickChoosesMemberByKeyboard (code) {
       if (code === 'ok') {
         if (this.xuanzehuiyuanDialog.mobile.length === 11) {
@@ -1769,6 +1839,7 @@ export default {
                   message: '没有查询到该会员的信息',
                   type: 'error'
                 })
+                this.xuanzehuiyuanDialog.memberVip = {}
                 this.jiezhangDialog.memberVip = {}
               }
             }).catch(err => {
@@ -1780,9 +1851,11 @@ export default {
               message: '请输入正确的手机号',
               type: 'error'
             })
+            this.xuanzehuiyuanDialog.memberVip = {}
             this.jiezhangDialog.memberVip = {}
           }
         } else {
+          this.xuanzehuiyuanDialog.memberVip = {}
           this.jiezhangDialog.memberVip = {}
         }
       } else {
@@ -1816,9 +1889,28 @@ export default {
           }
         })
       }
-      //购物车里有服务卡商品
-      if (this.chooeseGoods.cardList.length) {
-
+      //购物车里有服务商品
+      if (this.chooeseGoods.outServiceGoods.length){
+        let requestData = {
+          member_id : this.jiezhangDialog.memberVip.id,
+          ids:[]
+        }
+        for (let i = 0; i < this.chooeseGoods.outServiceGoods.length; i++){
+          if (this.chooeseGoods.outServiceGoods[i].is_service_goods === '1') {
+            requestData.ids.push(this.chooeseGoods.outServiceGoods[i].id)
+          }
+        }
+        postServiceItemList(requestData).then(res => {
+          if (res.data.length){
+            for(let i = 0;i<res.data.length;i++){
+              for (let j = 0; j < this.chooeseGoods.outServiceGoods.length; j++){
+                if((this.chooeseGoods.outServiceGoods[j].id === res.data[i].id) && (this.chooeseGoods.outServiceGoods[j].is_service_goods === '1')) {
+                  this.chooeseGoods.outServiceGoods[j].price = res.data[i].price
+                }
+              }
+            }
+          }
+        })
       }
     },
 
@@ -2134,8 +2226,16 @@ export default {
 
     // 购卡弹框
     goukaDialogShow () {
-      this.goukaDialog.isShow = true
-      this.goukaDialogSearch()
+      if (this.jiezhangDialog.memberVip.id) {
+        this.goukaDialog.isShow = true
+        this.goukaDialogSearch()
+      } else {
+        this.$message.closeAll()
+        this.$message({
+          message: '请先选择会员后在购卡',
+          type: 'error'
+        })
+      }
     },
     goukaDialogChoosesCardType (type) {
       if (type !== 0) { this.goukaDialog.title = '' }
@@ -2201,19 +2301,21 @@ export default {
         })
       } else {
         // 添加服务卡进购物车
-        if (this.chooeseGoods.goods.length) {
+        if (this.chooeseGoods.goods.length || this.chooeseGoods.outServiceGoods.length || this.chooeseGoods.outOrdinaryGoods.length) {
           this.$confirm('您确认清空购物车中的商品，重新添加另一种商品吗？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
             this.chooeseGoods.cardList = []
-            this.chooeseGoods.fuwuGoods = []
+            this.chooeseGoods.outServiceGoods = []
+            this.chooeseGoods.outOrdinaryGoods = []
             this.chooeseGoods.goods = []
             let addTopCarCard = this.goukaDialog.cardsList[key]
             addTopCarCard.num = 1
             addTopCarCard.is_checked = false
             addTopCarCard.is_edit = 0
+            addTopCarCard.minimum_selling_price = addTopCarCard.mprice
             addTopCarCard.edit_price = parseFloat(addTopCarCard.price).toFixed(2)
             addTopCarCard.price = parseFloat(addTopCarCard.price).toFixed(2)
             this.chooeseGoods.cardList.push(addTopCarCard)
@@ -2224,12 +2326,14 @@ export default {
           })
         } else {
           this.chooeseGoods.cardList = []
-          this.chooeseGoods.fuwuGoods = []
+          this.chooeseGoods.outServiceGoods = []
+          this.chooeseGoods.outOrdinaryGoods = []
           this.chooeseGoods.goods = []
           let addTopCarCard = this.goukaDialog.cardsList[key]
           addTopCarCard.num = 1
           addTopCarCard.is_checked = false
           addTopCarCard.is_edit = 0
+          addTopCarCard.minimum_selling_price = addTopCarCard.mprice
           addTopCarCard.edit_price = addTopCarCard.price
           this.chooeseGoods.cardList.push(addTopCarCard)
           this.goukaDialog.isShow = false
@@ -2278,6 +2382,16 @@ export default {
           this.$message.closeAll()
           this.$message({
             message: '您购物车里有普通商品，请选择商品的服务人员',
+            type: 'error'
+          })
+          return
+        }
+      }
+      if (this.chooeseGoods.cardList.length) {
+        if (this.jiezhangDialog.serviceCardNowWaiter.id === -1) {
+          this.$message.closeAll()
+          this.$message({
+            message: '请选择服务人员',
             type: 'error'
           })
           return
@@ -2366,7 +2480,7 @@ export default {
       if (this.chooeseGoods.cardList.length) {
         let requestData = {
           member_id: this.jiezhangDialog.memberVip.id, // 会员id
-          waiter: this.jiezhangDialog.nowWaiter.id, // 服务员id
+          waiter: this.jiezhangDialog.serviceCardNowWaiter.id, // 服务员id
           pay: this.jiezhangDialog.chooesePayWay, // 支付方式
           card_id: this.chooeseGoods.cardList[0].id, // 服务卡id
           price: this.chooeseGoods.cardList[0].is_edit ? this.chooeseGoods.cardList[0].edit_price : this.chooeseGoods.cardList[0].price
@@ -2412,7 +2526,7 @@ export default {
           this.jiezhangDialog.closedPayWay = [8,7]
         }
         // 余额不足，不能使用会员卡支付
-        if (this.jiezhangDialog.memberVip.money < this.jiezhangDialog.modifyMoney){
+        if (parseFloat(this.jiezhangDialog.memberVip.money) < parseFloat(this.jiezhangDialog.modifyMoney)){
           this.jiezhangDialog.closedPayWay.push(3)
         }
       } else {
