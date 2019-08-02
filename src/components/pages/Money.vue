@@ -60,7 +60,7 @@
                     </li>
                     <li class="title code clear-both">
                       <span class="yuanjia" v-if="good.is_edit">￥{{good.price}}</span>
-                      <span style="width:28px;height:20px;background:rgba(243,88,88,1);border-radius:4px;color: #ffffff;padding:0 3px; " v-if="good.is_edit">改</span>
+                      <el-tag v-if="good.is_edit" size="mini" type="danger" effect="dark">改</el-tag>
                       <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
                       <span class="red danjia" v-else>￥{{good.price}}</span>
                       <span v-if="good.is_edit && good.is_service_goods === '0'" style="color:#f5960c;font-size: 12px;">不低于{{good.minimum_selling_price}}</span>
@@ -92,7 +92,7 @@
                   </li>
                   <li class="title code clear-both">
                     <span class="yuanjia" v-if="good.is_edit">￥{{good.price}}</span>
-                    <span style="width:28px;height:20px;background:rgba(243,88,88,1);border-radius:4px;color: #ffffff;padding:0 3px; " v-if="good.is_edit">改</span>
+                    <el-tag v-if="good.is_edit" size="mini" type="danger" effect="dark">改</el-tag>
                     <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
                     <span class="red danjia" v-else>￥{{good.price}}</span>
                     <span v-if="good.is_edit && good.is_service_goods === '0'" style="color:#f5960c;font-size: 12px;">不低于{{good.minimum_selling_price}}</span>
@@ -124,7 +124,7 @@
                   </li>
                   <li class="title code clear-both">
                     <span class="yuanjia" v-if="good.is_edit">￥{{good.price}}</span>
-                    <span style="width:28px;height:20px;background:rgba(243,88,88,1);border-radius:4px;color: #ffffff;padding:0 3px; " v-if="good.is_edit">改</span>
+                    <el-tag v-if="good.is_edit" size="mini" type="danger" effect="dark">改</el-tag>
                     <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
                     <span class="red danjia" v-else>￥{{good.price}}</span>
                     <span v-if="good.is_edit && good.is_service_goods === '0'" style="color:#f5960c;font-size: 12px;">不低于{{good.minimum_selling_price}}</span>
@@ -156,7 +156,7 @@
                   </li>
                   <li class="title">
                     <span class="yuanjia" v-if="good.is_edit">￥{{good.price}}</span>
-                    <span style="width:28px;height:20px;background:rgba(243,88,88,1);border-radius:4px;color: #ffffff;padding:0 3px; " v-if="good.is_edit">改</span>
+                    <el-tag v-if="good.is_edit" size="mini" type="danger" effect="dark">改</el-tag>
                     <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
                     <span class="red danjia" v-else>￥{{good.price}}</span>
                     <!--                    <span class="huiyuanjia">会员价￥{{good.price}}</span>-->
@@ -515,6 +515,7 @@
             <el-table v-show="!huiyuanDialog.showFuwuTable" :data="huiyuanDialog.chongzhijiluList" height="216" border style="width: 100%">
               <el-table-column type="index" label="序号" width="80"></el-table-column>
               <el-table-column prop="member_id" label="会员"></el-table-column>
+              <el-table-column prop="title" label="充值名称"></el-table-column>
               <el-table-column label="充值金额">
                 <template slot-scope="scope">
                   <span v-if="scope.row.price < 0" class="font-red">{{scope.row.price}}</span>
@@ -1177,6 +1178,7 @@ export default {
         this.chooeseGoods.outOrdinaryGoods.push(good)
       }
       this.sumChooseGoodsMoney()
+      this.isShowChooeseWaiterBlock()
       this.$forceUpdate()
     },
 
