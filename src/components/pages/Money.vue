@@ -495,7 +495,6 @@
               <el-table-column type="index" label="序号" width="80"></el-table-column>
               <el-table-column prop="card_name" label="服务卡名称"></el-table-column>
               <el-table-column prop="real_price" label="购买金额"></el-table-column>
-              <el-table-column prop="" label="项目服务"></el-table-column>
               <el-table-column prop="type_card" label="类型"></el-table-column>
               <el-table-column prop="create_time" label="购买时间"></el-table-column>
               <el-table-column prop="start_time" label="激活时间"></el-table-column>
@@ -575,6 +574,23 @@
           </el-table>
         </div>
       </el-dialog>
+      <!--会员查询-耗卡-选择服务人员-->
+      <el-dialog title="是否确定使用" :visible.sync="huiyuanDialog.haokaDialog.choosesWaiterDialog.isShow" width="500px">
+        <el-form>
+          <el-form-item label="请选择服务人员">
+            <el-select v-model="huiyuanDialog.haokaDialog.choosesWaiterDialog.waiter_id" placeholder="请选择服务人员" @focus="getWaiterList()">
+              <el-option v-for="item in waiterList" :label="item.name" :key="item.id" :value="item.id">
+                <span style="float: left" class="font-blue">{{ item.name }}</span>
+                <span style="float: right;color: #ccc;" >({{ item.type }})</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="huiyuanDialog.haokaDialog.choosesWaiterDialog.isShow = false">取 消</el-button>
+          <el-button type="primary" @click="huiyuanDialogUseServiceCardToGo">确 定</el-button>
+        </span>
+      </el-dialog>
       <!--会员查询-服务卡列表-激活服务卡-->
       <el-dialog title="是否激活服务卡" :visible.sync="huiyuanDialog.activeServiceCardDialog.isShow" width="500px">
         <el-form>
@@ -596,9 +612,9 @@
       <el-dialog title="使用记录" :visible.sync="huiyuanDialog.shiyongjiluDialog.isShow" width="648px" :center="true">
         <div style="height: 240px;">
           <el-table :data="huiyuanDialog.shiyongjiluDialog.tableData" border  style="height: 240px;">
-            <el-table-column prop="name" label="服务项目"></el-table-column>
+            <el-table-column prop="service_name" label="服务项目"></el-table-column>
             <el-table-column prop="time" label="使用时间"></el-table-column>
-            <el-table-column prop="who" label="服务人员"></el-table-column>
+            <el-table-column prop="waiter" label="服务人员"></el-table-column>
           </el-table>
         </div>
       </el-dialog>
@@ -786,17 +802,18 @@ export default {
             {sname: '艾灸', num: '不限制', id: 1, s_num: '不限制', status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: '不可用'},
             {sname: '艾灸', num: '不限制', id: 2, s_num: '不限制', status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: '立即使用'},
             {sname: '艾灸', num: '不限制', id: 3, s_num: '不限制', status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: '无'}
-          ]
+          ],
+          choosesWaiterDialog:{
+            isShow: false,
+            service_id: '',
+            waiter_id: ''
+          }
         },
         // 使用记录弹窗
         shiyongjiluDialog: {
           isShow: false,
           tableData: [
-            {name: '水育', time: '2018-09-20 14:12:20', who: 5},
-            {name: '水域', time: '2018-09-20 14:12:20', who: 5},
-            {name: '水域', time: '2018-09-20 14:12:20', who: 5},
-            {name: '水域', time: '2018-09-20 14:12:20', who: 5},
-            {name: '水域', time: '2018-09-20 14:12:20', who: 5}
+            {service_name: '水育', time: '2018-09-20 14:12:20', waiter: 5},
           ]
         },
         // 退卡详情
@@ -2213,9 +2230,12 @@ export default {
       }
       if (requestData.waiter){
         postMemberServiceCardsActive(requestData).then(res => {
-          this.huiyuanDialog.activeServiceCardDialog.card_id = ''
-          this.huiyuanDialog.activeServiceCardDialog.waiter_id = ''
-          this.huiyuanDialog.activeServiceCardDialog.isShow = false
+          if (res.code === '200'){
+            this.huiyuanDialog.activeServiceCardDialog.card_id = ''
+            this.huiyuanDialog.activeServiceCardDialog.waiter_id = ''
+            this.huiyuanDialogSearchServiceCardList()
+            this.huiyuanDialog.activeServiceCardDialog.isShow = false
+          }
         })
       } else {
         this.$message.closeAll()
@@ -2227,13 +2247,12 @@ export default {
       }
     },
     // 耗卡列表
-    huiyuanDialogUseServiceCardList (card) {
-      console.log(card)
+    async huiyuanDialogUseServiceCardList (card) {
       let requestData = {
         ticket_id: card.id
       }
-      postMemberServiceCardsUseList(requestData).then(res => {
-        if (res.data) {
+      await postMemberServiceCardsUseList(requestData).then(res => {
+        if (res.data.length) {
           this.huiyuanDialog.haokaDialog.tableData = res.data
         }
       })
@@ -2241,29 +2260,45 @@ export default {
     },
     // 耗卡
     huiyuanDialogUseServiceCard (card) {
-      console.log(card)
+      this.huiyuanDialog.haokaDialog.choosesWaiterDialog.service_id = card.id
+      this.huiyuanDialog.haokaDialog.choosesWaiterDialog.isShow = true
+    },
+    // 耗卡
+    async huiyuanDialogUseServiceCardToGo(){
       let requestData = {
-        service_id: card.id
+        member_id:this.huiyuanDialog.huiyuanInfo.id,
+        service_id:this.huiyuanDialog.haokaDialog.choosesWaiterDialog.service_id,
+        waiter_id:this.huiyuanDialog.haokaDialog.choosesWaiterDialog.waiter_id
       }
-      postMemberServiceCardsUseListTicket(requestData).then(res => {
-        console.log(res)
-      }).catch(err => {
-        console.log(err)
-      })
+      if (requestData.waiter_id){
+        await postMemberServiceCardsUseListTicket(requestData).then(res => {
+            if (res.code === '200'){
+              this.huiyuanDialogUseServiceCardList({id:requestData.service_id})
+              this.huiyuanDialogSearchServiceCardList()
+            }
+        })
+      } else {
+        this.$message.closeAll()
+        this.$message({
+          message: '请选择服务人员',
+          type: 'error'
+        })
+        return
+      }
+      this.huiyuanDialog.haokaDialog.choosesWaiterDialog.waiter_id = ''
+      this.huiyuanDialog.haokaDialog.choosesWaiterDialog.service_id = ''
+      this.huiyuanDialog.haokaDialog.choosesWaiterDialog.isShow = false
     },
     // 使用记录
     huiyuanDialogServiceCardUseRecords (card) {
       let requestData = {
-        id: card.id
+        member_id:this.huiyuanDialog.huiyuanInfo.id,
+        ticket_id: card.id
       }
-      console.log(requestData)
       postMemberServiceCardsUseRecords(requestData).then(res => {
-        console.log(res)
-        if (res.data) {
+        if (res.data.length) {
           this.huiyuanDialog.shiyongjiluDialog.tableData = res.data
         }
-      }).catch(err => {
-        console.log(err)
       })
       this.huiyuanDialog.shiyongjiluDialog.isShow = true
     },

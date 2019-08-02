@@ -1,7 +1,7 @@
 <template>
     <div class="order-manage-page">
       <el-tabs v-model="requestData.type" @tab-click="handleClick">
-        <el-tab-pane label="商品订单" name="1">
+        <el-tab-pane label="门店订单" name="1">
           <div class="search-condition">
             <div class="select">
               <el-select v-model="requestData.nowWaiter" clearable placeholder="选择服务人员" >
@@ -71,37 +71,45 @@
           </div>
           <div class="serch-table">
             <el-table :data="responseData1.data" border style="width: 100%;" height="565">
-              <el-table-column prop="sn" label="订单号"></el-table-column>
-              <el-table-column label="会员账号">
+              <el-table-column label="订单信息">
                 <template slot-scope="scope">
-                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)" v-if="scope.row.member_id">{{scope.row.mobile}}</el-button>
-                  <span v-else>非会员</span>
+                  <div v-html="scope.row.message"></div>
+                </template>
+              </el-table-column>
+<!--              <el-table-column label="会员账号">-->
+<!--                <template slot-scope="scope">-->
+<!--                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)" v-if="scope.row.member_id">{{scope.row.mobile}}</el-button>-->
+<!--                  <span v-else>非会员</span>-->
+<!--                </template>-->
+<!--              </el-table-column>-->
+              <el-table-column label="商品信息">
+                <template slot-scope="scope">
+                  <div v-html="scope.row.item_list"></div>
+                </template>
+              </el-table-column>
+              <el-table-column label="商品价格">
+                <template slot-scope="scope">
+                  <div v-html="scope.row.price_list"></div>
+                </template>
+              </el-table-column>
+              <el-table-column label="购买数量">
+                <template slot-scope="scope">
+                  <div v-html="scope.row.num_list"></div>
+                </template>
+              </el-table-column>
+              <el-table-column label="服务人员">
+                <template slot-scope="scope">
+                  <div v-html="scope.row.waiter_list"></div>
                 </template>
               </el-table-column>
               <el-table-column prop="amount" label="付款金额"></el-table-column>
-              <el-table-column label="商品成本">
-                <template slot-scope="scope">
-                  {{scope.row.is_outsourcing_goods === 1 ?  scope.row.old_amount :  '无'}}
-                </template>
-              </el-table-column>
-              <el-table-column label="是否外包商品">
-                <template slot-scope="scope">
-                  {{scope.row.is_outsourcing_goods === 1 ? '是' :  '否'}}
-                </template>
-              </el-table-column>
-              <el-table-column prop="pay_way" label="付款方式"></el-table-column>
-              <el-table-column prop="time" label="交易时间"></el-table-column>
-              <el-table-column label="服务人员">
-                <template slot-scope="scope">
-                  <el-button type="text" size="small" @click="getWaiterInfo(scope.row.waiter_id)">{{scope.row.waiter}}</el-button>
-                </template>
-              </el-table-column>
-              <el-table-column prop="order_list_status" label="状态"></el-table-column>
-              <el-table-column prop="is_setting_goods_price" label="设置商品成本">
-                <template slot-scope="scope">
-                  <el-button type="text" size="mini" v-if="scope.row.is_outsourcing_goods === 1" @click="settingOutGoodPriceDialog.isShow = true">设置</el-button>
-                </template>
-              </el-table-column>
+              <el-table-column prop="overtime" label="交易时间"></el-table-column>
+<!--              <el-table-column label="服务人员">-->
+<!--                <template slot-scope="scope">-->
+<!--                  <el-button type="text" size="small" @click="getWaiterInfo(scope.row.waiter_id)">{{scope.row.waiter}}</el-button>-->
+<!--                </template>-->
+<!--              </el-table-column>-->
+              <el-table-column prop="order_status" label="状态"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
                   <el-button size="mini" @click="showOrderDetails(requestData.type, scope.row.id)">订单详情</el-button>
@@ -119,127 +127,6 @@
               @current-change="responseDataOnePageCurrentChange"
               :current-page.sync="requestData.page"
               :total="responseData1.count">
-            </el-pagination>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="服务订单" name="2">
-          <div class="search-condition">
-            <div class="select">
-              <el-select v-model="requestData.nowWaiter" clearable placeholder="选择服务人员" >
-                <el-option
-                  v-for="item in waiter"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id">
-                </el-option>
-              </el-select>
-            </div>
-            <div class="select">
-              <el-select v-model="requestData.service" clearable placeholder="选择服务项目">
-                <el-option
-                  v-for="item in serviceList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id">
-                </el-option>
-              </el-select>
-            </div>
-            <div class="select">
-              <el-select v-model="requestData.payWay" clearable placeholder="选中支付方式">
-                <el-option
-                  v-for="item in payWayList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id">
-                </el-option>
-              </el-select>
-            </div>
-            <div class="select" style="width: 148px;">
-              <el-select v-model="requestData.orderStatus" clearable placeholder="选择状态">
-                <el-option
-                  v-for="item in orderStatus"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id">
-                </el-option>
-              </el-select>
-            </div>
-            <div class="select" style="width:368px;height:48px;">
-              <el-input
-                v-model="requestData.mobile"
-                placeholder="请输入需查询的会员手机号/订单号"
-                clearable>
-              </el-input>
-            </div>
-            <div class="select">
-              <el-button plain @click="getOrderList">搜索</el-button>
-            </div>
-          </div>
-          <div class="search-btns">
-            <span class="span">筛选</span>
-            <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日</el-button>
-            <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日</el-button>
-            <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周</el-button>
-            <el-date-picker
-              @focus="chooseTimeDIY"
-              v-model="requestData.date"
-              type="daterange"
-              range-separator="至"
-              value-format="yyyy-MM-dd"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期">
-            </el-date-picker>
-          </div>
-          <div class="serch-table">
-            <el-table :data="responseData2.data" border style="width: 100%;" height="565">
-              <el-table-column prop="sn" label="订单号"></el-table-column>
-              <el-table-column label="会员账号">
-                <template slot-scope="scope">
-                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)" v-if="scope.row.member_id">{{scope.row.mobile}}</el-button>
-                  <span v-else>非会员</span>
-                </template>
-              </el-table-column>
-              <el-table-column prop="amount" label="付款金额"></el-table-column>
-              <el-table-column prop="pay_way" label="付款方式"></el-table-column>
-              <el-table-column label="服务成本">
-                <template slot-scope="scope">
-                  {{scope.row.is_outsourcing_goods === 1 ?  scope.row.old_amount :  '无'}}
-                </template>
-              </el-table-column>
-              <el-table-column label="是否外包服务">
-                <template slot-scope="scope">
-                  {{scope.row.is_outsourcing_goods === 1 ? '是' :  '否'}}
-                </template>
-              </el-table-column>
-              <el-table-column prop="time" label="交易时间"></el-table-column>
-              <el-table-column label="服务人员">
-                <template slot-scope="scope">
-                  <el-button type="text" size="small" @click="getWaiterInfo(scope.row.waiter_id)">{{scope.row.waiter}}</el-button>
-                </template>
-              </el-table-column>
-              <el-table-column prop="order_list_status" label="状态"></el-table-column>
-              <el-table-column prop="is_setting_goods_price" label="设置服务成本">
-                <template slot-scope="scope">
-                  <el-button type="text" size="mini" v-if="scope.row.is_outsourcing_goods === 1"  @click="settingOutGoodPriceDialog.isShow = true">设置</el-button>
-                </template>
-              </el-table-column>
-              <el-table-column label="操作">
-                <template slot-scope="scope">
-                  <el-button size="mini"  @click="showOrderDetails(requestData.type, scope.row.id)">订单详情</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-          <div class="footer">
-            <el-pagination
-              background
-              layout="total, sizes, prev, pager, next, jumper"
-              @size-change="pageSizeChange"
-              :page-sizes="[10, 20, 30, 40]"
-              :page-size="requestData.limit"
-              @current-change="responseDataOnePageCurrentChange"
-              :current-page.sync="requestData.page"
-              :total="responseData2.count">
             </el-pagination>
           </div>
         </el-tab-pane>
@@ -309,15 +196,14 @@
                   <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)">{{scope.row.mobile}}</el-button>
                 </template>
               </el-table-column>
-              <el-table-column prop="old_amount" label="充值金额"></el-table-column>
+              <el-table-column prop="amount" label="充值金额"></el-table-column>
               <el-table-column prop="pay_way" label="付款方式"></el-table-column>
-              <el-table-column prop="time" label="交易时间"></el-table-column>
+              <el-table-column prop="overtime" label="交易时间"></el-table-column>
               <el-table-column label="服务人员">
                 <template slot-scope="scope">
                   <el-button type="text" size="small" @click="getWaiterInfo(scope.row.waiter_id)">{{scope.row.waiter}}</el-button>
                 </template>
               </el-table-column>
-              <el-table-column prop="remake" label="备注"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
                   <el-button size="mini"   @click="showOrderDetails(requestData.type, scope.row.id)">订单详情</el-button>
