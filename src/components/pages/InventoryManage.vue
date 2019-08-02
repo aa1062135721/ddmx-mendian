@@ -49,9 +49,9 @@
         <el-tab-pane label="调拨单" name="1">
           <div>
             <div class="search">
-              <el-select  clearable placeholder="选择调入仓库" v-model="transferSlipRequestData.in_shop">
-                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
-              </el-select>
+<!--              <el-select  clearable placeholder="选择调入仓库" v-model="transferSlipRequestData.in_shop">-->
+<!--                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>-->
+<!--              </el-select>-->
 <!--              <el-select  clearable placeholder="选择调出仓库" v-model="transferSlipRequestData.out_shop">-->
 <!--                <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>-->
 <!--              </el-select>-->
@@ -236,7 +236,6 @@
                 <el-table-column prop="p_type" label="一级分类"></el-table-column>
                 <el-table-column prop="cname" label="二级分类"></el-table-column>
                 <el-table-column prop="stock" label="库存"></el-table-column>
-                <el-table-column prop="price" label="单价"></el-table-column>
               </el-table>
             </div>
             <div  style="text-align: right;margin-top: 20px;">

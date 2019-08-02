@@ -183,7 +183,7 @@
                     </span>
                   </li>
                   <li v-if="chooeseGoods.cardList.length">
-                    <span class="float-left">服务人员</span>
+                    <span class="float-left">服务卡服务人员</span>
                     <span class="float-right select">
                       <el-dropdown class="user-name" trigger="click" @command="clickWaiterServiceCard">
                         <span class="el-dropdown-link"  @click="getWaiterList()">
@@ -213,8 +213,8 @@
                   </li>
                   <li>
                     <span class="float-left">结算</span>
-                    <!-- 支付方式为赠送，需要支付的钱为0-->
-                    <span class="float-right" v-if="jiezhangDialog.chooesePayWay === 7">￥0.00</span>
+                    <!-- 支付方式为赠送 门店自用，需要支付的钱为0-->
+                    <span class="float-right" v-if="jiezhangDialog.chooesePayWay === 7 || jiezhangDialog.chooesePayWay ===8">￥0.00</span>
                     <span class="float-right" v-else>￥{{jiezhangDialog.modifyMoney}}</span>
                   </li>
                 </ul>
@@ -270,11 +270,11 @@
                 </li>
                 <li>
                   <span class="float-left">累积充值</span>
-                  <span class="float-right">￥{{chongzhiDialog.huiyuanInfo.amount ? parseFloat(chongzhiDialog.huiyuanInfo.amount).toFixed(2) : ''}}</span>
+                  <span class="float-right">{{chongzhiDialog.huiyuanInfo.amount ? '￥ ' + parseFloat(chongzhiDialog.huiyuanInfo.amount).toFixed(2) : ''}}</span>
                 </li>
                 <li>
                   <span class="float-left">余额</span>
-                  <span class="float-right font-red">￥{{chongzhiDialog.huiyuanInfo.money ? parseFloat(chongzhiDialog.huiyuanInfo.money).toFixed(2) : ''}}</span>
+                  <span class="float-right font-red">{{chongzhiDialog.huiyuanInfo.money ? '￥ ' + parseFloat(chongzhiDialog.huiyuanInfo.money).toFixed(2) : ''}}</span>
                 </li>
                 <li>
                   <span class="float-left">会员等级</span>
@@ -294,20 +294,22 @@
             <div class="four">
               <el-input @focus="chongzhiDialogInputFocus('money')" v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额" clearable></el-input>
             </div>
-            <el-form>
-              <el-form-item label="请选择服务人员">
-                <el-select v-model="chongzhiDialog.nowWaiter" placeholder="请选择" @focus="getWaiterList()">
-                  <el-option
-                    v-for="item in waiterList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id">
-                    <span style="float: left" class="font-blue">{{ item.name }}</span>
-                    <span style="float: right;color: #ccc;" >({{ item.type }})</span>
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-form>
+            <div style="height: 40px">
+              <el-form >
+                <el-form-item label="请选择服务人员">
+                  <el-select v-model="chongzhiDialog.nowWaiter" placeholder="请选择" @focus="getWaiterList()">
+                    <el-option
+                      v-for="item in waiterList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id">
+                      <span style="float: left" class="font-blue">{{ item.name }}</span>
+                      <span style="float: right;color: #ccc;" >({{ item.type }})</span>
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form>
+            </div>
           </div>
           <div class="float-right right">
             <v-keyboard @getNumber="chongzhiDialogGetCode"></v-keyboard>
@@ -328,8 +330,8 @@
             <ul>
               <li class="clear-both">
                 <span class="float-left">应收</span>
-                <!-- 选择赠送的支付方式，费用显示为0-->
-                <span class="float-right font-red" v-if="jiezhangDialog.chooesePayWay === 7">￥ 0.00</span>
+                <!-- 选择赠送和门店自用的支付方式，费用显示为0-->
+                <span class="float-right font-red" v-if="jiezhangDialog.chooesePayWay === 7 || jiezhangDialog.chooesePayWay ===8">￥ 0.00</span>
                 <span class="float-right font-red" v-else>¥ {{jiezhangDialog.modifyMoney}}</span>
               </li>
               <li class="clear-both">
@@ -2087,15 +2089,20 @@ export default {
             this.huiyuanDialog.huiyuanInfo = res.data
             this.huiyuanDialogSearchRechargeLog()
           } else {
+            this.huiyuanDialog.huiyuanInfo = {}
+            this.huiyuanDialog.fuwukaList = []
+            this.huiyuanDialog.chongzhijiluList = []
             this.$message.closeAll()
             this.$message({
               message: '没有查询到会员信息',
               type: 'error'
             })
           }
-        }).catch(err => {
-          console.log(err)
         })
+      } else {
+        this.huiyuanDialog.huiyuanInfo = {}
+        this.huiyuanDialog.fuwukaList = []
+        this.huiyuanDialog.chongzhijiluList = []
       }
     },
     huiyuanDialogAddMemberGetCode (code) {
