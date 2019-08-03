@@ -8,7 +8,7 @@
                     <p>门店管理系统</p>
                 </div>
 
-                <el-input  class="urser-name"  placeholder="请输入用户手机号码" v-model="username" @keyup.enter.native="submitForm" prefix-icon="el-icon-user">
+                <el-input  class="urser-name"  placeholder="请输入用户手机号码" v-model="username" @keyup.enter.native="submitForm" prefix-icon="el-icon-user" maxlength="11">
                 </el-input>
 
                 <el-input class="password" type="password"  placeholder="请输入登录密码" v-model="password" @keyup.enter.native="submitForm" prefix-icon="el-icon-lock">

@@ -799,9 +799,7 @@ export default {
         haokaDialog: {
           isShow: false,
           tableData: [
-            {sname: '艾灸', num: '不限制', id: 1, s_num: '不限制', status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: '不可用'},
-            {sname: '艾灸', num: '不限制', id: 2, s_num: '不限制', status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: '立即使用'},
-            {sname: '艾灸', num: '不限制', id: 3, s_num: '不限制', status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: '无'}
+            // {sname: '艾灸', num: '不限制', id: 1, s_num: '不限制', status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: '不可用'},
           ],
           choosesWaiterDialog:{
             isShow: false,
@@ -813,7 +811,7 @@ export default {
         shiyongjiluDialog: {
           isShow: false,
           tableData: [
-            {service_name: '水育', time: '2018-09-20 14:12:20', waiter: 5},
+            // {service_name: '水育', time: '2018-09-20 14:12:20', waiter: 5},
           ]
         },
         // 退卡详情
@@ -1025,7 +1023,7 @@ export default {
       }
     },
     // 将非外包的 服务或普通商品加入购物车
-    addShoppingCar (good) {
+    async addShoppingCar (good) {
       // 非外包服务商品
       if (good.is_service_goods === '1') {
         good.num = 1
@@ -1078,7 +1076,7 @@ export default {
         }
       }
       if (this.chooeseGoods.cardList.length || this.chooeseGoods.outOrdinaryGoods.length || this.chooeseGoods.outServiceGoods.length) {
-        this.$confirm('您购物车里已经存在其他类型的商品，此操作会清空购物车，是否确认？', '提示', {
+        await this.$confirm('您购物车里已经存在其他类型的商品，此操作会清空购物车，是否确认？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -1100,7 +1098,7 @@ export default {
       this.$forceUpdate()
     },
     // 将外包的 服务商品加入购物车
-    addShoppingCarOutServiceGoods (good) {
+    async addShoppingCarOutServiceGoods (good) {
       // 外包服务商品
       if (good.is_service_goods === '1') {
         good.num = 1
@@ -1125,7 +1123,7 @@ export default {
         }
       }
       if (this.chooeseGoods.goods.length || this.chooeseGoods.cardList.length || this.chooeseGoods.outOrdinaryGoods.length) {
-        this.$confirm('您购物车里已经存在其他类型的商品，此操作会清空购物车，是否确认？', '提示', {
+        await this.$confirm('您购物车里已经存在其他类型的商品，此操作会清空购物车，是否确认？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -1147,7 +1145,7 @@ export default {
       this.$forceUpdate()
     },
     // 将外包的 普通商品加入购物车
-    addShoppingCarOutOrdinaryGoods (good) {
+    async addShoppingCarOutOrdinaryGoods (good) {
       // 外包普通商品
       if (good.is_service_goods === '0') {
         // 检查库存是否为0
@@ -1177,7 +1175,7 @@ export default {
         }
       }
       if (this.chooeseGoods.goods.length || this.chooeseGoods.cardList.length || this.chooeseGoods.outServiceGoods.length) {
-        this.$confirm('您购物车里已经存在其他类型的商品，此操作会清空购物车，是否确认？', '提示', {
+        await this.$confirm('您购物车里已经存在其他类型的商品，此操作会清空购物车，是否确认？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -1236,6 +1234,7 @@ export default {
           arr.splice(key, 1)
           this.sumChooseGoodsMoney()
           this.isShowChooeseWaiterBlock()
+          this.$forceUpdate()
         } else {
           this.$message.closeAll()
           this.$message({
@@ -1243,7 +1242,6 @@ export default {
             type: 'error'
           })
         }
-        this.$forceUpdate()
     },
 
     // 购物车里的商品增加数量
@@ -1788,6 +1786,7 @@ export default {
           this.chooeseGoods.outServiceGoods = []
           this.isShowChooeseWaiterBlock()
           this.sumChooseGoodsMoney()
+          this.$forceUpdate()
         }
       })
     },
@@ -2002,7 +2001,7 @@ export default {
         console.log(err)
       })
     },
-    chongzhiDialogBtnOk () {
+    async chongzhiDialogBtnOk () {
       if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
         this.$message.closeAll()
         this.$message({
@@ -2057,7 +2056,7 @@ export default {
         pay_way: this.chongzhiDialog.payType,
         waiter_id: this.chongzhiDialog.nowWaiter
       }
-      this.$confirm(`是否确认给${this.chongzhiDialog.huiyuanInfo.mobile}充值，充值金额为：${requestData.price}元？`, '提示', {
+      await this.$confirm(`是否确认给${this.chongzhiDialog.huiyuanInfo.mobile}充值，充值金额为：${requestData.price}元？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -2131,7 +2130,7 @@ export default {
         this.huiyuanDialog.addHuiyuanDialog.mobile += `${code}`
       }
     },
-    huiyuanDialogAddMemberVip () {
+    async huiyuanDialogAddMemberVip () {
       let requestData = {
         mobile: this.huiyuanDialog.addHuiyuanDialog.mobile,
         nickname: this.huiyuanDialog.addHuiyuanDialog.nickname
@@ -2160,21 +2159,21 @@ export default {
         })
         return
       }
-      this.$confirm(`是否选择新增加该会员（${requestData.mobile}）?`, '提示', {
+      await this.$confirm(`是否选择新增加该会员（${requestData.mobile}）?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        postAddMemberVip(requestData).then(res => {
+        postAddMemberVip(requestData).then(async res => {
           if (res.code === '200') {
-            this.$confirm(`新增会员成功，是否选择会员（${requestData.mobile}）结账?`, '提示', {
+            await this.$confirm(`新增会员成功，是否选择会员（${requestData.mobile}）结账?`, '提示', {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
               type: 'warning'
             }).then(() => {
               this.xuanzehuiyuanDialog.mobile = requestData.mobile
               this.clickChoosesMemberByKeyboard('ok')
-            }).catch(() => {})
+            })
             this.huiyuanDialog.addHuiyuanDialog.isShow = false
             this.huiyuanDialog.addHuiyuanDialog.mobile = ''
             this.huiyuanDialog.addHuiyuanDialog.nickname = ''
@@ -2369,7 +2368,7 @@ export default {
       })
       this.goukaDialog.cardsList[key].is_checked = true
     },
-    goukaDialogNowBuy () {
+    async goukaDialogNowBuy () {
       let key = 'flag'
       this.goukaDialog.cardsList.map((item, index) => {
         if (item.is_checked === true) {
@@ -2385,7 +2384,7 @@ export default {
       } else {
         // 添加服务卡进购物车
         if (this.chooeseGoods.goods.length || this.chooeseGoods.outServiceGoods.length || this.chooeseGoods.outOrdinaryGoods.length) {
-          this.$confirm('您确认清空购物车中的商品，重新添加另一种商品吗？', '提示', {
+          await this.$confirm('您确认清空购物车中的商品，重新添加另一种商品吗？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
@@ -2403,8 +2402,6 @@ export default {
             addTopCarCard.price = parseFloat(addTopCarCard.price).toFixed(2)
             this.chooeseGoods.cardList.push(addTopCarCard)
             this.goukaDialog.isShow = false
-            this.sumChooseGoodsMoney()
-            this.$forceUpdate()
           }).catch(() => {
           })
         } else {
@@ -2420,9 +2417,9 @@ export default {
           addTopCarCard.edit_price = addTopCarCard.price
           this.chooeseGoods.cardList.push(addTopCarCard)
           this.goukaDialog.isShow = false
-          this.sumChooseGoodsMoney()
-          this.$forceUpdate()
         }
+        this.sumChooseGoodsMoney()
+        this.$forceUpdate()
       }
     },
 
