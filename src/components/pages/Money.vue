@@ -1275,7 +1275,7 @@ export default {
         this.clickAddNumShoppingCarGoodToAdd(this.chooeseGoods.outOrdinaryGoods, true)
       }
       if (this.chooeseGoods.cardList.length) {
-        this.clickAddNumShoppingCarGoodToAdd(this.chooeseGoods.cardList, false)
+        this.clickAddNumShoppingCarGoodToAdd(this.chooeseGoods.cardList, true)
       }
     },
     /**
@@ -1428,7 +1428,7 @@ export default {
         this.clickChangeNumShoppingCarGoodOkOk(this.chooeseGoods.outOrdinaryGoods, true)
       }
       if (this.chooeseGoods.cardList.length) {
-        this.clickChangeNumShoppingCarGoodOkOk(this.chooeseGoods.cardList, false)
+        this.clickChangeNumShoppingCarGoodOkOk(this.chooeseGoods.cardList, true)
       }
     },
     /**
@@ -2395,6 +2395,7 @@ export default {
             this.chooeseGoods.goods = []
             let addTopCarCard = this.goukaDialog.cardsList[key]
             addTopCarCard.num = 1
+            addTopCarCard.stock = 1
             addTopCarCard.is_checked = false
             addTopCarCard.is_edit = 0
             addTopCarCard.minimum_selling_price = addTopCarCard.mprice
@@ -2411,6 +2412,7 @@ export default {
           this.chooeseGoods.goods = []
           let addTopCarCard = this.goukaDialog.cardsList[key]
           addTopCarCard.num = 1
+          addTopCarCard.stock = 1
           addTopCarCard.is_checked = false
           addTopCarCard.is_edit = 0
           addTopCarCard.minimum_selling_price = addTopCarCard.mprice
