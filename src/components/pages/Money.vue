@@ -481,8 +481,8 @@
                 </table>
               </div>
               <div class="tab-btns">
-                <el-button :class="{'active':!huiyuanDialog.showFuwuTable}" @click="huiyuanDialogSearchRechargeLog">充值记录</el-button>
-                <el-button :class="{'active':huiyuanDialog.showFuwuTable}" @click="huiyuanDialogSearchServiceCardList">服务卡</el-button>
+                <el-button :class="{'active':huiyuanDialog.showWho === 'rechargeLog'}" @click="huiyuanDialogChoosesWho('rechargeLog')">充值记录</el-button>
+                <el-button :class="{'active':huiyuanDialog.showWho === 'serviceCard'}" @click="huiyuanDialogChoosesWho('serviceCard')">服务卡</el-button>
               </div>
             </div>
             <div class="float-right right">
@@ -491,7 +491,7 @@
           </div>
           <div class="my-table">
             <!-- 服务卡 -->
-            <el-table v-show="huiyuanDialog.showFuwuTable" :data="huiyuanDialog.fuwukaList" height="216" border style="width: 100%">
+            <el-table v-show="huiyuanDialog.showWho === 'serviceCard'" :data="huiyuanDialog.fuwukaList" height="300" border style="width: 100%">
               <el-table-column type="index" label="序号" width="80"></el-table-column>
               <el-table-column prop="card_name" label="服务卡名称"></el-table-column>
               <el-table-column prop="real_price" label="购买金额"></el-table-column>
@@ -511,7 +511,7 @@
               </el-table-column>
             </el-table>
             <!-- 充值记录 -->
-            <el-table v-show="!huiyuanDialog.showFuwuTable" :data="huiyuanDialog.chongzhijiluList" height="216" border style="width: 100%">
+            <el-table v-show="huiyuanDialog.showWho === 'rechargeLog'" :data="huiyuanDialog.chongzhijiluList" height="300" border style="width: 100%">
               <el-table-column type="index" label="序号" width="80"></el-table-column>
               <el-table-column prop="member_id" label="会员"></el-table-column>
               <el-table-column prop="title" label="充值名称"></el-table-column>
@@ -538,6 +538,18 @@
               </el-table-column>
               <el-table-column prop="create_time" label="充值时间"  width="155"></el-table-column>
             </el-table>
+            <div class="footer" style="margin-top: 10px;text-align: right;">
+              <el-pagination
+                background
+                layout="total, sizes, prev, pager, next, jumper"
+                @size-change="huiyuanDialogPageSizeChange"
+                :page-sizes="[5, 10, 20, 30]"
+                :page-size="huiyuanDialog.limit"
+                @current-change="huiyuanDialogOnePageCurrentChange"
+                :current-page.sync="huiyuanDialog.page"
+                :total="huiyuanDialog.count">
+              </el-pagination>
+            </div>
           </div>
         </div>
       </el-dialog>
@@ -765,8 +777,11 @@ export default {
           mobile: '',
           nickname: ''
         },
-        // 展示服务卡购买记录
-        showFuwuTable: true,
+        // 展示哪个数据 默认为充值记录
+        showWho: 'rechargeLog',
+        count:1,
+        page:1,
+        limit:5,
         // 服务卡购买记录
         fuwukaList: [
           // {
@@ -2182,12 +2197,31 @@ export default {
       }).catch(() => {
       })
     },
+    huiyuanDialogChoosesWho(who){
+      this.huiyuanDialog.showWho = who
+      switch (this.huiyuanDialog.showWho) {
+        case 'rechargeLog':
+          this.huiyuanDialog.page = 1
+          this.huiyuanDialogSearchRechargeLog()
+          break
+        case 'serviceCard':
+          this.huiyuanDialog.page = 1
+          this.huiyuanDialogSearchServiceCardList()
+          break
+      }
+    },
     huiyuanDialogSearchRechargeLog () {
       if (this.huiyuanDialog.huiyuanInfo.id) {
         this.huiyuanDialog.showFuwuTable = false
-        let requestData = {member_id: this.huiyuanDialog.huiyuanInfo.id}
+        let requestData = {
+          member_id: this.huiyuanDialog.huiyuanInfo.id,
+          page: `${this.huiyuanDialog.page},${this.huiyuanDialog.limit}`,
+        }
         postMemberVipRechargeLog(requestData).then(res => {
-          this.huiyuanDialog.chongzhijiluList = res.data
+          this.huiyuanDialog.count = res.count
+          if (res.data.length) {
+            this.huiyuanDialog.chongzhijiluList = res.data
+          }
         })
       } else {
         this.$message.closeAll()
@@ -2200,9 +2234,14 @@ export default {
     huiyuanDialogSearchServiceCardList () {
       if (this.huiyuanDialog.huiyuanInfo.id) {
         this.huiyuanDialog.showFuwuTable = true
-        let requestData = {member_id: this.huiyuanDialog.huiyuanInfo.id}
+        let requestData = {
+          member_id: this.huiyuanDialog.huiyuanInfo.id,
+          page: this.huiyuanDialog.page,
+          limit: this.huiyuanDialog.limit,
+        }
         postMemberServiceCards(requestData).then(res => {
-          if (res.data) {
+          this.huiyuanDialog.count = res.total
+          if (res.data.length) {
             this.huiyuanDialog.fuwukaList = res.data
           } else {
             this.huiyuanDialog.fuwukaList = []
@@ -2216,6 +2255,29 @@ export default {
         })
       }
     },
+    huiyuanDialogPageSizeChange(val){
+      this.huiyuanDialog.limit = val
+      switch (this.huiyuanDialog.showWho) {
+        case 'rechargeLog':
+          this.huiyuanDialogSearchRechargeLog()
+          break
+        case 'serviceCard':
+          this.huiyuanDialogSearchServiceCardList()
+          break
+      }
+    },
+    huiyuanDialogOnePageCurrentChange (val) {
+      this.huiyuanDialog.page = val
+      switch (this.huiyuanDialog.showWho) {
+        case 'rechargeLog':
+          this.huiyuanDialogSearchRechargeLog()
+          break
+        case 'serviceCard':
+          this.huiyuanDialogSearchServiceCardList()
+          break
+      }
+    },
+
     // 激活服务卡
     huiyuanDialogActiveServiceCard (card_id) {
       this.huiyuanDialog.activeServiceCardDialog.card_id = card_id
@@ -2330,7 +2392,8 @@ export default {
         search: this.goukaDialog.title,
         type: this.goukaDialog.requestData.type,
         page: this.goukaDialog.requestData.page,
-        limit: this.goukaDialog.requestData.limit
+        limit: this.goukaDialog.requestData.limit,
+        member_id: this.jiezhangDialog.memberVip.id
       }
       if (!requestData.search) {
         delete requestData.search
