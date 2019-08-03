@@ -622,8 +622,8 @@
       </el-dialog>
       <!-- 会员查询-使用记录  -->
       <el-dialog title="使用记录" :visible.sync="huiyuanDialog.shiyongjiluDialog.isShow" width="648px" :center="true">
-        <div style="height: 240px;">
-          <el-table :data="huiyuanDialog.shiyongjiluDialog.tableData" border  style="height: 240px;">
+        <div>
+          <el-table :data="huiyuanDialog.shiyongjiluDialog.tableData" border height="300">
             <el-table-column prop="service_name" label="服务项目"></el-table-column>
             <el-table-column prop="time" label="使用时间"></el-table-column>
             <el-table-column prop="waiter" label="服务人员"></el-table-column>

@@ -161,6 +161,15 @@ export const postBuyServiceCards = (data = null) => {
 }
 
 /**
+ * 收银大屏-购买服务卡-服务卡列表-详情
+ * @param data
+ * @returns {*}
+ */
+export const postBuyServiceCardsDetails = (data = null) => {
+  return Vue.prototype.$post('/ticket/ticket_details', data)
+}
+
+/**
  * 收银大屏-商品，服务商品-结算
  * @param data
  * @returns {*}
