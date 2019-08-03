@@ -437,7 +437,7 @@
                     <span class="float-left">服务卡</span>
                     <span class="float-right" v-if="xuanzehuiyuanDialog.memberVip.service_card || xuanzehuiyuanDialog.memberVip.service_card === 0">
                       <el-badge :value="xuanzehuiyuanDialog.memberVip.service_card">
-                        <el-button size="mini">查看</el-button>
+                        <el-button size="mini" @click="xuanzehuiyuanDialogSeeServiceCard">查看</el-button>
                       </el-badge>
                     </span>
                   </li>
@@ -489,7 +489,7 @@
               <v-keyboard-without-point @getNumber="huiyuanDialogGetCode"></v-keyboard-without-point>
             </div>
           </div>
-          <div class="my-table">
+          <div class="my-table" v-if="huiyuanDialog.fuwukaList.length || huiyuanDialog.chongzhijiluList.length">
             <!-- 服务卡 -->
             <el-table v-show="huiyuanDialog.showWho === 'serviceCard'" :data="huiyuanDialog.fuwukaList" height="300" border style="width: 100%">
               <el-table-column type="index" label="序号" width="80"></el-table-column>
@@ -1921,6 +1921,13 @@ export default {
         if (this.xuanzehuiyuanDialog.mobile.length < 11) { this.xuanzehuiyuanDialog.mobile += code }
       }
     },
+    // 选择会员后，点查看会员
+    xuanzehuiyuanDialogSeeServiceCard(){
+      this.xuanzehuiyuanDialog.isShow = false
+      this.huiyuanDialog.isShow = true
+      this.huiyuanDialog.mobile = this.xuanzehuiyuanDialog.mobile
+      this.huiyuanDialogSearchMemberVip()
+    },
     // 选择会员后时，如果购物车里有服务商品，或服务卡，就要显示他的会员价
     choosesGoodsShowMemberPrice () {
       // 当前页面中，被选中的是服务商品 刷新接口展示出会员价来
@@ -2120,7 +2127,7 @@ export default {
         postSearchVip(requestData).then(res => {
           if (res.data.id) {
             this.huiyuanDialog.huiyuanInfo = res.data
-            this.huiyuanDialogSearchRechargeLog()
+            this.huiyuanDialogChoosesWho()
           } else {
             this.huiyuanDialog.huiyuanInfo = {}
             this.huiyuanDialog.fuwukaList = []
@@ -2198,7 +2205,9 @@ export default {
       })
     },
     huiyuanDialogChoosesWho(who){
-      this.huiyuanDialog.showWho = who
+      if (who) {
+        this.huiyuanDialog.showWho = who
+      }
       switch (this.huiyuanDialog.showWho) {
         case 'rechargeLog':
           this.huiyuanDialog.page = 1
