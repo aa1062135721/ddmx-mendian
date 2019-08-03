@@ -147,82 +147,84 @@ export default {
     }
     .my-icon{
       margin-right: 20px;
-      height: 88px!important;
-      line-height: 88px!important;
+      height: 48px!important;
+      line-height: 48px!important;
+      width: 48px!important;
+      display:inline-block;
     }
 
    .reception-get-money{
-     background: url(../../assets/sidebar-icon/reception-get-money.png) center no-repeat;
+     background: url(../../assets/sidebar-icon/reception-get-money.png) center center no-repeat;
      &:before{
-       content: "\e611";
+       content: "";
        font-size: 48px;
        visibility: hidden;
      }
    }
     .marketing-manage{
-      background: url(../../assets/sidebar-icon/marketing-manage.png) center no-repeat;
+      background: url(../../assets/sidebar-icon/marketing-manage.png) center center no-repeat;
       &:before{
-        content: "\e611";
+        content: "";
         font-size: 48px;
         visibility: hidden;
       }
     }
 
     .order-manage{
-      background: url(../../assets/sidebar-icon/order-manage.png) center no-repeat;
+      background: url(../../assets/sidebar-icon/order-manage.png) center center no-repeat;
       &:before{
-        content: "\e611";
+        content: "";
         font-size: 48px;
         visibility: hidden;
       }
     }
     .shop-status{
-      background: url(../../assets/sidebar-icon/shop-status.png) center no-repeat;
+      background: url(../../assets/sidebar-icon/shop-status.png) center center no-repeat;
       &:before{
-        content: "\e611";
+        content: "";
         font-size: 48px;
         visibility: hidden;
       }
     }
     .member-manage{
-      background: url(../../assets/sidebar-icon/member-manage.png) center no-repeat;
+      background: url(../../assets/sidebar-icon/member-manage.png) center center no-repeat;
       font-size: 48px;
       &:before{
-        content: "\e611";
+        content: "";
         font-size: 48px;
         visibility: hidden;
       }
     }
     .stock-manage{
-      background: url(../../assets/sidebar-icon/stock-manange.png) center no-repeat;
+      background: url(../../assets/sidebar-icon/stock-manange.png) center center no-repeat;
       font-size: 48px;
       &:before{
-        content: "\e611";
+        content: "";
         font-size: 48px;
         visibility: hidden;
       }
     }
     .statement-analysis{
-      background: url(../../assets/sidebar-icon/statement-analysis.png) center no-repeat;
+      background: url(../../assets/sidebar-icon/statement-analysis.png) center center no-repeat;
       font-size: 48px;
       &:before{
-        content: "\e611";
+        content: "";
         font-size: 48px;
         visibility: hidden;
       }
     }
     .expenditure-manage{
-      background: url(../../assets/sidebar-icon/expenditure-manage.png) center no-repeat;
+      background: url(../../assets/sidebar-icon/expenditure-manage.png) center center no-repeat;
       &:before{
-        content: "\e611";
+        content: "";
         font-size: 48px;
         visibility: hidden;
       }
     }
     .system-setting{
-      background: url(../../assets/sidebar-icon/system-setting.png) center no-repeat;
+      background: url(../../assets/sidebar-icon/system-setting.png) center center no-repeat;
       &:before{
-        content: "\e611";
+        content: "";
         font-size: 48px;
         visibility: hidden;
       }
