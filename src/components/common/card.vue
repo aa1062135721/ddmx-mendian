@@ -38,13 +38,13 @@
           <div class="detail_header">时间有效期</div>
           <div class="detail_content">
             <div class="yuan float-left"></div>
-            <div class="title float-left">激活过期时间：{{detailDialog.responseData.end_time}}</div>
+            <div class="title float-left">激活过期时间：{{detailDialog.responseData.over_time}}</div>
             <div class="text clear-both">
             </div>
           </div>
           <div class="detail_content">
             <div class="yuan float-left"></div>
-            <div class="title float-left">激活后使用过期时间：{{detailDialog.responseData.over_time}}</div>
+            <div class="title float-left">激活后使用过期时间：{{detailDialog.responseData.end_time}}</div>
             <div class="text clear-both">
             </div>
           </div>
@@ -53,7 +53,7 @@
           <div class="detail_header">服务项目</div>
           <div class="detail_content" v-for="item in detailDialog.responseData.service">
             <div class="yuan float-left"></div>
-            <div class="title float-left">{{item.service_name}}（{{item.num}}次)</div>
+            <div class="title float-left">{{item.service_name}}({{item.num ==='0'?item.num+'次' :'不限制'}})</div>
             <div class="text clear-both">
               要求：{{(item.year === 0 && item.month === 0 && item.day === 0) ? '无' : '每年使用' + item.year + '次，每月使用' + item.month + '次，每日使用' + item.day + '次。'}}
             </div>

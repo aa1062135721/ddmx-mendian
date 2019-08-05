@@ -98,7 +98,7 @@ export default {
   },
   methods: {
     handleOpen (key, keyPath) {
-      console.log(key, keyPath)
+      // console.log(key, keyPath)
       this.$router.push({
         path: key,
         query: {}
@@ -125,16 +125,17 @@ export default {
         width: 100%;
         li{
           width: 100%;
-          height: 88px!important;
-          font-size:48px;
-          font-family:SourceHanSansCN-Regular;
+          height: 56px!important;
+          line-height: 56px!important;
+          font-size:20px;
           font-weight:400;
           color: #ffffff;
           span{
-            font-size:26px;
-            height: 88px;
+            font-size:20px!important;
             width: 100%;
-            line-height: 88px;
+          }
+          &:hover{
+            background-color: #06526E !important;
           }
         }
       }
@@ -145,88 +146,40 @@ export default {
     .el-menu-item.is-active {
       background-color: #06526E !important;
     }
-    .my-icon{
-      margin-right: 20px;
-      height: 48px!important;
-      line-height: 48px!important;
-      width: 48px!important;
-      display:inline-block;
-    }
 
    .reception-get-money{
      background: url(../../assets/sidebar-icon/reception-get-money.png) center center no-repeat;
-     &:before{
-       content: "";
-       font-size: 48px;
-       visibility: hidden;
-     }
    }
     .marketing-manage{
       background: url(../../assets/sidebar-icon/marketing-manage.png) center center no-repeat;
-      &:before{
-        content: "";
-        font-size: 48px;
-        visibility: hidden;
-      }
     }
-
     .order-manage{
       background: url(../../assets/sidebar-icon/order-manage.png) center center no-repeat;
-      &:before{
-        content: "";
-        font-size: 48px;
-        visibility: hidden;
-      }
     }
     .shop-status{
       background: url(../../assets/sidebar-icon/shop-status.png) center center no-repeat;
-      &:before{
-        content: "";
-        font-size: 48px;
-        visibility: hidden;
-      }
     }
     .member-manage{
       background: url(../../assets/sidebar-icon/member-manage.png) center center no-repeat;
-      font-size: 48px;
-      &:before{
-        content: "";
-        font-size: 48px;
-        visibility: hidden;
-      }
     }
     .stock-manage{
       background: url(../../assets/sidebar-icon/stock-manange.png) center center no-repeat;
-      font-size: 48px;
-      &:before{
-        content: "";
-        font-size: 48px;
-        visibility: hidden;
-      }
     }
     .statement-analysis{
       background: url(../../assets/sidebar-icon/statement-analysis.png) center center no-repeat;
-      font-size: 48px;
-      &:before{
-        content: "";
-        font-size: 48px;
-        visibility: hidden;
-      }
     }
     .expenditure-manage{
       background: url(../../assets/sidebar-icon/expenditure-manage.png) center center no-repeat;
-      &:before{
-        content: "";
-        font-size: 48px;
-        visibility: hidden;
-      }
     }
     .system-setting{
       background: url(../../assets/sidebar-icon/system-setting.png) center center no-repeat;
-      &:before{
-        content: "";
-        font-size: 48px;
-        visibility: hidden;
-      }
+    }
+    .my-icon{
+      margin-right: 20px;
+      height: 25px;
+      width: 25px;
+      display:inline-block;
+      font-size: 25px;
+      background-size: 25px 25px;
     }
 </style>

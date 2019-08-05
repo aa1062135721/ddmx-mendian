@@ -223,13 +223,13 @@ export default {
           clear: both;
           overflow-x: hidden;
           cursor:pointer;
-          height:84px;
-          line-height: 84px;
+          height:56px;
+          line-height: 56px;
           width: calc(100% - 20px);
           padding: 0 10px;
           text-align: center;
           border-bottom:1px solid rgba(204,204,204,1);
-          font-size:24px;
+          font-size:20px;
           font-family:SourceHanSansCN-Regular;
           font-weight:400;
           color:rgba(26,26,26,1);
@@ -240,8 +240,8 @@ export default {
             color: #B8B8B8;
             font-size: 24px;
             font-weight: bolder;
-            height: 84px;
-            line-height: 84px;
+            height: 56px;
+            line-height: 56px;
           }
         }
         .active{
