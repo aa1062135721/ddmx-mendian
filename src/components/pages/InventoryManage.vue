@@ -198,7 +198,7 @@
             </div>
             <div style="text-align: center;margin-top: 15px;">
               <el-button class="my-secondary-btn" @click="transferSlipPageData.addDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn" @click="addtransferSlipGoodOk">确定</el-button>
+              <el-button class="my-primary-btn"  type="primary" @click="addtransferSlipGoodOk" :disabled="!transferSlipPageData.addDialog.list.length">确定</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--新增调拨 选择商品-->
@@ -1594,7 +1594,6 @@ export default {
       }
       postCheckOrderAddGoodList(data).then(res => {
         if (res.data.length) {
-          this.checkOrderPageData.addDialog.isShow = true
           let formatArr = []
           res.data.forEach((item) => {
             formatArr.push({
@@ -1608,6 +1607,7 @@ export default {
           })
           this.checkOrderPageData.addDialog.list = formatArr
         }
+        this.checkOrderPageData.addDialog.isShow = true
       })
     },
     // 新增盘点单对话框获取二级分类列表
