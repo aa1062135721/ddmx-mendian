@@ -660,13 +660,13 @@
                <el-tab-pane label="年卡" name="4" v-infinite-scroll="goukaDialogSearchCardsNext" infinite-scroll-immediate="false">
                  <v-card class="card-botton" v-for="(item, index) in goukaDialog.cardsList" :key="item.id" :ocard="item" @click.native="goukaDialogClickChoosesCard(index)"></v-card>
                </el-tab-pane>
-               <el-tab-pane  label="搜索"  name="0" v-infinite-scroll="goukaDialogSearchCardsNext" infinite-scroll-immediate="false" :disabled="true"	>
+               <el-tab-pane  label="搜索"  name="0" v-infinite-scroll="goukaDialogSearchCardsNext" infinite-scroll-immediate="false" 	>
                  <v-card class="card-botton" v-for="(item, index) in goukaDialog.cardsList" :key="item.id" :ocard="item" @click.native="goukaDialogClickChoosesCard(index)"></v-card>
                </el-tab-pane>
              </el-tabs>
          <div slot="footer" class="footer">
-           <el-button @click="goukaDialog.isShow = false" class="btn">取消</el-button>
-           <el-button @click="goukaDialogNowBuy" class="btn active">立即购买</el-button>
+           <el-button @click="goukaDialog.isShow = false" class="btn" style="margin-right: 20px;">取消</el-button>
+           <el-button @click="goukaDialogNowBuy" class="btn active" style="margin-left: 20px;">立即购买</el-button>
          </div>
       </el-dialog>
       <!-- 结账成功弹框-->
@@ -3386,7 +3386,7 @@ export default {
               overflow: hidden;
               overflow-y: auto;
               padding: 32px 18px 0 18px;
-              background: #cccccc;
+              background: #F2F2F2;
               /deep/ .el-tab-pane{
                 display: flex;
                 flex-direction:row;
@@ -3412,7 +3412,7 @@ export default {
           height:44px;
           background:rgba(255,255,255,1);
           border:1px solid rgba(46,202,241,1);
-          border-radius:8px;
+          border-radius:4px;
           color: #2ECAF1;
           font-size:20px;
           font-family:SourceHanSansCN-Regular;
