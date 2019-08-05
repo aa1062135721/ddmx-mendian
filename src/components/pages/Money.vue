@@ -2363,6 +2363,7 @@ export default {
     },
     // 使用记录
     huiyuanDialogServiceCardUseRecords (card) {
+      this.huiyuanDialog.shiyongjiluDialog.tableData = []
       let requestData = {
         member_id:this.huiyuanDialog.huiyuanInfo.id,
         ticket_id: card.id

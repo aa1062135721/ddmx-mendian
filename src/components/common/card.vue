@@ -55,7 +55,13 @@
             <div class="yuan float-left"></div>
             <div class="title float-left">{{item.service_name}}({{item.num ==='0'?item.num+'次' :'不限制'}})</div>
             <div class="text clear-both">
-              要求：{{(item.year === 0 && item.month === 0 && item.day === 0) ? '无' : '每年使用' + item.year + '次，每月使用' + item.month + '次，每日使用' + item.day + '次。'}}
+              要求：
+              <span v-if="item.year === 0 && item.month === 0 && item.day === 0">无</span>
+              <span v-else>
+                <span v-if="item.year !== 0">每年使用{{item.year}}次 ;</span>
+                <span v-if="item.month !== 0">每月使用{{item.year}}次;</span>
+                <span v-if="item.day !== 0">每日使用{{item.day}}次。</span>
+              </span>
             </div>
           </div>
         </div>
