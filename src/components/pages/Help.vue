@@ -2,7 +2,7 @@
     <div class="page-help bg-blue">
       <div class="header clear-both">
         <div class="logo float-left">
-          <img class="img" src="../../assets/images/logo.png" alt="logo"  @click="goToUrl('/home')">
+          <img class="img" src="../../assets/images/logo.png" alt="logo"  @click="goToUrl('/home/order')">
           <span class="title">帮助中心</span>
         </div>
         <div class="tabs float-right">
@@ -33,13 +33,28 @@
           </ul>
         <div class="right float-right">
           <h1 class="title" v-if="hepls.length" v-html="hepls[index].title"></h1>
-          <div class="content" v-if="hepls.length" v-html="hepls[index].content"></div>
+          <div class="content" v-if="hepls.length" v-html="hepls[index].content">
+
+          </div>
         </div>
       </div>
     </div>
 </template>
 
 <script>
+import VueImg from 'v-img'
+import Vue from 'vue'
+const vueImgConfig = {
+  // Use `alt` attribute as gallery slide title
+  altAsTitle: false,
+  // Display 'download' button near 'close' that opens source image in new tab
+  sourceButton: false,
+  // Event listener to open gallery will be applied to <img> element
+  openOn: 'click',
+  // Show thumbnails for all groups with more than 1 image
+  thumbnails: false,
+}
+Vue.use(VueImg,vueImgConfig)
 import { postGetHelpList } from '../../api/getData'
 export default {
   name: 'Index',
@@ -80,6 +95,13 @@ export default {
       }
       postGetHelpList(requestData).then(res => {
         if (res.data.length) {
+          res.data.map(item => {
+            item.content.replace(/<img[^>]*>/gi, function (match, capture) {
+              console.log(match,capture)
+              // return match.replace(/al\s*?=\s*?([‘"])[\s\S]*?\1/ig, 'style="max-width:100%;height:auto;"') // 替换style
+            })
+          })
+
           if (requestData.content) {
             res.data.map(item => {
               // 匹配关键字正则
@@ -218,7 +240,8 @@ export default {
         background: #fff;
         text-align: center;
         list-style-type: none;
-        width:20.73%;
+        /*width:20.73%;*/
+        width: 268px;
         li{
           clear: both;
           overflow-x: hidden;
