@@ -644,36 +644,27 @@
         </div>
       </el-dialog>
       <!-- 点击购卡按钮弹窗-购卡项目 -->
-      <el-dialog class="goukaxiangmu-tanchuan" title="购卡项目" :visible.sync="goukaDialog.isShow" width="886px" :center="true" :show-close="false">
-         <div  slot="title">
-           <div class="search">
-             <el-input class="goods-search" @keyup.enter.native="goukaDialogChoosesCardType(0)"   placeholder="搜索服务卡名称"  v-model="goukaDialog.title">
-               <i slot="suffix" class="el-input__icon el-icon-search" @click="goukaDialogChoosesCardType(0)"></i>
-             </el-input>
-           </div>
-<!--           <div class="tab-btns">-->
-<!--             <el-button @click="goukaDialogChoosesCardType(1)" class="btn" :class="{'active': (!goukaDialog.title && goukaDialog.requestData.type === 1)}">次卡</el-button>-->
-<!--             <el-button @click="goukaDialogChoosesCardType(2)" class="btn" :class="{'active': (!goukaDialog.title && goukaDialog.requestData.type === 2)}">月卡</el-button>-->
-<!--             <el-button @click="goukaDialogChoosesCardType(4)" class="btn" :class="{'active': (!goukaDialog.title && goukaDialog.requestData.type === 4)}">年卡</el-button>-->
-<!--           </div>-->
+      <el-dialog class="goukaxiangmu-tanchuan" title="购卡项目" :visible.sync="goukaDialog.isShow" width="886px" :center="true">
+         <div class="search">
+           <el-input class="goods-search" @keyup.enter.native="goukaDialogChoosesCardType({name:'0'})"   placeholder="搜索服务卡名称"  v-model="goukaDialog.title">
+             <i slot="suffix" class="el-input__icon el-icon-search" @click="goukaDialogChoosesCardType({name:'0'})"></i>
+           </el-input>
          </div>
-
-         <div style="background: #F2F2F2;padding: 0;">
-             <el-tabs v-model="goukaDialog.requestData.type" @tab-click="goukaDialogChoosesCardType">
-               <el-tab-pane label="次卡" name="1">
+         <el-tabs v-model="goukaDialog.requestData.type" @tab-click="goukaDialogChoosesCardType">
+               <el-tab-pane label="次卡" name="1" v-infinite-scroll="goukaDialogSearchCardsNext" infinite-scroll-immediate="false">
                  <v-card class="card-botton" v-for="(item, index) in goukaDialog.cardsList" :key="item.id" :ocard="item" @click.native="goukaDialogClickChoosesCard(index)"></v-card>
                </el-tab-pane>
-               <el-tab-pane label="月卡" name="2">
+               <el-tab-pane label="月卡" name="2" v-infinite-scroll="goukaDialogSearchCardsNext" infinite-scroll-immediate="false">
                  <v-card class="card-botton" v-for="(item, index) in goukaDialog.cardsList" :key="item.id" :ocard="item" @click.native="goukaDialogClickChoosesCard(index)"></v-card>
                </el-tab-pane>
-               <el-tab-pane label="年卡" name="4">
+               <el-tab-pane label="年卡" name="4" v-infinite-scroll="goukaDialogSearchCardsNext" infinite-scroll-immediate="false">
+                 <v-card class="card-botton" v-for="(item, index) in goukaDialog.cardsList" :key="item.id" :ocard="item" @click.native="goukaDialogClickChoosesCard(index)"></v-card>
+               </el-tab-pane>
+               <el-tab-pane  label="搜索"  name="0" v-infinite-scroll="goukaDialogSearchCardsNext" infinite-scroll-immediate="false" :disabled="true"	>
                  <v-card class="card-botton" v-for="(item, index) in goukaDialog.cardsList" :key="item.id" :ocard="item" @click.native="goukaDialogClickChoosesCard(index)"></v-card>
                </el-tab-pane>
              </el-tabs>
-         </div>
          <div slot="footer" class="footer">
-           <el-button @click="goukaDialogSearchCardsPre" class="btn">上一页</el-button>
-           <el-button @click="goukaDialogSearchCardsNext" class="btn">下一页</el-button>
            <el-button @click="goukaDialog.isShow = false" class="btn">取消</el-button>
            <el-button @click="goukaDialogNowBuy" class="btn active">立即购买</el-button>
          </div>
@@ -921,7 +912,7 @@ export default {
         requestData: {
           total: 0,
           page: 1,
-          limit: 4,
+          limit: 5,
           type: "1"// 卡卷类型 1为次卡 2为月卡  3为季卡  4为年卡
         }
       },
@@ -2401,10 +2392,11 @@ export default {
         })
       }
     },
-    goukaDialogChoosesCardType (type) {
-      if (type !== 0) { this.goukaDialog.title = '' }
-      this.goukaDialog.requestData.type = type
+    goukaDialogChoosesCardType (type, e) {
+      if (type.name !== '0') { this.goukaDialog.title = '' }
+      this.goukaDialog.requestData.type = type.name
       this.goukaDialog.requestData.page = 1
+      this.goukaDialog.cardsList = []
       this.goukaDialogSearch()
     },
     goukaDialogSearch () {
@@ -2415,21 +2407,20 @@ export default {
         limit: this.goukaDialog.requestData.limit,
         member_id: this.jiezhangDialog.memberVip.id
       }
-      if (!requestData.search) {
-        delete requestData.search
-      }
-      if (!requestData.type) {
+      if (requestData.type === '0') {
         delete requestData.type
       }
       postBuyServiceCards(requestData).then(res => {
         this.goukaDialog.requestData.total = res.total
-        if (res.data) {
+        if (res.data.length) {
           res.data.map(item => {
             item.is_checked = false
           })
-          this.goukaDialog.cardsList = res.data
-        } else {
-          this.goukaDialog.cardsList = []
+          if (this.goukaDialog.requestData.page === 1) {
+            this.goukaDialog.cardsList =  res.data
+          } else {
+            this.goukaDialog.cardsList.push(...res.data)
+          }
         }
       })
     },
@@ -3348,50 +3339,70 @@ export default {
   }
   /*购卡项目弹窗*/
   .goukaxiangmu-tanchuan{
-    /*.content{*/
+      /deep/ .el-dialog{
+      /deep/ .el-dialog__body{
+          padding: 0!important;
+         /deep/ .el-tabs{
+            /deep/ .el-tabs__header {
+              margin: 0;
+              /deep/ .el-tabs__nav-wrap{
+                &:after{
+                  height: 0;
+                  background: none;
+                }
+                /deep/ .el-tabs__nav-scroll{
+                  text-align: center;
+                  /deep/ .el-tabs__nav{
+                    /*margin: auto;*/
+                    float: none;
+                    /*white-space: nowrap;*/
+                    /*display: flex;*/
+                    /*flex-direction: row;*/
+                    /*justify-content: space-around;*/
+                    .el-tabs__active-bar{
+                      height: 0;
+                      width: 0;
+                      background: none;
+                    }
+                    .el-tabs__item{
+                      padding: 0 80px;
+                      font-size: 24px;
+                      &:first-child{
+                        padding-left: 0;
+                      }
+                      &:nth-child(2){
+                        padding-left: 0;
+                      }
+                      &:last-child{
+                        padding-right: 0;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            /deep/ .el-tabs__content{
+              height: 450px;
+              overflow: hidden;
+              overflow-y: auto;
+              padding: 32px 18px 0 18px;
+              background: #cccccc;
+              /deep/ .el-tab-pane{
+                display: flex;
+                flex-direction:row;
+                flex-wrap:wrap;
+                justify-content:space-between;
+                .card-botton{
+                  margin-bottom: 28px;
+                }
+              }
+            }
+         }
+      }
+    }
       .search{
-        width: 100%;
-        margin-bottom: 24px;
-      }
-      .tab-btns{
-        width: 100%;
-        margin-bottom: 40px;
-        display: flex;
-        align-items: center;
-        flex-wrap:wrap;
-        justify-content: space-between;
-        align-content:flex-start;
-        .btn{
-          width:228px;
-          height:48px;
-          background:#6BD2F4;
-          font-size:24px;
-          font-family:SourceHanSansCN-Regular;
-          font-weight:400;
-          color:rgba(26,26,26,1);
-          &:active{
-            color: #ffffff;
-            background: #F55656;
-          }
-        }
-        .active{
-          color: #ffffff;
-          background: #F55656;
-        }
-      }
-      .bodys{
-        width: 100%;
-        height: 430px;
-        margin-bottom:28px;
-        display: flex;
-        align-items: center;
-        flex-wrap:wrap;
-        align-items:flex-start;
-        justify-content: space-between;
-        align-content:flex-start;
-        .card-botton{
-          margin-bottom: 28px;
-        }
+        padding: 15px 25px;
+        width: cale(100% - 50px);
       }
       .footer{
         width: 100%;
@@ -3412,7 +3423,6 @@ export default {
           background: #2DC2F3;
         }
       }
-    /*}*/
   }
   /*结账成功弹框*/
   .jiezhang-chenggong-tanchuan{
