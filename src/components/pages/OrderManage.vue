@@ -152,16 +152,16 @@
                 </el-option>
               </el-select>
             </div>
-            <div class="select" style="width: 148px;">
-              <el-select v-model="requestData.orderStatus" clearable placeholder="选择状态">
-                <el-option
-                  v-for="item in orderStatus"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id">
-                </el-option>
-              </el-select>
-            </div>
+<!--            <div class="select" style="width: 148px;">-->
+<!--              <el-select v-model="requestData.status" clearable placeholder="选择状态">-->
+<!--                <el-option-->
+<!--                  v-for="item in orderStatus"-->
+<!--                  :key="item.id"-->
+<!--                  :label="item.name"-->
+<!--                  :value="item.id">-->
+<!--                </el-option>-->
+<!--              </el-select>-->
+<!--            </div>-->
             <div class="select" style="width:368px;height:48px;">
               <el-input
                 v-model="requestData.search"
@@ -221,6 +221,102 @@
               @current-change="responseDataOnePageCurrentChange"
               :current-page.sync="requestData.page"
               :total="responseData3.count">
+            </el-pagination>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="服务卡订单" name="2">
+          <div class="search-condition">
+            <div class="select">
+              <el-select v-model="requestData.waiter_id" clearable placeholder="选择服务人员" >
+                <el-option
+                  v-for="item in waiter"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select">
+              <el-select v-model="requestData.pay_way" clearable placeholder="选中支付方式">
+                <el-option
+                  v-for="item in payWayList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select" style="width: 148px;">
+              <el-select v-model="requestData.status" clearable placeholder="选择状态">
+                <el-option
+                  v-for="item in orderStatusServiceCardOrder"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="select" style="width:368px;height:48px;">
+              <el-input
+                v-model="requestData.search"
+                placeholder="请输入需查询的会员手机号/订单号"
+                clearable>
+              </el-input>
+            </div>
+          </div>
+          <div class="search-btns">
+            <span class="span">筛选</span>
+            <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日</el-button>
+            <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日</el-button>
+            <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周</el-button>
+            <el-date-picker
+              @focus="chooseTimeDIY"
+              v-model="requestData.date"
+              type="daterange"
+              range-separator="至"
+              value-format="yyyy-MM-dd"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
+            <div class="select" style="margin-left: 20px">
+              <el-button type="primary" @click="requestData.page = 1;getOrderList()">搜索</el-button>
+            </div>
+          </div>
+          <div class="serch-table">
+            <el-table :data="responseData2.data" border style="width: 100%;" height="565">
+              <el-table-column prop="sn" label="订单号"></el-table-column>
+              <el-table-column label="会员账号">
+                <template slot-scope="scope">
+                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)">{{scope.row.mobile}}</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column prop="price" label="付款金额"></el-table-column>
+              <el-table-column prop="pay_way" label="付款方式"></el-table-column>
+              <el-table-column prop="time" label="交易时间"></el-table-column>
+              <el-table-column label="服务人员">
+                <template slot-scope="scope">
+                  <el-button type="text" size="small" @click="getWaiterInfo(scope.row.waiter_id)">{{scope.row.waiter}}</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column prop="time" label="使用情况"></el-table-column>
+              <el-table-column prop="time" label="状态"></el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope">
+                  <el-button size="mini"   @click="">订单详情</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <div class="footer">
+            <el-pagination
+              background
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="pageSizeChange"
+              :page-sizes="[10, 20, 30, 40]"
+              :page-size="requestData.limit"
+              @current-change="responseDataOnePageCurrentChange"
+              :current-page.sync="requestData.page"
+              :total="responseData2.count">
             </el-pagination>
           </div>
         </el-tab-pane>
@@ -361,26 +457,27 @@
       <!-- 门店订单--退款处理-->
       <el-dialog class="order-details-dialog" title="退款处理" :visible.sync="returnOrderDialog1.isShow" width="968px" :center="true">
         <div>
-          <div>
-            <div class="float-left">
-              <el-select v-model="requestData.nowWaiter" clearable placeholder="选择退货原因" >
+          <div style="margin-bottom: 20px;height: 50px;" class="clear-both">
+            <div class="float-left" style="width: 35%;" >
+              <el-select v-model="returnOrderDialog1.chooseResult" clearable placeholder="选择退货原因" >
                 <el-option
-                  v-for="item in returnOrderResult"
+                  v-for="item in returnOrderDialog1.returnOrderResult"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id">
                 </el-option>
               </el-select>
             </div>
-            <div>
+            <div class="float-right"  style="width: 60%;" v-if="returnOrderDialog1.chooseResult === 5">
               <el-input
+                v-model="returnOrderDialog1.otherResult"
                 placeholder="请输入其他原因"
                 clearable>
               </el-input>
             </div>
           </div>
           <div>
-            <el-table :data="orderDetailsDialog1.goods" border style="width: 100%;" height="142">
+            <el-table  border style="width: 100%;" height="142">
               <el-table-column prop="subtitle" label="商品名称" width="180"></el-table-column>
               <el-table-column prop="num" label="数量" width="180"></el-table-column>
               <el-table-column prop="real_price" label="成本价"></el-table-column>
@@ -401,55 +498,114 @@ export default {
   name: 'OrderManage', // 订单管理
   data () {
     return {
-      // 退货原因列表
-      returnOrderResult: [
-        {id: 1, name: '你这个东西太贵了。'},
-        {id: 2, name: '你这个东西是打发点死大多数大饭店太贵了。'},
-        {id: 3, name: '说是。'},
-        {id: 4, name: '你这个东西太事实上贵了。'},
-        {id: 5, name: '其他原因。'}
+      /**
+       * 公共参数
+       */
+      // 选择支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
+      payWayList: [
+        {id: 1, name: '微信'},
+        {id: 2, name: '支付宝'},
+        {id: 3, name: '余额(会员卡)'},
+        {id: 4, name: '银行卡'},
+        {id: 5, name: '现金'},
+        {id: 6, name: '美团'},
+        {id: 7, name: '赠送'},
+        {id: 8, name: '门店自用'},
+        {id: 9, name: '兑换'},
+        {id: 10, name: '包月服务'},
+        {id: 11, name: '定制疗程'},
+        {id: 99, name: '管理员充值'}
+      ],
+      // 会员信息弹框
+      memberInfoDialog: {
+        isShow: false,
+        memberInfo: {
+          nickname: '涵涵妈',
+          mobile: '18725928054',
+          shop_code: '两江时光店',
+          level: '普通会员',
+          addtime: '2017-08-15 12:52:04'
+        }
+      },
+      // 服务人员信息弹框
+      waiterInfoDialog: {
+        isShow: false,
+        waiterInfo: {
+          name: '测试员工',
+          mobile: '15223622442',
+          shop: '测试门店10',
+          type: '水育,大保健,艾灸',
+          addtime: '2018-11-02 09:32:27'
+        }
+      },
+      // 选择服务人员
+      waiter: [
+        // {
+        //   id: 1, // 服务员id  当服务员的id为0师表示为当前登录的店长
+        //   name: '管理员', // 服务员名称
+        //   type: '店长' // 服务类型
+        // },
       ],
       requestData: {
-        // 服务项目
-        service: '',
-        // 分页
+        // 分页 公共参数
         page: 1,
-        // 每页的条数
+        // 每页的条数 公共参数
         limit: 10,
-        // 当前选中的服务人员
+        // 当前选中的服务人员 公共参数
         waiter_id: '',
-        // 当前选中的支付方式
+        // 当前选中的支付方式 公共参数
         pay_way: '',
-        // 选择订单状态
+        // 选择订单状态 公共参数
         status: '',
-        //
+        //门店订单需要的参数
         goods_type: 0,
-        // 请输入需查询的会员手机号/订单号
+        // 请输入需查询的会员手机号/订单号 公共参数
         search: '',
-        // 门店id
-        shop_code: 18,
-        // 订单类型 1=商品订单，2=服务卡订单 3=充值购卡 4=收银台收银
+        // 订单类型 1=商品订单，2=服务卡订单 3=充值购卡 4=收银台收银 公共参数
         type: '1',
-        // 筛选时间 自定义时间
+        // 筛选时间 自定义时间 公共参数
         date: [],
-        // 当前选择的时间// 1=今日，2=昨日，3=本周 0=未选择
+        // 当前选择的时间// 1=今日，2=昨日，3=本周 0=未选择 公共参数
         timeBtnValue: 0,
-        startTime: '', // 开始时间
-        endTime: '' // 结束时间
+        startTime: '', // 开始时间 公共参数
+        endTime: '' // 结束时间 公共参数
       },
+
+      /**
+       * 门店订单
+       */
+      // 门店订单-选择订单状态
+      orderStatus: [
+        {id: 2, name: '正常'},
+        {id: -6, name: '已退单'},
+        {id: -3, name: '有退单'},
+      ],
+      // 门店订单-商品类型
+      goodsType: [
+        {id: 0, name: '全部'},
+        {id: 1, name: '非外包商品'},
+        {id: 2, name: '非外包服务'},
+        {id: 3, name: '外包商品'},
+        {id: 4, name: '外包服务'},
+      ],
       // 门店订单
       responseData1: {
         data: [],
         count: 10
       },
-      // 充值订单
-      responseData3: {
-        data: [],
-        count: 10
-      },
       // 门店订单-退单弹框
       returnOrderDialog1: {
-        isShow: false
+        isShow: false,
+        chooseResult:'',
+        otherResult:'',
+        // 退货原因列表
+        returnOrderResult: [
+          {id: 1, name: '你这个东西太贵了。'},
+          {id: 2, name: '你这个东西是打发点死大多数大饭店太贵了。'},
+          {id: 3, name: '说是。'},
+          {id: 4, name: '你这个东西太事实上贵了。'},
+          {id: 5, name: '其他原因。'}
+        ],
       },
       // 门店订单-订单详情弹窗内容
       orderDetailsDialog1: {
@@ -492,6 +648,15 @@ export default {
           }
         ]
       },
+
+      /**
+       * 充值订单
+       */
+      // 充值订单
+      responseData3: {
+        data: [],
+        count: 10
+      },
       // 充值订单-订单详情弹窗内容
       orderDetailsDialog3: {
         isShow: false,
@@ -533,65 +698,20 @@ export default {
           }
         ]
       },
-      // 选择服务人员
-      waiter: [
-        // {
-        //   id: 1, // 服务员id  当服务员的id为0师表示为当前登录的店长
-        //   name: '管理员', // 服务员名称
-        //   type: '店长' // 服务类型
-        // },
-      ],
-      // 选择订单状态
-      orderStatus: [
+
+      /**
+       * 服务卡订单
+       */
+      //服务卡订单
+      responseData2:{
+        data: [],
+        count: 0
+      },
+      // 服务卡订单-选择订单状态
+      orderStatusServiceCardOrder: [
         {id: 2, name: '正常'},
-        {id: -6, name: '已退单'},
-        {id: -3, name: '有退单'},
+        {id: -6, name: '退单'},
       ],
-      // 商品类型
-      goodsType: [
-        {id: 0, name: '全部'},
-        {id: 1, name: '非外包商品'},
-        {id: 2, name: '非外包服务'},
-        {id: 3, name: '外包商品'},
-        {id: 4, name: '外包服务'},
-      ],
-      // 选择支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
-      payWayList: [
-        {id: 1, name: '微信'},
-        {id: 2, name: '支付宝'},
-        {id: 3, name: '余额(会员卡)'},
-        {id: 4, name: '银行卡'},
-        {id: 5, name: '现金'},
-        {id: 6, name: '美团'},
-        {id: 7, name: '赠送'},
-        {id: 8, name: '门店自用'},
-        {id: 9, name: '兑换'},
-        {id: 10, name: '包月服务'},
-        {id: 11, name: '定制疗程'},
-        {id: 99, name: '管理员充值'}
-      ],
-      // 会员信息弹框
-      memberInfoDialog: {
-        isShow: false,
-        memberInfo: {
-          nickname: '涵涵妈',
-          mobile: '18725928054',
-          shop_code: '两江时光店',
-          level: '普通会员',
-          addtime: '2017-08-15 12:52:04'
-        }
-      },
-      // 服务人员信息弹框
-      waiterInfoDialog: {
-        isShow: false,
-        waiterInfo: {
-          name: '测试员工',
-          mobile: '15223622442',
-          shop: '测试门店10',
-          type: '水育,大保健,艾灸',
-          addtime: '2018-11-02 09:32:27'
-        }
-      },
     }
   },
   methods: {
@@ -698,6 +818,14 @@ export default {
     handleClick (tab, event) {
       console.log(tab, event)
       this.requestData.page = 1
+      this.requestData.status = ''
+      this.requestData.timeBtnValue = 0
+      this.requestData.date = []
+      this.requestData.startTime = ''
+      this.requestData.endTime = ''
+      this.requestData.search = ''
+      this.requestData.waiter_id = ''
+      this.requestData.pay_way = ''
       this.getOrderList()
     },
 
@@ -849,7 +977,7 @@ export default {
     .title{
       height:21px;
       width: 100%;
-      font-size:22px;
+      /*font-size:22px;*/
       font-family:SourceHanSansCN-Regular;
       font-weight:400;
       color:rgba(26,26,26,1);
@@ -860,7 +988,7 @@ export default {
       color: #808080;
       width: 100%;
       height:18px;
-      font-size:18px;
+      /*font-size:18px;*/
       font-family:SourceHanSansCN-Regular;
       font-weight:400;
       color:rgba(128,128,128,1);
