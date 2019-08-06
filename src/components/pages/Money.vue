@@ -59,6 +59,7 @@
                       <span class="float-right red">￥{{good.is_edit ? parseFloat(good.edit_price * good.num).toFixed(2) : parseFloat(good.price * good.num).toFixed(2)}}</span>
                     </li>
                     <li class="title code clear-both">
+                      <span class="yuanjia" v-if="good.old_price && jiezhangDialog.memberVip.nickname">原价￥{{good.old_price}}</span>
                       <span class="yuanjia" v-if="good.is_edit">￥{{good.price}}</span>
                       <el-tag v-if="good.is_edit" size="mini" type="danger" effect="dark">改</el-tag>
                       <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
@@ -91,6 +92,7 @@
                     <span class="float-right red">￥{{good.is_edit ? parseFloat(good.edit_price * good.num).toFixed(2) : parseFloat(good.price * good.num).toFixed(2)}}</span>
                   </li>
                   <li class="title code clear-both">
+                    <span class="yuanjia" v-if="good.old_price && jiezhangDialog.memberVip.nickname">原价￥{{good.old_price}}</span>
                     <span class="yuanjia" v-if="good.is_edit">￥{{good.price}}</span>
                     <el-tag v-if="good.is_edit" size="mini" type="danger" effect="dark">改</el-tag>
                     <span class="red danjia" v-if="good.is_edit">￥{{good.edit_price}}</span>
@@ -203,7 +205,7 @@
                     <span class="float-left">
                       会员&nbsp;
                       <span class="font-blue" @click="xuanzehuiyuanDialog.isShow = true">{{jiezhangDialog.memberVip.nickname ? jiezhangDialog.memberVip.nickname : '未选择'}}</span>
-                      <el-tag v-if="jiezhangDialog.memberVip.nickname" size="small" type="danger" style="cursor: pointer;color: #F83D3D;background: #fff;border: 1px solid #F83D3D;" @click="jiezhangDialog.memberVip={}">删除</el-tag>
+                      <el-tag v-if="jiezhangDialog.memberVip.nickname" size="mini" type="danger" style="cursor: pointer;color: #F83D3D;background: #fff;border: 1px solid #F83D3D;" @click="jiezhangDialog.memberVip={};choosesGoodsShowMemberPrice()">删除</el-tag>
                     </span>
                     <span class="float-right">余额￥{{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : '0.00'}}</span>
                   </li>
@@ -1939,7 +1941,7 @@ export default {
       this.huiyuanDialogSearchMemberVip()
     },
     // 选择会员后时，如果购物车里有服务商品，或服务卡，就要显示他的会员价 刷新接口
-    choosesGoodsShowMemberPrice () {
+    async choosesGoodsShowMemberPrice () {
       // 当前页面中，被选中的是服务商品 刷新接口展示出会员价来
       this.getServiceItemList()
       //购物车里有服务商品
@@ -1953,12 +1955,13 @@ export default {
             requestData.ids.push(this.chooeseGoods.goods[i].id)
           }
         }
-        postServiceItemList(requestData).then(res => {
+        await postServiceItemList(requestData).then(res => {
           if (res.data.length){
             for(let i = 0;i<res.data.length;i++){
               for (let j = 0; j < this.chooeseGoods.goods.length; j++){
                if((this.chooeseGoods.goods[j].id === res.data[i].id) && (this.chooeseGoods.goods[j].is_service_goods === '1')) {
                  this.chooeseGoods.goods[j].price = res.data[i].price
+                 this.chooeseGoods.goods[j].old_price = res.data[i].old_price
                }
               }
             }
@@ -1976,12 +1979,13 @@ export default {
             requestData.ids.push(this.chooeseGoods.outServiceGoods[i].id)
           }
         }
-        postServiceItemList(requestData).then(res => {
+        await postServiceItemList(requestData).then(res => {
           if (res.data.length){
             for(let i = 0;i<res.data.length;i++){
               for (let j = 0; j < this.chooeseGoods.outServiceGoods.length; j++){
                 if((this.chooeseGoods.outServiceGoods[j].id === res.data[i].id) && (this.chooeseGoods.outServiceGoods[j].is_service_goods === '1')) {
                   this.chooeseGoods.outServiceGoods[j].price = res.data[i].price
+                  this.chooeseGoods.outServiceGoods[j].old_price = res.data[i].old_price
                 }
               }
             }
