@@ -224,9 +224,9 @@
                     <span class="float-right" v-else>￥{{jiezhangDialog.modifyMoney}}</span>
                   </li>
                 </ul>
-                <div class="buttons" style="margin-top: 40px;">
-                  <el-button @click="xuanzehuiyuanDialog.isShow = true" class="my-btn">选择会员</el-button>
-                  <el-button @click="jiezhangDialogClickBtn"  class="my-btn active">结账</el-button>
+                <div class="buttons" style="margin-top: 50px;">
+                  <button @click="xuanzehuiyuanDialog.isShow = true" class="my-btn">选择会员</button>
+                  <button @click="jiezhangDialogClickBtn"  class="my-btn active">结账</button>
                 </div>
               </div>
             </div>
@@ -3045,11 +3045,17 @@ export default {
           border:1px solid rgba(46,202,241,1);
           border-radius:4px;
           font-size:24px;
-          font-family:SourceHanSansCN-Regular;
           font-weight:400;
-          margin-left: 5px;
-          margin-right: 5px;
+          margin-left: 20px;
+          margin-right: 20px;
+          outline: none;
           color:rgba(46,202,241,1);
+          &:first-child{
+            margin-left: 0;
+          }
+          &:last-child{
+            margin-right: 0;
+          }
         }
         .active{
           border: 0;
