@@ -200,7 +200,11 @@
                     </span>
                   </li>
                   <li>
-                    <span class="float-left">会员&nbsp;<span class="font-blue" @click="xuanzehuiyuanDialog.isShow = true">{{jiezhangDialog.memberVip.nickname ? jiezhangDialog.memberVip.nickname : '未选择'}}</span></span>
+                    <span class="float-left">
+                      会员&nbsp;
+                      <span class="font-blue" @click="xuanzehuiyuanDialog.isShow = true">{{jiezhangDialog.memberVip.nickname ? jiezhangDialog.memberVip.nickname : '未选择'}}</span>
+                      <el-tag v-if="jiezhangDialog.memberVip.nickname" size="small" type="danger" style="cursor: pointer;color: #F83D3D;background: #fff;border: 1px solid #F83D3D;" @click="jiezhangDialog.memberVip={}">删除</el-tag>
+                    </span>
                     <span class="float-right">余额￥{{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : '0.00'}}</span>
                   </li>
                   <li>
@@ -335,16 +339,19 @@
                 <span class="float-right font-red" v-else>¥ {{jiezhangDialog.modifyMoney}}</span>
               </li>
               <li class="clear-both">
-                <span class="float-left"></span>
-                <span class="float-right"></span>
-              </li>
-              <li class="clear-both">
                 <span class="float-left">改价</span>
                 <span class="float-right">¥ {{parseFloat(jiezhangDialog.modifyMoney - jiezhangDialog.sumMoney).toFixed(2)}}</span>
               </li>
               <li class="clear-both">
                 <span class="float-left"><span>会员</span> <span class="font-blue"  @click="xuanzehuiyuanDialog.isShow = true">{{jiezhangDialog.memberVip.nickname?jiezhangDialog.memberVip.nickname:'未选择'}}</span></span>
                 <span class="float-right">余额：¥ {{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : '0.00'}}</span>
+              </li>
+              <li>
+                <el-form label-width="50px">
+                  <el-form-item label="备注:">
+                    <el-input v-model="jiezhangDialog.remarks" placholder="请输入购买备注"></el-input>
+                  </el-form-item>
+                </el-form>
               </li>
             </ul>
             <div class="div clear-both">
@@ -948,6 +955,7 @@ export default {
         sumMoney: 0.00, // 所购商品的合计
         modifyMoney: 0.00, // 改价参数,
         chooesePayWay: '', // 支付方式
+        remarks:'',//备注
         closedPayWay: [ // 被禁用的支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
         ],
         // 支付完成之后弹出的结账成功弹框
@@ -1930,7 +1938,7 @@ export default {
       this.huiyuanDialog.mobile = this.xuanzehuiyuanDialog.mobile
       this.huiyuanDialogSearchMemberVip()
     },
-    // 选择会员后时，如果购物车里有服务商品，或服务卡，就要显示他的会员价
+    // 选择会员后时，如果购物车里有服务商品，或服务卡，就要显示他的会员价 刷新接口
     choosesGoodsShowMemberPrice () {
       // 当前页面中，被选中的是服务商品 刷新接口展示出会员价来
       this.getServiceItemList()
@@ -1980,6 +1988,8 @@ export default {
           }
         })
       }
+      //刷新后结算面板的价格展示也刷新
+      this.sumChooseGoodsMoney()
     },
 
     // 充值弹框
@@ -2093,8 +2103,6 @@ export default {
               message: res.msg,
               type: 'success'
             })
-            this.xuanzehuiyuanDialog.mobile = this.chongzhiDialog.mobile
-            this.clickChoosesMemberByKeyboard('ok')
             this.chongzhiDialog.mobile = ''
             this.chongzhiDialog.huiyuanInfo = {}
             this.chongzhiDialog.payType = ''
@@ -2187,18 +2195,15 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        postAddMemberVip(requestData).then(async res => {
+      }).then(async () => {
+        await postAddMemberVip(requestData).then(res => {
           if (res.code === '200') {
-            await this.$confirm(`新增会员成功，是否选择会员（${requestData.mobile}）结账?`, '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).then(() => {
-              this.xuanzehuiyuanDialog.mobile = requestData.mobile
-              this.clickChoosesMemberByKeyboard('ok')
-            })
             this.huiyuanDialog.addHuiyuanDialog.isShow = false
+            this.$message.closeAll()
+            this.$message({
+              message: res.msg,
+              type: 'success'
+            })
             this.huiyuanDialog.addHuiyuanDialog.mobile = ''
             this.huiyuanDialog.addHuiyuanDialog.nickname = ''
           }
@@ -2563,7 +2568,7 @@ export default {
       this.jiezhangDialog.chooesePayWay = way
     },
     //确认结账
-    jiezhangDialogClickOk () {
+    async jiezhangDialogClickOk () {
       if (!this.jiezhangDialog.chooesePayWay) {
         this.$message.closeAll()
         this.$message({
@@ -2572,11 +2577,23 @@ export default {
         })
         return
       }
+      if (
+        ((this.jiezhangDialog.chooesePayWay === 7) ||
+        (this.jiezhangDialog.modifyMoney - this.jiezhangDialog.sumMoney !== 0)) && (!this.jiezhangDialog.remarks.length)
+      ) {
+        this.$message.closeAll()
+        this.$message({
+          message: '请填入购买备注',
+          type: 'error'
+        })
+        return
+      }
       let requestData = {
         member: this.jiezhangDialog.memberVip ? this.jiezhangDialog.memberVip.id : '', // 会员id
         waiter: this.jiezhangDialog.isShowChooeseWaiterBlock ? this.jiezhangDialog.nowWaiter.id : '', // 普通商品服务员id
         pay_way: this.jiezhangDialog.chooesePayWay,
-        goods: []
+        goods: [],
+        remarks: this.jiezhangDialog.remarks,
       }
       if (this.chooeseGoods.goods.length) {
         let arr = []
@@ -2629,20 +2646,23 @@ export default {
         })
         requestData.goods = arr
       }
-      postNowPayGoods(requestData).then(res => {
+      await postNowPayGoods(requestData).then(res => {
         if (res.code === '200') {
           this.clearJiezhangDialogData()
         }
       })
+
+      //服务卡是另一个结算接口
       if (this.chooeseGoods.cardList.length) {
         let requestData = {
           member_id: this.jiezhangDialog.memberVip.id, // 会员id
           waiter: this.jiezhangDialog.serviceCardNowWaiter.id, // 服务员id
           pay: this.jiezhangDialog.chooesePayWay, // 支付方式
           card_id: this.chooeseGoods.cardList[0].id, // 服务卡id
-          price: this.chooeseGoods.cardList[0].is_edit ? this.chooeseGoods.cardList[0].edit_price : this.chooeseGoods.cardList[0].price
+          price: this.chooeseGoods.cardList[0].is_edit ? this.chooeseGoods.cardList[0].edit_price : this.chooeseGoods.cardList[0].price,
+          remarks: this.jiezhangDialog.remarks,
         }
-        postNowPayServiceCards(requestData).then(res => {
+        await postNowPayServiceCards(requestData).then(res => {
           if (res.code === '200') {
             this.clearJiezhangDialogData()
           }
@@ -2741,6 +2761,7 @@ export default {
       }, this.jiezhangDialog.jiezhangSuccessDialog.seconds)
       this.jiezhangDialog.isShowChooeseWaiterBlock = false
       this.jiezhangDialog.nowWaiter = {id: -1, name: '请选择服务员', type: ''}
+      this.jiezhangDialog.remarks = ''
       //刷新接口
       if (this.requestFuwuGoodData.who !== -1) {
         this.getServiceItemList()
@@ -3154,14 +3175,15 @@ export default {
       .my-left{
         width: 320px;
         height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         ul{
           list-style-type: none;
-          width: 100%;
           border-radius:8px;
-          padding: 34px 12px;
           li{
             clear: both;
-            min-height: 20px;
+            min-height: 30px;
             font-size:16px;
             width: 100%;
             font-family:SourceHanSansCN-Regular;
@@ -3172,11 +3194,14 @@ export default {
             &:first-child{
               color: #000;
             }
+            /deep/ .el-form-item__label{
+              color:rgba(128,128,128,1);
+              font-size:16px;
+            }
           }
         }
         .div {
-          width: 100%;
-          padding: 0 12px;
+          height: 44px;
           button{
             width:148px;
             height:44px;
@@ -3199,6 +3224,7 @@ export default {
         height: 100%;
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
         .div{
           width: 100%;
           height:56px;
@@ -3241,6 +3267,9 @@ export default {
           .closed{
             background:#D2D2D2;
             border:none;
+          }
+          &:last-child{
+            margin-bottom: 0;
           }
         }
       }
