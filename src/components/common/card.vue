@@ -16,13 +16,29 @@
             <span class="font-red float-left">{{ocard.price}}</span>
             <span class="float-right" style="" @click.stop="showDetails(ocard)">查看详情</span>
           </div>
-          <div class="body2 overflow-row1-ellipsis" v-if="ocard.service.length">
+          <div class="body2 overflow-row1-ellipsis" v-if="ocard.service.length && ocard.type === '1'">
             <span class="float-left" v-if="ocard.service[0]">{{ocard.service[0].service_name}} {{ocard.service[0].num}}次</span>
             <span class="float-right" v-if="ocard.service[1]">{{ocard.service[1].service_name}} {{ocard.service[1].num}}次</span>
           </div>
-          <div class="body2 overflow-row1-ellipsis" v-if="ocard.service.length">
+          <div class="body2 overflow-row1-ellipsis" v-if="ocard.service.length && ocard.type === '1'">
             <span class="float-left" v-if="ocard.service[2]">{{ocard.service[2].service_name}} {{ocard.service[2].num}}次</span>
             <span class="float-right" v-if="ocard.service[3]">{{ocard.service[3].service_name}} {{ocard.service[3].num}}次</span>
+          </div>
+          <div class="body2 overflow-row1-ellipsis" v-if="ocard.service.length && ocard.type === '2'">
+            <span class="float-left" v-if="ocard.service[0]">{{ocard.service[0].service_name}}</span>
+            <span class="float-right" v-if="ocard.service[1]">{{ocard.service[1].service_name}}</span>
+          </div>
+          <div class="body2 overflow-row1-ellipsis" v-if="ocard.service.length && ocard.type === '2'">
+            <span class="float-left" v-if="ocard.service[2]">{{ocard.service[2].service_name}}</span>
+            <span class="float-right" v-if="ocard.service[3]">{{ocard.service[3].service_name}}</span>
+          </div>
+          <div class="body2 overflow-row1-ellipsis" v-if="ocard.service.length && ocard.type === '4'">
+            <span class="float-left" v-if="ocard.service[0]">{{ocard.service[0].service_name}}</span>
+            <span class="float-right" v-if="ocard.service[1]">{{ocard.service[1].service_name}}</span>
+          </div>
+          <div class="body2 overflow-row1-ellipsis" v-if="ocard.service.length && ocard.type === '4'">
+            <span class="float-left" v-if="ocard.service[2]">{{ocard.service[2].service_name}}</span>
+            <span class="float-right" v-if="ocard.service[3]">{{ocard.service[3].service_name}}</span>
           </div>
         </div>
         <div class="footer">
