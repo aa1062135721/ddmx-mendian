@@ -446,7 +446,7 @@
                     <span class="float-left">服务卡</span>
                     <span class="float-right" v-if="xuanzehuiyuanDialog.memberVip.service_card || xuanzehuiyuanDialog.memberVip.service_card === 0">
                       <el-badge :value="xuanzehuiyuanDialog.memberVip.service_card">
-                        <el-button size="mini" @click="xuanzehuiyuanDialogSeeServiceCard">查看</el-button>
+                        <el-button size="mini" @click="huiyuanDialog.showWho = 'serviceCard'; xuanzehuiyuanDialogSeeServiceCard()">查看</el-button>
                       </el-badge>
                     </span>
                   </li>
@@ -508,7 +508,16 @@
               <el-table-column prop="create_time" label="购买时间"></el-table-column>
               <el-table-column prop="start_time" label="激活时间"></el-table-column>
               <el-table-column prop="end_time" label="过期时间"></el-table-column>
-              <el-table-column prop="status_name" label="状态"></el-table-column>
+<!--              <el-table-column prop="status_name" label="状态"></el-table-column>-->
+              <el-table-column  label="状态">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.status === 0">未激活</span>
+                  <span v-if="scope.row.status === 1">使用中</span>
+                  <span v-if="scope.row.status === 2">使用完</span>
+                  <span v-if="scope.row.status === 3">已过期</span>
+                  <span v-if="scope.row.status === 4">已退卡</span>
+                </template>
+              </el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
                   <!-- 状态 0未激活  1待使用 2为已使用 3为已过期 4 已退卡-->
@@ -2354,7 +2363,8 @@ export default {
       if (requestData.waiter_id){
         await postMemberServiceCardsUseListTicket(requestData).then(res => {
             if (res.code === '200'){
-              this.huiyuanDialogUseServiceCardList({id:requestData.service_id})
+              // this.huiyuanDialogUseServiceCardList({id:requestData.service_id})
+              this.huiyuanDialog.haokaDialog.isShow = false
               this.huiyuanDialogSearchServiceCardList()
             }
         })
