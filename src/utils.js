@@ -26,6 +26,53 @@ export const removeStore = name => {
 }
 
 /***
+ * 存cookie
+ * @param key
+ * @param value
+ * @param t 不传的时候表示关闭浏览器cookie过期
+ */
+export const  setCookie = (key, value, t = 0) => {
+  if (t){
+    let oDate=new Date()
+    oDate.setDate(oDate.getDate() + t)
+    document.cookie=key+"="+encodeURIComponent(value)+";expires="+oDate.toUTCString()
+  } else {
+    document.cookie=key+"="+encodeURIComponent(value)+";"
+  }
+}
+
+/**
+ * 取cookie
+ * @param key
+ * @returns {string|boolean}
+ */
+export const  getCookie = (key) => {
+  let str=document.cookie.replace(/;\s*/,';')
+  let cookieArr=str.split(';')
+  let cookieObj={}
+  let len=cookieArr.length
+  for(let i=0; i<len; i++){
+    let item=cookieArr[i]
+    let k=item.split('=')[0]
+    let v=item.split('=')[1]
+    cookieObj[k]=v;
+  }
+  if(cookieObj[key]){
+    return decodeURIComponent(cookieObj[key])
+  }else{
+    return false;
+  }
+}
+
+/**
+ * 删除cookie
+ * @param key
+ */
+export const  removeCookie = (key) => {
+  document.cookie=key+"=; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+}
+
+/***
  * 处理传进来的时间戳 为 2017-12-11 格式
  * @param timstamp
  */

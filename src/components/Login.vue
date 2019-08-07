@@ -30,7 +30,7 @@
 <script>
 import { mapActions } from 'vuex'
 import {postLogin, postUserInfo} from '../api/getData'
-import {setStore} from '../utils'
+import {setCookie} from '../utils'
 export default {
   data: function () {
     return {
@@ -53,7 +53,8 @@ export default {
       let that = this
       postLogin(data).then((res) => {
         if (res.code === '200') {
-          setStore('token', res.data.token)
+          setCookie('token', res.data.token) //浏览器保存登录凭证 这儿没有设置cookie的过期时间，默认是关闭浏览器就过期
+          that.saveToken(res.data.token) // vuex保存登录凭证
           postUserInfo().then((res) => {
             that.saveUserInfo(res.data) // vuex保存登录后的登录数据
             that.$router.push({
@@ -66,7 +67,7 @@ export default {
         }
       })
     },
-    ...mapActions(['saveUserInfo'])
+    ...mapActions(['saveUserInfo', 'saveToken'])
   }
 }
 </script>

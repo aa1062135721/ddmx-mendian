@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import {getStore} from '../utils'
+import {getCookie} from '../utils'
 
 Vue.use(Router)
 
@@ -121,8 +121,7 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  // console.log('全局路由守卫beforeEach', to)
-  let isLogin = getStore('token')
+  let isLogin = getCookie('token')
   // 如果登录了，跳转到首页
   if (to.path === '/login' || to.path === '/') {
     if (isLogin) {

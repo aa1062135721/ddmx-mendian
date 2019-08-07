@@ -7,6 +7,7 @@ Vue.use(Vuex)
 // root state object.
 // each Vuex instance is just a single state tree.
 const state = {
+  token: '',
   userInfo: {
     id: 1, // 用户id
     user_type: 1, //
@@ -40,9 +41,12 @@ const state = {
 // mutations must be synchronous and can be recorded by plugins
 // for debugging purposes.
 const mutations = {
-  setUserInfo (state, saveData) {
+  setUserInfo (state, saveData = {}) {
     state.userInfo = saveData
-  }
+  },
+  setToken (state, saveData = '') {
+    state.token = saveData
+  },
 }
 
 // actions are functions that cause side effects and can involve
@@ -50,12 +54,16 @@ const mutations = {
 const actions = {
   saveUserInfo ({ commit }, saveData = {}) {
     commit('setUserInfo', saveData)
-  }
+  },
+  saveToken ({ commit }, saveData = '') {
+    commit('setToken', saveData)
+  },
 }
 
 // getters are functions
 const getters = {
-  userInfo: state => state.userInfo
+  userInfo: state => state.userInfo,
+  token: state => state.token,
 }
 
 // A Vuex instance is created by combining the state, mutations, actions,

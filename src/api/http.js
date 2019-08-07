@@ -8,7 +8,8 @@
 import axios from 'axios'
 import Vue from 'vue'
 import router from '../router/index'
-import { getStore, removeStore } from '../utils'
+import { getCookie, removeCookie } from '../utils'
+import store from '../store/store' // vuex
 
 // 状态码错误信息
 const codeMessage = {
@@ -40,7 +41,7 @@ if (process.env.NODE_ENV === "development") {
 // http request 拦截器
 axios.interceptors.request.use(
   config => {
-    const token = getStore('token') // 引入cookie 存储token 有的接口需要认证
+    const token = getCookie('token')  // 从cookie中取出 token，所有接口都带上token
     if (config.data && config.data.form) {
       config.headers = {
         'Content-Type': 'multipart/form-data'
@@ -67,13 +68,10 @@ axios.interceptors.response.use(
   response => {
     Vue.prototype.$message.closeAll()
     if (response.data.code === '-2' || response.data.code === -2 || response.data.code === '-1' || response.data.code === -1) {
-      Vue.prototype.$message({
-        message: response.data.msg,
-        type: 'error'
-      })
-      removeStore('token')
+      removeCookie('token')
+      store.commit('setUserInfo')
+      store.commit('setToken',)
       router.push('/login')
-      return
     }
     if (response.data.code !== '200' && response.data.code !== 200 && response.data.code !== '1' && response.data.code !== 1) {
       Vue.prototype.$message({
@@ -93,10 +91,14 @@ axios.interceptors.response.use(
     })
     // 部分错误状态处理
     if (status === 401) {
-      removeStore('token')
+      removeCookie('token')
+      store.commit('setUserInfo')
+      store.commit('setToken',)
       router.push('/login')
     } else if (status === 403) {
-      removeStore('token')
+      removeCookie('token')
+      store.commit('setUserInfo')
+      store.commit('setToken',)
       router.push('/login')
     } else if (status >= 404 && status < 422) {
       router.push('/404')

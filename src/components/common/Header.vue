@@ -18,7 +18,7 @@
 </template>
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import { removeStore } from '../../utils'
+import { removeCookie } from '../../utils'
 export default {
   data () {
     return {
@@ -41,9 +41,10 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        removeStore('token')
-        this.$router.push('/login')
+        removeCookie('token')
         this.saveUserInfo({})
+        this.saveToken('')
+        this.$router.push('/login')
       }).catch(() => {
       })
     },
@@ -74,7 +75,7 @@ export default {
       }
       this.fullscreen = !this.fullscreen
     },
-    ...mapActions(['saveUserInfo'])
+    ...mapActions(['saveUserInfo', 'saveToken'])
   },
   computed: {
     ...mapGetters(['userInfo'])
