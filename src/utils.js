@@ -107,7 +107,7 @@ export const getWeekStartDateAndEndDateRange = () => {
 }
 
 /**
- * @returns {string}
+ * @returns {string} "2019-08-07 13:52:47"
  */
 export const getNowTime = () => {
   let date = new Date();

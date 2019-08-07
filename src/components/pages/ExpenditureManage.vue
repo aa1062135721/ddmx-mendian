@@ -45,7 +45,9 @@
           <el-table-column  label="操作人">{{userInfo.user_nickname}}</el-table-column>
           <el-table-column prop="create_time" label="新增时间"></el-table-column>
           <el-table-column label="操作">
-            <template slot-scope="scope">
+            <template slot-scope="scope" v-if="
+              (new Date(new Date().setHours(0, 0, 0, 0)).getTime() <= new Date(scope.row.create_time))
+               && (new Date(new Date().setHours(23, 59, 59, 999)).getTime() >= new Date(scope.row.create_time))">
               <el-button size="mini" @click="clickDelExpenditureBtn(scope.row.id)">删除</el-button>
               <el-button size="mini" @click="clickEditExpenditureBtn(scope.row)">编辑</el-button>
             </template>
@@ -166,7 +168,6 @@
 <script>
 import { mapGetters } from 'vuex'//  这儿需要用到vuex里的数据 shop_id
 import { postExpenditureList, postExpenditureTypeNameList, postAddExpenditure, postDelExpenditure } from '../../api/getData'
-import {getNowTime} from '../../utils'
 export default {
   name: 'ExpenditureManage', // 支出管理
   data () {
@@ -216,7 +217,6 @@ export default {
     }
   },
   mounted () {
-    console.log(getNowTime())
     this.getExpenditureList()
     this.getExpenditureTypeNameList()
   },
