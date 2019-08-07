@@ -221,10 +221,10 @@
                     <span class="float-left">结算</span>
                     <!-- 支付方式为赠送 门店自用，需要支付的钱为0-->
                     <span class="float-right" v-if="jiezhangDialog.chooesePayWay === 7 || jiezhangDialog.chooesePayWay ===8">￥0.00</span>
-                    <span class="float-right" v-else>￥{{jiezhangDialog.modifyMoney}}</span>
+                    <span class="float-right" v-else>￥{{parseFloat(jiezhangDialog.modifyMoney).toFixed(2)}}</span>
                   </li>
                 </ul>
-                <div class="buttons" style="margin-top: 50px;">
+                <div class="buttons" style="margin-top: 30px;">
                   <button @click="xuanzehuiyuanDialog.isShow = true" class="my-btn">选择会员</button>
                   <button @click="jiezhangDialogClickBtn"  class="my-btn active">结账</button>
                 </div>
@@ -2593,12 +2593,14 @@ export default {
         })
         requestData.goods = arr
       }
-      await postNowPayGoods(requestData).then(res => {
+      // 服务商品，普通商品结账操作
+      if (this.chooeseGoods.outOrdinaryGoods.length || this.chooeseGoods.outServiceGoods.length || this.chooeseGoods.goods.length) {
+        await postNowPayGoods(requestData).then(res => {
         if (res.code === '200') {
           this.clearJiezhangDialogData()
         }
       })
-
+      }
       //服务卡是另一个结算接口
       if (this.chooeseGoods.cardList.length) {
         let requestData = {
@@ -2723,6 +2725,7 @@ export default {
       this.jiezhangDialog.sumMoney = 0.00
       this.jiezhangDialog.modifyMoney = 0.00
       this.jiezhangDialog.chooesePayWay = ''
+      this.goukaDialog.cardsList = []
       this.$forceUpdate()
     }
   },

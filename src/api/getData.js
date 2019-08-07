@@ -215,7 +215,7 @@ export const postExpenditureTypeNameList = (data = null) => {
 }
 
 /**
- * 支出管理-营业支出的增加
+ * 支出管理-营业支出的增加和编辑
  * @param data
  * @returns {*}
  */
@@ -229,7 +229,7 @@ export const postAddExpenditure = (data = null) => {
  * @returns {*}
  */
 export const postDelExpenditure = (data = null) => {
-  return Vue.prototype.$post('/Expenditure/deleteType', data)
+  return Vue.prototype.$post('/Expenditure/expenditure_delete', data)
 }
 
 /**
