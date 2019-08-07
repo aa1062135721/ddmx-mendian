@@ -365,66 +365,82 @@
 <!--            1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
             <div class="div">
               <span v-if="jiezhangDialog.closedPayWay.indexOf(3) !== -1" class="span-btn closed">
-                <img src="../../assets/icon/checkout-huiyuanka.png" alt="会员卡">
+                <img src="../../assets/icon/checkout-huiyuanka.png" alt="会员卡" class="icon-img">
                 <span>会员卡</span>
               </span>
               <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 3}" @click="jiezhangDialogChoosesPayWay(3)">
-                <img src="../../assets/icon/checkout-huiyuanka.png" alt="会员卡">
+                <img src="../../assets/icon/checkout-huiyuanka.png" alt="会员卡" class="icon-img">
                 <span>会员卡</span>
+                <img v-if="jiezhangDialog.chooesePayWay === 3" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
               </span>
               <span  v-if="jiezhangDialog.closedPayWay.indexOf(5) !== -1"  class="span-btn closed">
-                <img src="../../assets/icon/checkout-xianjing.png" alt="现金支付">
+                <img src="../../assets/icon/checkout-xianjing.png" alt="现金支付" class="icon-img">
                 <span>现金</span>
               </span>
               <span  v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 5}" @click="jiezhangDialogChoosesPayWay(5)">
-                <img src="../../assets/icon/checkout-xianjing.png" alt="现金支付">
+                <img src="../../assets/icon/checkout-xianjing.png" alt="现金支付" class="icon-img">
                 <span>现金</span>
+                <img v-if="jiezhangDialog.chooesePayWay === 5" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
               </span>
             </div>
             <div class="div">
               <span v-if="jiezhangDialog.closedPayWay.indexOf(1) !== -1" class="span-btn closed">
-                <img src="../../assets/icon/checkout-weixin.png" alt="微信图标">
+                <img src="../../assets/icon/checkout-weixin.png" alt="微信图标" class="icon-img">
                 <span>微信</span>
               </span>
               <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 1}" @click="jiezhangDialogChoosesPayWay(1)">
-                <img src="../../assets/icon/checkout-weixin.png" alt="微信图标">
+                <img src="../../assets/icon/checkout-weixin.png" alt="微信图标" class="icon-img">
                 <span>微信</span>
+                <img v-if="jiezhangDialog.chooesePayWay === 1" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
               </span>
               <span v-if="jiezhangDialog.closedPayWay.indexOf(2) !== -1" class="span-btn closed">
-                <img src="../../assets/icon/checkout-zhifubao.png" alt="支付宝图标">
+                <img src="../../assets/icon/checkout-zhifubao.png" alt="支付宝图标" class="icon-img">
                 <span>支付宝</span>
               </span>
               <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 2}" @click="jiezhangDialogChoosesPayWay(2)">
-                <img src="../../assets/icon/checkout-zhifubao.png" alt="支付宝图标">
+                <img src="../../assets/icon/checkout-zhifubao.png" alt="支付宝图标" class="icon-img">
                 <span>支付宝</span>
+                <img v-if="jiezhangDialog.chooesePayWay === 2" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
               </span>
             </div>
             <div class="div">
                <span v-if="jiezhangDialog.closedPayWay.indexOf(4) !== -1" class="span-btn closed">
-                <img src="../../assets/icon/checkout-yinhangka.png" alt="银行卡"><span>银行卡</span>
+                <img src="../../assets/icon/checkout-yinhangka.png" alt="银行卡" class="icon-img">
+                 <span>银行卡</span>
                </span>
                <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 4}" @click="jiezhangDialogChoosesPayWay(4)">
-                <img src="../../assets/icon/checkout-yinhangka.png" alt="银行卡"><span>银行卡</span>
+                 <img src="../../assets/icon/checkout-yinhangka.png" alt="银行卡" class="icon-img">
+                 <span>银行卡</span>
+                 <img v-if="jiezhangDialog.chooesePayWay === 4" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
                </span>
                <span v-if="jiezhangDialog.closedPayWay.indexOf(6) !== -1"  class="span-btn closed">
-                <img src="../../assets/icon/checkout-meituan.png" alt=""><span>美团</span>
+                 <img src="../../assets/icon/checkout-meituan.png" alt="美团" class="icon-img">
+                 <span>美团</span>
                </span>
                <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 6}" @click="jiezhangDialogChoosesPayWay(6)">
-                <img src="../../assets/icon/checkout-meituan.png" alt=""><span>美团</span>
+                 <img src="../../assets/icon/checkout-meituan.png" alt="" class="icon-img">
+                 <span>美团</span>
+                 <img v-if="jiezhangDialog.chooesePayWay === 6" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
                </span>
              </div>
             <div class="div">
                <span v-if="jiezhangDialog.closedPayWay.indexOf(7) !== -1"  class="span-btn closed">
-                <img src="../../assets/icon/checkout-zengpin-sel.png" alt="赠送"><span>赠送</span>
+                 <img src="../../assets/icon/checkout-zengpin-sel.png" alt="赠送" class="icon-img">
+                 <span>赠送</span>
                </span>
                <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 7}" @click="jiezhangDialogChoosesPayWay(7)">
-                <img src="../../assets/icon/checkout-zengpin-sel.png" alt="赠送"><span>赠送</span>
+                 <img src="../../assets/icon/checkout-zengpin-sel.png" alt="赠送" class="icon-img">
+                 <span>赠送</span>
+                 <img v-if="jiezhangDialog.chooesePayWay === 7" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
                </span>
                <span  v-if="jiezhangDialog.closedPayWay.indexOf(8) !== -1 || jiezhangDialog.memberVip.id"   class="span-btn closed">
-                <img src="../../assets/icon/checkout-mendian.png" alt="门店自用"><span>门店自用</span>
+                 <img src="../../assets/icon/checkout-mendian.png" alt="门店自用" class="icon-img">
+                 <span>门店自用</span>
                </span>
                <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 8}" @click="jiezhangDialogChoosesPayWay(8)">
-                <img src="../../assets/icon/checkout-mendian.png" alt="门店自用"><span>门店自用</span>
+                 <img src="../../assets/icon/checkout-mendian.png" alt="门店自用" class="icon-img">
+                 <span>门店自用</span>
+                 <img v-if="jiezhangDialog.chooesePayWay === 8" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
                </span>
              </div>
           </div>
@@ -3204,13 +3220,21 @@ export default {
             font-family:SourceHanSansCN-Regular;
             font-weight:400;
             line-height: 56px;
+            overflow: hidden;
             color:rgba(26,26,26,1);
-            img{
+            .icon-img{
+              height: 30px;
+              width: 30px;
+              position: absolute;
+              top: 13px;
+              left: 26px;
+            }
+            .icon-active{
               height: 40px;
               width: 40px;
               position: absolute;
-              top: 8px;
-              left: 26px;
+              top: 0;
+              right: 0;
             }
             span{
               line-height: 56px;
@@ -3221,11 +3245,22 @@ export default {
           }
           .active{
             background:#BEE7F6;
-            border:none;
+            border: 1px solid red;
           }
           .closed{
             background:#D2D2D2;
-            border:none;
+            color: #606266;
+            &:hover{
+              cursor: auto;
+            }
+            .icon-img{
+              -webkit-filter: grayscale(100%);
+              -moz-filter: grayscale(100%);
+              -ms-filter: grayscale(100%);
+              -o-filter: grayscale(100%);
+              filter: grayscale(100%);
+              filter: gray;
+            }
           }
           &:last-child{
             margin-bottom: 0;
