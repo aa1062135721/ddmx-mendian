@@ -39,7 +39,7 @@
       <div>
         <el-table :data="tableData" border style="width: 100%;" height="650px">
           <el-table-column label="门店名称">{{userInfo.shop_name}}</el-table-column>
-          <el-table-column prop="type_id" label="类型名称"></el-table-column>
+          <el-table-column prop="type" label="类型名称"></el-table-column>
           <el-table-column prop="price" label="金额"></el-table-column>
           <el-table-column prop="remarks" label="备注"></el-table-column>
           <el-table-column  label="操作人">{{userInfo.user_nickname}}</el-table-column>
@@ -47,6 +47,7 @@
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button size="mini" @click="clickDelExpenditureBtn(scope.row.id)">删除</el-button>
+              <el-button size="mini" @click="clickEditExpenditureBtn(scope.row)">编辑</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -103,12 +104,69 @@
           </div>
         </div>
       </el-dialog>
+      <!-- 编辑支出弹框-->
+      <el-dialog class="expenditure-manage-add" title="编辑" :visible.sync="editExpenditureDialog.isShow" width="500px" :center="true">
+        <div>
+          <div class="item clear-both">
+            <div class="float-left"><span class="font-red">*</span> 类型名称：</div>
+            <div class="float-right">
+              <el-select  clearable placeholder="选择类型" v-model="editExpenditureDialog.requestData.type_id">
+                <el-option
+                  v-for="item in typeName"
+                  :key="item.id"
+                  :label="item.title"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+          </div>
+          <div class="item clear-both">
+            <div class="float-left"><span class="font-red">*</span> 支出金额：</div>
+            <div class="float-right">
+              <el-input placeholder="请输入支出金额" v-model="editExpenditureDialog.requestData.price"></el-input>
+            </div>
+          </div>
+          <div class="item clear-both" style="height: 70px">
+            <div class="float-left">备注：</div>
+            <div class="float-right">
+              <el-input
+                type="textarea"
+                :rows="3"
+                placeholder="请输入备注"
+                v-model="editExpenditureDialog.requestData.remarks">
+              </el-input>
+            </div>
+          </div>
+          <div class="item clear-both">
+            <el-button class="my-primary-btn" style="width: 100%;margin-top: 20px;" @click="clickEditExpenditureBtnOk">
+              保存
+            </el-button>
+          </div>
+        </div>
+      </el-dialog>
+      <!-- 删除支出弹框-->
+      <el-dialog title="删除" :visible.sync="delExpenditureDialog.isShow" width="500px">
+        <el-form>
+          <el-form-item label="请选择删除原因">
+            <el-select v-model="delExpenditureDialog.requestData.delete_why" placeholder="请选择删除原因">
+              <el-option  label="数据录入错误"  value="数据录入错误"></el-option>
+              <el-option  label="操作异常"  value="操作异常"></el-option>
+              <el-option  label="其他"  value="其他"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="delExpenditureDialog.isShow = false">取 消</el-button>
+          <el-button type="primary" @click="clickDelExpenditureBtnOk">确 定</el-button>
+        </span>
+      </el-dialog>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'//  这儿需要用到vuex里的数据 shop_id
 import { postExpenditureList, postExpenditureTypeNameList, postAddExpenditure, postDelExpenditure } from '../../api/getData'
+import {getNowTime} from '../../utils'
 export default {
   name: 'ExpenditureManage', // 支出管理
   data () {
@@ -137,10 +195,28 @@ export default {
           shop_id: '', // vuex里获取shop_id
           remarks: ''
         }
+      },
+      editExpenditureDialog: {
+        isShow: false,
+        requestData: {
+          id:'',
+          type_id: '',
+          price: '',
+          shop_id: '', // vuex里获取shop_id
+          remarks: ''
+        }
+      },
+      delExpenditureDialog:{
+        isShow: false,
+        requestData:{
+          id:'',
+          delete_why:''
+        }
       }
     }
   },
   mounted () {
+    console.log(getNowTime())
     this.getExpenditureList()
     this.getExpenditureTypeNameList()
   },
@@ -201,36 +277,97 @@ export default {
           this.addExpenditureDialog.addRequestData.price = ''
           this.addExpenditureDialog.addRequestData.remarks = ''
           this.addExpenditureDialog.addRequestData.type_id = ''
-          this.getExpenditureList()
+          setTimeout(() => {this.getExpenditureList()}, 1000)
         }
       }).catch(err => {
         console.log(err)
       })
     },
-    clickDelExpenditureBtn (id) {
-      this.$confirm('您确认删除吗？', '提示', {
+    clickDelExpenditureBtn(id){
+      this.delExpenditureDialog.requestData.id = id
+      this.delExpenditureDialog.isShow = true
+    },
+    async clickDelExpenditureBtnOk () {
+      if (!this.delExpenditureDialog.requestData.delete_why) {
+        this.$message.closeAll()
+        this.$message({
+          showClose: true,
+          message: '请选择删除原因',
+          type: 'error'
+        })
+        return
+      }
+
+      await this.$confirm('您确认删除吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        let requestData = {
-          id: id
-        }
-        postDelExpenditure(requestData).then(res => {
+      }).then(async () => {
+        await postDelExpenditure(this.delExpenditureDialog.requestData).then(res => {
           if (res.code === '200') {
+            this.delExpenditureDialog.isShow = false
             this.$message({
               showClose: true,
               message: '删除成功',
               type: 'success'
             })
-            this.getExpenditureList()
+            setTimeout(() => {this.getExpenditureList()}, 1000)
+            this.delExpenditureDialog.requestData.id = ''
+            this.delExpenditureDialog.requestData.delete_why = ''
           }
-        }).catch(err => {
-          console.log(err)
         })
       }).catch(() => {
       })
 
+    },
+    clickEditExpenditureBtn(item) {
+        this.editExpenditureDialog.requestData.id = item.id
+        this.editExpenditureDialog.requestData.price = item.price
+        this.editExpenditureDialog.requestData.remarks = item.remarks
+        this.editExpenditureDialog.requestData.type_id = item.type_id
+        this.editExpenditureDialog.isShow = true
+    },
+    async clickEditExpenditureBtnOk(){
+      if (!this.editExpenditureDialog.requestData.type_id) {
+        this.$message.closeAll()
+        this.$message({
+          showClose: true,
+          message: '请选择类型',
+          type: 'error'
+        })
+        return
+      }
+      if (!/^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/.test(this.editExpenditureDialog.requestData.price)) {
+        this.$message({
+          showClose: true,
+          message: '请输入金额或输入的金额格式不正确',
+          type: 'error'
+        })
+        return
+      }
+      await this.$confirm('您确认编辑吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        this.editExpenditureDialog.requestData.shop_id = this.userInfo.shop_id
+        await postAddExpenditure(this.editExpenditureDialog.requestData).then(res => {
+          if (res.code === '200') {
+            this.editExpenditureDialog.isShow = false
+            this.$message({
+              showClose: true,
+              message: '编辑成功',
+              type: 'success'
+            })
+            this.editExpenditureDialog.requestData.id = ''
+            this.editExpenditureDialog.requestData.price = ''
+            this.editExpenditureDialog.requestData.remarks = ''
+            this.editExpenditureDialog.requestData.type_id = ''
+            setTimeout(() => {this.getExpenditureList()}, 1000)
+          }
+        })
+      }).catch(() => {
+      })
     },
     pageSizeChange (val) {
       // console.log(`每页 ${val} 条`)
