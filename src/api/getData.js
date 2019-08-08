@@ -287,6 +287,60 @@ export const postOrderDetailsGoods = (data = null) => {
 }
 
 /**
+ * 订单管理-门店订单 - 可退货商品信息 - 退货时加载列表
+ * @param data
+ * @returns {*}
+ */
+export const postOrderReturnGoodsList = (data = null) => {
+  return Vue.prototype.$post('/order/refund', data)
+}
+
+/**
+ * 订单管理-门店订单 - 选择了退货商品后 - 退货
+ * @param data
+ * @returns {*}
+ */
+export const postOrderReturnConfirm = (data = null) => {
+  return Vue.prototype.$post('/order/refund_order', data)
+}
+
+/**
+ * 订单管理-门店订单详情 - 退货商品信息
+ * @param data
+ * @returns {*}
+ */
+export const postOrderDetailsReturnGoods = (data = null) => {
+  return Vue.prototype.$post('/order/order_refund', data)
+}
+
+/**
+ * 订单管理-服务卡订单-列表
+ * @param data
+ * @returns {*}
+ */
+export const postServiceCardOrderList = (data = null) => {
+  return Vue.prototype.$post('/order/ticket_list', data)
+}
+
+/**
+ * 订单管理-服务卡订单-服务卡退单时数据加载
+ * @param data
+ * @returns {*}
+ */
+export const postReturnServiceCardOrder = (data = null) => {
+  return Vue.prototype.$post('/order/ticketrefund', data)
+}
+
+/**
+ * 订单管理-服务卡订单-服务卡退单
+ * @param data
+ * @returns {*}
+ */
+export const postReturnServiceCardOrderConfirm = (data = null) => {
+  return Vue.prototype.$post('/order/ticket_refund', data)
+}
+
+/**
  * 订单管理-库存管理 - 盘点单列表
  * @param data
  * @returns {*}
@@ -296,7 +350,7 @@ export const postCheckOrderList = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 盘点单 -新增盘点单时 获取商品别表
+ * 库存管理 - 盘点单 -新增盘点单时 获取商品别表
  * @param data
  * @returns {*}
  */
@@ -305,7 +359,7 @@ export const postCheckOrderAddGoodList = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 盘点单 -新增盘点单
+ * 库存管理 - 盘点单 -新增盘点单
  * @param data
  * @returns {*}
  */
@@ -314,7 +368,7 @@ export const postCheckOrderAdd = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 盘点单 -详情
+ * 库存管理 - 盘点单 -详情
  * @param data
  * @returns {*}
  */
@@ -323,7 +377,7 @@ export const postCheckOrderInfo = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 盘点单 -删除
+ * 库存管理 - 盘点单 -删除
  * @param data
  * @returns {*}
  */
@@ -332,7 +386,7 @@ export const postCheckOrderDel = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 盘点单 -删除
+ * 库存管理 - 盘点单 -删除
  * @param data
  * @returns {*}
  */
@@ -341,8 +395,7 @@ export const postCheckOrderConfirm = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 盘点单 -编辑 --只允许 编辑 备注信息，
- 其他信息不允许编辑
+ * 库存管理 - 盘点单 -编辑 --只允许 编辑 备注信息，其他信息不允许编辑
  * @param data
  * @returns {*}
  */
@@ -351,7 +404,7 @@ export const postCheckOrderEdit = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 盘亏盈单 - 列表
+ * 库存管理 - 盘亏盈单 - 列表
  其他信息不允许编辑
  * @param data
  * @returns {*}
@@ -361,7 +414,7 @@ export const postCheckLossOrWinOrderList = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 盘亏盈单 - 详情
+ * 库存管理 - 盘亏盈单 - 详情
  其他信息不允许编辑
  * @param data
  * @returns {*}
@@ -371,7 +424,7 @@ export const postCheckLossOrWinOrderDetails = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 列表
+ * 库存管理 - 调拨单 - 列表
  其他信息不允许编辑
  * @param data
  * @returns {*}
@@ -381,7 +434,7 @@ export const postTransferSlipList = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 新增
+ * 库存管理 - 调拨单 - 新增
  * @param data
  * @returns {*}
  */
@@ -390,7 +443,7 @@ export const postTransferSlipAdd = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 删除
+ * 库存管理 - 调拨单 - 删除
  * @param data
  * @returns {*}
  */
@@ -399,7 +452,7 @@ export const postTransferSlipDel = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 发货弹框-获取调拨单信息
+ * 库存管理 - 调拨单 - 发货弹框-获取调拨单信息
  * @param data
  * @returns {*}
  */
@@ -408,7 +461,7 @@ export const postTransferSlipSendGoodsGetInfo = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 发货弹框-获取商品列表
+ * 库存管理 - 调拨单 - 发货弹框-获取商品列表
  * @param data
  * @returns {*}
  */
@@ -417,7 +470,7 @@ export const postTransferSlipSendGoodsGetGoodList = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 发货
+ * 库存管理 - 调拨单 - 发货
  * @param data
  * @returns {*}
  */
@@ -426,7 +479,7 @@ export const postTransferSlipSendGoods = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 取消发货
+ * 库存管理 - 调拨单 - 取消发货
  * @param data
  * @returns {*}
  */
@@ -435,7 +488,7 @@ export const postTransferSlipSendGoodsCancel = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 详情
+ * 库存管理 - 调拨单 - 详情
  * @param data
  * @returns {*}
  */
@@ -444,7 +497,7 @@ export const postTransferSlipDetails = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 详情-商品列表 ?确认收货列表表单
+ * 库存管理 - 调拨单 - 详情-商品列表 ?确认收货列表表单
  * @param data
  * @returns {*}
  */
@@ -453,7 +506,7 @@ export const postTransferSlipGoodsDetails = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 确认收货
+ * 库存管理 - 调拨单 - 确认收货
  * @param data
  * @returns {*}
  */
@@ -462,7 +515,7 @@ export const postTransferSlipConfirmGoods = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 新增调拨，选择商品，获取商品列表
+ * 库存管理 - 调拨单 - 新增调拨，选择商品，获取商品列表
  * @param data
  * @returns {*}
  */
@@ -471,7 +524,7 @@ export const postTransferSlipGetGoodList = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 调拨单 - 调入，调出 仓库列表
+ * 库存管理 - 调拨单 - 调入，调出 仓库列表
  * @param data
  * @returns {*}
  */
@@ -480,7 +533,7 @@ export const postShopList = (data = null) => {
 }
 
 /**
- * 订单管理-库存管理 - 库存查询 - 获取列表
+ * 库存管理 - 库存查询 - 获取列表
  * @param data
  * @returns {*}
  */
