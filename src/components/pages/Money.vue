@@ -630,17 +630,55 @@
           </el-table>
         </div>
       </el-dialog>
-      <!-- 会员查询-退卡详情   -->
-      <el-dialog title="退卡详情" :visible.sync="huiyuanDialog.tuikaDialog.isShow" width="976px" :center="true">
-        <div style="height: 240px;">
-          <el-table :data="huiyuanDialog.tuikaDialog.tableData" border>
-            <el-table-column prop="name" label="服务卡名"></el-table-column>
-            <el-table-column prop="time" label="退卡时间"></el-table-column>
-            <el-table-column prop="money" label="退卡金额"></el-table-column>
-            <el-table-column prop="why" label="退卡原因"></el-table-column>
-            <el-table-column prop="reg" label="备注"></el-table-column>
-            <el-table-column prop="who" label="操作人员"></el-table-column>
-          </el-table>
+      <!-- 会员查询--退卡详情-->
+      <el-dialog class="order-details-dialog" title="退卡详情" :visible.sync="huiyuanDialog.tuikaDialog.isShow" width="500px" :center="true">
+        <div>
+          <div>
+            <div class="content clear-both">
+              <div class="float-left">订单编号：{{huiyuanDialog.tuikaDialog.responseData.o_sn}}</div>
+              <div class="float-right">退单编号：{{huiyuanDialog.tuikaDialog.responseData.r_sn}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="content clear-both">
+              <div class="float-left">卡卷类型：{{huiyuanDialog.tuikaDialog.responseData.type_text}}</div>
+              <div class="float-right">使用月份：{{huiyuanDialog.tuikaDialog.responseData.ticket.months || '次卡'}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="content clear-both">
+              <div class="float-left">激活时间：{{huiyuanDialog.tuikaDialog.responseData.ticket.start}}</div>
+              <div class="float-right">到期时间：{{huiyuanDialog.tuikaDialog.responseData.ticket.end}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="content clear-both">
+              <div class="float-left">支付金额：{{huiyuanDialog.tuikaDialog.responseData.ticket.real_price + '元'}}</div>
+              <div class="float-right">退款金额：{{huiyuanDialog.tuikaDialog.responseData.r_amount + '元'}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="content clear-both">
+              <div class="float-left">申请人员：{{huiyuanDialog.tuikaDialog.responseData.ticket.waiter}}</div>
+              <div class="float-right">申请时间：{{huiyuanDialog.tuikaDialog.responseData.ticket.create_time}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="content clear-both">
+              <div class="float-left">退款方式：{{(huiyuanDialog.tuikaDialog.responseData.otype === 1) ?"现金退款":(huiyuanDialog.tuikaDialog.responseData.otype === 2 ? "余额退款" : '银行卡退款')}}</div>
+              <div class="float-right">退款状态：{{(huiyuanDialog.tuikaDialog.responseData.r_status === 0) ?"申请中":(huiyuanDialog.tuikaDialog.responseData.r_status === 1 ? "已完成" : '取消')}}</div>
+            </div>
+          </div>
+          <div class="content clear-both" style="height: 80px;">
+            <div class="float-left">
+              退卡原因:<br>
+              <el-input type="textarea" v-model="huiyuanDialog.tuikaDialog.responseData.reason" :disabled="true"></el-input>
+            </div>
+            <div class="float-right">
+              备注:<br>
+              <el-input type="textarea" v-model="huiyuanDialog.tuikaDialog.responseData.remarks" :disabled="true"></el-input>
+            </div>
+          </div>
         </div>
       </el-dialog>
       <!-- 点击购卡按钮弹窗-购卡项目 -->
@@ -689,7 +727,7 @@ import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-o
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
 import BScroll from 'better-scroll' // 滚动插件
-import { postServiceCategory, postMemberLevelInfo, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords } from '../../api/getData'
+import { postServiceCardReturnDetail, postServiceCategory, postMemberLevelInfo, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords } from '../../api/getData'
 import { mapGetters } from 'vuex' //  这儿需要用到vuex里的数据
 
 export default {
@@ -830,6 +868,59 @@ export default {
         // 退卡详情
         tuikaDialog: {
           isShow: false,
+          responseData:{
+            id: 8,
+            order_id: 34,
+            o_sn: "XM156481327221",
+            r_sn: "OR156516404221",
+            r_number: 1,
+            r_amount: "126.00",
+            r_status: 1,
+            reason: "",
+            remarks: "",
+            type: 1,
+            update_time: 1565245615,
+            dealwith_time: 1565245615,
+            shop_id: 21,
+            otype: 3,
+            creator: "1",
+            creator_id: 0,
+            r_type: "3",
+            status: 1,
+            worker_id: 13,
+            worker: "荣天铭",
+            create_time: 1565164042,
+            ticket: {
+              id: 2,
+              order_id: 34,
+              shop_id: 21,
+              member_id: 2,
+              mobile: "13637765376",
+              ticket_id: 1,
+              status: 1,
+              price: "188.00",
+              real_price: "126.00",
+              start_time: 1564813302,
+              end_time: 1584028799,
+              over_time: 0,
+              use_over_time: null,
+              day: 222,
+              month: 0,
+              year: 0,
+              refund: 0,
+              refund_time: 1565245615,
+              create_time: "2019-08-03 14:21:12",
+              waiter: "荣天铭",
+              waiter_id: 13,
+              type: 1,
+              level_id: 6,
+              log: 0,
+              refund_id: 1,
+              start: "2019-08-03",
+              end: "2020-03-12"
+            },
+            type_text: "次卡"
+          },
           tableData: [
             // {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了', reg: '无'},
             // {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了', reg: '无'},
@@ -2088,6 +2179,10 @@ export default {
               message: res.msg,
               type: 'success'
             })
+            if (this.jiezhangDialog.memberVip.id) {
+              this.xuanzehuiyuanDialog.mobile = this.jiezhangDialog.memberVip.mobile
+              this.clickChoosesMemberByKeyboard('ok')
+            }
             this.chongzhiDialog.mobile = ''
             this.chongzhiDialog.huiyuanInfo = {}
             this.chongzhiDialog.payType = ''
@@ -2344,8 +2439,13 @@ export default {
       this.huiyuanDialog.shiyongjiluDialog.isShow = true
     },
     // 退卡详情
-    huiyuanDialogServiceCardReturnCardsDetails (card) {
-      this.huiyuanDialog.tuikaDialog.isShow = true
+    async huiyuanDialogServiceCardReturnCardsDetails (card) {
+      await postServiceCardReturnDetail({id:card.id}).then(res => {
+        if (res.code === '200') {
+          this.huiyuanDialog.tuikaDialog.responseData = res.data
+          this.huiyuanDialog.tuikaDialog.isShow = true
+        }
+      })
     },
 
     // 购卡弹框

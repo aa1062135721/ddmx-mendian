@@ -112,8 +112,8 @@
               <el-table-column prop="order_status" label="状态"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button size="mini" @click="showDoorShopOrderReturnDialog(scope.row.id)" v-if="scope.row.order_status === '正常' || scope.row.order_status === '有退单'">退单</el-button>
-                  <el-button size="mini" @click="showOrderDetails(scope.row.id)">订单详情</el-button>
+                  <el-button size="mini" type="text" @click="showDoorShopOrderReturnDialog(scope.row.id)">退单</el-button>
+                  <el-button size="mini" type="text" @click="showOrderDetails(scope.row.id)">订单详情</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -207,7 +207,7 @@
               </el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button size="mini"   @click="showOrderDetails(scope.row.id)">订单详情</el-button>
+                  <el-button size="mini" type="text" @click="showOrderDetails(scope.row.id)">订单详情</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -311,8 +311,9 @@
               <el-table-column prop="o_status" label="状态"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-<!--                  <el-button size="mini" @click="">订单详情</el-button>-->
-                  <el-button size="mini" v-if="scope.row.refund" @click="showServiceCardDialog(scope.row.id)">退单</el-button>
+<!--                  <el-button size="mini" @click="" type="text">订单详情</el-button>-->
+                  <el-button size="mini" @click="showServiceCardReturnDetailDialog(scope.row.id)" type="text" v-if="scope.row.status === 4">退单详情</el-button>
+                  <el-button size="mini"  @click="showServiceCardDialog(scope.row.id)" type="text" v-if="scope.row.refund">退单</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -525,26 +526,26 @@
         <div>
           <el-form ref="form"  label-width="80px" label-position="left" :inline="true" class="demo-form-inline">
             <el-form-item label="卡卷类型">
-              <el-input :placeholder="returnOrderDialog2.responseData.card.type" :disabled="true"></el-input>
+              <el-input :value="returnOrderDialog2.responseData.card.type"></el-input>
             </el-form-item>
             <el-form-item label="使用月份">
-              <el-input :placeholder="returnOrderDialog2.responseData.month || '次卡'" :disabled="true"></el-input>
+              <el-input :value="returnOrderDialog2.responseData.month || '次卡'"></el-input>
             </el-form-item>
           </el-form>
           <el-form ref="form"  label-width="80px" label-position="left" :inline="true" class="demo-form-inline">
             <el-form-item label="激活时间">
-              <el-input :placeholder="returnOrderDialog2.responseData.start" :disabled="true"></el-input>
+              <el-input :value="returnOrderDialog2.responseData.start"></el-input>
             </el-form-item>
             <el-form-item label="到期时间">
-              <el-input :placeholder="returnOrderDialog2.responseData.end" :disabled="true"></el-input>
+              <el-input :value="returnOrderDialog2.responseData.end"></el-input>
             </el-form-item>
           </el-form>
           <el-form ref="form"  label-width="80px" label-position="left" :inline="true" class="demo-form-inline">
             <el-form-item label="支付金额">
-              <el-input :placeholder="returnOrderDialog2.responseData.real_price + '元'" :disabled="true"></el-input>
+              <el-input :value="returnOrderDialog2.responseData.real_price + '元'"></el-input>
             </el-form-item>
             <el-form-item label="使用金额">
-              <el-input :placeholder="returnOrderDialog2.responseData.card.money + '元'" :disabled="true"></el-input>
+              <el-input :value="returnOrderDialog2.responseData.card.money + '元'"></el-input>
             </el-form-item>
           </el-form>
           <el-form ref="form"  label-width="80px" label-position="left">
@@ -564,23 +565,74 @@
               </el-radio-group>
             </el-form-item>
             <el-form-item label="退款金额">
-              <el-input :placeholder="returnOrderDialog2.responseData.card.balance + '元'" :disabled="true"></el-input>
+              <el-input :value="returnOrderDialog2.responseData.card.balance + '元'"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" v-model="returnOrderDialog2.requestData.remarks"></el-input>
             </el-form-item>
-            <el-form-item style="text-align: right;">
+            <div style="text-align: center;">
               <el-button @click="returnOrderDialog2.isShow = false">取消</el-button>
               <el-button @click="serviceCardReturn" type="primary">退款</el-button>
-            </el-form-item>
+            </div>
           </el-form>
+        </div>
+      </el-dialog>
+      <!-- 服务卡订单--退单详情-->
+      <el-dialog class="order-details-dialog" title="服务卡订单退单详情" :visible.sync="returnDetailDialog2.isShow" width="500px" :center="true">
+        <div>
+          <div>
+            <div class="content clear-both">
+              <div class="float-left">订单编号：{{returnDetailDialog2.responseData.o_sn}}</div>
+              <div class="float-right">退单编号：{{returnDetailDialog2.responseData.r_sn}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="content clear-both">
+              <div class="float-left">卡卷类型：{{returnDetailDialog2.responseData.type_text}}</div>
+              <div class="float-right">使用月份：{{returnDetailDialog2.responseData.ticket.months || '次卡'}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="content clear-both">
+              <div class="float-left">激活时间：{{returnDetailDialog2.responseData.ticket.start}}</div>
+              <div class="float-right">到期时间：{{returnDetailDialog2.responseData.ticket.end}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="content clear-both">
+              <div class="float-left">支付金额：{{returnDetailDialog2.responseData.ticket.real_price + '元'}}</div>
+              <div class="float-right">退款金额：{{returnDetailDialog2.responseData.r_amount + '元'}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="content clear-both">
+              <div class="float-left">申请人员：{{returnDetailDialog2.responseData.ticket.waiter}}</div>
+              <div class="float-right">申请时间：{{returnDetailDialog2.responseData.ticket.create_time}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="content clear-both">
+              <div class="float-left">退款方式：{{(returnDetailDialog2.responseData.otype === 1) ?"现金退款":(returnDetailDialog2.responseData.otype === 2 ? "余额退款" : '银行卡退款')}}</div>
+              <div class="float-right">退款状态：{{(returnDetailDialog2.responseData.r_status === 0) ?"申请中":(returnDetailDialog2.responseData.r_status === 1 ? "已完成" : '取消')}}</div>
+            </div>
+          </div>
+          <div class="content clear-both" style="height: 80px;">
+            <div class="float-left">
+              退卡原因:<br>
+              <el-input type="textarea" v-model="returnDetailDialog2.responseData.reason" :disabled="true"></el-input>
+            </div>
+            <div class="float-right">
+              备注:<br>
+              <el-input type="textarea" v-model="returnDetailDialog2.responseData.remarks" :disabled="true"></el-input>
+            </div>
+          </div>
         </div>
       </el-dialog>
     </div>
 </template>
 
 <script>
-import { postOrderList, postWaiter, postOrderWaiter, postMemberInfo, postOrderDetails, postOrderDetailsGoods, postReturnServiceCardOrder, postReturnServiceCardOrderConfirm, postServiceCardOrderList, postOrderDetailsReturnGoods, postOrderReturnGoodsList, postOrderReturnConfirm, } from '../../api/getData'
+import { postOrderList, postWaiter, postOrderWaiter, postMemberInfo, postOrderDetails, postOrderDetailsGoods, postReturnServiceCardOrder, postReturnServiceCardOrderConfirm, postServiceCardOrderList, postOrderDetailsReturnGoods, postOrderReturnGoodsList, postOrderReturnConfirm, postServiceCardReturnDetail, } from '../../api/getData'
 import { changeTime, getWeekStartDateAndEndDateRange } from '../../utils'
 
 export default {
@@ -880,6 +932,63 @@ export default {
           remarks:'',//备注
         },
       },
+      //服务卡退单详情
+      returnDetailDialog2:{
+        isShow: false,
+        responseData:{
+          id: 8,
+          order_id: 34,
+          o_sn: "XM156481327221",
+          r_sn: "OR156516404221",
+          r_number: 1,
+          r_amount: "126.00",
+          r_status: 1,
+          reason: "sdfadsfasdf",
+          remarks: "sfadsfadsf",
+          type: 1,
+          update_time: 1565245615,
+          dealwith_time: 1565245615,
+          shop_id: 21,
+          otype: 3,
+          creator: "1",
+          creator_id: 0,
+          r_type: "3",
+          status: 1,
+          worker_id: 13,
+          worker: "荣天铭",
+          create_time: 1565164042,
+          ticket: {
+            id: 2,
+            order_id: 34,
+            shop_id: 21,
+            member_id: 2,
+            mobile: "13637765376",
+            ticket_id: 1,
+            status: 1,
+            price: "188.00",
+            real_price: "126.00",
+            start_time: 1564813302,
+            end_time: 1584028799,
+            over_time: 0,
+            use_over_time: null,
+            day: 222,
+            month: 0,
+            year: 0,
+            refund: 0,
+            refund_time: 1565245615,
+            create_time: "2019-08-03 14:21:12",
+            waiter: "荣天铭",
+            waiter_id: 13,
+            type: 1,
+            level_id: 6,
+            log: 0,
+            refund_id: 1,
+            start: "2019-08-03",
+            end: "2020-03-12"
+          },
+          type_text: "次卡"
+        }
+      },
     }
   },
   methods: {
@@ -911,6 +1020,8 @@ export default {
           await postOrderDetailsReturnGoods(data2).then(res => {
             if (res.code === '200')
               this.orderDetailsDialog1.responseReturnGoodList = res.data
+          }).catch(err => {
+            console.log(err)
           })
           this.orderDetailsDialog1.isShow = true
           break
@@ -1075,13 +1186,15 @@ export default {
       this.returnOrderDialog1.multipleSelection = []
       this.returnOrderDialog1.id = id
       await postOrderReturnGoodsList({order_id:id}).then(res => {
-        if (res.data.length){
-          res.data.map(item => {
-            item.my_return_num = ''
-            item.my_return_price = ''
-          })
-          this.returnOrderDialog1.responseGoodsData = res.data
-          this.returnOrderDialog1.isShow = true
+        if (res.code === '200'){
+          if (res.data.data) {
+            res.data.data.map(item => {
+              item.my_return_num = ''
+              item.my_return_price = ''
+            })
+            this.returnOrderDialog1.responseGoodsData = res.data.data
+            this.returnOrderDialog1.isShow = true
+          }
         }
       })
     },
@@ -1234,6 +1347,15 @@ export default {
         }
       })
     },
+    //服务卡退单详情
+    async showServiceCardReturnDetailDialog(id) {
+      await postServiceCardReturnDetail({id}).then(res => {
+        if (res.code === '200') {
+          this.returnDetailDialog2.responseData = res.data
+          this.returnDetailDialog2.isShow = true
+        }
+      })
+    },
   },
   mounted () {
     this.getOrderList()
@@ -1325,8 +1447,7 @@ export default {
       color: #808080;
       width: 100%;
       height:18px;
-      /*font-size:18px;*/
-      font-family:SourceHanSansCN-Regular;
+      margin-bottom: 15px;
       font-weight:400;
       color:rgba(128,128,128,1);
     }
@@ -1334,6 +1455,10 @@ export default {
   /* 会员详情弹框*/
   .order-manage-page-member-info{
 
+  }
+  .demo-form-inline{
+    display: flex;
+    justify-content: space-between;
   }
 }
 </style>

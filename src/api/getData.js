@@ -341,6 +341,15 @@ export const postReturnServiceCardOrderConfirm = (data = null) => {
 }
 
 /**
+ * 订单管理-服务卡订单-退单详情
+ * @param data
+ * @returns {*}
+ */
+export const postServiceCardReturnDetail = (data = null) => {
+  return Vue.prototype.$post('/order/ticket_list_details', data)
+}
+
+/**
  * 订单管理-库存管理 - 盘点单列表
  * @param data
  * @returns {*}
