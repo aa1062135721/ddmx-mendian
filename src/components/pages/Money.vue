@@ -266,7 +266,8 @@
         <div class="clear-both both">
           <div class="float-left left">
             <div class="one">
-              <el-input v-model="chongzhiDialog.mobile" @input.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')"  placeholder="请输入会员手机号" clearable maxlength="11"></el-input>
+              <el-button style="width: 30%;" type="primary" plain @click="chongzhiDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
+              <el-input style="width: 65%;" v-model="chongzhiDialog.mobile" @input.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')"  placeholder="请输入会员手机号" clearable maxlength="11"></el-input>
             </div>
             <div class="two">
               <ul>
@@ -300,7 +301,7 @@
             <div class="four">
               <el-input @focus="chongzhiDialogInputFocus('money')" v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额" clearable></el-input>
             </div>
-            <div style="height: 40px">
+            <div style="height: 40px;width: 100%;">
               <el-form >
                 <el-form-item label="请选择服务人员">
                   <el-select v-model="chongzhiDialog.nowWaiter" placeholder="请选择" @focus="getWaiterList()">
@@ -451,7 +452,8 @@
         <div class="clear-both div">
             <div class="float-left left">
               <div class="search">
-                <el-input @keyup.native="searchMember()" @keyup.enter.native="searchMember()" v-model="xuanzehuiyuanDialog.mobile" placeholder="请输入会员手机号" maxlength="11"></el-input>
+                <el-button style="width: 30%;" type="primary" plain @click="xuanzehuiyuanDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
+                <el-input style="width: 65%;" @keyup.native="searchMember()" @keyup.enter.native="searchMember()" v-model="xuanzehuiyuanDialog.mobile" placeholder="请输入会员手机号" maxlength="11"></el-input>
               </div>
               <div class="content">
                 <ul>
@@ -488,9 +490,9 @@
           <div class="clear-both header">
             <div class="float-left left">
               <div class="search-btns">
-                <el-button type="primary" @click="huiyuanDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
+                <el-button type="primary" plain @click="huiyuanDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
                 <el-input style="width:392px;" @keyup.native="huiyuanDialogSearchMemberVip" v-model="huiyuanDialog.mobile" placeholder="请输入您需要查询的会员手机号码"  maxlength="11"></el-input>
-                <el-button  plain @click="huiyuanDialogSearchMemberVip">搜索</el-button>
+                <el-button  type="primary"  @click="huiyuanDialogSearchMemberVip">搜索</el-button>
               </div>
               <div class="user-info el-table--border">
                 <table class="el-table el-table__body" cellspacing="0" cellpadding="0" border="0">
@@ -3219,7 +3221,7 @@ export default {
         flex-direction:column;
         justify-content:space-between;
         .one{
-
+          display: flex;justify-content: space-between;
         }
         .two{
           width:368px;
@@ -3433,6 +3435,7 @@ export default {
       .left{
         width: 50%;
         .search{
+          display: flex;justify-content: space-between;
           margin-bottom: 20px;
         }
         .content{
@@ -3476,14 +3479,6 @@ export default {
         .left{
           .search-btns{
             width: 584px;display: flex;justify-content: space-between;margin-bottom: 50px;
-            button{
-             &:first-child{
-               background: #2DC2F3;
-             }
-              &:last-child{
-                width: 84px;
-              }
-            }
           }
           .user-info{
             margin-bottom: 50px;
