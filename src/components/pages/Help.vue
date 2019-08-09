@@ -2,7 +2,7 @@
     <div class="page-help bg-blue">
       <div class="header clear-both">
         <div class="logo float-left">
-          <img class="img" src="../../assets/images/logo.png" alt="logo"  @click="goToUrl('/home')">
+          <img class="img" src="../../assets/images/logo.png" alt="logo"  @click="goToUrl('/home/order')">
           <span class="title">帮助中心</span>
         </div>
         <div class="tabs float-right">
@@ -33,13 +33,18 @@
           </ul>
         <div class="right float-right">
           <h1 class="title" v-if="hepls.length" v-html="hepls[index].title"></h1>
-          <div class="content" v-if="hepls.length" v-html="hepls[index].content"></div>
+          <div class="content" v-if="hepls.length">
+            <my-render :html="hepls[index].content"></my-render>
+          </div>
         </div>
       </div>
     </div>
 </template>
 
 <script>
+import VueImg from 'v-img'
+import Vue from 'vue'
+Vue.use(VueImg)
 import { postGetHelpList } from '../../api/getData'
 export default {
   name: 'Index',
@@ -57,7 +62,19 @@ export default {
       ]
     }
   },
-  components: {},
+  components: {
+    "my-render": {
+      props: {
+        html: String,
+      },
+      render (h) {
+        const com =  Vue.extend({
+          template: `<div>${this.html}</div>`
+        })
+        return h(com, {})
+      },
+    },
+  },
   beforeMount () {
     this.searchHelp()
   },
@@ -80,6 +97,10 @@ export default {
       }
       postGetHelpList(requestData).then(res => {
         if (res.data.length) {
+          res.data.map(item => {
+            item.content = item.content.replace(/<img/gi, "<img v-img:group ")
+          })
+
           if (requestData.content) {
             res.data.map(item => {
               // 匹配关键字正则
@@ -218,7 +239,8 @@ export default {
         background: #fff;
         text-align: center;
         list-style-type: none;
-        width:20.73%;
+        /*width:20.73%;*/
+        width: 268px;
         li{
           clear: both;
           overflow-x: hidden;
