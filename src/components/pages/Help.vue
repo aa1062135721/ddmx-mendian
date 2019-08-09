@@ -33,8 +33,8 @@
           </ul>
         <div class="right float-right">
           <h1 class="title" v-if="hepls.length" v-html="hepls[index].title"></h1>
-          <div class="content" v-if="hepls.length" v-html="hepls[index].content">
-
+          <div class="content" v-if="hepls.length">
+            <my-render :html="hepls[index].content"></my-render>
           </div>
         </div>
       </div>
@@ -44,17 +44,7 @@
 <script>
 import VueImg from 'v-img'
 import Vue from 'vue'
-const vueImgConfig = {
-  // Use `alt` attribute as gallery slide title
-  altAsTitle: false,
-  // Display 'download' button near 'close' that opens source image in new tab
-  sourceButton: false,
-  // Event listener to open gallery will be applied to <img> element
-  openOn: 'click',
-  // Show thumbnails for all groups with more than 1 image
-  thumbnails: false,
-}
-Vue.use(VueImg,vueImgConfig)
+Vue.use(VueImg)
 import { postGetHelpList } from '../../api/getData'
 export default {
   name: 'Index',
@@ -72,7 +62,19 @@ export default {
       ]
     }
   },
-  components: {},
+  components: {
+    "my-render": {
+      props: {
+        html: String,
+      },
+      render (h) {
+        const com =  Vue.extend({
+          template: `<div>${this.html}</div>`
+        })
+        return h(com, {})
+      },
+    },
+  },
   beforeMount () {
     this.searchHelp()
   },
@@ -96,10 +98,7 @@ export default {
       postGetHelpList(requestData).then(res => {
         if (res.data.length) {
           res.data.map(item => {
-            item.content.replace(/<img[^>]*>/gi, function (match, capture) {
-              console.log(match,capture)
-              // return match.replace(/al\s*?=\s*?([‘"])[\s\S]*?\1/ig, 'style="max-width:100%;height:auto;"') // 替换style
-            })
+            item.content = item.content.replace(/<img/gi, "<img v-img:group ")
           })
 
           if (requestData.content) {
