@@ -549,3 +549,12 @@ export const postShopList = (data = null) => {
 export const postCheckStockGoodsList = (data = null) => {
   return Vue.prototype.$post('/Check/stock_about', data)
 }
+
+/**
+ * 会员管理 - 获取会员列表
+ * @param data
+ * @returns {*}
+ */
+export const postMemberList = (data = null) => {
+  return Vue.prototype.$post('/member/memberList', data)
+}

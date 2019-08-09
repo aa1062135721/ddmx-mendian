@@ -73,6 +73,15 @@ const router = new Router({
           component: resolve => require(['@/components/pages/OrderManage.vue'], resolve)
         },
         {
+          path: 'member',
+          name: 'Member',
+          meta: {
+            title: '会员管理',
+            requireAuth: true// 需要登录
+          },
+          component: resolve => require(['@/components/pages/MemberManage.vue'], resolve)
+        },
+        {
           path: 'expenditure',
           name: 'Expenditure',
           meta: {

@@ -23,3 +23,12 @@ export const timeStampToYMDHIS = (timestamp) => {
   }
   return o.y + '-' + o.M + '-' + o.d + ' ' + o.h + ':' + o.m + ':' + o.s
 }
+
+/**
+ * 金额保留两位小数
+ * @param money
+ * @returns {string}
+ */
+export const moneyToFixed = (money) => {
+  return parseFloat(money).toFixed(2)
+}

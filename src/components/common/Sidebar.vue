@@ -43,11 +43,11 @@ export default {
         //   icon: 'marketing-manage',
         //   index: '/home/index'
         // },
-        // {
-        //   title: '会员管理',
-        //   icon: 'member-manage',
-        //   index: '15'
-        // },
+        {
+          title: '会员管理',
+          icon: 'member-manage',
+          index: '/home/member'
+        },
         {
           title: '库存管理',
           icon: 'stock-manage',
