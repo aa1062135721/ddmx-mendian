@@ -20,8 +20,8 @@
                 </div>
               </div>
               <div class="page-buttons">
-                <el-button  @click="clickPrePageBtn" :disabled="prePageBtnDisabled">上一页</el-button>
-                <el-button class="page-button"  @click="clickNextPageBtn" :disabled="nextPageBtnDisabled">下一页</el-button>
+                <el-button  @click="clickPrePageBtn" :disabled="prePageBtnDisabled" style="margin-right: 15px;">上一页</el-button>
+                <el-button  @click="clickNextPageBtn" :disabled="nextPageBtnDisabled"  style="margin-left: 15px;">下一页</el-button>
               </div>
             </div>
           </div>
@@ -3284,7 +3284,7 @@ export default {
             color: #2ECAF1;
             font-size:20px;
             border:1px solid rgba(46,202,241,1);
-            border-radius:8px;
+            border-radius:4px;
             outline: none;    //消除默认点击蓝色边框效果
           }
           .active{

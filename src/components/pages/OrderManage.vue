@@ -112,7 +112,7 @@
               <el-table-column prop="order_status" label="状态"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button size="mini" type="text" @click="showDoorShopOrderReturnDialog(scope.row.id)">退单</el-button>
+                  <el-button size="mini" type="text" @click="showDoorShopOrderReturnDialog(scope.row.id)" v-if="scope.row.status !== -6">退单</el-button>
                   <el-button size="mini" type="text" @click="showOrderDetails(scope.row.id)">订单详情</el-button>
                 </template>
               </el-table-column>
@@ -461,7 +461,6 @@
               <el-table-column type="selection" width="55"></el-table-column>
               <el-table-column prop="subtitle" label="商品名称"></el-table-column>
               <el-table-column prop="num" label="商品购买数量"></el-table-column>
-              <el-table-column prop="price" label="商品价格"></el-table-column>
               <el-table-column prop="real_price" label="商品成交价格"></el-table-column>
               <el-table-column prop="refund_price" label="最高可退货单价"></el-table-column>
               <el-table-column  label="请输入退货单价">
@@ -561,7 +560,7 @@
               <el-radio-group v-model="returnOrderDialog2.requestData.type">
                 <el-radio label="cash">现金退款</el-radio>
                 <el-radio label="balance">余额退款</el-radio>
-                <el-radio label="card">银行卡</el-radio>
+<!--                <el-radio label="card">银行卡</el-radio>-->
               </el-radio-group>
             </el-form-item>
             <el-form-item label="退款金额">
@@ -1187,12 +1186,12 @@ export default {
       this.returnOrderDialog1.id = id
       await postOrderReturnGoodsList({order_id:id}).then(res => {
         if (res.code === '200'){
-          if (res.data.data) {
-            res.data.data.map(item => {
+          if (res.data) {
+            res.data.map(item => {
               item.my_return_num = ''
               item.my_return_price = ''
             })
-            this.returnOrderDialog1.responseGoodsData = res.data.data
+            this.returnOrderDialog1.responseGoodsData = res.data
             this.returnOrderDialog1.isShow = true
           }
         }
@@ -1459,6 +1458,11 @@ export default {
   .demo-form-inline{
     display: flex;
     justify-content: space-between;
+    .el-form-item{
+      &:last-child{
+        margin-right: 0;
+      }
+    }
   }
 }
 </style>
