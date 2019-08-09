@@ -200,11 +200,12 @@
               <el-table-column prop="amount" label="充值金额"></el-table-column>
               <el-table-column prop="pay_way" label="付款方式"></el-table-column>
               <el-table-column prop="overtime" label="交易时间"></el-table-column>
-              <el-table-column label="服务人员">
-                <template slot-scope="scope">
-                  <el-button type="text" size="small" @click="getWaiterInfo(scope.row.waiter_id)">{{scope.row.waiter}}</el-button>
-                </template>
-              </el-table-column>
+              <el-table-column prop="waiter" label="服务人员"></el-table-column>
+<!--              <el-table-column label="服务人员">-->
+<!--                <template slot-scope="scope">-->
+<!--                  <el-button type="text" size="small" @click="getWaiterInfo(scope.row.waiter_id)">{{scope.row.waiter}}</el-button>-->
+<!--                </template>-->
+<!--              </el-table-column>-->
               <el-table-column label="操作">
                 <template slot-scope="scope">
                   <el-button size="mini" type="text" @click="showOrderDetails(scope.row.id)">订单详情</el-button>
@@ -437,25 +438,6 @@
       <!-- 门店订单--退款处理-->
       <el-dialog class="order-details-dialog" title="退款处理" :visible.sync="returnOrderDialog1.isShow" width="968px" :center="true">
         <div>
-          <div style="margin-bottom: 20px;height: 50px;" class="clear-both">
-            <div class="float-left" style="width: 35%;" >
-              <el-select v-model="returnOrderDialog1.reason_id" clearable placeholder="选择退货原因"  @change="returnResultChange">
-                <el-option
-                  v-for="item in returnOrderDialog1.returnOrderResult"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id">
-                </el-option>
-              </el-select>
-            </div>
-            <div class="float-right"  style="width: 60%;" v-if="returnOrderDialog1.reason_id === 0">
-              <el-input
-                v-model="returnOrderDialog1.reason"
-                placeholder="请输入其他原因"
-                clearable>
-              </el-input>
-            </div>
-          </div>
           <div>
             <el-table  :data="returnOrderDialog1.responseGoodsData" border style="width: 100%;"  @selection-change="choosesHandleSelectionChange">
               <el-table-column type="selection" width="55"></el-table-column>
@@ -476,8 +458,20 @@
               </el-table-column>
             </el-table>
           </div>
-          <div style="margin-top: 20px;height: 50px;">
-            <el-input type="textarea" v-model="returnOrderDialog1.remarks" placeholder="请输入备注信息"></el-input>
+          <div style="margin-top: 20px;">
+            <el-form ref="form"  label-width="100px" label-position="left">
+              <el-form-item label="退货原因:" required>
+                <el-select v-model="returnOrderDialog1.reason_id" placeholder="选择退货原因" @change="returnResultChange">
+                  <el-option  v-for="item in returnOrderDialog1.returnOrderResult" :label="item.name" :value="item.id"  :key="item.id"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="其他原因:" required v-if="returnOrderDialog1.reason_id === 0">
+                <el-input type="textarea" v-model="returnOrderDialog1.reason" placeholder="请输入其他原因"></el-input>
+              </el-form-item>
+              <el-form-item label="备注:" required>
+                <el-input type="textarea" v-model="returnOrderDialog1.remarks" placeholder="请输入备注信息"></el-input>
+              </el-form-item>
+            </el-form>
           </div>
           <div style="margin-top: 20px;height: 50px;text-align: center;">
             <el-button @click="returnOrderDialog1.isShow = false">取消</el-button>
@@ -547,16 +541,16 @@
               <el-input :value="returnOrderDialog2.responseData.card.money + '元'"></el-input>
             </el-form-item>
           </el-form>
-          <el-form ref="form"  label-width="80px" label-position="left">
-            <el-form-item label="退货原因">
-              <el-select v-model="returnOrderDialog2.requestData.reason_id" placeholder="请选择退货原因" @change="serviceCardReturnResultChange">
+          <el-form ref="form"  label-width="80px" label-position="left" class="demo-dynamic">
+            <el-form-item label="退卡原因" required>
+              <el-select v-model="returnOrderDialog2.requestData.reason_id" placeholder="请选择退卡原因" @change="serviceCardReturnResultChange">
                 <el-option  v-for="item in returnOrderDialog2.returnOrderResult" :label="item.name" :value="item.id"  :key="item.id"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="其他原因" v-if="returnOrderDialog2.requestData.reason_id === 0">
               <el-input type="textarea" v-model="returnOrderDialog2.requestData.reason"></el-input>
             </el-form-item>
-            <el-form-item label="退款方式">
+            <el-form-item label="退款方式" required>
               <el-radio-group v-model="returnOrderDialog2.requestData.type">
                 <el-radio label="cash">现金退款</el-radio>
                 <el-radio label="balance">余额退款</el-radio>
@@ -566,7 +560,7 @@
             <el-form-item label="退款金额">
               <el-input :value="returnOrderDialog2.responseData.card.balance + '元'"></el-input>
             </el-form-item>
-            <el-form-item label="备注">
+            <el-form-item label="备注" required>
               <el-input type="textarea" v-model="returnOrderDialog2.requestData.remarks"></el-input>
             </el-form-item>
             <div style="text-align: center;">
@@ -709,6 +703,12 @@ export default {
         timeBtnValue: 0,
         startTime: '', // 开始时间 公共参数
         endTime: '' // 结束时间 公共参数
+      },
+      rules:{
+        //退货原因
+        reason: [
+          { required: true, message: '请填写退货原因', trigger: 'blur' }
+        ]
       },
 
       /**
@@ -1234,6 +1234,7 @@ export default {
           subtitle:this.returnOrderDialog1.multipleSelection[i].subtitle,
           refund_price:this.returnOrderDialog1.multipleSelection[i].my_return_price,
           refund_num:this.returnOrderDialog1.multipleSelection[i].my_return_num,
+          is_service_goods:this.returnOrderDialog1.multipleSelection[i].is_service_goods,
         }
         returnGoods.push(obj)
       }

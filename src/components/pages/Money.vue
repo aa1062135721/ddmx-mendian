@@ -820,7 +820,7 @@ export default {
         },
         // 展示哪个数据 默认为充值记录
         showWho: 'rechargeLog',
-        count:1,
+        count:0,
         page:1,
         limit:5,
         // 服务卡购买记录
@@ -2064,6 +2064,14 @@ export default {
           }
         })
       }
+
+      /**
+       *选择会员结账时，单击删除会员，会清空购物车
+       * 给会员充值时，会清空购物车
+       */
+      if (this.chooeseGoods.cardList.length) {
+        this.chooeseGoods.cardList = []
+      }
       //刷新后结算面板的价格展示也刷新
       this.sumChooseGoodsMoney()
     },
@@ -2271,7 +2279,7 @@ export default {
         })
         return
       }
-      await this.$confirm(`是否选择新增加该会员（${requestData.mobile}）?`, '提示', {
+      await this.$confirm(`是否新增该会员（${requestData.mobile}）?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -2848,6 +2856,53 @@ export default {
   computed: {
     ...mapGetters(['userInfo']),
   },
+  watch:{
+    "xuanzehuiyuanDialog.isShow":{
+      handler:function(newVal,oldVal){
+        if (newVal === false) {
+          this.xuanzehuiyuanDialog.mobile = ''
+          this.xuanzehuiyuanDialog.memberVip = {}
+        }
+      },
+      deep:true
+    },
+    "chongzhiDialog.isShow":{
+      handler:function(newVal,oldVal){
+        if (newVal === false) {
+          this.chongzhiDialog.mobile = ''
+          this.chongzhiDialog.huiyuanInfo = {}
+          this.chongzhiDialog.chooeseWho = 'mobile'
+          this.chongzhiDialog.payType = ''
+          this.chongzhiDialog.payMoney = ''
+          this.chongzhiDialog.nowWaiter = ''
+        }
+      },
+      deep:true
+    },
+    "huiyuanDialog.isShow":{
+      handler:function(newVal,oldVal){
+        if (newVal === false) {
+          this.huiyuanDialog.mobile = ''
+          this.huiyuanDialog.huiyuanInfo = {}
+          this.huiyuanDialog.count = 0
+          this.huiyuanDialog.page = 1
+          this.huiyuanDialog.limit = 5
+          this.huiyuanDialog.fuwukaList = []
+          this.huiyuanDialog.chongzhijiluList = []
+        }
+      },
+      deep:true
+    },
+    "huiyuanDialog.addHuiyuanDialog.isShow":{
+      handler:function(newVal,oldVal){
+        if (newVal === false) {
+          this.huiyuanDialog.addHuiyuanDialog.mobile = ''
+          this.huiyuanDialog.addHuiyuanDialog.nickname = ''
+        }
+      },
+      deep:true
+    },
+  }
 }
 </script>
 
