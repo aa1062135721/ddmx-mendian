@@ -618,6 +618,23 @@
           </el-table>
         </div>
       </el-dialog>
+      <!--会员查询-耗卡-选择服务人员-->
+      <el-dialog title="是否确定使用" :visible.sync="huiyuanDialog.haokaDialog.choosesWaiterDialog.isShow" width="500px">
+        <el-form>
+          <el-form-item label="请选择服务人员">
+            <el-select v-model="huiyuanDialog.haokaDialog.choosesWaiterDialog.waiter_id" placeholder="请选择服务人员" @focus="getWaiterList()">
+              <el-option v-for="item in waiterList" :label="item.name" :key="item.id" :value="item.id">
+                <span style="float: left" class="font-blue">{{ item.name }}</span>
+                <span style="float: right;color: #ccc;" >({{ item.type }})</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="huiyuanDialog.haokaDialog.choosesWaiterDialog.isShow = false">取 消</el-button>
+          <el-button type="primary" @click="huiyuanDialogUseServiceCardToGo">确 定</el-button>
+        </span>
+      </el-dialog>
       <!-- 会员查询-使用记录  -->
       <el-dialog title="使用记录" :visible.sync="huiyuanDialog.shiyongjiluDialog.isShow" width="648px" :center="true">
         <div>
@@ -855,6 +872,12 @@ export default {
           tableData: [
             // {sname: '艾灸', num: '不限制', id: 1, s_num: '不限制', status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: '不可用'},
           ],
+          // 耗卡时候需要选择服务人员
+          choosesWaiterDialog:{
+            isShow: false,
+            service_id: '',
+            waiter_id: ''
+          }
         },
         // 使用记录弹窗
         shiyongjiluDialog: {
@@ -2410,25 +2433,36 @@ export default {
       })
       this.huiyuanDialog.haokaDialog.isShow = true
     },
-    // 耗卡
-    async huiyuanDialogUseServiceCard (card) {
+    // 耗卡选择服务人员弹框显示
+    huiyuanDialogUseServiceCard (card) {
+      this.huiyuanDialog.haokaDialog.choosesWaiterDialog.service_id = card.id
+      this.huiyuanDialog.haokaDialog.choosesWaiterDialog.isShow = true
+    },
+    // 耗卡 选择服务人员后确认耗卡
+    async huiyuanDialogUseServiceCardToGo(){
       let requestData = {
         member_id:this.huiyuanDialog.huiyuanInfo.id,
-        service_id:card.id,
-        waiter_id:this.userInfo.id
+        service_id:this.huiyuanDialog.haokaDialog.choosesWaiterDialog.service_id,
+        waiter_id:this.huiyuanDialog.haokaDialog.choosesWaiterDialog.waiter_id
       }
-      await this.$confirm('您正在进行消耗服务卡操作, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(async () => {
+      if (requestData.waiter_id){
         await postMemberServiceCardsUseListTicket(requestData).then(res => {
           if (res.code === '200'){
+            this.huiyuanDialog.haokaDialog.isShow = false
             this.huiyuanDialogSearchServiceCardList()
           }
         })
-        this.huiyuanDialog.haokaDialog.isShow = false
-      }).catch(() => {})
+      } else {
+        this.$message.closeAll()
+        this.$message({
+          message: '请选择服务人员',
+          type: 'error'
+        })
+        return
+      }
+      this.huiyuanDialog.haokaDialog.choosesWaiterDialog.waiter_id = ''
+      this.huiyuanDialog.haokaDialog.choosesWaiterDialog.service_id = ''
+      this.huiyuanDialog.haokaDialog.choosesWaiterDialog.isShow = false
     },
     // 使用记录
     huiyuanDialogServiceCardUseRecords (card) {
