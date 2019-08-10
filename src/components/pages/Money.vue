@@ -301,21 +301,17 @@
             <div class="four">
               <el-input @focus="chongzhiDialogInputFocus('money')" v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额" clearable></el-input>
             </div>
-            <div style="height: 40px;width: 100%;">
-              <el-form >
-                <el-form-item label="请选择服务人员">
-                  <el-select v-model="chongzhiDialog.nowWaiter" placeholder="请选择" @focus="getWaiterList()">
-                    <el-option
-                      v-for="item in waiterList"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id">
-                      <span style="float: left" class="font-blue">{{ item.name }}</span>
-                      <span style="float: right;color: #ccc;" >({{ item.type }})</span>
-                    </el-option>
-                  </el-select>
-                </el-form-item>
-              </el-form>
+            <div>
+              <el-select v-model="chongzhiDialog.nowWaiter" placeholder="请选择服务人员" @focus="getWaiterList()" style="width: 100%;">
+                <el-option
+                  v-for="item in waiterList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                  <span style="float: left" class="font-blue">{{ item.name }}</span>
+                  <span style="float: right;color: #ccc;" >({{ item.type }})</span>
+                </el-option>
+              </el-select>
             </div>
           </div>
           <div class="float-right right">
@@ -705,8 +701,8 @@
                </el-tab-pane>
              </el-tabs>
          <div slot="footer" class="footer">
-           <el-button @click="goukaDialog.isShow = false" class="btn" style="margin-right: 20px;">取消</el-button>
-           <el-button @click="goukaDialogNowBuy" class="btn active" style="margin-left: 20px;">立即购买</el-button>
+           <el-button @click="goukaDialog.isShow = false" class="btn my-btn" style="margin-right: 20px;">取消</el-button>
+           <el-button @click="goukaDialogNowBuy" class="btn active my-btn-active" style="margin-left: 20px;">立即购买</el-button>
          </div>
       </el-dialog>
       <!-- 结账成功弹框-->
@@ -2466,11 +2462,7 @@ export default {
         this.goukaDialog.cardsList = []
         this.goukaDialogSearch()
       } else {
-        this.$message.closeAll()
-        this.$message({
-          message: '请先选择会员后在购卡',
-          type: 'error'
-        })
+        this.xuanzehuiyuanDialog.isShow = true
       }
     },
     goukaDialogChoosesCardType (type, e) {

@@ -449,6 +449,12 @@
           </div>
           <div style="margin-top: 20px;">
             <el-form ref="form"  label-width="100px" label-position="left">
+              <el-form-item label="退款方式" required>
+                <el-radio-group v-model="returnOrderDialog1.type">
+                  <el-radio label="cash">现金退款</el-radio>
+                  <el-radio label="balance">余额退款</el-radio>
+                </el-radio-group>
+              </el-form-item>
               <el-form-item label="退货原因:" required>
                 <el-select v-model="returnOrderDialog1.reason_id" placeholder="选择退货原因" @change="returnResultChange">
                   <el-option  v-for="item in returnOrderDialog1.returnOrderResult" :label="item.name" :value="item.id"  :key="item.id"></el-option>
@@ -720,16 +726,15 @@ export default {
         isShow: false,
         reason_id:'',//当前选择的推过原因的id，0为其他
         reason:'',//其他原因，自己输入
+        type:'',
         id: '',
         remarks:'',
         //选中的退货商品
         multipleSelection: [],
         // 退货原因列表
         returnOrderResult: [
-          {id: 1, name: '你这个东西太贵了。'},
-          {id: 2, name: '你这个东西是打发点死大多数大饭店太贵了。'},
-          {id: 3, name: '说是。'},
-          {id: 4, name: '你这个东西太事实上贵了。'},
+          {id: 1, name: '商品质量问题'},
+          {id: 2, name: '商品不一致，客户退货'},
           {id: 0, name: '其他'}
         ],
         //可退货的商品列表
@@ -1240,13 +1245,22 @@ export default {
         remarks: this.returnOrderDialog1.remarks,
         reason: this.returnOrderDialog1.reason,
         data: returnGoods,
-        money: money
+        money: money,
+        type: this.returnOrderDialog1.type,
       }
 
       if(!requestData.data.length) {
         this.$message.closeAll()
         this.$message({
           message: `请选择要退货的商品`,
+          type: 'error'
+        })
+        return
+      }
+      if (!requestData.type){
+        this.$message.closeAll()
+        this.$message({
+          message: `请选择退款方式`,
           type: 'error'
         })
         return
