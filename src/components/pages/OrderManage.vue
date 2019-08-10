@@ -391,7 +391,7 @@
               <div class="float-right">会员昵称：{{orderDetailsDialog1.responseData.member  ? orderDetailsDialog1.responseData.member.nickname : ''}}</div>
             </div>
             <div class="content clear-both">
-              <div class="float-left">会员等级：{{orderDetailsDialog1.responseData.member ? orderDetailsDialog1.responseData.member.level : ''}}</div>
+              <div class="float-left">会员等级：{{orderDetailsDialog1.responseData.member ? orderDetailsDialog1.responseData.member.level_name : ''}}</div>
               <div class="float-right">会员余额：{{orderDetailsDialog1.responseData.member ? orderDetailsDialog1.responseData.member.money : ''}}</div>
             </div>
           </div>
@@ -496,7 +496,7 @@
               <div class="float-right">会员昵称：{{orderDetailsDialog3.responseData.member  ? orderDetailsDialog3.responseData.member.nickname : ''}}</div>
             </div>
             <div class="content clear-both">
-              <div class="float-left">会员等级：{{orderDetailsDialog3.responseData.member ? orderDetailsDialog3.responseData.member.level : ''}}</div>
+              <div class="float-left">会员等级：{{orderDetailsDialog3.responseData.member ? orderDetailsDialog3.responseData.member.level_name : ''}}</div>
               <div class="float-right">会员余额：{{orderDetailsDialog3.responseData.member ? orderDetailsDialog3.responseData.member.money : ''}}</div>
             </div>
           </div>

@@ -242,7 +242,7 @@
               <v-keyboard @getNumber="clickChangejiageShoppingCarGood"></v-keyboard>
             </div>
             <div class="float-right">
-              <el-button @click="clickChangejiageShoppingCarGoodOk" class="gaijia-queding-btn my-btn-active">确<br><br><br><br>定</el-button>
+              <el-button @click="clickChangejiageShoppingCarGoodOk" class="gaijia-queding-btn my-btn-active">确定</el-button>
             </div>
           </div>
         </div>
@@ -256,7 +256,7 @@
               <v-keyboard-without-point @getNumber="clickChangeNumShoppingCarGood"></v-keyboard-without-point>
             </div>
             <div class="float-right">
-              <el-button @click="clickChangeNumShoppingCarGoodOk" class="gaijia-queding-btn my-btn-active">确<br><br><br><br>定</el-button>
+              <el-button @click="clickChangeNumShoppingCarGoodOk" class="gaijia-queding-btn my-btn-active">确定</el-button>
             </div>
           </div>
         </div>
@@ -358,8 +358,8 @@
               </li>
             </ul>
             <div class="div clear-both">
-              <button @click="jiezhangDialog.isShow = false" class="float-left">取消</button>
-              <button @click="jiezhangDialogClickOk" class="float-right active">确认结账</button>
+              <button @click="jiezhangDialog.isShow = false" class="float-left my-btn">取消</button>
+              <button @click="jiezhangDialogClickOk" class="float-right active my-btn-active">确认结账</button>
             </div>
           </div>
           <div class="float-right my-right">
@@ -448,7 +448,7 @@
         </div>
       </el-dialog>
       <!-- 选择会员弹框 -->
-      <el-dialog class="xuanzehuiyuan-tanchuan" title="选择会员" :visible.sync="xuanzehuiyuanDialog.isShow" width="810px" :center="true">
+      <el-dialog class="xuanzehuiyuan-tanchuan" title="选择会员" :visible.sync="xuanzehuiyuanDialog.isShow" width="720px" :center="true">
         <div class="clear-both div">
             <div class="float-left left">
               <div class="search">
@@ -2462,6 +2462,8 @@ export default {
     goukaDialogShow () {
       if (this.jiezhangDialog.memberVip.id) {
         this.goukaDialog.isShow = true
+        this.goukaDialog.requestData.page = 1
+        this.goukaDialog.cardsList = []
         this.goukaDialogSearch()
       } else {
         this.$message.closeAll()
@@ -3185,6 +3187,9 @@ export default {
     .gaijia-input{
       margin-bottom: 10px;
     }
+    /deep/ .el-button{
+      padding: 0;
+    }
     .gaijia-queding-btn{
       width:80px;
       height:290px;
@@ -3417,7 +3422,6 @@ export default {
     .div{
       width:100%;
       height:300px;
-      margin-bottom: 20px;
       .left{
         width: 50%;
         .search{
@@ -3450,9 +3454,6 @@ export default {
             }
           }
         }
-      }
-      .right{
-       width: 45%;
       }
     }
   }
