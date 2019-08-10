@@ -28,13 +28,11 @@
           </el-date-picker>
         </div>
         <div class="item">
-          <el-button class="my-primary-btn" @click="clickSearchBtn">
-            搜索
-          </el-button>
+          <el-button @click="clickSearchBtn"  type="primary">搜索</el-button>
         </div>
       </div>
       <div class="add-expenditure">
-        <el-button class="my-primary-btn" @click="addExpenditureDialog.isShow = true">新增</el-button>
+        <el-button @click="addExpenditureDialog.isShow = true" type="primary">新增</el-button>
       </div>
       <div>
         <el-table :data="tableData" border style="width: 100%;" height="650px">
@@ -100,7 +98,7 @@
            </div>
          </div>
           <div class="item clear-both">
-            <el-button class="my-primary-btn" style="width: 100%;margin-top: 20px;" @click="clickAddExpenditureBtn">
+            <el-button  style="width: 100%;margin-top: 20px;" @click="clickAddExpenditureBtn"  type="primary">
               保存
             </el-button>
           </div>
@@ -140,7 +138,7 @@
             </div>
           </div>
           <div class="item clear-both">
-            <el-button class="my-primary-btn" style="width: 100%;margin-top: 20px;" @click="clickEditExpenditureBtnOk">
+            <el-button style="width: 100%;margin-top: 20px;" @click="clickEditExpenditureBtnOk" type="primary">
               保存
             </el-button>
           </div>
@@ -158,7 +156,7 @@
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="delExpenditureDialog.isShow = false">取 消</el-button>
+          <el-button @click="delExpenditureDialog.isShow = false"  type="primary" plain>取 消</el-button>
           <el-button type="primary" @click="clickDelExpenditureBtnOk">确 定</el-button>
         </span>
       </el-dialog>

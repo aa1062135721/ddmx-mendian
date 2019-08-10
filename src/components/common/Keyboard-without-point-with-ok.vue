@@ -17,7 +17,7 @@
       </div>
      <div>
        <el-button class="btn" @click="sendMsg('0')" style="width: 190px;">0</el-button>
-       <el-button class="btn" @click="sendMsg('ok')" type="primary" style="color: #fff;font-size:24px;background:rgba(45,194,243,1);">确定</el-button>
+       <el-button class="btn my-btn-active" @click="sendMsg('ok')">确定</el-button>
      </div>
     </div>
 </template>
@@ -61,6 +61,11 @@ export default {
           background:rgba(204,204,204,1);
           border: none;
         }
+      }
+      .my-btn-active{
+        /*color: #fff;*/
+        /*font-size:24px;*/
+        /*background:rgba(45,194,243,1);*/
       }
     }
   }

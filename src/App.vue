@@ -10,7 +10,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less">
   * {
     margin: 0;
     padding: 0;
@@ -66,15 +66,24 @@ export default {
     overflow: hidden;
     text-overflow:ellipsis;/*显示省略号来代表被修剪的文本*/
   }
-  .my-primary-btn{
-    color: #fff;
-    background: #2ECAF1;
-    border:1px solid #2ECAF1;
+  .my-btn{
+    background:rgba(255,255,255,1)!important;
+    border:1px solid rgba(46,202,241,1)!important;
+    background:#fff!important;
+    outline: none!important;
+    color:rgba(46,202,241,1)!important;
+    &:active{
+      background:#bee7f6!important;
+    }
   }
-  .my-secondary-btn{
-    border:1px solid #2ECAF1;
-    color: #2ECAF1;
-    background: #FFFFFF;
+  .my-btn-active {
+    outline: none!important;
+    border: 1px solid #2DC2F3!important;
+    background:#2DC2F3!important;
+    color:#fff!important;
+    &:active{
+      background:#09b7f0!important;
+    }
   }
   .flex-space-between{
     flex: 1;

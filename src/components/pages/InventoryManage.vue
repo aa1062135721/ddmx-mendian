@@ -21,7 +21,7 @@
                 </el-option>
               </el-select>
               <el-input placeholder="商品名/条形码" style="width: 180px;"  v-model="stockCheck.requestData.title"></el-input>
-              <el-button @click="getStockCheckList">搜索</el-button>
+              <el-button @click="getStockCheckList"  type="primary">搜索</el-button>
             </div>
             <div style="margin-top: 15px;">
               <el-table  :data="stockCheck.responseData.data" border style="width: 100%;" height="620">
@@ -71,11 +71,11 @@
               </el-date-picker>
               <el-input style="width: 300px;" v-model="transferSlipRequestData.search" placeholder="请输入需查询的订单号/商品名" clearable>
               </el-input>
-              <el-button>搜索</el-button>
+              <el-button type="primary">搜索</el-button>
             </div>
             <div class="search" style="margin-top: 15px;">
-              <el-button>导出</el-button>
-              <el-button @click="transferSlipAddDialogShow">新增调拨</el-button>
+              <el-button type="primary" plain>导出</el-button>
+              <el-button @click="transferSlipAddDialogShow"  type="primary">新增调拨</el-button>
             </div>
           </div>
           <div style="margin-top: 15px;">
@@ -150,7 +150,7 @@
               <el-select  clearable placeholder="选择调入仓库" v-model="transferSlipPageData.addDialog.responseData.allot_in">
                 <el-option v-for="item in shopList" :label="item.name" :key="item.id" :value="item.id"></el-option>
               </el-select>
-              <el-button @click="transferSlipPageData.chooseGoodsDialog.isShow = true">选择商品</el-button>
+              <el-button @click="transferSlipPageData.chooseGoodsDialog.isShow = true"  type="primary" plain>选择商品</el-button>
             </div>
             <div style="margin-top: 15px;">
               <el-table :data="transferSlipPageData.addDialog.list" border style="width: 100%;">
@@ -197,8 +197,8 @@
               </div>
             </div>
             <div style="text-align: center;margin-top: 15px;">
-              <el-button class="my-secondary-btn" @click="transferSlipPageData.addDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn"  type="primary" @click="addtransferSlipGoodOk" :disabled="!transferSlipPageData.addDialog.list.length">确定</el-button>
+              <el-button @click="transferSlipPageData.addDialog.isShow = false"  type="primary" plain>取消</el-button>
+              <el-button  type="primary" @click="addtransferSlipGoodOk" :disabled="!transferSlipPageData.addDialog.list.length">确定</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--新增调拨 选择商品-->
@@ -222,7 +222,7 @@
                   :value="item.id">
                 </el-option>
               </el-select>
-              <el-button @click="transferSlipPageData.chooseGoodsDialog.page = 1; clickTransferSlipSearchGoods()">查询</el-button>
+              <el-button @click="transferSlipPageData.chooseGoodsDialog.page = 1; clickTransferSlipSearchGoods()"  type="primary">查询</el-button>
             </div>
             <div>
               <el-table
@@ -251,8 +251,8 @@
               </el-pagination>
             </div>
             <div style="text-align: center;margin-top: 20px;">
-              <el-button class="my-secondary-btn" @click="transferSlipPageData.chooseGoodsDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn" @click="clickTransferSlipChoosesGoods">确定</el-button>
+              <el-button @click="transferSlipPageData.chooseGoodsDialog.isShow = false"  type="primary" plain>取消</el-button>
+              <el-button @click="clickTransferSlipChoosesGoods"  type="primary">确定</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--发货-->
@@ -275,8 +275,8 @@
               </el-table>
             </div>
             <div style="text-align: center;margin-top: 20px;">
-              <el-button class="my-secondary-btn" @click="transferSlipPageData.sendGoodsDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn" @click="clickTransferSlipSendGoodsOk(transferSlipPageData.sendGoodsDialog.id)">确定发货</el-button>
+              <el-button @click="transferSlipPageData.sendGoodsDialog.isShow = false"  type="primary">取消</el-button>
+              <el-button @click="clickTransferSlipSendGoodsOk(transferSlipPageData.sendGoodsDialog.id)" type="primary">确定发货</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--打印-->
@@ -305,8 +305,8 @@
                 <span>收货人：{{transferSlipPageData.printingDialog.responseData.in_admin_user}}</span>
               </div>
             <div style="text-align: center;margin-top: 20px;">
-              <el-button class="my-secondary-btn" @click="transferSlipPageData.printingDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn">打印</el-button>
+              <el-button @click="transferSlipPageData.printingDialog.isShow = false"  type="primary" plain>取消</el-button>
+              <el-button  type="primary">打印</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--调拨详情-->
@@ -380,11 +380,11 @@
               </el-date-picker>
               <el-input style="width: 300px;" v-model="checkOrderRequestData.name" placeholder="订单号/商品名(目前仅支持单号搜索)" clearable>
               </el-input>
-              <el-button @click="getCheckOrderList">搜索</el-button>
+              <el-button @click="getCheckOrderList" type="primary">搜索</el-button>
             </div>
             <div class="search" style="margin-top: 15px;">
-              <el-button>导出</el-button>
-              <el-button @click="clickAddCheckOrder">新增盘点</el-button>
+              <el-button type="primary" plain>导出</el-button>
+              <el-button @click="clickAddCheckOrder" type="primary">新增盘点</el-button>
             </div>
           </div>
           <div  style="margin-top: 15px;">
@@ -419,7 +419,7 @@
           <!-- 盘点单--新增盘点-->
           <el-dialog :visible.sync="checkOrderPageData.addDialog.isShow"  title="新增盘点"  width="968px" :center="true">
             <div style="margin-bottom: 15px;">
-              <el-button  @click="checkOrderPageData.addGoodsDialog.isShow = true">新增商品</el-button>
+              <el-button  @click="checkOrderPageData.addGoodsDialog.isShow = true"  type="primary" plain>新增商品</el-button>
             </div>
             <div>
               <el-table :data="checkOrderPageData.addDialog.list" border style="width: 100%;" height="400px">
@@ -443,8 +443,8 @@
               </el-form>
             </div>
             <div style="text-align: center;">
-              <el-button class="my-secondary-btn" @click="checkOrderPageData.addDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn" @click="clickAddCheckOrderDialogOk">确定</el-button>
+              <el-button @click="checkOrderPageData.addDialog.isShow = false"  type="primary" plain>取消</el-button>
+              <el-button @click="clickAddCheckOrderDialogOk"  type="primary">确定</el-button>
             </div>
           </el-dialog>
           <!-- 盘点单-- 新增商品-->
@@ -474,7 +474,7 @@
                   :value="item.id">
                 </el-option>
               </el-select>
-              <el-button @click="getCheckOrderGoodList">查询</el-button>
+              <el-button @click="getCheckOrderGoodList"  type="primary">查询</el-button>
             </div>
             <div>
               <el-table :data="checkOrderPageData.addGoodsDialog.list"
@@ -489,8 +489,8 @@
               </el-table>
             </div>
             <div style="text-align: center;margin-top: 20px;">
-              <el-button class="my-secondary-btn" @click="checkOrderPageData.addGoodsDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn" @click="clickAddGoodsDialogOk">确定</el-button>
+              <el-button @click="checkOrderPageData.addGoodsDialog.isShow = false" type="primary" plain>取消</el-button>
+              <el-button @click="clickAddGoodsDialogOk" type="primary">确定</el-button>
             </div>
           </el-dialog>
           <!-- 盘点单--确认盘点-->
@@ -519,8 +519,8 @@
               </el-form>
             </div>
             <div style="text-align: center;">
-              <el-button class="my-secondary-btn" @click="checkOrderPageData.confirmDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn" @click="clickCheckOrderConfirmOk">确认盘点</el-button>
+              <el-button @click="checkOrderPageData.confirmDialog.isShow = false" type="primary" plain>取消</el-button>
+              <el-button @click="clickCheckOrderConfirmOk"  type="primary">确认盘点</el-button>
             </div>
           </el-dialog>
           <!-- 盘点单--详情-->
@@ -576,8 +576,8 @@
               </el-form>
             </div>
             <div style="text-align: center;">
-              <el-button class="my-secondary-btn" @click="checkOrderPageData.editDialog.isShow = false">取消</el-button>
-              <el-button class="my-primary-btn" @click="clickCheckOrderEditOk">确定编辑</el-button>
+              <el-button @click="checkOrderPageData.editDialog.isShow = false" type="primary" plain>取消</el-button>
+              <el-button @click="clickCheckOrderEditOk" type="primary">确定编辑</el-button>
             </div>
           </el-dialog>
         </el-tab-pane>
@@ -600,10 +600,10 @@
               </el-date-picker>
               <el-input v-model="checkLossOrderRequestData.name" style="width: 300px;" placeholder="请输入需查询的订单号/商品名" clearable>
               </el-input>
-              <el-button @click="searchCheckLossOrder">搜索</el-button>
+              <el-button @click="searchCheckLossOrder"  type="primary">搜索</el-button>
             </div>
             <div class="search" style="margin-top: 15px;">
-              <el-button>导出</el-button>
+              <el-button  type="primary" plain>导出</el-button>
             </div>
           </div>
           <div style="margin-top: 15px;">
@@ -678,10 +678,10 @@
                 end-placeholder="结束日期">
               </el-date-picker>
               <el-input style="width: 300px;" placeholder="请输入需查询的订单号/商品名" clearable v-model="checkWinOrderRequestData.name"></el-input>
-              <el-button @click="searchCheckWinOrder">搜索</el-button>
+              <el-button @click="searchCheckWinOrder"  type="primary">搜索</el-button>
             </div>
             <div class="search" style="margin-top: 15px;">
-              <el-button>导出</el-button>
+              <el-button type="primary" plain>导出</el-button>
             </div>
           </div>
           <div style="margin-top: 15px">

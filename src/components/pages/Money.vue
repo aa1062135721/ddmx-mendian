@@ -226,7 +226,7 @@
                 </ul>
                 <div class="buttons" style="margin-top: 30px;">
                   <button @click="xuanzehuiyuanDialog.isShow = true" class="my-btn">选择会员</button>
-                  <button @click="jiezhangDialogClickBtn"  class="my-btn active">结账</button>
+                  <button @click="jiezhangDialogClickBtn"  class="my-btn-active">结账</button>
                 </div>
               </div>
             </div>
@@ -242,7 +242,7 @@
               <v-keyboard @getNumber="clickChangejiageShoppingCarGood"></v-keyboard>
             </div>
             <div class="float-right">
-              <el-button @click="clickChangejiageShoppingCarGoodOk" class="gaijia-queding-btn">确定</el-button>
+              <el-button @click="clickChangejiageShoppingCarGoodOk" class="gaijia-queding-btn my-btn-active">确<br><br><br><br>定</el-button>
             </div>
           </div>
         </div>
@@ -256,7 +256,7 @@
               <v-keyboard-without-point @getNumber="clickChangeNumShoppingCarGood"></v-keyboard-without-point>
             </div>
             <div class="float-right">
-              <el-button @click="clickChangeNumShoppingCarGoodOk" class="gaijia-queding-btn">确定</el-button>
+              <el-button @click="clickChangeNumShoppingCarGoodOk" class="gaijia-queding-btn my-btn-active">确<br><br><br><br>定</el-button>
             </div>
           </div>
         </div>
@@ -320,7 +320,7 @@
           </div>
           <div class="float-right right">
             <v-keyboard @getNumber="chongzhiDialogGetCode"></v-keyboard>
-            <el-button @click="chongzhiDialogBtnOk" class="queding-chongzhi">确定充值</el-button>
+            <button @click="chongzhiDialogBtnOk" class="queding-chongzhi my-btn-active">确定充值</button>
           </div>
         </div>
       </el-dialog>
@@ -3163,26 +3163,18 @@ export default {
         .my-btn{
           width:210px;
           height:44px;
-          background:rgba(255,255,255,1);
-          border:1px solid rgba(46,202,241,1);
-          border-radius:4px;
-          font-size:24px;
-          font-weight:400;
-          margin-left: 20px;
           margin-right: 20px;
-          outline: none;
-          color:rgba(46,202,241,1);
-          &:first-child{
-            margin-left: 0;
-          }
-          &:last-child{
-            margin-right: 0;
-          }
+          font-size: 24px;
+          border-radius:4px;
+          font-weight: 400;
         }
-        .active{
-          border: 0;
-          background:rgba(45,194,243,1);
-          color:rgba(255,255,255,1);
+        .my-btn-active{
+          width:210px;
+          height:44px;
+          border-radius:4px;
+          margin-left: 20px;
+          font-size: 24px;
+          font-weight: 400;
         }
       }
     }
@@ -3203,9 +3195,6 @@ export default {
       font-family:SourceHanSansCN-Regular;
       font-weight:400;
       color:rgba(239,239,239,1);
-      &:active{
-        border: none;
-      }
     }
   }
   /*充值弹窗样式*/
@@ -3264,12 +3253,9 @@ export default {
         .queding-chongzhi{
           width:292px;
           height:62px;
-          background:rgba(45,194,243,1);
-          border-radius:10px;;
-          font-size:24px;
-          font-family:SourceHanSansCN-Regular;
-          font-weight:400;
-          color:rgba(239,239,239,1);
+          font-size: 24px;
+          font-weight: 400;
+          border-radius:10px;
         }
       }
     }

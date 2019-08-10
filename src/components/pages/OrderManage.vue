@@ -16,7 +16,7 @@
             <div class="select">
               <el-select v-model="requestData.pay_way" clearable placeholder="选中支付方式">
                 <el-option
-                  v-for="item in payWayList"
+                  v-for="item in payWayList1"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id">
@@ -71,17 +71,11 @@
           </div>
           <div class="serch-table">
             <el-table :data="responseData1.data" border style="width: 100%;" height="565">
-              <el-table-column label="订单信息">
+              <el-table-column label="订单信息" width="300px">
                 <template slot-scope="scope">
                   <div v-html="scope.row.message"></div>
                 </template>
               </el-table-column>
-<!--              <el-table-column label="会员账号">-->
-<!--                <template slot-scope="scope">-->
-<!--                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)" v-if="scope.row.member_id">{{scope.row.mobile}}</el-button>-->
-<!--                  <span v-else>非会员</span>-->
-<!--                </template>-->
-<!--              </el-table-column>-->
               <el-table-column label="商品信息">
                 <template slot-scope="scope">
                   <div v-html="scope.row.item_list"></div>
@@ -92,24 +86,19 @@
                   <div v-html="scope.row.price_list"></div>
                 </template>
               </el-table-column>
-              <el-table-column label="购买数量">
+              <el-table-column label="购买数量" width="80px">
                 <template slot-scope="scope">
                   <div v-html="scope.row.num_list"></div>
                 </template>
               </el-table-column>
+              <el-table-column prop="amount" label="付款金额" width="100px"></el-table-column>
+              <el-table-column prop="overtime" label="交易时间" width="155px"></el-table-column>
               <el-table-column label="服务人员">
                 <template slot-scope="scope">
                   <div v-html="scope.row.waiter_list"></div>
                 </template>
               </el-table-column>
-              <el-table-column prop="amount" label="付款金额"></el-table-column>
-              <el-table-column prop="overtime" label="交易时间"></el-table-column>
-<!--              <el-table-column label="服务人员">-->
-<!--                <template slot-scope="scope">-->
-<!--                  <el-button type="text" size="small" @click="getWaiterInfo(scope.row.waiter_id)">{{scope.row.waiter}}</el-button>-->
-<!--                </template>-->
-<!--              </el-table-column>-->
-              <el-table-column prop="order_status" label="状态"></el-table-column>
+              <el-table-column prop="order_status" label="状态" width="70px"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
                   <el-button size="mini" type="text" @click="showDoorShopOrderReturnDialog(scope.row.id)" v-if="scope.row.status !== -6">退单</el-button>
@@ -146,7 +135,7 @@
             <div class="select">
               <el-select v-model="requestData.pay_way" clearable placeholder="选中支付方式">
                 <el-option
-                  v-for="item in payWayList"
+                  v-for="item in payWayList3"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id">
@@ -241,7 +230,7 @@
             <div class="select">
               <el-select v-model="requestData.pay_way" clearable placeholder="选中支付方式">
                 <el-option
-                  v-for="item in payWayList"
+                  v-for="item in payWayList2"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id">
@@ -409,7 +398,7 @@
           <div>
             <div class="title">商品信息</div>
             <div>
-              <el-table :data="orderDetailsDialog1.responseGoodList" border style="width: 100%;" height="200">
+              <el-table :data="orderDetailsDialog1.responseGoodList" border style="width: 100%;">
                 <el-table-column prop="title" label="商品名称" width="180"></el-table-column>
                 <el-table-column prop="num" label="数量" width="180"></el-table-column>
                 <el-table-column prop="cost_price" label="成本价"></el-table-column>
@@ -421,7 +410,7 @@
           <div v-if="orderDetailsDialog1.responseReturnGoodList.length">
             <div class="title">退单信息</div>
             <div>
-              <el-table :data="orderDetailsDialog1.responseReturnGoodList" border style="width: 100%;" height="142">
+              <el-table :data="orderDetailsDialog1.responseReturnGoodList" border style="width: 100%;">
                 <el-table-column prop="r_sn" label="退货订单号"></el-table-column>
                 <el-table-column prop="r_number" label="退货数量"></el-table-column>
                 <el-table-column prop="r_amount" label="退货总金额"></el-table-column>
@@ -635,21 +624,6 @@ export default {
       /**
        * 公共参数
        */
-      // 选择支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
-      payWayList: [
-        {id: 1, name: '微信'},
-        {id: 2, name: '支付宝'},
-        {id: 3, name: '余额(会员卡)'},
-        {id: 4, name: '银行卡'},
-        {id: 5, name: '现金'},
-        {id: 6, name: '美团'},
-        {id: 7, name: '赠送'},
-        {id: 8, name: '门店自用'},
-        {id: 9, name: '兑换'},
-        {id: 10, name: '包月服务'},
-        {id: 11, name: '定制疗程'},
-        {id: 99, name: '管理员充值'}
-      ],
       // 会员信息弹框
       memberInfoDialog: {
         isShow: false,
@@ -719,6 +693,14 @@ export default {
         {id: 2, name: '正常'},
         {id: -6, name: '已退单'},
         {id: -3, name: '有退单'},
+      ],
+      // 选择支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
+      payWayList1: [
+        {id: 1, name: '微信'},
+        {id: 2, name: '支付宝'},
+        {id: 3, name: '余额'},
+        {id: 4, name: '银行卡'},
+        {id: 5, name: '现金'},
       ],
       // 门店订单-商品类型
       goodsType: [
@@ -866,6 +848,13 @@ export default {
           }
         ]
       },
+      // 选择支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
+      payWayList3: [
+        {id: 1, name: '微信'},
+        {id: 2, name: '支付宝'},
+        {id: 4, name: '银行卡'},
+        {id: 5, name: '现金'},
+      ],
 
       /**
        * 服务卡订单
@@ -879,6 +868,12 @@ export default {
       orderStatusServiceCardOrder: [
         {id: 0, name: '正常'},
         {id: 1, name: '退单'},
+      ],
+      // 选择支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
+      payWayList2: [
+        {id: 6, name: '美团'},
+        {id: 7, name: '赠送'},
+        {id: 8, name: '门店自用'},
       ],
       //服务卡订单-退单弹框
       returnOrderDialog2: {
@@ -1212,6 +1207,7 @@ export default {
     //门店订单确认退货
     async showDoorShopOrderReturnConfirm(){
       let returnGoods = []
+      let money = 0.0
       for(let i = 0; i < this.returnOrderDialog1.multipleSelection.length; i++) {
         if (!(/^[0-9]*[1-9][0-9]*$/.test(this.returnOrderDialog1.multipleSelection[i].my_return_num)) || (this.returnOrderDialog1.multipleSelection[i].my_return_num > this.returnOrderDialog1.multipleSelection[i].refund_num)) {
           this.$message.closeAll()
@@ -1230,12 +1226,12 @@ export default {
           return
         }
         let obj = {
-          item_id:this.returnOrderDialog1.multipleSelection[i].id,
-          subtitle:this.returnOrderDialog1.multipleSelection[i].subtitle,
+          refund_id:this.returnOrderDialog1.multipleSelection[i].s_id,
           refund_price:this.returnOrderDialog1.multipleSelection[i].my_return_price,
           refund_num:this.returnOrderDialog1.multipleSelection[i].my_return_num,
           is_service_goods:this.returnOrderDialog1.multipleSelection[i].is_service_goods,
         }
+        money += parseFloat(this.returnOrderDialog1.multipleSelection[i].my_return_price) * parseFloat(this.returnOrderDialog1.multipleSelection[i].my_return_num)
         returnGoods.push(obj)
       }
 
@@ -1244,6 +1240,7 @@ export default {
         remarks: this.returnOrderDialog1.remarks,
         reason: this.returnOrderDialog1.reason,
         data: returnGoods,
+        money: money
       }
 
       if(!requestData.data.length) {
