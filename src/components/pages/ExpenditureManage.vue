@@ -36,11 +36,11 @@
       </div>
       <div>
         <el-table :data="tableData" border style="width: 100%;" height="650px">
-          <el-table-column label="门店名称">{{userInfo.shop_name}}</el-table-column>
+          <el-table-column prop="shop_id" label="门店名称"></el-table-column>
           <el-table-column prop="type" label="类型名称"></el-table-column>
           <el-table-column prop="price" label="金额"></el-table-column>
           <el-table-column prop="remarks" label="备注"></el-table-column>
-          <el-table-column  label="操作人">{{userInfo.user_nickname}}</el-table-column>
+          <el-table-column prop="user_id" label="操作人"></el-table-column>
           <el-table-column prop="create_time" label="新增时间"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope" v-if="
