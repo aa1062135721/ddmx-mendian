@@ -262,7 +262,7 @@
         </div>
       </el-dialog>
       <!--充值按钮弹框-->
-      <el-dialog class="chongzhi-tanchuan" title="充值" :visible.sync="chongzhiDialog.isShow" width="750px" :center="true">
+      <el-dialog class="chongzhi-tanchuan" title="充值" :visible.sync="chongzhiDialog.isShow" width="765px" :center="true">
         <div class="clear-both both">
           <div class="float-left left">
             <div class="one">
@@ -298,11 +298,9 @@
                 <el-radio label="4">银行卡</el-radio>
               </el-radio-group>
             </div>
-            <div class="four">
-              <el-input @focus="chongzhiDialogInputFocus('money')" v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额" clearable></el-input>
-            </div>
-            <div>
-              <el-select v-model="chongzhiDialog.nowWaiter" placeholder="请选择服务人员" @focus="getWaiterList()" style="width: 100%;">
+            <div class="four clear-both">
+              <el-input  class="float-left" @focus="chongzhiDialogInputFocus('money')" v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额" clearable style="width: 48%;"></el-input>
+              <el-select class="float-right" v-model="chongzhiDialog.nowWaiter" placeholder="请选择服务人员" @focus="getWaiterList()" style="width: 48%;">
                 <el-option
                   v-for="item in waiterList"
                   :key="item.id"
@@ -2496,6 +2494,12 @@ export default {
         this.goukaDialog.cardsList = []
         this.goukaDialogSearch()
       } else {
+        this.$message.closeAll()
+        this.$message({
+          message: '请先选择会员后再购卡',
+          type: 'error',
+          customClass:'zZindex'
+        })
         this.xuanzehuiyuanDialog.isShow = true
       }
     },
@@ -3232,7 +3236,7 @@ export default {
   .chongzhi-tanchuan{
     border-radius:10px;
     .both{
-      width: 700px;
+      width: 715px;
       height: 368px;
       .left{
         width: 394px;

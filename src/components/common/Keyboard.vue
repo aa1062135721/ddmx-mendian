@@ -17,7 +17,7 @@
       </div>
      <div>
        <el-button class="btn" style="width: 190px;" @click="sendMsg('0')">0</el-button>
-       <el-button class="btn" @click="sendMsg('.')">.</el-button>
+       <el-button class="btn" @click="sendMsg('.')">·</el-button>
      </div>
     </div>
 </template>

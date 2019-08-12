@@ -455,8 +455,8 @@
                   <el-radio label="balance">余额退款</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label="退货原因:" required>
-                <el-select v-model="returnOrderDialog1.reason_id" placeholder="选择退货原因" @change="returnResultChange">
+              <el-form-item label="退款原因:" required>
+                <el-select v-model="returnOrderDialog1.reason_id" placeholder="选择退款原因" @change="returnResultChange">
                   <el-option  v-for="item in returnOrderDialog1.returnOrderResult" :label="item.name" :value="item.id"  :key="item.id"></el-option>
                 </el-select>
               </el-form-item>
@@ -537,8 +537,8 @@
             </el-form-item>
           </el-form>
           <el-form ref="form"  label-width="80px" label-position="left" class="demo-dynamic">
-            <el-form-item label="退卡原因" required>
-              <el-select v-model="returnOrderDialog2.requestData.reason_id" placeholder="请选择退卡原因" @change="serviceCardReturnResultChange">
+            <el-form-item label="退款原因" required>
+              <el-select v-model="returnOrderDialog2.requestData.reason_id" placeholder="请选择退款原因" @change="serviceCardReturnResultChange">
                 <el-option  v-for="item in returnOrderDialog2.returnOrderResult" :label="item.name" :value="item.id"  :key="item.id"></el-option>
               </el-select>
             </el-form-item>
@@ -1222,7 +1222,7 @@ export default {
           })
           return
         }
-        if (!(/^\d+(\.\d+)?$/.test(this.returnOrderDialog1.multipleSelection[i].my_return_price)) || (this.returnOrderDialog1.multipleSelection[i].my_return_price > this.returnOrderDialog1.multipleSelection[i].refund_price)) {
+        if (!((this.returnOrderDialog1.multipleSelection[i].my_return_price>=0) && (this.returnOrderDialog1.multipleSelection[i].my_return_price <= this.returnOrderDialog1.multipleSelection[i].refund_price))) {
           this.$message.closeAll()
           this.$message({
             message: `【${this.returnOrderDialog1.multipleSelection[i].subtitle}】商品的退货单价有误！`,
@@ -1266,10 +1266,10 @@ export default {
         return
       }
 
-      if(!requestData.reason) {
+      if(!(requestData.reason  || requestData.remarks)) {
         this.$message.closeAll()
         this.$message({
-          message: `请选填退货原因`,
+          message: `请选填退款原因或备注`,
           type: 'error'
         })
         return
@@ -1286,6 +1286,7 @@ export default {
         }
       })
       this.returnOrderDialog1.remarks = ''
+      this.returnOrderDialog1.type = ''
       this.returnOrderDialog1.reason = ''
       this.returnOrderDialog1.reason_id = ''
 
@@ -1327,10 +1328,18 @@ export default {
         reason: this.returnOrderDialog2.requestData.reason,
         remarks: this.returnOrderDialog2.requestData.remarks,
       }
-      if (!requestData.type || !requestData.reason) {
+      if (!requestData.type) {
         this.$message.closeAll()
         this.$message({
-          message: '请把申请退单的参数输入完整',
+          message: '请选择退款方式',
+          type: 'error'
+        })
+        return
+      }
+      if(!(requestData.reason  || requestData.remarks)) {
+        this.$message.closeAll()
+        this.$message({
+          message: `请选填退款原因或备注`,
           type: 'error'
         })
         return

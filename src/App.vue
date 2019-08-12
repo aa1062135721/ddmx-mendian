@@ -91,4 +91,8 @@ export default {
     flex-direction: row;
     justify-content: space-between;
   }
+  /* message 解决弹框被dialog遮住 */
+  .zZindex {
+    z-index:3000 !important;
+  }
 </style>
