@@ -353,7 +353,8 @@
             </ul>
             <div class="div clear-both">
               <button @click="jiezhangDialog.isShow = false" class="float-left my-btn">取消</button>
-              <button @click="jiezhangDialogClickOk" class="float-right active my-btn-active">确认结账</button>
+              <button @click="jiezhangDialogClickOk"  class="float-right active my-btn-active"  v-if="jiezhangDialog.canSave">确认结账</button>
+              <button class="float-right active my-btn-active"  v-else :disabled="true">确认结账</button>
             </div>
           </div>
           <div class="float-right my-right">
@@ -1057,7 +1058,8 @@ export default {
           content: '结账成功',
           seconds: 1500// 多少毫秒之后自动关闭
         },
-        //
+        // 禁止一次结账，出现两次一样的订单，单击两次，结账两次
+        canSave: true,
       }
     }
   },
@@ -1680,7 +1682,7 @@ export default {
       })
       if (key !== 'undefined') {
         if (isCheckMinimumSellingPrice){
-          if (parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2) >= parseFloat(arr[key].minimum_selling_price).toFixed(2)) {
+          if (parseFloat(this.xiugaijiageDialog.inputValue) > parseFloat(arr[key].minimum_selling_price)) {
             arr[key].is_edit = 1
             arr[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
             this.xiugaijiageDialog.inputValue = ''
@@ -2674,6 +2676,9 @@ export default {
     },
     //确认结账
     async jiezhangDialogClickOk () {
+      if(!this.jiezhangDialog.canSave){
+        return
+      }
       if (!this.jiezhangDialog.chooesePayWay) {
         this.$message.closeAll()
         this.$message({
@@ -2753,11 +2758,11 @@ export default {
       }
       // 服务商品，普通商品结账操作
       if (this.chooeseGoods.outOrdinaryGoods.length || this.chooeseGoods.outServiceGoods.length || this.chooeseGoods.goods.length) {
-        await postNowPayGoods(requestData).then(res => {
-        if (res.code === '200') {
-          this.clearJiezhangDialogData()
-        }
-      })
+        await postNowPayGoods(requestData).then(async res => {
+          if (res.code === '200') {
+            await this.clearJiezhangDialogData()
+          }
+        })
       }
       //服务卡是另一个结算接口
       if (this.chooeseGoods.cardList.length) {
@@ -2769,12 +2774,13 @@ export default {
           price: this.chooeseGoods.cardList[0].is_edit ? this.chooeseGoods.cardList[0].edit_price : this.chooeseGoods.cardList[0].price,
           remarks: this.jiezhangDialog.remarks,
         }
-        await postNowPayServiceCards(requestData).then(res => {
+        await postNowPayServiceCards(requestData).then(async res => {
           if (res.code === '200') {
-            this.clearJiezhangDialogData()
+            await this.clearJiezhangDialogData()
           }
         })
       }
+      this.jiezhangDialog.canSave = true
     },
     // 结账时可选支付方式
     confirmPayWay () {
@@ -2807,7 +2813,7 @@ export default {
           this.jiezhangDialog.closedPayWay = [8]
         }
         if (this.chooeseGoods.cardList.length) {
-          this.jiezhangDialog.closedPayWay = [8,7]
+          this.jiezhangDialog.closedPayWay = [1,2,4,5,6,7,8,9,10,11,99]
         }
         // 余额不足，不能使用会员卡支付
         if (parseFloat(this.jiezhangDialog.memberVip.money) < parseFloat(this.jiezhangDialog.modifyMoney)){
@@ -2841,7 +2847,7 @@ export default {
           this.jiezhangDialog.closedPayWay = [3]
         }
         if (this.chooeseGoods.cardList.length) {
-          this.jiezhangDialog.closedPayWay = [3,7]
+          this.jiezhangDialog.closedPayWay = [1,2,4,5,6,7,8,9,10,11,99]
         }
       }
     },

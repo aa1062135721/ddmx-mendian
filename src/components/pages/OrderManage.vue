@@ -302,7 +302,7 @@
               <el-table-column label="操作">
                 <template slot-scope="scope">
 <!--                  <el-button size="mini" @click="" type="text">订单详情</el-button>-->
-                  <el-button size="mini" @click="showServiceCardReturnDetailDialog(scope.row.id)" type="text" v-if="scope.row.status === 4">退单详情</el-button>
+                  <el-button size="mini" @click="showServiceCardReturnDetailDialog(scope.row)" type="text" v-if="scope.row.status === 4">退单详情</el-button>
                   <el-button size="mini"  @click="showServiceCardDialog(scope.row.id)" type="text" v-if="scope.row.refund">退单</el-button>
                 </template>
               </el-table-column>
@@ -1368,8 +1368,8 @@ export default {
       })
     },
     //服务卡退单详情
-    async showServiceCardReturnDetailDialog(id) {
-      await postServiceCardReturnDetail({id}).then(res => {
+    async showServiceCardReturnDetailDialog(item) {
+      await postServiceCardReturnDetail({id:item.order_id}).then(res => {
         if (res.code === '200') {
           this.returnDetailDialog2.responseData = res.data
           this.returnDetailDialog2.isShow = true
