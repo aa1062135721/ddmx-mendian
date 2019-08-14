@@ -1,6 +1,22 @@
 import Vue from 'vue'
 
 /**
+ * 登录的时候，获取验证码
+ * @returns {Promise|*}
+ */
+export const postLoginGetCode = (data = null) => {
+  return Vue.prototype.$post('/login/getCode', data)
+}
+
+/**
+ * 登录接口 根据手机号和验证码登录
+ * @returns {Promise|*}
+ */
+export const postLoginByCode = (data = null) => {
+  return Vue.prototype.$post('/login/userLogin', data)
+}
+
+/**
  * 登录接口
  * @returns {Promise|*}
  */
@@ -9,7 +25,7 @@ export const postLogin = (data = null) => {
 }
 
 /**
- * 登录接口
+ * 登录后获取用户信息接口
  * @returns {Promise|*}
  */
 export const postUserInfo = (data = null) => {

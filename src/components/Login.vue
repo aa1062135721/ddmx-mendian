@@ -24,12 +24,12 @@
                     <el-button type="primary" @click="submitForm()">登录</el-button>
                 </div>
 
-              <div class="login-type" v-show="type === 2" @click="type = 1">
-                <p>手机验证码登录</p>
-              </div>
-              <div class="login-type" v-show="type === 1" @click="type = 2">
-                <p>微信二维码登录</p>
-              </div>
+<!--              <div class="login-type" v-show="type === 2" @click="type = 1">-->
+<!--                <p>手机验证码登录</p>-->
+<!--              </div>-->
+<!--              <div class="login-type" v-show="type === 1" @click="type = 2">-->
+<!--                <p>微信二维码登录</p>-->
+<!--              </div>-->
             </el-form>
         </div>
     </div>
@@ -37,7 +37,7 @@
 
 <script>
 import { mapActions } from 'vuex'
-import {postLogin, postUserInfo} from '../api/getData'
+import {postUserInfo, postLoginGetCode, postLoginByCode} from '../api/getData'
 import {setCookie} from '../utils'
 export default {
   data: function () {
@@ -49,7 +49,7 @@ export default {
       //发送验证码按钮所需要的数据
       canClick: true,
       content: '发送验证码',  // 按钮里显示的内容
-      totalTime: 10,      //记录具体倒计时时间
+      totalTime: 60,      //记录具体倒计时时间
     }
   },
   methods: {
@@ -59,11 +59,18 @@ export default {
         this.msg = '用户名应为手机号码'
         return
       }
-      if (!this.canClick) return  //改动的是这两行代码
+      if (!this.canClick) {
+        return
+      }
 
-      let data = {mobile: this.username, type: 2}
-      // await this.$api.MyRequest(login.GetGetCode.url, login.GetGetCode.method, data)
-      //   .then(res=>{
+      let data = {mobile: this.username}
+      await postLoginGetCode(data).then(res => {
+        if (res.code === 200) {
+          this.$message.closeAll()
+          this.$message({
+            message: res.msg,
+            type: 'success'
+          })
           this.canClick = false
           this.msg = ''
           this.content = `重新发送(${this.totalTime})`
@@ -73,16 +80,14 @@ export default {
             if (this.totalTime < 0) {
               clearInterval(clock)
               this.content = '发送验证码'
-              this.totalTime = 10
+              this.totalTime = 60
               this.canClick = true  //这里重新开启
             }
           },1000)
-        // })
-        // .catch(e=>{
-        // })
-
+        }
+      })
     },
-    submitForm () {
+    async submitForm () {
       if (this.username === '' || this.password === '') {
         this.msg = '请输入用户名或验证码'
         return
@@ -91,14 +96,14 @@ export default {
         this.msg = '用户名应为手机号码'
         return
       }
-      let data = {username: this.username, password: this.password}
+      let data = {mobile: this.username, code: this.password}
       let that = this
-      postLogin(data).then((res) => {
+      await postLoginByCode(data).then(async (res) => {
         if (res.code === '200') {
-          setCookie('token', res.data.token) //浏览器保存登录凭证 这儿没有设置cookie的过期时间，默认是关闭浏览器就过期
-          that.saveToken(res.data.token) // vuex保存登录凭证
-          postUserInfo().then((res) => {
-            that.saveUserInfo(res.data) // vuex保存登录后的登录数据
+          await setCookie('token', res.data.token) //浏览器保存登录凭证 这儿没有设置cookie的过期时间，默认是关闭浏览器就过期
+          await that.saveToken(res.data.token) // vuex保存登录凭证
+          await postUserInfo().then(async (res) => {
+            await that.saveUserInfo(res.data) // vuex保存登录后的登录数据
             that.$router.push({
               path: '/money',
               query: {}
