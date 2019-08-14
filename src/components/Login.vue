@@ -11,7 +11,9 @@
                 <el-input  class="urser-name"  placeholder="请输入用户手机号码" v-model="username" @keyup.enter.native="submitForm" prefix-icon="el-icon-user" maxlength="11">
                 </el-input>
 
-                <el-input class="password" type="password"  placeholder="请输入登录密码" v-model="password" @keyup.enter.native="submitForm" prefix-icon="el-icon-lock">
+                <el-input class="password"  placeholder="请输入验证码" v-model="password" @keyup.enter.native="submitForm" prefix-icon="el-icon-lock">
+                    <el-button slot="suffix" round plain size="small" @click="getCode" v-if="canClick" class="sed-code">{{content}}</el-button>
+                    <el-button slot="suffix" round plain size="small" v-else class="re-sed-code">{{content}}</el-button>
                 </el-input>
 
                 <div class="tips" v-if="msg">
@@ -22,6 +24,12 @@
                     <el-button type="primary" @click="submitForm()">登录</el-button>
                 </div>
 
+<!--              <div class="login-type" v-show="type === 2" @click="type = 1">-->
+<!--                <p>手机验证码登录</p>-->
+<!--              </div>-->
+<!--              <div class="login-type" v-show="type === 1" @click="type = 2">-->
+<!--                <p>微信二维码登录</p>-->
+<!--              </div>-->
             </el-form>
         </div>
     </div>
@@ -29,34 +37,73 @@
 
 <script>
 import { mapActions } from 'vuex'
-import {postLogin, postUserInfo} from '../api/getData'
+import {postUserInfo, postLoginGetCode, postLoginByCode} from '../api/getData'
 import {setCookie} from '../utils'
 export default {
   data: function () {
     return {
       msg: '',
       username: '',
-      password: ''
+      password: '',
+      type:1,//1短信验证码登录，2微信二维码登录
+      //发送验证码按钮所需要的数据
+      canClick: true,
+      content: '发送验证码',  // 按钮里显示的内容
+      totalTime: 60,      //记录具体倒计时时间
     }
   },
   methods: {
-    submitForm () {
+    //获取验证码
+    async getCode(){
+      if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.username)) {
+        this.msg = '用户名应为手机号码'
+        return
+      }
+      if (!this.canClick) {
+        return
+      }
+
+      let data = {mobile: this.username}
+      await postLoginGetCode(data).then(res => {
+        if (res.code === 200) {
+          this.$message.closeAll()
+          this.$message({
+            message: res.msg,
+            type: 'success'
+          })
+          this.canClick = false
+          this.msg = ''
+          this.content = `重新发送(${this.totalTime})`
+          let clock = setInterval(() => {
+            this.totalTime--
+            this.content =  `重新发送(${this.totalTime})`
+            if (this.totalTime < 0) {
+              clearInterval(clock)
+              this.content = '发送验证码'
+              this.totalTime = 60
+              this.canClick = true  //这里重新开启
+            }
+          },1000)
+        }
+      })
+    },
+    async submitForm () {
       if (this.username === '' || this.password === '') {
-        this.msg = '请输入用户名或密码'
+        this.msg = '请输入用户名或验证码'
         return
       }
       if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.username)) {
         this.msg = '用户名应为手机号码'
         return
       }
-      let data = {username: this.username, password: this.password}
+      let data = {mobile: this.username, code: this.password}
       let that = this
-      postLogin(data).then((res) => {
+      await postLoginByCode(data).then(async (res) => {
         if (res.code === '200') {
-          setCookie('token', res.data.token) //浏览器保存登录凭证 这儿没有设置cookie的过期时间，默认是关闭浏览器就过期
-          that.saveToken(res.data.token) // vuex保存登录凭证
-          postUserInfo().then((res) => {
-            that.saveUserInfo(res.data) // vuex保存登录后的登录数据
+          await setCookie('token', res.data.token) //浏览器保存登录凭证 这儿没有设置cookie的过期时间，默认是关闭浏览器就过期
+          await that.saveToken(res.data.token) // vuex保存登录凭证
+          await postUserInfo().then(async (res) => {
+            await that.saveUserInfo(res.data) // vuex保存登录后的登录数据
             that.$router.push({
               path: '/money',
               query: {}
@@ -113,6 +160,18 @@ export default {
             border-radius:8px;
             font-size: 16px!important;
           }
+          /deep/ .el-input__suffix{
+            top: 8px;
+            right: 10px;
+            .sed-code{
+                color: #2ECAF1;
+                border-color: #2ECAF1;
+              }
+            .re-sed-code{
+              color: #606266;
+              border-color: #606266;
+            }
+          }
         }
         .logo{
           text-align: center;
@@ -152,6 +211,18 @@ export default {
           button{
             width:324px;
             height:48px;
+          }
+        }
+        .login-type{
+          width:100%;
+          margin-top: 5px;
+          p{
+            width:324px;
+            /* border: 1px solid black; */
+            margin: auto;
+            text-align: right;
+            color: #808080;
+            font-size: 16px;
           }
         }
       }
