@@ -21,10 +21,14 @@
                 </el-option>
               </el-select>
               <el-input placeholder="商品名/条形码" style="width: 180px;"  v-model="stockCheck.requestData.title"></el-input>
+              <el-select  clearable placeholder="剩余库存筛选" v-model="stockCheck.requestData.stock">
+                <el-option label="显示零库存" value="1"></el-option>
+                <el-option label="隐藏零库存" value="2"></el-option>
+              </el-select>
               <el-button @click="getStockCheckList"  type="primary">搜索</el-button>
             </div>
             <div style="margin-top: 15px;">
-              <el-table  :data="stockCheck.responseData.data" border style="width: 100%;" height="620">
+              <el-table  :data="stockCheck.responseData.data" border style="width: 100%;" height="675">
                 <el-table-column prop="title" label="商品名称"></el-table-column>
                 <el-table-column prop="bar_code" label="条形码"></el-table-column>
                 <el-table-column prop="type_ids" label="一级分类"></el-table-column>
@@ -92,9 +96,7 @@
                   </div>
                 </template>
               </el-table-column>
-<!--              <el-table-column prop="amount" label="单位成本"></el-table-column>-->
-<!--              <el-table-column  label="商品成本"></el-table-column>-->
-              <el-table-column  label="调拨数量">
+              <el-table-column  label="调拨数量" width="80px">
                 <template slot-scope="scope">
                   <div v-html="scope.row.number">
                   </div>
@@ -112,7 +114,7 @@
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column label="状态">
+              <el-table-column label="状态" width="70px">
                 <template slot-scope="scope">
                  <span v-if="scope.row.status === 1">调拨中</span>
                  <span v-if="scope.row.status === 0">待发货</span>
@@ -766,10 +768,11 @@ export default {
         ],
         requestData:{
           page:1,
-          limit:10,
+          limit:20,
           type_id:'',
           type:'',
           title:'',
+          stock:'',
         },
         responseData:{
           count:0,
@@ -991,7 +994,7 @@ export default {
           {id: 3, name: '已完成'}
         ],
         // 盘点单列表总数
-        count: 200,
+        count: 0,
         // 盘点单请求列表
         list: [
           // {
@@ -1105,7 +1108,7 @@ export default {
           {id: 2, name: '已确认(确认库存)'}
         ],
         // 盘亏单数据总数
-        count: 100,
+        count: 0,
         list: [
           // {
           //   id: 1,
@@ -1152,7 +1155,7 @@ export default {
           {id: 1, name: '待确认'},
           {id: 2, name: '已确认(确认库存)'}
         ],
-        count: 100,
+        count: 0,
         list: [
           // {
           //   id: 1,
@@ -1237,6 +1240,7 @@ export default {
         type:this.stockCheck.requestData.type,
         title:this.stockCheck.requestData.title,
         page:`${this.stockCheck.requestData.page},${this.stockCheck.requestData.limit}`,
+        stock:this.stockCheck.requestData.stock,
       }
       postCheckStockGoodsList(data).then(res => {
         this.stockCheck.responseData = res
