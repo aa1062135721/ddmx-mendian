@@ -32,15 +32,36 @@ const codeMessage = {
 
 axios.defaults.timeout = 10000
 axios.defaults.baseURL = 'http://testmd.ddxm661.com/index' //   // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === 'development') {
   axios.defaults.baseURL = '/api/index/'  // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
-}else {
+} else {
   axios.defaults.baseURL = 'http://testmd.ddxm661.com/index' //   // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
+}
+/**
+ * 决绝同一个接口，相同参数，相同请求方法 ……  发送多次请求
+ * @type {Array}
+ */
+let pending = [] // 声明一个数组用于存储每个请求的取消函数和axios标识
+let cancelToken = axios.CancelToken
+let removePending = (config) => {
+  for (let p in pending) {
+    if ((pending[p].u) === (config.url + JSON.stringify(config.data) + '&' + config.method)) { // 当当前请求在数组中存在时执行函数体
+      pending[p].f('操作频繁,请稍后再试 ^_^') // 执行取消操作
+      pending.splice(p, 1)
+    }
+  }
 }
 
 // http request 拦截器
 axios.interceptors.request.use(
   config => {
+    removePending(config) // 在一个axios发送前执行一下取消操作
+    // eslint-disable-next-line new-cap
+    config.cancelToken = new cancelToken((c) => {
+      // 这里的axios标识我是用请求地址&请求方式拼接的字符串，当然你可以选择其他的一些方式
+      pending.push({ u: config.url + JSON.stringify(config.data) + '&' + config.method, f: c })
+    })
+
     const token = getCookie('token')  // 从cookie中取出 token，所有接口都带上token
     if (config.data && config.data.form) {
       config.headers = {
@@ -66,11 +87,13 @@ axios.interceptors.request.use(
 // http reponse 拦截器
 axios.interceptors.response.use(
   response => {
+    removePending(response.config) // 在一个axios响应后再执行一下取消操作，把已经完成的请求从pending中移除
+
     Vue.prototype.$message.closeAll()
     if (response.data.code === '-2' || response.data.code === -2 || response.data.code === '-1' || response.data.code === -1) {
       removeCookie('token')
       store.commit('setUserInfo')
-      store.commit('setToken',)
+      store.commit('setToken')
       router.push('/login')
     }
     if (response.data.code !== '200' && response.data.code !== 200 && response.data.code !== '1' && response.data.code !== 1) {
@@ -93,12 +116,12 @@ axios.interceptors.response.use(
     if (status === 401) {
       removeCookie('token')
       store.commit('setUserInfo')
-      store.commit('setToken',)
+      store.commit('setToken')
       router.push('/login')
     } else if (status === 403) {
       removeCookie('token')
       store.commit('setUserInfo')
-      store.commit('setToken',)
+      store.commit('setToken')
       router.push('/login')
     } else if (status >= 404 && status < 422) {
       router.push('/404')
