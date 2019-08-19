@@ -11,7 +11,7 @@
                 <el-input  class="urser-name"  placeholder="请输入用户手机号码" v-model="username" @keyup.enter.native="submitForm" prefix-icon="el-icon-user" maxlength="11">
                 </el-input>
 
-                <el-input class="password"  placeholder="请输入验证码" v-model="password" @keyup.enter.native="submitForm" prefix-icon="el-icon-lock">
+                <el-input class="password"  placeholder="请输入验证码" v-model="password" @keyup.enter.native="submitForm" prefix-icon="el-icon-lock" maxlength="6">
                     <el-button slot="suffix" round plain size="small" @click="getCode" v-if="canClick" class="sed-code">{{content}}</el-button>
                     <el-button slot="suffix" round plain size="small" v-else class="re-sed-code">{{content}}</el-button>
                 </el-input>
@@ -119,7 +119,7 @@ export default {
 }
 </script>
 
-<style  lang="less">
+<style  lang="less" scoped>
     .login-wrap{
         position: relative;
         width:100%;
@@ -141,8 +141,7 @@ export default {
           width:324px;
           text-align: center;
           margin-bottom: 20px;
-          font-size: 20px;
-          .el-input__inner{
+          /deep/ .el-input__inner{
             height:48px;
             background:rgba(255,255,255,1);
             border-radius:8px;
@@ -153,24 +152,11 @@ export default {
           width:324px;
           text-align: center;
           margin-bottom:20px;
-          font-size: 20px;
-          .el-input__inner{
+          /deep/ .el-input__inner{
             height:48px;
             background:rgba(255,255,255,1);
             border-radius:8px;
             font-size: 16px!important;
-          }
-          /deep/ .el-input__suffix{
-            top: 8px;
-            right: 10px;
-            .sed-code{
-                color: #2ECAF1;
-                border-color: #2ECAF1;
-              }
-            .re-sed-code{
-              color: #606266;
-              border-color: #606266;
-            }
           }
         }
         .logo{
@@ -228,4 +214,22 @@ export default {
       }
     }
 
+</style>
+
+<style scoped>
+  .el-input /deep/ .el-input__prefix{
+    font-size: 20px;
+  }
+  .el-input /deep/ .el-input__suffix{
+    top: 8px;
+    right: 10px;
+  }
+  .sed-code{
+    color: #2ECAF1;
+    border-color: #2ECAF1;
+  }
+  .re-sed-code{
+    color: #606266;
+    border-color: #606266;
+  }
 </style>

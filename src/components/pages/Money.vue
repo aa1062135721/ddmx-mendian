@@ -3647,3 +3647,56 @@ export default {
     }
   }
 </style>
+
+<style scoped>
+  .goukaxiangmu-tanchuan /deep/ .el-dialog__body{
+    padding: 0 !important;
+  }
+  .goukaxiangmu-tanchuan /deep/ .el-tabs__header{
+    margin: 0;
+  }
+  .goukaxiangmu-tanchuan /deep/ .el-tabs__nav-wrap::after{
+    height: 0;
+    background: none;
+  }
+  .goukaxiangmu-tanchuan /deep/ .el-tabs__nav-scroll{
+    text-align: center;
+  }
+  .goukaxiangmu-tanchuan /deep/ .el-tabs__nav{
+    float: none;
+  }
+  .goukaxiangmu-tanchuan /deep/ .el-tabs__nav .el-tabs__active-bar {
+    height: 0;
+    width: 0;
+    background: none;
+  }
+  .goukaxiangmu-tanchuan /deep/ .el-tabs__nav .el-tabs__item {
+    padding: 0 80px;
+    font-size: 24px;
+  }
+  .goukaxiangmu-tanchuan /deep/ .el-tabs__nav .el-tabs__item :first-child{
+    padding-left: 0;
+  }
+  .goukaxiangmu-tanchuan /deep/ .el-tabs__nav .el-tabs__item :nth-child(2){
+    padding-left: 0;
+  }
+  .goukaxiangmu-tanchuan /deep/ .el-tabs__nav .el-tabs__item :last-child(2){
+    padding-right: 0;
+  }
+  .goukaxiangmu-tanchuan /deep/ .el-tabs__content {
+    height: 450px;
+    overflow: hidden;
+    overflow-y: auto;
+    padding: 32px 18px 0 18px;
+    background: #F2F2F2;
+  }
+  .goukaxiangmu-tanchuan /deep/ .el-tabs__content /deep/ .el-tab-pane {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .goukaxiangmu-tanchuan /deep/ .el-tabs__content /deep/ .el-tab-pane .card-botton{
+    margin-bottom: 28px;
+  }
+</style>
