@@ -8,6 +8,8 @@ import 'element-ui/lib/theme-chalk/index.css'
 import VueLazyload from 'vue-lazyload'
 import * as filters from './filter/index'
 import store from './store/store' // vuex
+import Print from 'vue-print-nb'
+Vue.use(Print)
 
 // 导入 http请求 定义全局变量·
 import {fetch, post, patch, put} from './api/http'

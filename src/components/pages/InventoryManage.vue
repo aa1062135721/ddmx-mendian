@@ -283,6 +283,7 @@
           </el-dialog>
           <!-- 调拨单--打印-->
           <el-dialog  :visible.sync="transferSlipPageData.printingDialog.isShow" title="打印" width="968px" :center="true">
+            <div id="printTest">
             <div class="flex-space-between" style="margin-bottom: 15px;width: 100%;">
               <span>调拨单号：{{transferSlipPageData.printingDialog.responseData.sn}}</span>
               <span>调出仓库：{{transferSlipPageData.printingDialog.responseData.out_shop}}</span>
@@ -290,25 +291,26 @@
               <span>调拨时间：{{transferSlipPageData.printingDialog.responseData.create_time}}</span>
             </div>
             <div style="margin-bottom: 5px;width: 100%;">
-              <span>备注：{{transferSlipPageData.printingDialog.responseData.remark || '无'}}</span>
+              <span>备注：{{transferSlipPageData.printingDialog.responseData.remark}}</span>
             </div>
-            <div style="width: 100%;">
-              <el-table :data="transferSlipPageData.printingDialog.responseData.item" border>
-                <el-table-column type="index" label="序号" withd="100px"></el-table-column>
+            <div style="width: 100%;margin-bottom: 10px;">
+              <el-table :data="transferSlipPageData.printingDialog.responseData.item" border :row-style="{color:'#000',borderColor:'#000',}"	:header-row-style="{color:'#000'}">
+                <el-table-column type="index" label="序号" width="150"></el-table-column>
                 <el-table-column prop="item" label="商品名称"></el-table-column>
                 <el-table-column prop="bar_code" label="条形码"></el-table-column>
                 <el-table-column prop="num" label="发货数量"></el-table-column>
               </el-table>
             </div>
-            <div class="flex-space-between" style="margin-top:30px;margin-bottom: 15px;width: 100%;">
+            <div class="flex-space-between" style="margin-top:20px;margin-bottom: 15px;width: 100%;">
                 <span>制单人：{{transferSlipPageData.printingDialog.responseData.worker}}</span>
                 <span>配货人：</span>
                 <span>发货人：</span>
                 <span>收货人：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
               </div>
-            <div style="text-align: center;margin-top: 20px;">
+            </div>
+            <div  style="text-align: center;margin-top: 20px;">
               <el-button @click="transferSlipPageData.printingDialog.isShow = false"  type="primary" plain>取消</el-button>
-              <el-button  type="primary">打印</el-button>
+              <el-button  type="primary" v-print="'#printTest'">打印</el-button>
             </div>
           </el-dialog>
           <!-- 调拨单--调拨详情-->
