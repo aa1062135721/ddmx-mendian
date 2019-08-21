@@ -459,6 +459,15 @@ export const postTransferSlipList = (data = null) => {
 }
 
 /**
+ * 库存管理 - 调拨单 - 打印
+ * @param data
+ * @returns {*}
+ */
+export const postTransferSlipPrint = (data = null) => {
+  return Vue.prototype.$post('/allot/print', data)
+}
+
+/**
  * 库存管理 - 调拨单 - 新增
  * @param data
  * @returns {*}

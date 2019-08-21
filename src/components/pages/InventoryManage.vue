@@ -282,18 +282,18 @@
             </div>
           </el-dialog>
           <!-- 调拨单--打印-->
-          <el-dialog  :visible.sync="transferSlipPageData.printingDialog.isShow" title="调拨单-打印" width="968px" :center="true">
+          <el-dialog  :visible.sync="transferSlipPageData.printingDialog.isShow" title="打印" width="968px" :center="true">
             <div class="flex-space-between" style="margin-bottom: 15px;width: 100%;">
               <span>调拨单号：{{transferSlipPageData.printingDialog.responseData.sn}}</span>
-              <span>调拨仓库：{{transferSlipPageData.printingDialog.responseData.out_shop}}</span>
-              <span>调拨人员：{{transferSlipPageData.printingDialog.responseData.creator}}</span>
+              <span>调出仓库：{{transferSlipPageData.printingDialog.responseData.out_shop}}</span>
+              <span>调入仓库：{{transferSlipPageData.printingDialog.responseData.in_shop}}</span>
               <span>调拨时间：{{transferSlipPageData.printingDialog.responseData.create_time}}</span>
             </div>
             <div style="margin-bottom: 5px;width: 100%;">
               <span>备注：{{transferSlipPageData.printingDialog.responseData.remark || '无'}}</span>
             </div>
             <div style="width: 100%;">
-              <el-table :data="transferSlipPageData.printingDialog.responseGoodList" border>
+              <el-table :data="transferSlipPageData.printingDialog.responseData.item" border>
                 <el-table-column type="index" label="序号" withd="100px"></el-table-column>
                 <el-table-column prop="item" label="商品名称"></el-table-column>
                 <el-table-column prop="bar_code" label="条形码"></el-table-column>
@@ -301,10 +301,10 @@
               </el-table>
             </div>
             <div class="flex-space-between" style="margin-top:30px;margin-bottom: 15px;width: 100%;">
-                <span>制单人：{{transferSlipPageData.printingDialog.responseData.creator}}</span>
-                <span>配货人：XXXXXX</span>
-                <span>发货人：{{transferSlipPageData.printingDialog.responseData.out_admin_user || '发货人'}}</span>
-                <span>收货人：{{transferSlipPageData.printingDialog.responseData.in_admin_user}}</span>
+                <span>制单人：{{transferSlipPageData.printingDialog.responseData.worker}}</span>
+                <span>配货人：</span>
+                <span>发货人：</span>
+                <span>收货人：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
               </div>
             <div style="text-align: center;margin-top: 20px;">
               <el-button @click="transferSlipPageData.printingDialog.isShow = false"  type="primary" plain>取消</el-button>
@@ -746,7 +746,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { postCheckStockGoodsList, postTransferSlipGetGoodList, postTransferSlipConfirmGoods, postTransferSlipSendGoodsGetInfo, postTransferSlipSendGoodsGetGoodList, postTransferSlipGoodsDetails, postTransferSlipDetails, postTransferSlipSendGoods, postTransferSlipSendGoodsCancel, postTransferSlipDel, postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails } from '../../api/getData'
+import { postCheckStockGoodsList, postTransferSlipGetGoodList, postTransferSlipConfirmGoods, postTransferSlipSendGoodsGetInfo, postTransferSlipSendGoodsGetGoodList, postTransferSlipGoodsDetails, postTransferSlipDetails, postTransferSlipSendGoods, postTransferSlipSendGoodsCancel, postTransferSlipDel, postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails, postTransferSlipPrint, } from '../../api/getData'
 export default {
   name: 'InventoryManage', // 库存管理，进销存
   data () {
@@ -907,36 +907,15 @@ export default {
         printingDialog: {
           isShow: false,
           responseData: {
-            amount: null,
-            create_time: "2019-07-25 14:45:26",
-            creator: "公司帐户",
-            creator_id: 177,
-            del: "1",
-            id: 14,
-            in_admin_id: 0,
-            in_admin_user: "到期时间",
-            in_shop: "测试门店10",
-            in_time: "2019-07-26 14:45:40",
-            number: 1,
-            out_admin_id: null,
-            out_admin_user: null,
-            out_shop: "测试WY",
-            out_time: "2019-07-25 14:45:40",
-            remark: "发斯蒂芬",
-            sn: "DB2019072500004",
-            status: 1,
-            type: 1,
-            union_code: null,
+            create_time: "",
+            id: 25,
+            in_shop: "",
+            item: [],
+            out_shop: "",
+            remark: "",
+            sn: "",
+            worker: "",
           },
-          responseGoodList: [
-            {
-              item_id: 27,
-              item: "港版美素佳儿1段  1罐装",
-              num: 1,
-              bar_code: "暂无条形码",
-              stock: 0
-            }
-          ]
         },
         // 调拨详情
         detailsDialog: {
@@ -1276,12 +1255,11 @@ export default {
 
     //调拨单打印
     async clickTransferSlipPrinting(id){
-      await postTransferSlipDetails({id}).then(res => {
-        this.transferSlipPageData.printingDialog.responseData = res.data
-      })
-      await postTransferSlipGoodsDetails({id}).then(res => {
-        this.transferSlipPageData.printingDialog.responseGoodList = res.data
-        this.transferSlipPageData.printingDialog.isShow = true
+      await postTransferSlipPrint({id}).then(res => {
+        if (res.code === "200") {
+          this.transferSlipPageData.printingDialog.responseData = res.data
+          this.transferSlipPageData.printingDialog.isShow = true
+        }
       })
     },
     // 调拨单获取列表
