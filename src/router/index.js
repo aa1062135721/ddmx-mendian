@@ -98,7 +98,16 @@ const router = new Router({
             requireAuth: true// 需要登录
           },
           component: resolve => require(['@/components/pages/InventoryManage.vue'], resolve)
-        }
+        },
+        {
+          path: 'statement',
+          name: 'statement',
+          meta: {
+            title: '统计报表',
+            requireAuth: true
+          },
+          component: resolve => require(['@/components/pages/StatementReportForm.vue'], resolve)
+        },
       ]
     },
     {

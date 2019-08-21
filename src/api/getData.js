@@ -574,3 +574,30 @@ export const postCheckStockGoodsList = (data = null) => {
 export const postMemberList = (data = null) => {
   return Vue.prototype.$post('/member/memberList', data)
 }
+
+/**
+ * 统计报表 - 支出统计
+ * @param data
+ * @returns {*}
+ */
+export const postStatisticsExpenditure = (data = null) => {
+  return Vue.prototype.$post('/Statistics/expenditure', data)
+}
+
+/**
+ * 统计报表 - 会员统计
+ * @param data
+ * @returns {*}
+ */
+export const postStatisticsMember = (data = null) => {
+  return Vue.prototype.$post('/Statistics/member', data)
+}
+
+/**
+ * 统计报表 - 充值统计
+ * @param data
+ * @returns {*}
+ */
+export const postStatisticsCz = (data = null) => {
+  return Vue.prototype.$post('/Statistics/cz', data)
+}
