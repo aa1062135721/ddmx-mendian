@@ -47,6 +47,11 @@ export default {
     height: 290px;
     overflow: hidden;
     div{
+      width: 292px;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between;
       .btn{
         width:88px;
         height:62px;

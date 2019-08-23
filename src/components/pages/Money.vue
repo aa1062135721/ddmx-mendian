@@ -2955,7 +2955,7 @@ export default {
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
-    justify-content: space-between;
+    justify-content: space-around;
     overflow:hidden;
     padding: 20px 20px 0 20px;
   }

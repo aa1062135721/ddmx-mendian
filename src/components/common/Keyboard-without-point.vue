@@ -16,7 +16,7 @@
         <el-button class="btn" @click="sendMsg('9')">9</el-button>
       </div>
      <div>
-       <el-button class="btn"  @click="sendMsg('0')" style="width: 288px;">0</el-button>
+       <el-button class="btn"  @click="sendMsg('0')" style="width: 292px;">0</el-button>
      </div>
     </div>
 </template>
@@ -40,12 +40,16 @@ export default {
   .btns{
     display: flex;
     flex-direction:column;
-    flex-wrap:wrap;
     justify-content:space-between;
     width: 292px;
     height: 290px;
     overflow: hidden;
     div{
+      width: 292px;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between;
       .btn{
         width:88px;
         height:62px;
