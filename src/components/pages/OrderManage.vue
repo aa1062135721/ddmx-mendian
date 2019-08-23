@@ -53,9 +53,11 @@
           </div>
           <div class="search-btns">
             <span class="span">筛选</span>
+            <el-button-group class="btns">
             <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日</el-button>
             <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日</el-button>
             <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周</el-button>
+            </el-button-group>
             <el-date-picker
               @focus="chooseTimeDIY"
               v-model="requestData.date"
@@ -162,9 +164,11 @@
           </div>
           <div class="search-btns">
             <span class="span">筛选</span>
+            <el-button-group class="btns">
             <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日</el-button>
             <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日</el-button>
             <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周</el-button>
+            </el-button-group>
             <el-date-picker
               @focus="chooseTimeDIY"
               v-model="requestData.date"
@@ -257,9 +261,11 @@
           </div>
           <div class="search-btns">
             <span class="span">筛选</span>
+            <el-button-group class="btns">
             <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日</el-button>
             <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日</el-button>
             <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周</el-button>
+            </el-button-group>
             <el-date-picker
               @focus="chooseTimeDIY"
               v-model="requestData.date"
@@ -1430,18 +1436,18 @@ export default {
           height:40px;
           margin-right: 32px;
         }
-        .btn{
-          color: #1A1A1A;
-          width:108px;
-          height:40px;
-          background: #F5F5F5;
-          border-radius:4px;
+        .btns{
           margin-right: 32px;
-          margin-left: 0;
-        }
-        .active{
-          color: #fff;
-          background:rgba(107,210,244,1);
+          .btn{
+            color: #606266;
+            border-color: #DCDFE6;
+            background: #fff;
+          }
+          .active{
+            color: #409EFF;
+            background:#ecf5ff;
+            border-color: #b3d8ff;
+          }
         }
       }
 

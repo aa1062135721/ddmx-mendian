@@ -53,11 +53,11 @@ export default {
           icon: 'stock-manage',
           index: '/home/inventory'
         },
-        // {
-        //   title: '报表分析',
-        //   icon: 'statement-analysis',
-        //   index: '17'
-        // },
+        {
+          title: '统计报表',
+          icon: 'statement-analysis',
+          index: '/home/statement'
+        },
         {
           title: '支出管理',
           icon: 'expenditure-manage',

@@ -583,3 +583,57 @@ export const postCheckStockGoodsList = (data = null) => {
 export const postMemberList = (data = null) => {
   return Vue.prototype.$post('/member/memberList', data)
 }
+
+/**
+ * 统计报表 - 支出统计
+ * @param data
+ * @returns {*}
+ */
+export const postStatisticsExpenditure = (data = null) => {
+  return Vue.prototype.$post('/Statistics/expenditure', data)
+}
+
+/**
+ * 统计报表 - 会员统计
+ * @param data
+ * @returns {*}
+ */
+export const postStatisticsMember = (data = null) => {
+  return Vue.prototype.$post('/Statistics/member', data)
+}
+
+/**
+ * 统计报表 - 充值统计
+ * @param data
+ * @returns {*}
+ */
+export const postStatisticsCz = (data = null) => {
+  return Vue.prototype.$post('/Statistics/cz', data)
+}
+
+/**
+ * 统计报表 - 销量统计
+ * @param data
+ * @returns {*}
+ */
+export const postStatisticsVolume = (data = null) => {
+  return Vue.prototype.$post('/Statistics/volume', data)
+}
+
+/**
+ * 统计报表 - 服务统计
+ * @param data
+ * @returns {*}
+ */
+export const postStatisticsService = (data = null) => {
+  return Vue.prototype.$post('/Statistics/service', data)
+}
+
+/**
+ * 统计报表 - 服务统计
+ * @param data
+ * @returns {*}
+ */
+export const postStatisticsOrder = (data = null) => {
+  return Vue.prototype.$post('/Statistics/order', data)
+}
