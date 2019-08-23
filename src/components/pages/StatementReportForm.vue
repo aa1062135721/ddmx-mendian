@@ -5,16 +5,17 @@
         <div class="search-condition">
           <div class="div">
             <el-button-group>
-              <el-button class="btn" @click="requestData1.type = 1;" :class="{'active' : requestData1.type === 1}">全部</el-button>
+              <el-button class="btn" @click="requestData1.type = 1;requestData.search = '';" :class="{'active' : requestData1.type === 1}">全部</el-button>
               <el-button class="btn" @click="requestData1.type = 2;" :class="{'active' : requestData1.type === 2}">商品</el-button>
-              <el-button class="btn" @click="requestData1.type = 3;" :class="{'active' : requestData1.type === 3}">服务卡项目</el-button>
-              <el-button class="btn" @click="requestData1.type = 4;" :class="{'active' : requestData1.type === 4}">服务卡</el-button>
+              <el-button class="btn" @click="requestData1.type = 3;requestData.search = '';" :class="{'active' : requestData1.type === 3}">服务卡项目</el-button>
+              <el-button class="btn" @click="requestData1.type = 4;requestData.search = '';" :class="{'active' : requestData1.type === 4}">服务卡</el-button>
             </el-button-group>
           </div>
           <div class="div" style="width: 250px">
             <el-input
               v-model="requestData.search"
               placeholder="请输入需查询的商品名称/条形码"
+              :disabled="requestData1.type!==2"
               clearable>
             </el-input>
           </div>
@@ -665,6 +666,8 @@
       },
     },
     mounted () {
+      this.chooseTime(1)
+      this.getList()
       this.getExpenditureTypeNameList()
       this.getWaiterList()
       this.getServiceItemList()
