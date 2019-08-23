@@ -601,3 +601,30 @@ export const postStatisticsMember = (data = null) => {
 export const postStatisticsCz = (data = null) => {
   return Vue.prototype.$post('/Statistics/cz', data)
 }
+
+/**
+ * 统计报表 - 销量统计
+ * @param data
+ * @returns {*}
+ */
+export const postStatisticsVolume = (data = null) => {
+  return Vue.prototype.$post('/Statistics/volume', data)
+}
+
+/**
+ * 统计报表 - 服务统计
+ * @param data
+ * @returns {*}
+ */
+export const postStatisticsService = (data = null) => {
+  return Vue.prototype.$post('/Statistics/service', data)
+}
+
+/**
+ * 统计报表 - 服务统计
+ * @param data
+ * @returns {*}
+ */
+export const postStatisticsOrder = (data = null) => {
+  return Vue.prototype.$post('/Statistics/order', data)
+}

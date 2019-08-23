@@ -5,10 +5,10 @@
         <div class="search-condition">
           <div class="div">
             <el-button-group>
-              <el-button class="btn">全部</el-button>
-              <el-button class="btn">商品</el-button>
-              <el-button class="btn">服务卡项目</el-button>
-              <el-button class="btn">服务卡</el-button>
+              <el-button class="btn" @click="requestData1.type = 1;" :class="{'active' : requestData1.type === 1}">全部</el-button>
+              <el-button class="btn" @click="requestData1.type = 2;" :class="{'active' : requestData1.type === 2}">商品</el-button>
+              <el-button class="btn" @click="requestData1.type = 3;" :class="{'active' : requestData1.type === 3}">服务卡项目</el-button>
+              <el-button class="btn" @click="requestData1.type = 4;" :class="{'active' : requestData1.type === 4}">服务卡</el-button>
             </el-button-group>
           </div>
           <div class="div" style="width: 250px">
@@ -46,96 +46,16 @@
             <el-button type="primary" plain>导出</el-button>
           </div>
           <div class="div">
-            <el-button type="primary">搜索</el-button>
+            <el-button type="primary" @click="requestData.page = 1;getList()">搜索</el-button>
           </div>
         </div>
         <div class="content1">
-          <el-card class="box-card">
+          <el-card class="box-card" v-for="(item, index) in responseData1.data" :key="index">
             <div slot="header" class="clearfix">
-              <span>销售总额</span>
+              <span>{{item.name}}</span>
             </div>
             <h1>
-              30000元
-            </h1>
-          </el-card>
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>退款金额</span>
-            </div>
-            <h1>
-              30000元
-            </h1>
-          </el-card>
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>销售单数</span>
-            </div>
-            <h1>
-              30000元
-            </h1>
-          </el-card>
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>退单数</span>
-            </div>
-            <h1>
-              30000元
-            </h1>
-          </el-card>
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>余额消耗</span>
-            </div>
-            <h1>
-              30000元
-            </h1>
-          </el-card>
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>微信收款</span>
-            </div>
-            <h1>
-              30000元
-            </h1>
-          </el-card>
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>支付宝收款</span>
-            </div>
-            <h1>
-              30000元
-            </h1>
-          </el-card>
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>现金收款</span>
-            </div>
-            <h1>
-              30000元
-            </h1>
-          </el-card>
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>银行卡收款</span>
-            </div>
-            <h1>
-              30000元
-            </h1>
-          </el-card>
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>美团收款</span>
-            </div>
-            <h1>
-              30000元
-            </h1>
-          </el-card>
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>赠送收款</span>
-            </div>
-            <h1>
-              30000元
+              {{item.price}}
             </h1>
           </el-card>
         </div>
@@ -259,7 +179,7 @@
       <el-tab-pane label="服务统计" name="4">
         <div class="search-condition">
           <div class="div">
-            <el-select v-model="requestData.waiter_id" clearable placeholder="选择服务人员">
+            <el-select v-model="requestData4.waiter_id" clearable placeholder="选择服务人员">
               <el-option
                 v-for="item in waiter"
                 :key="item.id"
@@ -269,11 +189,11 @@
             </el-select>
           </div>
           <div class="div">
-            <el-select v-model="requestData.waiter_id" clearable placeholder="选择服务项目">
+            <el-select v-model="requestData4.service_id" clearable placeholder="选择服务项目">
               <el-option
-                v-for="item in waiter"
+                v-for="item in serviceItemList"
                 :key="item.id"
-                :label="item.name"
+                :label="item.title"
                 :value="item.id">
               </el-option>
             </el-select>
@@ -306,59 +226,39 @@
             <el-button type="primary" plain>导出</el-button>
           </div>
           <div class="div">
-            <el-button type="primary">搜索</el-button>
+            <el-button type="primary" @click="requestData.page = 1;getList()">搜索</el-button>
           </div>
         </div>
         <div class="content2">
-          <el-table border style="width: 100%;height: 260px;">
-            <el-table-column label="开始时间"></el-table-column>
-            <el-table-column label="结束时间"></el-table-column>
-            <el-table-column label="服务项目"></el-table-column>
-            <el-table-column prop="amount" label="总次数"></el-table-column>
+          <el-table :data="responseData4.data" border style="width: 100%;margin-top: 30px" height="565">
+            <el-table-column label="排行" type="index" width="150"></el-table-column>
+            <el-table-column prop="start_time" label="开始时间"></el-table-column>
+            <el-table-column prop="end_time" label="结束时间"></el-table-column>
+            <el-table-column prop="name" label="服务人员"></el-table-column>
+            <el-table-column prop="service_name" label="服务项目"></el-table-column>
+            <el-table-column prop="num" label="服务次数"></el-table-column>
           </el-table>
-          <div class="footer">
-            <el-pagination
-              background
-              layout="total, sizes, prev, pager, next, jumper"
-              @size-change="pageSizeChange"
-              :page-sizes="[10, 20, 30, 40]"
-              :page-size="requestData.limit"
-              @current-change="pageCurrentChange"
-              :current-page.sync="requestData.page"
-            >
-            </el-pagination>
-          </div>
-        </div>
-        <div class="content2">
-          <el-table border style="width: 100%;height: 260px;margin-top: 30px">
-            <el-table-column label="排行"></el-table-column>
-            <el-table-column label="开始时间"></el-table-column>
-            <el-table-column label="结束时间"></el-table-column>
-            <el-table-column label="服务人员"></el-table-column>
-            <el-table-column label="服务项目"></el-table-column>
-            <el-table-column prop="amount" label="服务次数"></el-table-column>
-          </el-table>
-          <div class="footer">
-            <el-pagination
-              background
-              layout="total, sizes, prev, pager, next, jumper"
-              @size-change="pageSizeChange"
-              :page-sizes="[10, 20, 30, 40]"
-              :page-size="requestData.limit"
-              @current-change="pageCurrentChange"
-              :current-page.sync="requestData.page"
-            >
-            </el-pagination>
-          </div>
+<!--          <div class="footer">-->
+<!--            <el-pagination-->
+<!--              background-->
+<!--              layout="total, sizes, prev, pager, next, jumper"-->
+<!--              @size-change="pageSizeChange"-->
+<!--              :page-sizes="[10, 20, 30, 40]"-->
+<!--              :page-size="requestData.limit"-->
+<!--              @current-change="pageCurrentChange"-->
+<!--              :current-page.sync="requestData.page"-->
+<!--            >-->
+<!--            </el-pagination>-->
+<!--          </div>-->
         </div>
       </el-tab-pane>
       <el-tab-pane label="销量统计" name="5">
         <div class="search-condition">
           <div class="div">
             <el-button-group>
-              <el-button class="btn">商品</el-button>
-              <el-button class="btn">服务卡项目</el-button>
-              <el-button class="btn">服务卡</el-button>
+              <el-button class="btn" @click="requestData5.type = 1;" :class="{'active' : requestData5.type === 1}">商品</el-button>
+              <el-button class="btn" @click="requestData5.type = 2;" :class="{'active' : requestData5.type === 2}">服务卡项目</el-button>
+              <el-button class="btn" @click="requestData5.type = 3;" :class="{'active' : requestData5.type === 3}">服务卡</el-button>
             </el-button-group>
           </div>
           <div class="div" style="width: 250px">
@@ -396,31 +296,31 @@
             <el-button type="primary" plain>导出</el-button>
           </div>
           <div class="div">
-            <el-button type="primary">搜索</el-button>
+            <el-button type="primary" @click="requestData.page = 1;getList()">搜索</el-button>
           </div>
         </div>
         <div class="content2">
-          <el-table border style="width: 100%;" height="565">
-            <el-table-column label="排行"></el-table-column>
-            <el-table-column label="开始时间"></el-table-column>
-            <el-table-column label="结束时间"></el-table-column>
-            <el-table-column label="商品名称"></el-table-column>
-            <el-table-column prop="amount" label="条形码"></el-table-column>
-            <el-table-column prop="overtime" label="销量"></el-table-column>
+          <el-table :data="responseData5.data" border style="width: 100%;" height="565">
+            <el-table-column label="排行" type="index" width="130"></el-table-column>
+            <el-table-column prop="start_time" label="开始时间"></el-table-column>
+            <el-table-column prop="end_time" label="结束时间"></el-table-column>
+            <el-table-column prop="item_name" label="商品名称"></el-table-column>
+            <el-table-column prop="bar_code" label="条形码"></el-table-column>
+            <el-table-column prop="all_num" label="销量"></el-table-column>
           </el-table>
         </div>
-        <div class="footer">
-          <el-pagination
-            background
-            layout="total, sizes, prev, pager, next, jumper"
-            @size-change="pageSizeChange"
-            :page-sizes="[10, 20, 30, 40]"
-            :page-size="requestData.limit"
-            @current-change="pageCurrentChange"
-            :current-page.sync="requestData.page"
-          >
-          </el-pagination>
-        </div>
+<!--        <div class="footer">-->
+<!--          <el-pagination-->
+<!--            background-->
+<!--            layout="total, sizes, prev, pager, next, jumper"-->
+<!--            @size-change="pageSizeChange"-->
+<!--            :page-sizes="[10, 20, 30, 40]"-->
+<!--            :page-size="requestData.limit"-->
+<!--            @current-change="pageCurrentChange"-->
+<!--            :current-page.sync="requestData.page"-->
+<!--          >-->
+<!--          </el-pagination>-->
+<!--        </div>-->
       </el-tab-pane>
       <el-tab-pane label="支出统计" name="6">
         <div class="search-condition">
@@ -495,7 +395,12 @@
     postStatisticsExpenditure,
     postExpenditureTypeNameList,
     postStatisticsMember,
-    postStatisticsCz
+    postStatisticsCz,
+    postStatisticsVolume,
+    postStatisticsService,
+    postWaiter,
+    postServiceItemList,
+    postStatisticsOrder,
   } from '../../api/getData'
   import {changeTime, getWeekStartDateAndEndDateRange} from '../../utils'
 
@@ -507,7 +412,6 @@
           page: 1,
           limit: 10,
           search: '',
-          waiter_id: '',
           type: '1',
           // 筛选时间 自定义时间 公共参数
           date: [],
@@ -516,13 +420,14 @@
           startTime: '', // 开始时间 公共参数
           endTime: '' // 结束时间 公共参数
         },
-        waiter: [
-          {
-            id: 1, // 服务员id  当服务员的id为0师表示为当前登录的店长
-            name: '管理员', // 服务员名称
-            type: '店长' // 服务类型
-          },
-        ],
+
+        //订单统计
+        requestData1: {
+          type: 1,//条件类型：1全部;2商品;3服务项目;4服务卡
+        },
+        responseData1:{
+          data:[]
+        },
 
         //充值统计
         responseData2: {
@@ -538,6 +443,31 @@
           sanCount: 0      //散客
         },
 
+        //服务统计
+        //服务人员列表
+        waiter: [],
+        //选择服务项目
+        serviceItemList: [],
+        requestData4: {
+          waiter_id: '',
+          service_id:'',
+          page:1,//用于选择服务项目分页请求
+          limit:10,//用于选择服务项目分页请求
+        },
+        responseData4:{
+          // count: 0,
+          data:[]
+        },
+
+        //销量统计
+        requestData5: {
+          type: 1,//类型：1商品;2服务项目;3服务卡
+        },
+        responseData5:{
+          // count: 0,
+          data:[]
+        },
+
         //支出统计
         requestData6: {
           type_id: '',
@@ -549,9 +479,8 @@
             data: []
           }
         },
-        typeName: [
-          // {id: 4, title: "水费",   update_time: "2019-06-22 13:52:32"}
-        ],
+        //选择支出类型
+        typeName: [],
       }
     },
     methods: {
@@ -568,13 +497,19 @@
       getList () {
         switch (this.requestData.type) {
           case '1':
-            // this.getOrderList()
+            this.getStatisticsOrder()
             break
           case '2':
             this.getStatisticsCz()
             break
           case '3':
             this.getStatisticsMember()
+            break
+          case '4':
+            this.getStatisticsService()
+            break
+          case '5':
+            this.getStatisticsVolume()
             break
           case '6':
             this.getStatisticsExpenditure()
@@ -612,9 +547,25 @@
       // tab切换
       handleClick () {
         this.requestData.page = 1
+        this.requestData.search = ''
         this.chooseTime(1)
         this.requestData.date = []
         this.getList()
+      },
+
+      //订单统计
+      async getStatisticsOrder(){
+        let data = {
+          start_time: this.requestData.date[0] || this.requestData.startTime,
+          end_time: this.requestData.date[1] || this.requestData.endTime,
+          type:this.requestData1.type,
+          title:this.requestData.search,
+        }
+        await postStatisticsOrder(data).then(res => {
+          if (res.code === 200) {
+            this.responseData1.data = res.data
+          }
+        })
       },
 
       //充值统计
@@ -643,6 +594,55 @@
         })
       },
 
+      //服务统计
+      async getStatisticsService(){
+        let data = {
+          start_time: this.requestData.date[0] || this.requestData.startTime,
+          end_time: this.requestData.date[1] || this.requestData.endTime,
+          service_id:this.requestData4.service_id,
+          waiter_id:this.requestData4.waiter_id,
+        }
+        await postStatisticsService(data).then(res => {
+          if (res.code === 200){
+            this.responseData4.data = res.data
+          }
+        })
+      },
+      getWaiterList(){
+        postWaiter().then(res => {
+          if (res.data.length) {
+            this.waiter = res.data
+          }
+        })
+      },
+      getServiceItemList(){
+        let data = {
+          page:`${this.requestData4.page},${this.requestData4.limit}`
+        }
+        postServiceItemList(data).then(res => {
+          if (res.data.length) {
+            this.serviceItemList.push(...res.data)
+            this.requestData4.page++
+            this.getServiceItemList()
+          }
+        })
+      },
+
+      //销量统计
+      async getStatisticsVolume(){
+        let data = {
+          start_time: this.requestData.date[0] || this.requestData.startTime,
+          end_time: this.requestData.date[1] || this.requestData.endTime,
+          type:this.requestData5.type,
+          title: this.requestData.search
+        }
+        await postStatisticsVolume(data).then(res => {
+          if (res.code === 200){
+            this.responseData5.data = res.data
+          }
+        })
+      },
+
       //支出统计
       async getStatisticsExpenditure () {
         let data = {
@@ -666,6 +666,8 @@
     },
     mounted () {
       this.getExpenditureTypeNameList()
+      this.getWaiterList()
+      this.getServiceItemList()
     }
   }
 </script>
