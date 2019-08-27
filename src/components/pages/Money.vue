@@ -760,10 +760,8 @@ export default {
       ],
       // 服务分类
       serviceCategoryList:[
-        {cname: "服务商品1", id: 205},
-        {cname: "服务商品2", id: 204},
-        {cname: "服务商品3", id: 203},
-        {cname: "查询结果", id: 202},
+        // {cname: "服务商品1", id: 205},
+        // {cname: "查询结果", id: -1},
       ],
       // 服务商品
       requestFuwuGoodData: {
@@ -2036,7 +2034,10 @@ export default {
     // 选择会员后时，如果购物车里有服务商品，或服务卡，就要显示他的会员价 刷新接口
     async choosesGoodsShowMemberPrice () {
       // 当前页面中，被选中的是服务商品 刷新接口展示出会员价来
-      this.getServiceItemList()
+      if(this.requestFuwuGoodData.who !== -1) {
+        this.getServiceItemList()
+      }
+
       //购物车里有服务商品
       if (this.chooeseGoods.goods.length){
         let requestData = {
