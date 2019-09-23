@@ -1,116 +1,158 @@
 <template>
   <div class="statement-report-form">
     <el-tabs v-model="requestData.type" @tab-click="handleClick">
-      <el-tab-pane label="订单统计" name="1">
-        <div class="search-condition">
-          <div class="div">
-            <el-button-group>
-              <el-button class="btn" @click="requestData1.type = 1;requestData.search = '';" :class="{'active' : requestData1.type === 1}">全部</el-button>
-              <el-button class="btn" @click="requestData1.type = 2;requestData.search = '';" :class="{'active' : requestData1.type === 2}">商品</el-button>
-              <el-button class="btn" @click="requestData1.type = 3;requestData.search = '';" :class="{'active' : requestData1.type === 3}">服务卡项目</el-button>
-              <el-button class="btn" @click="requestData1.type = 4;requestData.search = '';" :class="{'active' : requestData1.type === 4}">服务卡</el-button>
-            </el-button-group>
-          </div>
-          <div class="div" style="width: 250px">
-            <el-input
-              v-model="requestData.search"
-              placeholder="请输入查询关键字"
-              :disabled="requestData1.type===1"
-              clearable>
-            </el-input>
-          </div>
-        </div>
-        <div class="search-condition">
-          <div class="div">
-            <el-button-group>
-              <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日
-              </el-button>
-              <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日
-              </el-button>
-              <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周
-              </el-button>
-            </el-button-group>
-          </div>
-          <div class="div">
-            <el-date-picker
-              @focus="chooseTimeDIY"
-              :clearable="false"
-              v-model="requestData.date"
-              type="daterange"
-              range-separator="至"
-              value-format="yyyy-MM-dd"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期">
-            </el-date-picker>
-          </div>
-          <div class="div">
-            <el-button type="primary" plain>导出</el-button>
-          </div>
-          <div class="div">
-            <el-button type="primary" @click="requestData.page = 1;getList()">搜索</el-button>
-          </div>
-        </div>
-        <div class="content1">
-          <el-card class="box-card" v-for="(item, index) in responseData1.data" :key="index">
-            <div slot="header" class="clearfix">
-              <span>{{item.name}}</span>
-            </div>
-            <h1>
-              {{item.price}}
-            </h1>
-          </el-card>
-        </div>
-      </el-tab-pane>
-      <el-tab-pane label="充值统计" name="2">
-        <div class="search-condition">
-          <div class="div">
-            <el-button-group>
-              <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日
-              </el-button>
-              <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日
-              </el-button>
-              <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周
-              </el-button>
-            </el-button-group>
-          </div>
-          <div class="div">
-            <el-date-picker
-              @focus="chooseTimeDIY"
-              :clearable="false"
-              v-model="requestData.date"
-              type="daterange"
-              range-separator="至"
-              value-format="yyyy-MM-dd"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期">
-            </el-date-picker>
-          </div>
-          <div class="div">
-            <el-button type="primary" plain>导出</el-button>
-          </div>
-          <div class="div">
-            <el-button type="primary" @click="requestData.page = 1;getList()">搜索</el-button>
-          </div>
-        </div>
-        <div class="content1">
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>充值金额</span>
-            </div>
-            <h1>
-              {{responseData2.all_price | moneyToFixed}}元
-            </h1>
-          </el-card>
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>退款金额</span>
-            </div>
-            <h1>
-              {{responseData2.price | moneyToFixed}}元
-            </h1>
-          </el-card>
-        </div>
-      </el-tab-pane>
+            <el-tab-pane label="订单统计" name="1">
+              <div class="search-condition">
+                <div class="div">
+                  <el-button-group>
+                    <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日
+                    </el-button>
+                    <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日
+                    </el-button>
+                    <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周
+                    </el-button>
+                  </el-button-group>
+                </div>
+                <div class="div">
+                  <el-date-picker
+                    @focus="chooseTimeDIY"
+                    :clearable="false"
+                    v-model="requestData.date"
+                    type="daterange"
+                    range-separator="至"
+                    value-format="yyyy-MM-dd"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期">
+                  </el-date-picker>
+                </div>
+                <div class="div">
+                  <el-button type="primary" plain>导出</el-button>
+                </div>
+                <div class="div">
+                  <el-button type="primary" @click="requestData.page = 1;getList()">搜索</el-button>
+                </div>
+              </div>
+              <div class="content1">
+                <el-card class="box-card" v-for="(item, index) in responseData1.data" :key="index">
+                  <div slot="header" class="clearfix">
+                    <span>{{item.name}}</span>
+                  </div>
+                  <h1>
+                    {{item.price}}
+                  </h1>
+                </el-card>
+              </div>
+            </el-tab-pane>
+<!--      <el-tab-pane label="订单统计" name="1">-->
+<!--        <div class="search-condition">-->
+<!--          <div class="div">-->
+<!--            <el-button-group>-->
+<!--              <el-button class="btn" @click="requestData1.type = 1;requestData.search = '';" :class="{'active' : requestData1.type === 1}">全部</el-button>-->
+<!--              <el-button class="btn" @click="requestData1.type = 2;requestData.search = '';" :class="{'active' : requestData1.type === 2}">商品</el-button>-->
+<!--              <el-button class="btn" @click="requestData1.type = 3;requestData.search = '';" :class="{'active' : requestData1.type === 3}">服务卡项目</el-button>-->
+<!--              <el-button class="btn" @click="requestData1.type = 4;requestData.search = '';" :class="{'active' : requestData1.type === 4}">服务卡</el-button>-->
+<!--            </el-button-group>-->
+<!--          </div>-->
+<!--          <div class="div" style="width: 250px">-->
+<!--            <el-input-->
+<!--              v-model="requestData.search"-->
+<!--              placeholder="请输入查询关键字"-->
+<!--              :disabled="requestData1.type===1"-->
+<!--              clearable>-->
+<!--            </el-input>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="search-condition">-->
+<!--          <div class="div">-->
+<!--            <el-button-group>-->
+<!--              <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日-->
+<!--              </el-button>-->
+<!--              <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日-->
+<!--              </el-button>-->
+<!--              <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周-->
+<!--              </el-button>-->
+<!--            </el-button-group>-->
+<!--          </div>-->
+<!--          <div class="div">-->
+<!--            <el-date-picker-->
+<!--              @focus="chooseTimeDIY"-->
+<!--              :clearable="false"-->
+<!--              v-model="requestData.date"-->
+<!--              type="daterange"-->
+<!--              range-separator="至"-->
+<!--              value-format="yyyy-MM-dd"-->
+<!--              start-placeholder="开始日期"-->
+<!--              end-placeholder="结束日期">-->
+<!--            </el-date-picker>-->
+<!--          </div>-->
+<!--          <div class="div">-->
+<!--            <el-button type="primary" plain>导出</el-button>-->
+<!--          </div>-->
+<!--          <div class="div">-->
+<!--            <el-button type="primary" @click="requestData.page = 1;getList()">搜索</el-button>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="content1">-->
+<!--          <el-card class="box-card" v-for="(item, index) in responseData1.data" :key="index">-->
+<!--            <div slot="header" class="clearfix">-->
+<!--              <span>{{item.name}}</span>-->
+<!--            </div>-->
+<!--            <h1>-->
+<!--              {{item.price}}-->
+<!--            </h1>-->
+<!--          </el-card>-->
+<!--        </div>-->
+<!--      </el-tab-pane>-->
+<!--      <el-tab-pane label="充值统计" name="2">-->
+<!--        <div class="search-condition">-->
+<!--          <div class="div">-->
+<!--            <el-button-group>-->
+<!--              <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日-->
+<!--              </el-button>-->
+<!--              <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日-->
+<!--              </el-button>-->
+<!--              <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周-->
+<!--              </el-button>-->
+<!--            </el-button-group>-->
+<!--          </div>-->
+<!--          <div class="div">-->
+<!--            <el-date-picker-->
+<!--              @focus="chooseTimeDIY"-->
+<!--              :clearable="false"-->
+<!--              v-model="requestData.date"-->
+<!--              type="daterange"-->
+<!--              range-separator="至"-->
+<!--              value-format="yyyy-MM-dd"-->
+<!--              start-placeholder="开始日期"-->
+<!--              end-placeholder="结束日期">-->
+<!--            </el-date-picker>-->
+<!--          </div>-->
+<!--          <div class="div">-->
+<!--            <el-button type="primary" plain>导出</el-button>-->
+<!--          </div>-->
+<!--          <div class="div">-->
+<!--            <el-button type="primary" @click="requestData.page = 1;getList()">搜索</el-button>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="content1">-->
+<!--          <el-card class="box-card">-->
+<!--            <div slot="header" class="clearfix">-->
+<!--              <span>充值金额</span>-->
+<!--            </div>-->
+<!--            <h1>-->
+<!--              {{responseData2.all_price | moneyToFixed}}元-->
+<!--            </h1>-->
+<!--          </el-card>-->
+<!--          <el-card class="box-card">-->
+<!--            <div slot="header" class="clearfix">-->
+<!--              <span>退款金额</span>-->
+<!--            </div>-->
+<!--            <h1>-->
+<!--              {{responseData2.price | moneyToFixed}}元-->
+<!--            </h1>-->
+<!--          </el-card>-->
+<!--        </div>-->
+<!--      </el-tab-pane>-->
       <el-tab-pane label="会员统计" name="3">
         <div class="search-condition">
           <div class="div">
@@ -253,76 +295,64 @@
 <!--          </div>-->
         </div>
       </el-tab-pane>
-      <el-tab-pane label="销量统计" name="5">
-        <div class="search-condition">
-          <div class="div">
-            <el-button-group>
-              <el-button class="btn" @click="requestData5.type = 1;" :class="{'active' : requestData5.type === 1}">商品</el-button>
-              <el-button class="btn" @click="requestData5.type = 2;" :class="{'active' : requestData5.type === 2}">服务卡项目</el-button>
-              <el-button class="btn" @click="requestData5.type = 3;" :class="{'active' : requestData5.type === 3}">服务卡</el-button>
-            </el-button-group>
-          </div>
-          <div class="div" style="width: 250px">
-            <el-input
-              v-model="requestData.search"
-              placeholder="请输入需查询的商品名称/条形码"
-              clearable>
-            </el-input>
-          </div>
-        </div>
-        <div class="search-condition">
-          <div class="div">
-            <el-button-group>
-              <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日
-              </el-button>
-              <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日
-              </el-button>
-              <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周
-              </el-button>
-            </el-button-group>
-          </div>
-          <div class="div">
-            <el-date-picker
-              @focus="chooseTimeDIY"
-              :clearable="false"
-              v-model="requestData.date"
-              type="daterange"
-              range-separator="至"
-              value-format="yyyy-MM-dd"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期">
-            </el-date-picker>
-          </div>
-          <div class="div">
-            <el-button type="primary" plain>导出</el-button>
-          </div>
-          <div class="div">
-            <el-button type="primary" @click="requestData.page = 1;getList()">搜索</el-button>
-          </div>
-        </div>
-        <div class="content2">
-          <el-table :data="responseData5.data" border style="width: 100%;" height="565">
-            <el-table-column label="排行" type="index" width="130"></el-table-column>
-            <el-table-column prop="start_time" label="开始时间"></el-table-column>
-            <el-table-column prop="end_time" label="结束时间"></el-table-column>
-            <el-table-column prop="item_name" label="商品名称"></el-table-column>
-            <el-table-column prop="bar_code" label="条形码"></el-table-column>
-            <el-table-column prop="all_num" label="销量"></el-table-column>
-          </el-table>
-        </div>
-<!--        <div class="footer">-->
-<!--          <el-pagination-->
-<!--            background-->
-<!--            layout="total, sizes, prev, pager, next, jumper"-->
-<!--            @size-change="pageSizeChange"-->
-<!--            :page-sizes="[10, 20, 30, 40]"-->
-<!--            :page-size="requestData.limit"-->
-<!--            @current-change="pageCurrentChange"-->
-<!--            :current-page.sync="requestData.page"-->
-<!--          >-->
-<!--          </el-pagination>-->
+<!--      <el-tab-pane label="销量统计" name="5">-->
+<!--        <div class="search-condition">-->
+<!--          <div class="div">-->
+<!--            <el-button-group>-->
+<!--              <el-button class="btn" @click="requestData5.type = 1;" :class="{'active' : requestData5.type === 1}">商品</el-button>-->
+<!--              <el-button class="btn" @click="requestData5.type = 2;" :class="{'active' : requestData5.type === 2}">服务卡项目</el-button>-->
+<!--              <el-button class="btn" @click="requestData5.type = 3;" :class="{'active' : requestData5.type === 3}">服务卡</el-button>-->
+<!--            </el-button-group>-->
+<!--          </div>-->
+<!--          <div class="div" style="width: 250px">-->
+<!--            <el-input-->
+<!--              v-model="requestData.search"-->
+<!--              placeholder="请输入需查询的商品名称/条形码"-->
+<!--              clearable>-->
+<!--            </el-input>-->
+<!--          </div>-->
 <!--        </div>-->
-      </el-tab-pane>
+<!--        <div class="search-condition">-->
+<!--          <div class="div">-->
+<!--            <el-button-group>-->
+<!--              <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日-->
+<!--              </el-button>-->
+<!--              <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日-->
+<!--              </el-button>-->
+<!--              <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周-->
+<!--              </el-button>-->
+<!--            </el-button-group>-->
+<!--          </div>-->
+<!--          <div class="div">-->
+<!--            <el-date-picker-->
+<!--              @focus="chooseTimeDIY"-->
+<!--              :clearable="false"-->
+<!--              v-model="requestData.date"-->
+<!--              type="daterange"-->
+<!--              range-separator="至"-->
+<!--              value-format="yyyy-MM-dd"-->
+<!--              start-placeholder="开始日期"-->
+<!--              end-placeholder="结束日期">-->
+<!--            </el-date-picker>-->
+<!--          </div>-->
+<!--          <div class="div">-->
+<!--            <el-button type="primary" plain>导出</el-button>-->
+<!--          </div>-->
+<!--          <div class="div">-->
+<!--            <el-button type="primary" @click="requestData.page = 1;getList()">搜索</el-button>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="content2">-->
+<!--          <el-table :data="responseData5.data" border style="width: 100%;" height="565">-->
+<!--            <el-table-column label="排行" type="index" width="130"></el-table-column>-->
+<!--            <el-table-column prop="start_time" label="开始时间"></el-table-column>-->
+<!--            <el-table-column prop="end_time" label="结束时间"></el-table-column>-->
+<!--            <el-table-column prop="item_name" label="商品名称"></el-table-column>-->
+<!--            <el-table-column prop="bar_code" label="条形码"></el-table-column>-->
+<!--            <el-table-column prop="all_num" label="销量"></el-table-column>-->
+<!--          </el-table>-->
+<!--        </div>-->
+<!--      </el-tab-pane>-->
       <el-tab-pane label="支出统计" name="6">
         <div class="search-condition">
           <div class="div">
