@@ -637,3 +637,12 @@ export const postStatisticsService = (data = null) => {
 export const postStatisticsOrder = (data = null) => {
   return Vue.prototype.$post('/Statistics/order', data)
 }
+
+/**
+ * 查询会员的限时余额
+ * @param data
+ * @returns {Promise}
+ */
+export const postLimitedPrice = (data = null) => {
+  return Vue.prototype.$post('/index/getLimitedPrice', data)
+}

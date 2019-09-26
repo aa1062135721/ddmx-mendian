@@ -201,11 +201,15 @@
                       </el-dropdown>
                     </span>
                   </li>
-                  <li>
+                  <li style="display:flex; justify-content: space-between;">
                     <span class="float-left">
                       会员&nbsp;
                       <span class="font-blue" @click="xuanzehuiyuanDialog.isShow = true">{{jiezhangDialog.memberVip.nickname ? jiezhangDialog.memberVip.nickname : '未选择'}}</span>
                       <el-tag v-if="jiezhangDialog.memberVip.nickname" size="mini" type="danger" style="cursor: pointer;color: #F83D3D;background: #fff;border: 1px solid #F83D3D;" @click="jiezhangDialog.memberVip={};choosesGoodsShowMemberPrice()">删除</el-tag>
+                    </span>
+                    <span v-if="jiezhangDialog.memberVip.id && limitedPriceDialog.responseData.allprice">
+                      限时余额：￥{{limitedPriceDialog.responseData.allprice}}
+                      <el-tag size="mini" type="danger" style="cursor: pointer;color: #F83D3D;background: #fff;border: 1px solid #F83D3D;" @click="limitedPriceDialog.isShow = true">查看过期</el-tag>
                     </span>
                     <span class="float-right">余额￥{{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : '0.00'}}</span>
                   </li>
@@ -453,7 +457,17 @@
               <div class="content">
                 <ul>
                   <li><span class="float-left">会员</span><span class="float-right font-blue">{{xuanzehuiyuanDialog.memberVip.nickname}}</span></li>
-                  <li><span class="float-left">余额</span><span class="float-right font-red">{{xuanzehuiyuanDialog.memberVip.money ? `￥`+xuanzehuiyuanDialog.memberVip.money:''}}</span></li>
+                  <li>
+                    <span class="float-left">余额</span>
+                    <span class="float-right font-red">{{xuanzehuiyuanDialog.memberVip.money ? `￥`+xuanzehuiyuanDialog.memberVip.money:''}}</span>
+                  </li>
+                  <li v-if="xuanzehuiyuanDialog.memberVip.id && limitedPriceDialog.responseData.allprice">
+                    <span class="float-left">限时余额</span>
+                    <span class="float-right">
+                      ￥{{limitedPriceDialog.responseData.allprice}}
+                       <el-button size="mini" @click="limitedPriceDialog.isShow = true">查看过期</el-button>
+                    </span>
+                  </li>
                   <li><span class="float-left">会员等级</span><span class="float-right">{{xuanzehuiyuanDialog.memberVip.level_name}}</span></li>
                   <li>
                     <span class="float-left">服务卡</span>
@@ -497,8 +511,12 @@
                     <td colspan="2">会员等级：{{ huiyuanDialog.huiyuanInfo.level_name }}</td>
                   </tr>
                   <tr>
-                    <td colspan="4">累计充值：￥ {{ huiyuanDialog.huiyuanInfo.amount }} &nbsp;&nbsp;&nbsp;余额：<span class="font-red">￥ {{ huiyuanDialog.huiyuanInfo.money }}</span></td>
-                    <td colspan="3">加入时间：{{ huiyuanDialog.huiyuanInfo.regtime }}</td>
+                    <td colspan="5">
+                      累计充值：￥ {{ huiyuanDialog.huiyuanInfo.amount || '0.00' }} &nbsp;
+                      余额：<span class="font-red">￥ {{ huiyuanDialog.huiyuanInfo.money || '0.00'}}</span>&nbsp;
+                      <span v-if="huiyuanDialog.huiyuanInfo.id && limitedPriceDialog.responseData.allprice">限时余额：￥{{limitedPriceDialog.responseData.allprice}} <el-tag size="mini" type="danger" style="cursor: pointer;color: #F83D3D;background: #fff;border: 1px solid #F83D3D;" @click="limitedPriceDialog.isShow = true">查看过期</el-tag></span>
+                    </td>
+                    <td colspan="2">加入时间：<br>{{ huiyuanDialog.huiyuanInfo.regtime }}</td>
                   </tr>
                 </table>
               </div>
@@ -730,6 +748,15 @@
           </div>
         </div>
       </el-dialog>
+      <!--限时余额-->
+      <el-dialog title="限时余额" :visible.sync="limitedPriceDialog.isShow" width="648px" :center="true">
+        <div>
+          <el-table :data="limitedPriceDialog.responseData.data" border style="height: 240px;">
+            <el-table-column prop="price" label="余额(元)"></el-table-column>
+            <el-table-column prop="company" label="过期时间"></el-table-column>
+          </el-table>
+        </div>
+      </el-dialog>
     </div>
 </template>
 
@@ -741,7 +768,9 @@ import vKeyboardWithoutPointWithOk from '../common/Keyboard-without-point-with-o
 import vKeyboardWithoutPoint from '../common/Keyboard-without-point'
 import vCard from '../common/card.vue'
 import BScroll from 'better-scroll' // 滚动插件
-import { postServiceCardReturnDetail, postServiceCategory, postMemberLevelInfo, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords } from '../../api/getData'
+import { postServiceCardReturnDetail, postServiceCategory, postMemberLevelInfo, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords,
+  postLimitedPrice,
+} from '../../api/getData'
 import { mapGetters } from 'vuex' //  这儿需要用到vuex里的数据
 
 export default {
@@ -996,6 +1025,14 @@ export default {
           regtime: '', // 加入时间
           service_card:''
         },
+      },
+      //显示余额弹窗
+      limitedPriceDialog:{
+        isShow: false,
+        responseData:{
+          allprice:0,
+          data:[],
+        }
       },
 
       // 购卡弹窗
@@ -1755,6 +1792,7 @@ export default {
       data.page = `${this.requestFuwuGoodData.page},${this.requestFuwuGoodData.num}`
       data.member_id = this.jiezhangDialog.memberVip.id
       postServiceItemList(data).then((res) => {
+        this.goodsList = res.data.length ? res.data :[]
         if (res.data.length === 0) {
           if (this.requestFuwuGoodData.page !== 1) {
             this.requestFuwuGoodData.page -= 1
@@ -1963,6 +2001,7 @@ export default {
           let requestData = {mobile: this.xuanzehuiyuanDialog.mobile}
           postSearchVip(requestData).then(res => {
             if (res.data.id) {
+              this.getLimitedPrice(res.data.id)
               this.xuanzehuiyuanDialog.memberVip = res.data
             } else {
               this.$message.closeAll()
@@ -1992,6 +2031,7 @@ export default {
             let requestData = {mobile: this.xuanzehuiyuanDialog.mobile}
             postSearchVip(requestData).then(res => {
               if (res.data.id) {
+                this.getLimitedPrice(res.data.id)
                 this.jiezhangDialog.memberVip = res.data
                 this.xuanzehuiyuanDialog.isShow = false
                 this.choosesGoodsShowMemberPrice()
@@ -2096,6 +2136,29 @@ export default {
       }
       //刷新后结算面板的价格展示也刷新
       this.sumChooseGoodsMoney()
+    },
+    //查询会员的限时余额
+    async getLimitedPrice(menber_id = 0) {
+      let requestData = {
+        member_id: menber_id || this.jiezhangDialog.memberVip.id || this.xuanzehuiyuanDialog.memberVip.id,
+      }
+      await postLimitedPrice(requestData).then(res => {
+        console.log('限时余额：', res)
+        if(res.code === 200) {
+          this.limitedPriceDialog.responseData = res.data
+        } else {
+          this.limitedPriceDialog.responseData = {
+            allprice:0,
+            data:[],
+          }
+        }
+      }).catch(err =>{
+        console.log(err)
+        this.limitedPriceDialog.responseData = {
+          allprice:0,
+          data:[],
+        }
+      })
     },
 
     // 充值弹框
@@ -2246,6 +2309,7 @@ export default {
         let requestData = {mobile: this.huiyuanDialog.mobile}
         postSearchVip(requestData).then(res => {
           if (res.data.id) {
+            this.getLimitedPrice(res.data.id)
             this.huiyuanDialog.huiyuanInfo = res.data
             this.huiyuanDialogChoosesWho()
           } else {
