@@ -1717,7 +1717,7 @@ export default {
       })
       if (key !== 'undefined') {
         if (isCheckMinimumSellingPrice){
-          if (parseFloat(this.xiugaijiageDialog.inputValue) > parseFloat(arr[key].minimum_selling_price)) {
+          if (parseFloat(this.xiugaijiageDialog.inputValue) >= parseFloat(arr[key].minimum_selling_price)) {
             arr[key].is_edit = 1
             arr[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
             this.xiugaijiageDialog.inputValue = ''
@@ -1730,7 +1730,7 @@ export default {
             })
           }
         } else {
-          if (parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2) > 0.0) {
+          if (parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2) >= 0.0) {
             arr[key].is_edit = 1
             arr[key].edit_price = parseFloat(this.xiugaijiageDialog.inputValue).toFixed(2)
             this.xiugaijiageDialog.inputValue = ''

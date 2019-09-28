@@ -461,8 +461,8 @@
                   <el-radio label="balance">余额退款</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label="退款原因:" required>
-                <el-select v-model="returnOrderDialog1.reason_id" placeholder="选择退款原因" @change="returnResultChange">
+              <el-form-item label="退货原因:" required>
+                <el-select v-model="returnOrderDialog1.reason_id" placeholder="选择退货原因" @change="returnResultChange">
                   <el-option  v-for="item in returnOrderDialog1.returnOrderResult" :label="item.name" :value="item.id"  :key="item.id"></el-option>
                 </el-select>
               </el-form-item>
@@ -518,7 +518,7 @@
       <!-- 服务卡订单--退款处理-->
       <el-dialog class="order-details-dialog" title="服务卡订单退单" :visible.sync="returnOrderDialog2.isShow" width="700px" :center="true">
         <div>
-          <el-form ref="form"  label-width="80px" label-position="left" :inline="true" class="demo-form-inline">
+          <el-form ref="form"  label-width="100px" label-position="left" :inline="true" class="demo-form-inline">
             <el-form-item label="卡卷类型">
               <el-input :value="returnOrderDialog2.responseData.card.type"></el-input>
             </el-form-item>
@@ -526,7 +526,7 @@
               <el-input :value="returnOrderDialog2.responseData.month || '次卡'"></el-input>
             </el-form-item>
           </el-form>
-          <el-form ref="form"  label-width="80px" label-position="left" :inline="true" class="demo-form-inline">
+          <el-form ref="form"  label-width="100px" label-position="left" :inline="true" class="demo-form-inline">
             <el-form-item label="激活时间">
               <el-input :value="returnOrderDialog2.responseData.start"></el-input>
             </el-form-item>
@@ -534,7 +534,7 @@
               <el-input :value="returnOrderDialog2.responseData.end"></el-input>
             </el-form-item>
           </el-form>
-          <el-form ref="form"  label-width="80px" label-position="left" :inline="true" class="demo-form-inline">
+          <el-form ref="form"  label-width="100px" label-position="left" :inline="true" class="demo-form-inline">
             <el-form-item label="支付金额">
               <el-input :value="returnOrderDialog2.responseData.real_price + '元'"></el-input>
             </el-form-item>
@@ -542,26 +542,26 @@
               <el-input :value="returnOrderDialog2.responseData.card.money + '元'"></el-input>
             </el-form-item>
           </el-form>
-          <el-form ref="form"  label-width="80px" label-position="left" class="demo-dynamic">
-            <el-form-item label="退款原因" required>
-              <el-select v-model="returnOrderDialog2.requestData.reason_id" placeholder="请选择退款原因" @change="serviceCardReturnResultChange">
+          <el-form ref="form"  label-width="100px" label-position="left" class="demo-dynamic">
+            <el-form-item label="退服务原因" required label-width="100px" >
+              <el-select v-model="returnOrderDialog2.requestData.reason_id" placeholder="请选择退服务原因" @change="serviceCardReturnResultChange">
                 <el-option  v-for="item in returnOrderDialog2.returnOrderResult" :label="item.name" :value="item.id"  :key="item.id"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="其他原因" v-if="returnOrderDialog2.requestData.reason_id === 0">
+            <el-form-item label="其他原因" label-width="100px" v-if="returnOrderDialog2.requestData.reason_id === 0">
               <el-input type="textarea" v-model="returnOrderDialog2.requestData.reason"></el-input>
             </el-form-item>
-            <el-form-item label="退款方式" required>
+            <el-form-item label="退款方式" required label-width="100px">
               <el-radio-group v-model="returnOrderDialog2.requestData.type">
                 <el-radio label="cash">现金退款</el-radio>
                 <el-radio label="balance">余额退款</el-radio>
 <!--                <el-radio label="card">银行卡</el-radio>-->
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="退款金额">
+            <el-form-item label="退款金额" label-width="100px">
               <el-input :value="returnOrderDialog2.responseData.card.balance + '元'"></el-input>
             </el-form-item>
-            <el-form-item label="备注" required>
+            <el-form-item label="备注" required label-width="100px">
               <el-input type="textarea" v-model="returnOrderDialog2.requestData.remarks"></el-input>
             </el-form-item>
             <div style="text-align: center;">
@@ -738,9 +738,12 @@ export default {
         //选中的退货商品
         multipleSelection: [],
         // 退货原因列表
+        // 退货原因：1、产品质量问题   2、过期产品   3、顾客自己原因     4、门店录单错误
         returnOrderResult: [
-          {id: 1, name: '商品质量问题'},
-          {id: 2, name: '商品不一致，客户退货'},
+          {id: 1, name: '产品质量问题'},
+          {id: 2, name: '过期产品'},
+          {id: 3, name: '顾客自己原因'},
+          {id: 4, name: '门店录单错误'},
           {id: 0, name: '其他'}
         ],
         //可退货的商品列表
@@ -924,9 +927,11 @@ export default {
           end: "2020-03-12"
         },
         // 退货原因列表
+        // 退服务原因：1、服务人员选错   2、服务项目和次数录入错误   3、扣错客户服务卡及余额
         returnOrderResult: [
-          {id: 1, name: '商品质量问题'},
-          {id: 2, name: '商品不一致，客户退货'},
+          {id: 1, name: '服务人员选错'},
+          {id: 2, name: '服务项目和次数录入错误'},
+          {id: 3, name: '扣错客户服务卡及余额'},
           {id: 0, name: '其他'}
         ],
         requestData:{

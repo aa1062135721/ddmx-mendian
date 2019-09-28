@@ -1,9 +1,7 @@
 <template>
     <div class="bg">
       <div class="left">
-        <img  v-lazy="ogood.pic" alt="商品封面">
-      </div>
-      <div class="middle">
+        <img  v-lazy="ogood.pic || ogood.cover" alt="商品封面">
       </div>
       <div class="right">
         <div class="right-title overflow-row2-ellipsis">
@@ -65,13 +63,8 @@ export default {
         border-radius:8px 0px 0px 8px;
       }
     }
-    .middle{
-      float: left;
-      height: 100%;
-      border-right:1px solid rgba(229,229,229,1);
-    }
     .right{
-      width: 169px;
+      width: 170px;
       float: left;
       padding: 15px;
       /*flex: 1;*/
