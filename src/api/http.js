@@ -31,11 +31,10 @@ const codeMessage = {
 }
 
 axios.defaults.timeout = 10000
-axios.defaults.baseURL = 'http://testmd.ddxm661.com/index' //   // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
 if (process.env.NODE_ENV === 'development') {
-  axios.defaults.baseURL = '/api/index/'  // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
+  axios.defaults.baseURL = '/api/'  // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
 } else {
-  axios.defaults.baseURL = 'http://testmd.ddxm661.com/index' //   // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
+  axios.defaults.baseURL = 'https://ddxm661.com/index' // 正式服务器环境
 }
 /**
  * 决绝同一个接口，相同参数，相同请求方法 ……  发送多次请求

@@ -293,15 +293,6 @@
                 </li>
               </ul>
             </div>
-            <div class="three">
-              <el-radio-group v-model="chongzhiDialog.payType">
-<!--                //支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
-                <el-radio label="5">现金</el-radio>
-                <el-radio label="1">微信</el-radio>
-                <el-radio label="2">支付宝</el-radio>
-                <el-radio label="4">银行卡</el-radio>
-              </el-radio-group>
-            </div>
             <div class="four clear-both">
               <el-input  class="float-left" @focus="chongzhiDialogInputFocus('money')" v-model="chongzhiDialog.payMoney" placeholder="请输入充值金额" clearable style="width: 48%;"></el-input>
               <el-select class="float-right" v-model="chongzhiDialog.nowWaiter" placeholder="请选择服务人员" @focus="getWaiterList()" style="width: 48%;">
@@ -314,6 +305,18 @@
                   <span style="float: right;color: #ccc;" >({{ item.type }})</span>
                 </el-option>
               </el-select>
+            </div>
+            <div class="three">
+              <el-radio-group v-model="chongzhiDialog.payType" @change="chongzhiDialogPayTypeChange">
+                <!--                //支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
+                <el-radio label="5">现金</el-radio>
+                <el-radio label="1">微信</el-radio>
+                <el-radio label="2">支付宝</el-radio>
+                <el-radio label="4">银行卡</el-radio>
+              </el-radio-group>
+            </div>
+            <div class="one" v-if="['1','2',1,2].indexOf(chongzhiDialog.payType) !== -1">
+              <el-input ref="refInputAuthCodeCZ" style="width: 100%;" v-model="chongzhiDialog.auth_code" placeholder="请扫描支付条码" @keyup.enter.native="chongzhiDialogBtnOk"></el-input>
             </div>
           </div>
           <div class="float-right right">
@@ -350,9 +353,12 @@
               <li>
                 <el-form label-width="50px">
                   <el-form-item label="备注:">
-                    <el-input v-model="jiezhangDialog.remarks" placholder="请输入购买备注"></el-input>
+                    <el-input v-model="jiezhangDialog.remarks" placeholder="请输入购买备注"></el-input>
                   </el-form-item>
                 </el-form>
+              </li>
+              <li v-if="[1,2].indexOf(jiezhangDialog.chooesePayWay) !== -1">
+                <el-input ref="refInputAuthCode" v-model="jiezhangDialog.auth_code"  placeholder="请扫描支付条码" :autofocus="true" @keyup.enter.native="jiezhangDialogClickOk"></el-input>
               </li>
             </ul>
             <div class="div clear-both">
@@ -443,7 +449,19 @@
                  <img v-if="jiezhangDialog.chooesePayWay === 8" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
                </span>
              </div>
+            <div class="div">
+               <span v-if="jiezhangDialog.closedPayWay.indexOf(12) !== -1"  class="span-btn closed">
+                 <img src="../../assets/icon/super-buy.png" alt="超级汇买" class="icon-img">
+                 <span>超级汇买</span>
+               </span>
+              <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 12}" @click="jiezhangDialogChoosesPayWay(12)">
+                 <img src="../../assets/icon/super-buy.png" alt="超级汇买" class="icon-img">
+                 <span>超级汇买</span>
+                 <img v-if="jiezhangDialog.chooesePayWay === 12" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
+               </span>
+            </div>
           </div>
+
         </div>
       </el-dialog>
       <!-- 选择会员弹框 -->
@@ -1006,6 +1024,7 @@ export default {
           ]
         },
         payType: '', // 充值方式
+        auth_code:'',//微信支付，支付宝支付时候 ，扫码枪框
         payMoney: '', // 充值金额
         nowWaiter: '',
       },
@@ -1085,6 +1104,7 @@ export default {
         modifyMoney: 0.00, // 改价参数,
         chooesePayWay: '', // 支付方式
         remarks:'',//备注
+        auth_code: '',//微信支付，支付宝支付  -     扫码的参数
         closedPayWay: [ // 被禁用的支付方式：1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
         ],
         // 支付完成之后弹出的结账成功弹框
@@ -1997,7 +2017,7 @@ export default {
     // 选择会员
     searchMember(){
       if (this.xuanzehuiyuanDialog.mobile.length === 11) {
-        if (/^[1][3,4,5,7,8][0-9]{9}$/.test(this.xuanzehuiyuanDialog.mobile)) {
+        if (/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.xuanzehuiyuanDialog.mobile)) {
           let requestData = {mobile: this.xuanzehuiyuanDialog.mobile}
           postSearchVip(requestData).then(res => {
             if (res.data.id) {
@@ -2027,7 +2047,7 @@ export default {
     clickChoosesMemberByKeyboard (code) {
       if (code === 'ok') {
         if (this.xuanzehuiyuanDialog.mobile.length === 11) {
-          if (/^[1][3,4,5,7,8][0-9]{9}$/.test(this.xuanzehuiyuanDialog.mobile)) {
+          if (/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.xuanzehuiyuanDialog.mobile)) {
             let requestData = {mobile: this.xuanzehuiyuanDialog.mobile}
             postSearchVip(requestData).then(res => {
               if (res.data.id) {
@@ -2180,7 +2200,7 @@ export default {
       if (this.chongzhiDialog.mobile.length !== 11) {
         return
       }
-      if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
+      if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
         this.$message.closeAll()
         this.$message({
           message: '请输入正确的手机号',
@@ -2204,8 +2224,17 @@ export default {
         console.log(err)
       })
     },
+    //选择支付方式
+    chongzhiDialogPayTypeChange(way){
+      //微信支付宝扫码支付
+      if (way === 1 || way === 2 || way === '1' || way === "2"){
+        this.$nextTick(() => {
+          this.$refs.refInputAuthCodeCZ.focus()
+        })
+      }
+    },
     async chongzhiDialogBtnOk () {
-      if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
+      if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
         this.$message.closeAll()
         this.$message({
           message: '请输入正确的手机号',
@@ -2237,6 +2266,17 @@ export default {
         })
         return
       }
+      if (((this.chongzhiDialog.payType === '1') || (this.chongzhiDialog.payType === '2')) && (this.chongzhiDialog.auth_code === '')) {
+        this.$message.closeAll()
+        this.$message({
+          message: '请用扫码枪扫一下哦',
+          type: 'error'
+        })
+        this.$nextTick(() => {
+          this.$refs.refInputAuthCodeCZ.focus()
+        })
+        return
+      }
       if (!this.chongzhiDialog.huiyuanInfo.id) {
         this.$message.closeAll()
         this.$message({
@@ -2257,7 +2297,8 @@ export default {
         member_id: this.chongzhiDialog.huiyuanInfo.id,
         price: this.chongzhiDialog.payMoney,
         pay_way: this.chongzhiDialog.payType,
-        waiter_id: this.chongzhiDialog.nowWaiter
+        waiter_id: this.chongzhiDialog.nowWaiter,
+        auth_code: this.chongzhiDialog.auth_code,
       }
       await this.$confirm(`是否确认给${this.chongzhiDialog.huiyuanInfo.mobile}充值，充值金额为：${requestData.price}元？`, '提示', {
         confirmButtonText: '确定',
@@ -2281,9 +2322,13 @@ export default {
             this.chongzhiDialog.payType = ''
             this.chongzhiDialog.payMoney = ''
             this.chongzhiDialog.nowWaiter = ''
+            this.chongzhiDialog.auth_code = ''
+          } else {
+            this.chongzhiDialog.auth_code = ''
           }
         })
       }).catch(() => {
+        this.chongzhiDialog.auth_code = ''
       })
     },
 
@@ -2295,7 +2340,7 @@ export default {
     },
     huiyuanDialogSearchMemberVip () {
       if (this.huiyuanDialog.mobile.length === 11) {
-        if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.huiyuanDialog.mobile)) {
+        if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.huiyuanDialog.mobile)) {
           this.$message.closeAll()
           this.$message({
             message: '请输入正确的手机号',
@@ -2341,7 +2386,7 @@ export default {
         mobile: this.huiyuanDialog.addHuiyuanDialog.mobile,
         nickname: this.huiyuanDialog.addHuiyuanDialog.nickname
       }
-      if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(requestData.mobile)) {
+      if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(requestData.mobile)) {
         this.$message.closeAll()
         this.$message({
           message: '请输入正确的手机号',
@@ -2738,6 +2783,12 @@ export default {
     //选择支付方式
     jiezhangDialogChoosesPayWay (way) {
       this.jiezhangDialog.chooesePayWay = way
+      //微信支付宝扫码支付
+      if (way === 1 || way === 2){
+        this.$nextTick(() => {
+          this.$refs.refInputAuthCode.focus()
+        })
+      }
     },
     //确认结账
     async jiezhangDialogClickOk () {
@@ -2769,6 +2820,26 @@ export default {
         pay_way: this.jiezhangDialog.chooesePayWay,
         goods: [],
         remarks: this.jiezhangDialog.remarks,
+      }
+
+      if (
+        (
+          (this.jiezhangDialog.chooesePayWay === 1) ||
+          (this.jiezhangDialog.chooesePayWay === 2)
+        ) &&
+        (this.jiezhangDialog.auth_code === '')
+      ) {
+        this.$message.closeAll()
+        this.$message({
+          message: '请用扫码枪扫一下哦',
+          type: 'error'
+        })
+        this.$nextTick(() => {
+          this.$refs.refInputAuthCode.focus()
+        })
+        return
+      } else {
+        requestData.auth_code = this.jiezhangDialog.auth_code
       }
       if (this.chooeseGoods.goods.length) {
         let arr = []
@@ -2826,7 +2897,11 @@ export default {
         await postNowPayGoods(requestData).then(async res => {
           if (res.code === '200') {
             await this.clearJiezhangDialogData()
+          } else {
+            this.jiezhangDialog.auth_code = ''
           }
+        }).catch(err => {
+          this.jiezhangDialog.auth_code = ''
         })
       }
       //服务卡是另一个结算接口
@@ -2940,6 +3015,7 @@ export default {
       this.jiezhangDialog.isShowChooeseWaiterBlock = false
       this.jiezhangDialog.nowWaiter = {id: -1, name: '请选择服务员', type: ''}
       this.jiezhangDialog.remarks = ''
+      this.jiezhangDialog.auth_code = ''//微信支付，支付宝支付 扫描的码
       //刷新接口
       if (this.requestFuwuGoodData.who !== -1) {
         this.getServiceItemList()
@@ -2980,6 +3056,7 @@ export default {
           this.chongzhiDialog.payType = ''
           this.chongzhiDialog.payMoney = ''
           this.chongzhiDialog.nowWaiter = ''
+          this.chongzhiDialog.auth_code = ''
         }
       },
       deep:true
@@ -3395,7 +3472,7 @@ export default {
   /*结账弹框样式*/
   .jiezhang-tanchuan{
     .box{
-      height: 300px;
+      height: 350px;
       .my-left{
         width: 320px;
         height: 100%;

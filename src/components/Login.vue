@@ -55,7 +55,7 @@ export default {
   methods: {
     //获取验证码
     async getCode(){
-      if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.username)) {
+      if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.username)) {
         this.msg = '用户名应为手机号码'
         return
       }
@@ -92,7 +92,7 @@ export default {
         this.msg = '请输入用户名或验证码'
         return
       }
-      if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(this.username)) {
+      if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.username)) {
         this.msg = '用户名应为手机号码'
         return
       }

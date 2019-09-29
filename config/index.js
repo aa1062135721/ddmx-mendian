@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        target: 'http://testmd.ddxm661.com',  // 本地测试
+        target: 'https://ddxm661.com/index',  // http://testmd.ddxm661.com 本地测试   https://ddxm661.com/index 正式
         changeOrigin: true,//是否允许跨越
         pathRewrite: {
           '^/api': '',//重写,
@@ -21,7 +21,7 @@ module.exports = {
     },
 
     // Various Dev Server settings
-    host: '192.168.0.114', // can be overwritten by process.env.HOST  192.168.0.114  or  localhost
+    host: 'localhost', // can be overwritten by process.env.HOST  192.168.0.114  or  localhost
     port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,
