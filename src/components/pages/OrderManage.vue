@@ -459,6 +459,7 @@
                 <el-radio-group v-model="returnOrderDialog1.type">
                   <el-radio label="cash">现金退款</el-radio>
                   <el-radio label="balance">余额退款</el-radio>
+                  <el-radio label="card">银行卡</el-radio>
                 </el-radio-group>
               </el-form-item>
               <el-form-item label="退货原因:" required>
@@ -555,7 +556,7 @@
               <el-radio-group v-model="returnOrderDialog2.requestData.type">
                 <el-radio label="cash">现金退款</el-radio>
                 <el-radio label="balance">余额退款</el-radio>
-<!--                <el-radio label="card">银行卡</el-radio>-->
+                <el-radio label="card">银行卡</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item label="退款金额" label-width="100px">

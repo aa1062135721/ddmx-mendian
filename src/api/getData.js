@@ -464,7 +464,7 @@ export const postTransferSlipList = (data = null) => {
  * @returns {*}
  */
 export const postTransferSlipPrint = (data = null) => {
-  return Vue.prototype.$post('/allot/print', data)
+  return Vue.prototype.$post('/allot/prints', data)
 }
 
 /**

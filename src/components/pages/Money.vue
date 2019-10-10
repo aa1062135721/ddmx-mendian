@@ -44,7 +44,7 @@
           <div style="max-width: 636px;width:33.13%;overflow: hidden;">
             <div class="jiesuan-goods" >
               <div class="search">
-                <el-input class="goods-search" @input="getGoodByCondition" @keyup.enter.native="getGoods()" placeholder="商品名称/条形码"  v-model="requestGoodData.title">
+                <el-input class="goods-search" @keyup.enter.native="getGoodByCondition()" placeholder="商品名称/条形码"  v-model="requestGoodData.title">
                   <i slot="suffix" class="el-input__icon el-icon-search" @click="requestFuwuGoodData.who = -1 ;getGoods()"></i>
                 </el-input>
               </div>
@@ -1884,6 +1884,8 @@ export default {
           // 全部是数字
           this.searchGoodsByGoodCode()
         }
+      } else {
+        this.getGoods()
       }
     },
     // 搜索商品按商品条形码
@@ -1960,10 +1962,16 @@ export default {
           }
           this.chooeseGoods.cardList = []
           this.chooeseGoods.outServiceGoods = []
+          this.requestGoodData.title = ''
           this.isShowChooeseWaiterBlock()
           this.sumChooseGoodsMoney()
           this.$forceUpdate()
+        } else {
+          this.requestGoodData.title = ''
         }
+      }).catch(err =>{
+        this.requestGoodData.title = ''
+        console.log(err)
       })
     },
     // 计算结算总价
