@@ -646,3 +646,12 @@ export const postStatisticsOrder = (data = null) => {
 export const postLimitedPrice = (data = null) => {
   return Vue.prototype.$post('/index/getLimitedPrice', data)
 }
+
+/**
+ * 激活限时余额
+ * @param data
+ * @returns {Promise}
+ */
+export const postActivationExpireMoney = (data = null) => {
+  return Vue.prototype.$post('/index/activationExpireMoney', data)
+}

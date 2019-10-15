@@ -209,7 +209,7 @@
                     </span>
                     <span v-if="jiezhangDialog.memberVip.id && limitedPriceDialog.responseData.allprice">
                       限时余额：￥{{limitedPriceDialog.responseData.allprice}}
-                      <el-tag size="mini" type="danger" style="cursor: pointer;color: #F83D3D;background: #fff;border: 1px solid #F83D3D;" @click="limitedPriceDialog.isShow = true">查看过期</el-tag>
+                      <el-tag size="mini" type="danger" style="cursor: pointer;color: #F83D3D;background: #fff;border: 1px solid #F83D3D;" @click="getLimitedPrice(jiezhangDialog.memberVip.id);limitedPriceDialog.isShow = true">查看</el-tag>
                     </span>
                     <span class="float-right">余额￥{{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : '0.00'}}</span>
                   </li>
@@ -347,7 +347,7 @@
                 <span class="float-right">¥ {{parseFloat(jiezhangDialog.modifyMoney - jiezhangDialog.sumMoney).toFixed(2)}}</span>
               </li>
               <li class="clear-both">
-                <span class="float-left"><span>会员</span> <span class="font-blue"  @click="xuanzehuiyuanDialog.isShow = true">{{jiezhangDialog.memberVip.nickname?jiezhangDialog.memberVip.nickname:'未选择'}}</span></span>
+                <span class="float-left"><span>会员</span> <span class="font-blue">{{jiezhangDialog.memberVip.nickname?jiezhangDialog.memberVip.nickname:'未选择'}}</span></span>
                 <span class="float-right">余额：¥ {{jiezhangDialog.memberVip.money ? jiezhangDialog.memberVip.money : '0.00'}}</span>
               </li>
               <li>
@@ -368,7 +368,7 @@
             </div>
           </div>
           <div class="float-right my-right">
-<!--            1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值-->
+<!--            1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程12超级汇买13限时余额99=管理员充值-->
             <div class="div">
               <span v-if="jiezhangDialog.closedPayWay.indexOf(3) !== -1" class="span-btn closed">
                 <img src="../../assets/icon/checkout-huiyuanka.png" alt="会员卡" class="icon-img">
@@ -454,10 +454,19 @@
                  <img src="../../assets/icon/super-buy.png" alt="超级汇买" class="icon-img">
                  <span>超级汇买</span>
                </span>
-              <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 12}" @click="jiezhangDialogChoosesPayWay(12)">
+               <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 12}" @click="jiezhangDialogChoosesPayWay(12)">
                  <img src="../../assets/icon/super-buy.png" alt="超级汇买" class="icon-img">
                  <span>超级汇买</span>
                  <img v-if="jiezhangDialog.chooesePayWay === 12" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
+               </span>
+              <span v-if="jiezhangDialog.closedPayWay.indexOf(13) !== -1"  class="span-btn closed">
+                 <img src="../../assets/icon/checkout-time-money.png" alt="限时余额" class="icon-img">
+                 <span>限时余额</span>
+               </span>
+              <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 13}" @click="jiezhangDialogChoosesPayWay(13)">
+                 <img src="../../assets/icon/checkout-time-money.png" alt="限时余额" class="icon-img">
+                 <span>限时余额</span>
+                 <img v-if="jiezhangDialog.chooesePayWay === 13" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
                </span>
             </div>
           </div>
@@ -483,7 +492,7 @@
                     <span class="float-left">限时余额</span>
                     <span class="float-right">
                       ￥{{limitedPriceDialog.responseData.allprice}}
-                       <el-button size="mini" @click="limitedPriceDialog.isShow = true">查看过期</el-button>
+                       <el-button size="mini" @click="getLimitedPrice(xuanzehuiyuanDialog.memberVip.id);limitedPriceDialog.isShow = true">查看</el-button>
                     </span>
                   </li>
                   <li><span class="float-left">会员等级</span><span class="float-right">{{xuanzehuiyuanDialog.memberVip.level_name}}</span></li>
@@ -530,9 +539,9 @@
                   </tr>
                   <tr>
                     <td colspan="5">
+                      <span v-if="huiyuanDialog.huiyuanInfo.id && limitedPriceDialog.responseData.allprice">限时余额：￥{{limitedPriceDialog.responseData.allprice}} <el-tag size="mini" type="danger" style="cursor: pointer;color: #F83D3D;background: #fff;border: 1px solid #F83D3D;" @click="getLimitedPrice(huiyuanDialog.huiyuanInfo.id);limitedPriceDialog.isShow = true">查看</el-tag><br></span>
                       累计充值：￥ {{ huiyuanDialog.huiyuanInfo.amount || '0.00' }} &nbsp;
                       余额：<span class="font-red">￥ {{ huiyuanDialog.huiyuanInfo.money || '0.00'}}</span>&nbsp;
-                      <span v-if="huiyuanDialog.huiyuanInfo.id && limitedPriceDialog.responseData.allprice">限时余额：￥{{limitedPriceDialog.responseData.allprice}} <el-tag size="mini" type="danger" style="cursor: pointer;color: #F83D3D;background: #fff;border: 1px solid #F83D3D;" @click="limitedPriceDialog.isShow = true">查看过期</el-tag></span>
                     </td>
                     <td colspan="2">加入时间：<br>{{ huiyuanDialog.huiyuanInfo.regtime }}</td>
                   </tr>
@@ -772,6 +781,11 @@
           <el-table :data="limitedPriceDialog.responseData.data" border style="height: 240px;">
             <el-table-column prop="price" label="余额(元)"></el-table-column>
             <el-table-column prop="company" label="过期时间"></el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button v-if="scope.row.status === 0" type="text" @click="postActivationExpireMoney(scope.row.id)">激活</el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
       </el-dialog>
@@ -788,6 +802,7 @@ import vCard from '../common/card.vue'
 import BScroll from 'better-scroll' // 滚动插件
 import { postServiceCardReturnDetail, postServiceCategory, postMemberLevelInfo, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords,
   postLimitedPrice,
+  postActivationExpireMoney,
 } from '../../api/getData'
 import { mapGetters } from 'vuex' //  这儿需要用到vuex里的数据
 
@@ -2166,9 +2181,9 @@ export default {
       this.sumChooseGoodsMoney()
     },
     //查询会员的限时余额
-    async getLimitedPrice(menber_id = 0) {
+    async getLimitedPrice(member_id = 0) {
       let requestData = {
-        member_id: menber_id || this.jiezhangDialog.memberVip.id || this.xuanzehuiyuanDialog.memberVip.id,
+        member_id: member_id,
       }
       await postLimitedPrice(requestData).then(res => {
         console.log('限时余额：', res)
@@ -2186,6 +2201,26 @@ export default {
           allprice:0,
           data:[],
         }
+      })
+    },
+    //激活限时余额
+    async postActivationExpireMoney(id = 0){
+      await this.$confirm(`确认激活吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        await postActivationExpireMoney({id}).then(res => {
+          console.log('激活限时余额结果：', res)
+          if(res.code === 200) {
+            this.limitedPriceDialog.isShow = false
+            this.$message({
+              message: res.msg,
+              type: 'success'
+            })
+          }
+        })
+      }).catch(() => {
       })
     },
 
@@ -2932,7 +2967,7 @@ export default {
     },
     // 结账时可选支付方式
     confirmPayWay () {
-      // 1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程99=管理员充值
+      // 1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程12超级汇买13限时余额99=管理员充值
       if (this.jiezhangDialog.memberVip.id) { // 选择了会员
         if (this.chooeseGoods.goods.length) {
           let onlyOrdinaryGoods = 0, onlyServiceGoods = 0
@@ -2967,6 +3002,10 @@ export default {
         if (parseFloat(this.jiezhangDialog.memberVip.money) < parseFloat(this.jiezhangDialog.modifyMoney)){
           this.jiezhangDialog.closedPayWay.push(3)
         }
+        //选择会员的限时余额不足，不能使用限时余额支付
+        if (parseFloat(this.limitedPriceDialog.responseData.allprice) < parseFloat(this.jiezhangDialog.modifyMoney)){
+          this.jiezhangDialog.closedPayWay.push(13)
+        }
       } else {
         if (this.chooeseGoods.goods.length) {
           let onlyOrdinaryGoods = 0, onlyServiceGoods = 0
@@ -2979,23 +3018,23 @@ export default {
             }
           }
           if (onlyOrdinaryGoods === this.chooeseGoods.goods.length){
-            this.jiezhangDialog.closedPayWay = [3]
+            this.jiezhangDialog.closedPayWay = [3,13]
           }
           if (onlyServiceGoods === this.chooeseGoods.goods.length){
-            this.jiezhangDialog.closedPayWay = [3]
+            this.jiezhangDialog.closedPayWay = [3,13]
           }
           if (onlyServiceGoods > 0 && onlyServiceGoods > 0){
-            this.jiezhangDialog.closedPayWay = [3]
+            this.jiezhangDialog.closedPayWay = [3,13]
           }
         }
         if (this.chooeseGoods.outServiceGoods.length) {
-          this.jiezhangDialog.closedPayWay = [3]
+          this.jiezhangDialog.closedPayWay = [3,13]
         }
         if (this.chooeseGoods.outOrdinaryGoods.length) {
-          this.jiezhangDialog.closedPayWay = [3]
+          this.jiezhangDialog.closedPayWay = [3,13]
         }
         if (this.chooeseGoods.cardList.length) {
-          this.jiezhangDialog.closedPayWay = [1,2,4,5,6,7,8,9,10,11,99]
+          this.jiezhangDialog.closedPayWay = [1,2,4,5,6,7,8,9,10,11,13,99]
         }
       }
     },
