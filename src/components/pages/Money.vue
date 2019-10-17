@@ -3386,22 +3386,26 @@ export default {
         }
       }
       .buttons{
+        display: flex;
+        justify-content: space-around;
         text-align: center;
         .my-btn{
-          width:210px;
+          width:45%;
           height:44px;
-          margin-right: 20px;
+          line-height: 44px;
           font-size: 24px;
           border-radius:4px;
           font-weight: 400;
+          overflow: hidden;
         }
         .my-btn-active{
-          width:210px;
+          width:45%;
           height:44px;
+          line-height: 44px;
           border-radius:4px;
-          margin-left: 20px;
           font-size: 24px;
           font-weight: 400;
+          overflow: hidden;
         }
       }
     }
