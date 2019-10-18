@@ -427,8 +427,9 @@
             </div>
             <div>
               <el-table :data="checkOrderPageData.addDialog.list" border style="width: 100%;" height="400px">
-                <el-table-column type="index" label="序号"></el-table-column>
+                <el-table-column type="index" label="序号" width="80"></el-table-column>
                 <el-table-column prop="item_title" label="商品名称"></el-table-column>
+                <el-table-column prop="bar_code" label="条形码"></el-table-column>
                 <el-table-column prop="top_category" label="一级分类"></el-table-column>
                 <el-table-column prop="two_category" label="二级分类"></el-table-column>
                 <el-table-column prop="stock_reality" label="当前库存"></el-table-column>
@@ -460,8 +461,7 @@
 <!--              </el-radio-group>-->
 <!--            </div>-->
             <div style="margin-bottom: 15px;">
-              <el-input placeholder="请输入商品名称" v-model="checkOrderPageData.addGoodsDialog.title"  style="width: 180px;"></el-input>
-<!--              <el-input placeholder="请输入条形码" style="width: 180px;"></el-input>-->
+              <el-input placeholder="商品名称/条形码" v-model="checkOrderPageData.addGoodsDialog.title" @keyup.enter.native="getCheckOrderGoodList" style="width: 180px;"></el-input>
               <el-select  clearable placeholder="选择一级分类" v-model="checkOrderPageData.addGoodsDialog.topCategoryId" @change="clickAddCheckOrderTwoCategory">
                 <el-option
                   v-for="item in checkOrderPageData.addGoodsDialog.topCategory"
@@ -487,8 +487,9 @@
                         border style="width: 100%;">
                 <el-table-column type="selection" width="55"></el-table-column>
                 <el-table-column prop="title" label="商品名称"></el-table-column>
-                <el-table-column prop="type_id" label="一级分类"></el-table-column>
-                <el-table-column prop="type" label="二级分类"></el-table-column>
+                <el-table-column prop="bar_code" label="条形码"></el-table-column>
+                <el-table-column prop="type_ids" label="一级分类"></el-table-column>
+                <el-table-column prop="types" label="二级分类"></el-table-column>
                 <el-table-column prop="stock" label="库存"></el-table-column>
               </el-table>
             </div>
@@ -1628,6 +1629,8 @@ export default {
       postCheckOrderAddGoodList(data).then(res => {
         if (res.data.length) {
           this.checkOrderPageData.addGoodsDialog.list = res.data
+        }else {
+          this.checkOrderPageData.addGoodsDialog.list = []
         }
       })
     },
@@ -1647,8 +1650,9 @@ export default {
         formatArr.push({
           item_id: item.id, // 商品id
           item_title: item.title, // 商品名称
-          top_category: item.type_id, // 一级分类
-          two_category: item.type, // 二级分类
+          bar_code: item.bar_code, // 商品条形码
+          top_category: item.type_ids, // 一级分类
+          two_category: item.types, // 二级分类
           stock_reality: item.stock, // 当前库存
           stock_now: ''// 盘点库存
         })
@@ -1871,6 +1875,27 @@ export default {
         }
       })
     }
+  },
+  watch:{
+    // 新增盘点单弹框
+    "checkOrderPageData.addDialog.isShow":{
+      handler(newVal,oldVal){
+        if (newVal === false) {
+          this.checkOrderPageData.addDialog.list = []
+        }
+      },
+      deep:true
+    },
+    // 新增盘点商品
+    "checkOrderPageData.addGoodsDialog.isShow":{
+      handler(newVal,oldVal){
+        if (newVal === false) {
+          this.checkOrderPageData.addGoodsDialog.list = []
+        }
+      },
+      deep:true
+    },
+
   },
   computed: {
     ...mapGetters(['userInfo'])

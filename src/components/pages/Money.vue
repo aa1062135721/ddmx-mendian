@@ -559,7 +559,8 @@
           <div class="my-table" v-if="huiyuanDialog.fuwukaList.length || huiyuanDialog.chongzhijiluList.length">
             <!-- 服务卡 -->
             <el-table v-show="huiyuanDialog.showWho === 'serviceCard'" :data="huiyuanDialog.fuwukaList" height="300" border style="width: 100%">
-              <el-table-column type="index" label="序号" width="80"></el-table-column>
+              <el-table-column type="index" label="序号" width="70"></el-table-column>
+              <el-table-column prop="id" label="ID"></el-table-column>
               <el-table-column prop="card_name" label="服务卡名称"></el-table-column>
               <el-table-column prop="real_price" label="购买金额"></el-table-column>
               <el-table-column prop="type_card" label="类型"></el-table-column>
@@ -683,6 +684,7 @@
       <el-dialog title="使用记录" :visible.sync="huiyuanDialog.shiyongjiluDialog.isShow" width="648px" :center="true">
         <div>
           <el-table :data="huiyuanDialog.shiyongjiluDialog.tableData" border height="300">
+            <el-table-column type="index" label="序号"></el-table-column>
             <el-table-column prop="service_name" label="服务项目"></el-table-column>
             <el-table-column prop="time" label="使用时间"></el-table-column>
             <el-table-column prop="waiter" label="服务人员"></el-table-column>

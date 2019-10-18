@@ -185,6 +185,7 @@
           <div class="serch-table">
             <el-table :data="responseData3.data" border style="width: 100%;" height="565">
               <el-table-column prop="sn" label="订单号"></el-table-column>
+              <el-table-column prop="nickname" label="昵称"></el-table-column>
               <el-table-column label="会员账号">
                 <template slot-scope="scope">
                   <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)">{{scope.row.mobile}}</el-button>
