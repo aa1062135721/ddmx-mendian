@@ -559,14 +559,14 @@
           <div class="my-table" v-if="huiyuanDialog.fuwukaList.length || huiyuanDialog.chongzhijiluList.length">
             <!-- 服务卡 -->
             <el-table v-show="huiyuanDialog.showWho === 'serviceCard'" :data="huiyuanDialog.fuwukaList" height="300" border style="width: 100%">
-              <el-table-column type="index" label="序号" width="70"></el-table-column>
+              <el-table-column type="index" label="序号" width="55"></el-table-column>
               <el-table-column prop="id" label="ID"></el-table-column>
-              <el-table-column prop="card_name" label="服务卡名称"></el-table-column>
+              <el-table-column prop="card_name" label="服务卡名称" width="100"></el-table-column>
               <el-table-column prop="real_price" label="购买金额"></el-table-column>
               <el-table-column prop="type_card" label="类型"></el-table-column>
-              <el-table-column prop="create_time" label="购买时间"></el-table-column>
-              <el-table-column prop="start_time" label="激活时间"></el-table-column>
-              <el-table-column prop="end_time" label="过期时间"></el-table-column>
+              <el-table-column prop="create_time" label="购买时间" width="100"></el-table-column>
+              <el-table-column prop="start_time" label="激活时间" width="100"></el-table-column>
+              <el-table-column prop="end_time" label="过期时间" width="100"></el-table-column>
 <!--              <el-table-column prop="status_name" label="状态"></el-table-column>-->
               <el-table-column  label="状态">
                 <template slot-scope="scope">

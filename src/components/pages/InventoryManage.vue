@@ -424,6 +424,7 @@
           <el-dialog :visible.sync="checkOrderPageData.addDialog.isShow"  title="新增盘点"  width="968px" :center="true">
             <div style="margin-bottom: 15px;">
               <el-button  @click="checkOrderPageData.addGoodsDialog.isShow = true"  type="primary" plain>新增商品</el-button>
+              <el-button  @click="addCheckOrderDialongLoadMoreGoods" type="primary" plain :disabled="checkOrderPageData.addDialog.is_enable">加载下一批商品</el-button>
             </div>
             <div>
               <el-table :data="checkOrderPageData.addDialog.list" border style="width: 100%;" height="400px">
@@ -484,6 +485,7 @@
               <el-table :data="checkOrderPageData.addGoodsDialog.list"
                         tooltip-effect="dark"
                         @selection-change="clickAddGoodsDialogHandleSelectionChange"
+                        height="460"
                         border style="width: 100%;">
                 <el-table-column type="selection" width="55"></el-table-column>
                 <el-table-column prop="title" label="商品名称"></el-table-column>
@@ -492,6 +494,18 @@
                 <el-table-column prop="types" label="二级分类"></el-table-column>
                 <el-table-column prop="stock" label="库存"></el-table-column>
               </el-table>
+            </div>
+            <div style="text-align: right;margin-top: 15px;">
+              <el-pagination
+                background
+                layout="total, sizes, prev, pager, next, jumper"
+                @size-change="getCheckOrderGoodListPageSizeChange"
+                :page-sizes="[10, 20, 30, 40]"
+                :page-size="checkOrderPageData.addGoodsDialog.limit"
+                @current-change="getCheckOrderGoodListOnePageCurrentChange"
+                :current-page.sync="checkOrderPageData.addGoodsDialog.page"
+                :total="checkOrderPageData.addGoodsDialog.count">
+              </el-pagination>
             </div>
             <div style="text-align: center;margin-top: 20px;">
               <el-button @click="checkOrderPageData.addGoodsDialog.isShow = false" type="primary" plain>取消</el-button>
@@ -1001,6 +1015,9 @@ export default {
             //   stock_now:0,//盘点库存
             // }
           ],
+          page:1,//分页
+          limit:20,//每页显示的条数
+          is_enable: false,//加载下一批商品
           // 备注
           remarks: ''
         },
@@ -1019,6 +1036,9 @@ export default {
           ],
           title: '', // 商品名称
           stock_type: 1, // 获取商品的类型：1获取库存不为0的列表,2获取库存为0的列表
+          page:1, // 分页
+          limit:20,// 每页显示的条数
+          count:0,//数据总数
           multipleSelection: [],
           list: [
             // {
@@ -1568,10 +1588,17 @@ export default {
           this.checkOrderPageData.addGoodsDialog.topCategory = res.data
         }
       })
+      this.checkOrderPageData.addDialog.page = 1
+      this.checkOrderPageData.addDialog.is_enable = false
+      this.clickAddCheckOrderDialogSearchBtn()
+    },
+    addCheckOrderDialongLoadMoreGoods(){
+      this.checkOrderPageData.addDialog.page += 1
       this.clickAddCheckOrderDialogSearchBtn()
     },
     clickAddCheckOrderDialogSearchBtn () {
       let data = {
+        page:`${this.checkOrderPageData.addDialog.page},${this.checkOrderPageData.addDialog.limit}`,
         stock_type: 1,
         title: '',
         type_id: '',
@@ -1583,18 +1610,33 @@ export default {
           res.data.forEach((item) => {
             formatArr.push({
               item_id: item.id, // 商品id
+              bar_code: item.bar_code,//商品二维码
               item_title: item.title, // 商品名称
-              top_category: item.type_id, // 一级分类
-              two_category: item.type, // 二级分类
+              top_category: item.type_ids, // 一级分类
+              two_category: item.types, // 二级分类
               stock_reality: item.stock, // 当前库存
               stock_now: ''// 盘点库存
             })
           })
-          this.checkOrderPageData.addDialog.list = formatArr
+
+          // 数据拼接
+          let newArr = this.checkOrderPageData.addDialog.list.concat(formatArr)
+          // 去重
+          let obj = {}
+          newArr = newArr.reduce(function (item, next) {
+            obj[next.item_id] ? '' : obj[next.item_id] = true && item.push(next)
+            return item
+          }, [])
+
+          this.checkOrderPageData.addDialog.list = newArr
+        }
+        if (res.data.length < this.checkOrderPageData.addDialog.limit) {
+          this.checkOrderPageData.addDialog.is_enable = true //关闭加载更多商品按钮
         }
         this.checkOrderPageData.addDialog.isShow = true
       })
     },
+
     // 新增盘点单对话框获取二级分类列表
     clickAddCheckOrderTwoCategory () {
       this.checkOrderPageData.addGoodsDialog.twoCategoryId = ''
@@ -1621,18 +1663,32 @@ export default {
     getCheckOrderGoodList () {
       this.checkOrderPageData.addGoodsDialog.isShow = true
       let data = {
+        page: `${this.checkOrderPageData.addGoodsDialog.page},${this.checkOrderPageData.addGoodsDialog.limit}`,
         stock_type: 2,
         title: this.checkOrderPageData.addGoodsDialog.title,
         type_id: this.checkOrderPageData.addGoodsDialog.topCategoryId,
         type: this.checkOrderPageData.addGoodsDialog.twoCategoryId
       }
       postCheckOrderAddGoodList(data).then(res => {
-        if (res.data.length) {
-          this.checkOrderPageData.addGoodsDialog.list = res.data
-        }else {
-          this.checkOrderPageData.addGoodsDialog.list = []
+        if (res.code === 200){
+          this.checkOrderPageData.addGoodsDialog.count = res.count
+          if (res.data.length) {
+            this.checkOrderPageData.addGoodsDialog.list = res.data
+          }else {
+            this.checkOrderPageData.addGoodsDialog.list = []
+          }
         }
       })
+    },
+    // 盘点单 新增盘点单时 获取商品列表 页码操作
+    getCheckOrderGoodListOnePageCurrentChange (val) {
+      this.checkOrderPageData.addGoodsDialog.page = val
+      this.getCheckOrderGoodList()
+    },
+    // 盘点单，新增盘点单时 获取商品列表  每页数据条数操作
+    getCheckOrderGoodListPageSizeChange (val) {
+      this.checkOrderRequestData.addGoodsDialog.limit = val
+      this.getCheckOrderGoodList()
     },
     // 新增盘点单弹框盘->选择商品—>确定按钮
     clickAddGoodsDialogOk () {
