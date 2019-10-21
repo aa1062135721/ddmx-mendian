@@ -423,6 +423,7 @@
           <!-- 盘点单--新增盘点-->
           <el-dialog :visible.sync="checkOrderPageData.addDialog.isShow"  title="新增盘点"  width="968px" :center="true">
             <div style="margin-bottom: 15px;">
+              <el-button  @click="checkOrderPageData.addDialog.list = []"  type="danger" plain>全部删除</el-button>
               <el-button  @click="checkOrderPageData.addGoodsDialog.isShow = true"  type="primary" plain>新增商品</el-button>
               <el-button  @click="addCheckOrderDialongLoadMoreGoods" type="primary" plain :disabled="checkOrderPageData.addDialog.is_enable">加载下一批商品</el-button>
             </div>

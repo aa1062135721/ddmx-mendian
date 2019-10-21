@@ -520,7 +520,7 @@
             </div>
           </div>
       </el-dialog>
-      <!--  会员按钮弹框-会员查询 -->
+      <!-- 会员查询 -->
       <el-dialog class="huiyuanchaxun-tanchuan" title="会员查询" :visible.sync="huiyuanDialog.isShow" width="960px" :center="true">
         <div class="content">
           <div class="clear-both header">
@@ -582,7 +582,7 @@
                   <!-- 状态 0未激活  1待使用 2为已使用 3为已过期 4 已退卡-->
                   <el-button v-if="scope.row.status === 0" type="text" size="mini" @click="huiyuanDialogActiveServiceCard(scope.row)">激活</el-button>
                   <el-button v-if="scope.row.status === 1" type="text" size="mini" @click="huiyuanDialogUseServiceCardList(scope.row)">耗卡</el-button>
-                  <el-button v-if="scope.row.status === 2 || scope.row.status === 1" type="text" size="mini" @click="huiyuanDialogServiceCardUseRecords(scope.row)">使用记录</el-button>
+                  <el-button v-if=" [1,2,3,4].indexOf(scope.row.status) !== -1" type="text" size="mini" @click="huiyuanDialogServiceCardUseRecords(scope.row)">使用记录</el-button>
                   <el-button v-if="scope.row.status === 4" type="text" size="mini" @click="huiyuanDialogServiceCardReturnCardsDetails(scope.row)">退卡详情</el-button>
                 </template>
               </el-table-column>
