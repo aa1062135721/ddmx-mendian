@@ -318,6 +318,9 @@
             <div class="one" v-if="['1','2',1,2].indexOf(chongzhiDialog.payType) !== -1">
               <el-input ref="refInputAuthCodeCZ" style="width: 100%;" v-model="chongzhiDialog.auth_code" placeholder="请扫描支付条码" @keyup.enter.native="chongzhiDialogBtnOk"></el-input>
             </div>
+            <div class="one">
+              <el-input v-model="chongzhiDialog.remarks" placeholder="请输入充值备注" clearable style="width: 100%;"></el-input>
+            </div>
           </div>
           <div class="float-right right">
             <v-keyboard @getNumber="chongzhiDialogGetCode"></v-keyboard>
@@ -1044,6 +1047,7 @@ export default {
         auth_code:'',//微信支付，支付宝支付时候 ，扫码枪框
         payMoney: '', // 充值金额
         nowWaiter: '',
+        remarks: '',//充值备注，只有门店id为46的才为必填
       },
       // 选择会员弹框是否显示
       xuanzehuiyuanDialog: {
@@ -2338,12 +2342,24 @@ export default {
         })
         return
       }
+      /*
+      只有门店id为46的充值备注为必填
+       */
+      if (this.userInfo.shop_id === 46 && this.chongzhiDialog.remarks === ''){
+        this.$message.closeAll()
+        this.$message({
+          message: '请输入充值备注',
+          type: 'error'
+        })
+        return
+      }
       let requestData = {
         member_id: this.chongzhiDialog.huiyuanInfo.id,
         price: this.chongzhiDialog.payMoney,
         pay_way: this.chongzhiDialog.payType,
         waiter_id: this.chongzhiDialog.nowWaiter,
         auth_code: this.chongzhiDialog.auth_code,
+        remarks: this.chongzhiDialog.remarks,
       }
       await this.$confirm(`是否确认给${this.chongzhiDialog.huiyuanInfo.mobile}充值，充值金额为：${requestData.price}元？`, '提示', {
         confirmButtonText: '确定',
@@ -3438,10 +3454,10 @@ export default {
     border-radius:10px;
     .both{
       width: 715px;
-      height: 368px;
+      height: 400px;
       .left{
         width: 394px;
-        height: 368px;
+        height: 400px;
         display: flex;
         flex-direction:column;
         justify-content:space-between;

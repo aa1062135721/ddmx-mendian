@@ -655,3 +655,12 @@ export const postLimitedPrice = (data = null) => {
 export const postActivationExpireMoney = (data = null) => {
   return Vue.prototype.$post('/index/activationExpireMoney', data)
 }
+
+/**
+ * 库存管理 盘点单 部分盘点
+ * @param data
+ * @returns {Promise}
+ */
+export const postCheckOrderAddGoodList2 = (data = null) => {
+  return Vue.prototype.$post('/Check/getItems', data)
+}

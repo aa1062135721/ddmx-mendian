@@ -388,7 +388,8 @@
             </div>
             <div class="search" style="margin-top: 15px;">
               <el-button type="primary" plain>导出</el-button>
-              <el-button @click="clickAddCheckOrder" type="primary">新增盘点</el-button>
+              <el-button @click="clickAddCheckOrder(1)" type="primary">新增盘点</el-button>
+              <el-button @click="clickAddCheckOrder(2)" type="primary" plain>部分盘点</el-button>
             </div>
           </div>
           <div  style="margin-top: 15px;">
@@ -425,7 +426,8 @@
             <div style="margin-bottom: 15px;">
               <el-button  @click="checkOrderPageData.addDialog.list = []"  type="danger" plain>全部删除</el-button>
               <el-button  @click="checkOrderPageData.addGoodsDialog.isShow = true"  type="primary" plain>新增商品</el-button>
-              <el-button  @click="addCheckOrderDialongLoadMoreGoods" type="primary" plain :disabled="checkOrderPageData.addDialog.is_enable">加载下一批商品</el-button>
+              <el-button  @click="addCheckOrderDialongLoadMoreGoods" type="primary" plain :disabled="checkOrderPageData.addDialog.is_enable"
+                v-if="!checkOrderPageData.addDialog.isShow2">加载下一批商品</el-button>
             </div>
             <div>
               <el-table :data="checkOrderPageData.addDialog.list" border style="width: 100%;" height="400px">
@@ -494,6 +496,7 @@
                         height="460"
                         border style="width: 100%;">
                 <el-table-column type="selection" width="55"></el-table-column>
+                <el-table-column type="index" label="序号"></el-table-column>
                 <el-table-column prop="title" label="商品名称"></el-table-column>
                 <el-table-column prop="bar_code" label="条形码"></el-table-column>
                 <el-table-column prop="type_ids" label="一级分类"></el-table-column>
@@ -830,7 +833,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { postCheckStockGoodsList, postTransferSlipGetGoodList, postTransferSlipConfirmGoods, postTransferSlipSendGoodsGetInfo, postTransferSlipSendGoodsGetGoodList, postTransferSlipGoodsDetails, postTransferSlipDetails, postTransferSlipSendGoods, postTransferSlipSendGoodsCancel, postTransferSlipDel, postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails, postTransferSlipPrint, } from '../../api/getData'
+import { postCheckStockGoodsList, postTransferSlipGetGoodList, postTransferSlipConfirmGoods, postTransferSlipSendGoodsGetInfo, postTransferSlipSendGoodsGetGoodList, postTransferSlipGoodsDetails, postTransferSlipDetails, postTransferSlipSendGoods, postTransferSlipSendGoodsCancel, postTransferSlipDel, postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails, postTransferSlipPrint,
+  postCheckOrderAddGoodList2,
+} from '../../api/getData'
 export default {
   name: 'InventoryManage', // 库存管理，进销存
   data () {
@@ -1072,6 +1077,10 @@ export default {
         // 新增盘点单弹框
         addDialog: {
           isShow: false,
+
+          //2=盘点单  新增部分盘点
+          isShow2: false,
+
           list: [
             // {
             //   item_id: 1768,    //商品id
@@ -1651,7 +1660,13 @@ export default {
       })
     },
     // 新增盘点单对话框显示
-    clickAddCheckOrder () {
+    clickAddCheckOrder (type = 1) {
+      if (type === 2){
+        // 新增部分盘点
+        this.checkOrderPageData.addDialog.isShow2 = true
+        this.checkOrderPageData.addDialog.isShow = true
+      }
+
       // 获取一级分类
       postTwotype().then(res => {
         if (res.data.length) {
@@ -1660,7 +1675,10 @@ export default {
       })
       this.checkOrderPageData.addDialog.page = 1
       this.checkOrderPageData.addDialog.is_enable = false
-      this.clickAddCheckOrderDialogSearchBtn()
+      if (type === 1){
+        // 非新增部分盘点 去请求第一页数据
+        this.clickAddCheckOrderDialogSearchBtn()
+      }
     },
     addCheckOrderDialongLoadMoreGoods(){
       this.checkOrderPageData.addDialog.page += 1
@@ -1731,6 +1749,26 @@ export default {
     },
     // 盘点单 -新增盘点单时 获取商品别表
     getCheckOrderGoodList () {
+      if (this.checkOrderPageData.addDialog.isShow2 === true) {
+        let data = {
+          page: `${this.checkOrderPageData.addGoodsDialog.page},${this.checkOrderPageData.addGoodsDialog.limit}`,
+          title: this.checkOrderPageData.addGoodsDialog.title,
+          type_id: this.checkOrderPageData.addGoodsDialog.topCategoryId,
+          type: this.checkOrderPageData.addGoodsDialog.twoCategoryId
+        }
+        postCheckOrderAddGoodList2(data).then(res => {
+          if (res.code === 200){
+            this.checkOrderPageData.addGoodsDialog.count = res.count
+            if (res.data.length) {
+              this.checkOrderPageData.addGoodsDialog.list = res.data
+            }else {
+              this.checkOrderPageData.addGoodsDialog.list = []
+            }
+          }
+        })
+
+        return
+      }
       let data = {
         page: `${this.checkOrderPageData.addGoodsDialog.page},${this.checkOrderPageData.addGoodsDialog.limit}`,
         stock_type: 2,
@@ -1756,7 +1794,7 @@ export default {
     },
     // 盘点单，新增盘点单时 获取商品列表  每页数据条数操作
     getCheckOrderGoodListPageSizeChange (val) {
-      this.checkOrderRequestData.addGoodsDialog.limit = val
+      this.checkOrderPageData.addGoodsDialog.limit = val
       this.getCheckOrderGoodList()
     },
     // 新增盘点单弹框盘->选择商品—>确定按钮
@@ -2056,6 +2094,7 @@ export default {
     "checkOrderPageData.addDialog.isShow":{
       handler(newVal,oldVal){
         if (newVal === false) {
+          this.checkOrderPageData.addDialog.isShow2 = false
           this.checkOrderPageData.addDialog.list = []
         }
       },
