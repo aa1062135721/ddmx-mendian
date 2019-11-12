@@ -371,7 +371,7 @@
             </div>
           </div>
           <div class="float-right my-right">
-<!--            1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程12超级汇买13限时余额99=管理员充值-->
+<!--            1=微信支付 2=支付宝 3=余额(会员卡)4=银行卡5=现金6=美团7=赠送8=门店自用 9=兑换10=包月服务11=定制疗程12超级汇买13限时余额14=云客赞99=管理员充值-->
             <div class="div">
               <span v-if="jiezhangDialog.closedPayWay.indexOf(3) !== -1" class="span-btn closed">
                 <img src="../../assets/icon/checkout-huiyuanka.png" alt="会员卡" class="icon-img">
@@ -471,6 +471,18 @@
                  <span>限时余额</span>
                  <img v-if="jiezhangDialog.chooesePayWay === 13" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
                </span>
+            </div>
+            <div class="div" v-if="userInfo.shop_id === 38">
+               <span v-if="jiezhangDialog.closedPayWay.indexOf(14) !== -1"  class="span-btn closed">
+                 <img src="../../assets/icon/checkout-cloudGuestsNice.png" alt="云客赞" class="icon-img">
+                 <span>云客赞</span>
+               </span>
+               <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 14}" @click="jiezhangDialogChoosesPayWay(14)">
+                 <img src="../../assets/icon/checkout-cloudGuestsNice.png" alt="云客赞" class="icon-img">
+                 <span>云客赞</span>
+                 <img v-if="jiezhangDialog.chooesePayWay === 14" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
+               </span>
+
             </div>
           </div>
 
@@ -3541,7 +3553,7 @@ export default {
   /*结账弹框样式*/
   .jiezhang-tanchuan{
     .box{
-      height: 350px;
+      height: 416px;
       .my-left{
         width: 320px;
         height: 100%;
