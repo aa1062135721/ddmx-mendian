@@ -17,7 +17,7 @@
     </div>
 </template>
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 import { removeCookie } from '../../utils'
 export default {
   data () {
@@ -42,8 +42,8 @@ export default {
         type: 'warning'
       }).then(() => {
         removeCookie('token')
-        this.saveUserInfo({})
-        this.saveToken('')
+        this.setUserInfo()
+        this.setToken('')
         this.$router.push('/login')
       }).catch(() => {
       })
@@ -75,10 +75,10 @@ export default {
       }
       this.fullscreen = !this.fullscreen
     },
-    ...mapActions(['saveUserInfo', 'saveToken'])
+    ...mapMutations(['setUserInfo', 'setToken'])
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapState(['userInfo'])
   }
 }
 </script>

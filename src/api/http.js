@@ -61,7 +61,8 @@ axios.interceptors.request.use(
       pending.push({ u: config.url + JSON.stringify(config.data) + '&' + config.method, f: c })
     })
 
-    const token = getCookie('token')  // 从cookie中取出 token，所有接口都带上token
+    // const token = getCookie('token')  // 从cookie中取出 token，所有接口都带上token
+    const token = store.state.token  // 从vuex中取出 token，所有接口都带上token
     if (config.data && config.data.form) {
       config.headers = {
         'Content-Type': 'multipart/form-data'

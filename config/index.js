@@ -12,7 +12,8 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        target: 'https://www.ddxm661.com/index',
+        // target: 'https://www.ddxm661.com/index',// 正式环境
+        target: 'https://ddxm661.com/index',// 测试环境
         changeOrigin: true,//是否允许跨越
         pathRewrite: {
           '^/api': '',//重写,

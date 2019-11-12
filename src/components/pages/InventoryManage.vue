@@ -832,7 +832,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import { postCheckStockGoodsList, postTransferSlipGetGoodList, postTransferSlipConfirmGoods, postTransferSlipSendGoodsGetInfo, postTransferSlipSendGoodsGetGoodList, postTransferSlipGoodsDetails, postTransferSlipDetails, postTransferSlipSendGoods, postTransferSlipSendGoodsCancel, postTransferSlipDel, postTransferSlipAdd, postShopList, postTransferSlipList, postCheckOrderList, postTwotype, postCheckOrderAddGoodList, postCheckOrderAdd, postCheckOrderInfo, postCheckOrderDel, postCheckOrderConfirm, postCheckOrderEdit, postCheckLossOrWinOrderList, postCheckLossOrWinOrderDetails, postTransferSlipPrint,
   postCheckOrderAddGoodList2,
 } from '../../api/getData'
@@ -2112,7 +2112,7 @@ export default {
 
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapState(['userInfo'])
   }
 }
 </script>

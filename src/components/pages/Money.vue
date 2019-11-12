@@ -472,7 +472,8 @@
                  <img v-if="jiezhangDialog.chooesePayWay === 13" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
                </span>
             </div>
-            <div class="div" v-if="userInfo.shop_id === 38">
+            <div class="div">
+              <template v-if="userInfo.shop_id === 38">
                <span v-if="jiezhangDialog.closedPayWay.indexOf(14) !== -1"  class="span-btn closed">
                  <img src="../../assets/icon/checkout-cloudGuestsNice.png" alt="云客赞" class="icon-img">
                  <span>云客赞</span>
@@ -482,7 +483,16 @@
                  <span>云客赞</span>
                  <img v-if="jiezhangDialog.chooesePayWay === 14" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
                </span>
-
+              </template>
+              <span v-if="jiezhangDialog.closedPayWay.indexOf(15) !== -1"  class="span-btn closed">
+                 <img src="../../assets/icon/checkout-frame-baby.png" alt="框框宝" class="icon-img">
+                 <span>框框宝</span>
+               </span>
+              <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 15}" @click="jiezhangDialogChoosesPayWay(15)">
+                 <img src="../../assets/icon/checkout-frame-baby.png" alt="框框宝" class="icon-img">
+                 <span>框框宝</span>
+                 <img v-if="jiezhangDialog.chooesePayWay === 15" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
+               </span>
             </div>
           </div>
 
@@ -821,7 +831,7 @@ import { postServiceCardReturnDetail, postServiceCategory, postMemberLevelInfo, 
   postLimitedPrice,
   postActivationExpireMoney,
 } from '../../api/getData'
-import { mapGetters } from 'vuex' //  这儿需要用到vuex里的数据
+import { mapState } from 'vuex' //  这儿需要用到vuex里的数据
 
 export default {
   name: 'Money',
@@ -3112,7 +3122,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo']),
+    ...mapState(['userInfo']),
   },
   watch:{
     "xuanzehuiyuanDialog.isShow":{

@@ -164,7 +164,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'//  这儿需要用到vuex里的数据 shop_id
+import { mapState } from 'vuex'//  这儿需要用到vuex里的数据 shop_id
 import { postExpenditureList, postExpenditureTypeNameList, postAddExpenditure, postDelExpenditure } from '../../api/getData'
 export default {
   name: 'ExpenditureManage', // 支出管理
@@ -379,7 +379,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapState(['userInfo'])
   }
 }
 </script>

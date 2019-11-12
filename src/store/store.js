@@ -52,18 +52,12 @@ const mutations = {
 // actions are functions that cause side effects and can involve
 // asynchronous operations.
 const actions = {
-  saveUserInfo ({ commit }, saveData = {}) {
-    commit('setUserInfo', saveData)
-  },
-  saveToken ({ commit }, saveData = '') {
-    commit('setToken', saveData)
-  },
+
 }
 
 // getters are functions
 const getters = {
-  userInfo: state => state.userInfo,
-  token: state => state.token,
+
 }
 
 // A Vuex instance is created by combining the state, mutations, actions,

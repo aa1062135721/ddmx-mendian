@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapMutations } from 'vuex'
 import {postUserInfo, postLoginGetCode, postLoginByCode} from '../api/getData'
 import {setCookie} from '../utils'
 export default {
@@ -101,10 +101,10 @@ export default {
       await postLoginByCode(data).then(async (res) => {
         if (res.code === '200') {
           await setCookie('token', res.data.token) //浏览器保存登录凭证 这儿没有设置cookie的过期时间，默认是关闭浏览器就过期
-          await that.saveToken(res.data.token) // vuex保存登录凭证
+          await that.setToken(res.data.token) // vuex保存登录凭证
           await postUserInfo().then(async (res) => {
-            await that.saveUserInfo(res.data) // vuex保存登录后的登录数据
-            that.$router.push({
+            await that.setUserInfo(res.data) // vuex保存登录后的登录数据
+            await that.$router.push({
               path: '/money',
               query: {}
             })
@@ -114,7 +114,7 @@ export default {
         }
       })
     },
-    ...mapActions(['saveUserInfo', 'saveToken'])
+    ...mapMutations(['setUserInfo', 'setToken'])
   }
 }
 </script>
