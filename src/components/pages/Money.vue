@@ -223,8 +223,8 @@
                   </li>
                   <li>
                     <span class="float-left">结算</span>
-                    <!-- 支付方式为赠送 门店自用，需要支付的钱为0-->
-                    <span class="float-right" v-if="jiezhangDialog.chooesePayWay === 7 || jiezhangDialog.chooesePayWay ===8">￥0.00</span>
+                    <!-- 支付方式为赠送 门店自用 框框宝，需要支付的钱为0-->
+                    <span class="float-right" v-if="[7, 8, 15].indexOf(jiezhangDialog.chooesePayWay) !== -1">￥0.00</span>
                     <span class="float-right" v-else>￥{{parseFloat(jiezhangDialog.modifyMoney).toFixed(2)}}</span>
                   </li>
                 </ul>
@@ -341,8 +341,8 @@
             <ul>
               <li class="clear-both">
                 <span class="float-left">应收</span>
-                <!-- 选择赠送和门店自用的支付方式，费用显示为0-->
-                <span class="float-right font-red" v-if="jiezhangDialog.chooesePayWay === 7 || jiezhangDialog.chooesePayWay ===8">￥ 0.00</span>
+                <!-- 选择赠送和门店自用和框框宝的支付方式，费用显示为0-->
+                <span class="float-right font-red" v-if="[7, 8, 15].indexOf(jiezhangDialog.chooesePayWay) !== -1">￥ 0.00</span>
                 <span class="float-right font-red" v-else>¥ {{jiezhangDialog.modifyMoney}}</span>
               </li>
               <li class="clear-both">
@@ -3036,7 +3036,7 @@ export default {
           this.jiezhangDialog.closedPayWay = [8]
         }
         if (this.chooeseGoods.cardList.length) {
-          this.jiezhangDialog.closedPayWay = [1,2,4,5,6,7,8,9,10,11,99]
+          this.jiezhangDialog.closedPayWay = [1,2,4,5,6,7,8,9,10,11,15,99]
         }
         // 余额不足，不能使用会员卡支付
         if (parseFloat(this.jiezhangDialog.memberVip.money) < parseFloat(this.jiezhangDialog.modifyMoney)){
@@ -3074,7 +3074,7 @@ export default {
           this.jiezhangDialog.closedPayWay = [3,13]
         }
         if (this.chooeseGoods.cardList.length) {
-          this.jiezhangDialog.closedPayWay = [1,2,4,5,6,7,8,9,10,11,13,99]
+          this.jiezhangDialog.closedPayWay = [1,2,4,5,6,7,8,9,10,11,13,15,99]
         }
       }
     },
