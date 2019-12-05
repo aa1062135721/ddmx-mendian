@@ -217,6 +217,38 @@
               {{responseData3.sanCount}}人
             </h1>
           </el-card>
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <span>总分销员</span>
+            </div>
+            <h1>
+              {{responseData3.all_distributor}}人
+            </h1>
+          </el-card>
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <span>新增分销员</span>
+            </div>
+            <h1>
+              {{responseData3.new_add_distributor}}人
+            </h1>
+          </el-card>
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <span>总粉丝</span>
+            </div>
+            <h1>
+              {{responseData3.all_fans}}人
+            </h1>
+          </el-card>
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <span>新增粉丝</span>
+            </div>
+            <h1>
+              {{responseData3.new_add_fans}}人
+            </h1>
+          </el-card>
         </div>
       </el-tab-pane>
       <el-tab-pane label="服务统计" name="4">
@@ -406,7 +438,7 @@
             </el-card>
           </div>
           <div class="content2 float-right" style="width: 80%;">
-            <el-table :data="responseData6.data.data" border style="width: 100%;">
+            <el-table :data="responseData6.data.data" border style="width: 100%;" height="500">
               <el-table-column prop="title" label="支出类型"></el-table-column>
               <el-table-column label="金额">
                 <template slot-scope="scope">
@@ -471,7 +503,11 @@
           all_total: 0,     //总会员
           new_member: 0,    //新客会员
           xiao_total: 0,    //消费会员
-          sanCount: 0      //散客
+          sanCount: 0,      //散客
+          all_distributor: 0, //总分销员
+          all_fans: 0, // 总粉丝
+          new_add_distributor: 0, //新增分销员
+          new_add_fans: 0, // 新增粉丝
         },
 
         //服务统计

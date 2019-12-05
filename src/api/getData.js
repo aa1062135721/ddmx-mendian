@@ -664,3 +664,12 @@ export const postActivationExpireMoney = (data = null) => {
 export const postCheckOrderAddGoodList2 = (data = null) => {
   return Vue.prototype.$post('/Check/getItems', data)
 }
+
+/**
+ * 会员查询-编辑会员姓名/昵称
+ * @param data
+ * @returns {Promise}
+ */
+export const postEditNickName = (data = null) => {
+  return Vue.prototype.$post('/Index/edit', data)
+}

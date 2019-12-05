@@ -453,11 +453,11 @@
                </span>
              </div>
             <div class="div">
-               <span v-if="jiezhangDialog.closedPayWay.indexOf(12) !== -1"  class="span-btn closed">
+               <span v-if="jiezhangDialog.closedPayWay.indexOf(12) !== -1"  class="span-btn closed" style="display: none;opacity: 0;">
                  <img src="../../assets/icon/super-buy.png" alt="超级汇买" class="icon-img">
                  <span>超级汇买</span>
                </span>
-               <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 12}" @click="jiezhangDialogChoosesPayWay(12)">
+               <span v-else class="span-btn" :class="{'active' : jiezhangDialog.chooesePayWay === 12}" @click="jiezhangDialogChoosesPayWay(12)" style="display: none;opacity: 0;">
                  <img src="../../assets/icon/super-buy.png" alt="超级汇买" class="icon-img">
                  <span>超级汇买</span>
                  <img v-if="jiezhangDialog.chooesePayWay === 12" src="../../assets/icon/is-chooese.png" alt="" class="icon-active">
@@ -559,7 +559,17 @@
                 <table class="el-table el-table__body" cellspacing="0" cellpadding="0" border="0">
                   <tr>
                     <td colspan="3">手机号：{{ huiyuanDialog.huiyuanInfo.mobile }}</td>
-                    <td colspan="2">姓名：<span class="font-blue">{{ huiyuanDialog.huiyuanInfo.nickname }}</span></td>
+                    <td colspan="2">
+                      姓名：<span class="font-blue">{{ huiyuanDialog.huiyuanInfo.nickname }}</span>
+                      <el-tag
+                        v-show="huiyuanDialog.huiyuanInfo.mobile"
+                        size="mini"
+                        type="danger"
+                        @click="editNickName(huiyuanDialog.huiyuanInfo)"
+                        effect="dark">
+                        编辑
+                      </el-tag>
+                    </td>
                     <td colspan="2">会员等级：{{ huiyuanDialog.huiyuanInfo.level_name }}</td>
                   </tr>
                   <tr>
@@ -661,6 +671,9 @@
           <div class="float-left left" style="width: 50%;">
               <div style="margin-bottom: 48px;">
                 <el-input @keyup.enter.native="huiyuanDialogAddMemberVip" v-model="huiyuanDialog.addHuiyuanDialog.mobile" placeholder="请输入会员手机号码" maxlength="11"></el-input>
+              </div>
+              <div style="margin-bottom: 48px;color:red;">
+                如果该手机号在微信商城里是会员，新增会员操作会将微信商场会员转入到本门店下。
               </div>
               <div>
                 <el-input @keyup.enter.native="huiyuanDialogAddMemberVip" v-model="huiyuanDialog.addHuiyuanDialog.nickname"  placeholder="请输入会员昵称"></el-input>
@@ -805,7 +818,7 @@
       <!--限时余额-->
       <el-dialog title="限时余额" :visible.sync="limitedPriceDialog.isShow" width="648px" :center="true">
         <div>
-          <el-table :data="limitedPriceDialog.responseData.data" border style="height: 240px;">
+          <el-table :data="limitedPriceDialog.responseData.data" border height="240">
             <el-table-column prop="price" label="余额(元)"></el-table-column>
             <el-table-column prop="company" label="过期时间"></el-table-column>
             <el-table-column label="操作">
@@ -830,6 +843,7 @@ import BScroll from 'better-scroll' // 滚动插件
 import { postServiceCardReturnDetail, postServiceCategory, postMemberLevelInfo, postGoods, postGoodsByCode, postServiceItemList, postWaiter, postSearchVip, postMemberVipRecharge, postAddMemberVip, postMemberServiceCards, postBuyServiceCards, postMemberVipRechargeLog, postNowPayGoods, postNowPayServiceCards, postMemberServiceCardsUseList, postMemberServiceCardsActive, postMemberServiceCardsUseListTicket, postMemberServiceCardsUseRecords,
   postLimitedPrice,
   postActivationExpireMoney,
+  postEditNickName,
 } from '../../api/getData'
 import { mapState } from 'vuex' //  这儿需要用到vuex里的数据
 
@@ -2594,6 +2608,36 @@ export default {
           this.huiyuanDialogSearchServiceCardList()
           break
       }
+    },
+    // 编辑会员的姓名
+    editNickName(userInfo){
+      console.log(userInfo)
+      this.$prompt('请输入会员姓名', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+      }).then(({ value }) => {
+        if (value) {
+          postEditNickName({
+            member_id: userInfo.id,
+            nickname: value,
+          }).then(res => {
+            if (res.code === '200'){
+              this.huiyuanDialog.huiyuanInfo.nickname = value
+              this.$message({
+                type: 'success',
+                message: res.msg
+              });
+            }
+          })
+        }
+        else {
+          this.$message({
+            type: 'error',
+            message: '请输入会员姓名'
+          });
+        }
+      }).catch(() => {
+      });
     },
 
     // 激活服务卡

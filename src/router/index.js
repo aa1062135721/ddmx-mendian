@@ -7,6 +7,15 @@ Vue.use(Router)
 const router = new Router({
   routes: [
     {
+      path: '/double12',
+      name: 'Double12',
+      meta: {
+        title: '统计页面',
+        requireAuth: false// 不需要登录
+      },
+      component: resolve => require(['@/components/double12'], resolve)
+    },
+    {
       path: '/',
       name: 'Index',
       meta: {
@@ -149,7 +158,7 @@ router.beforeEach((to, from, next) => {
   if (to.matched.length === 0) {
     // 没有匹配到当前路由
     next('/')
-  } else if (!isLogin && to.path !== '/login' && to.path !== '/' && to.path !== '/password') {
+  } else if (!isLogin && to.path !== '/login' && to.path !== '/' && to.path !== '/password' && to.path !== '/double12') {
     // 如果没有登录，跳转到登录页面
     next('/login')
   } else {
