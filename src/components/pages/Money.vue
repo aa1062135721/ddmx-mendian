@@ -844,6 +844,7 @@ import { postServiceCardReturnDetail, postServiceCategory, postMemberLevelInfo, 
   postLimitedPrice,
   postActivationExpireMoney,
   postEditNickName,
+  postCreateOrderFuwuCardFixBug,
 } from '../../api/getData'
 import { mapState } from 'vuex' //  这儿需要用到vuex里的数据
 
@@ -1173,6 +1174,8 @@ export default {
         // 禁止一次结账，出现两次一样的订单，单击两次，结账两次
         canSave: true,
       }
+      ,
+      fuwuCardFixBugSn: '',
     }
   },
   components: {
@@ -2902,6 +2905,19 @@ export default {
           })
           return
         }
+        let requestData = {
+          member_id: this.jiezhangDialog.memberVip.id, // 会员id
+          waiter: this.jiezhangDialog.serviceCardNowWaiter.id, // 服务员id
+          card_id: this.chooeseGoods.cardList[0].id, // 服务卡id
+          price: this.chooeseGoods.cardList[0].is_edit ? this.chooeseGoods.cardList[0].edit_price : this.chooeseGoods.cardList[0].price,
+        }
+        postCreateOrderFuwuCardFixBug(requestData).then(res => {
+          if(res.code === '200') {
+            this.fuwuCardFixBugSn = res.data
+          } else {
+            this.jiezhangDialog.canSave = false //不能进行结账操作了
+          }
+        })
       }
       // 这人需要确定用户的支付方式
       this.confirmPayWay()
@@ -3032,14 +3048,15 @@ export default {
         })
       }
       //服务卡是另一个结算接口
-      if (this.chooeseGoods.cardList.length) {
+      if (this.chooeseGoods.cardList.length && this.fuwuCardFixBugSn) {
         let requestData = {
-          member_id: this.jiezhangDialog.memberVip.id, // 会员id
-          waiter: this.jiezhangDialog.serviceCardNowWaiter.id, // 服务员id
+          // member_id: this.jiezhangDialog.memberVip.id, // 会员id
+          // waiter: this.jiezhangDialog.serviceCardNowWaiter.id, // 服务员id
           pay: this.jiezhangDialog.chooesePayWay, // 支付方式
-          card_id: this.chooeseGoods.cardList[0].id, // 服务卡id
-          price: this.chooeseGoods.cardList[0].is_edit ? this.chooeseGoods.cardList[0].edit_price : this.chooeseGoods.cardList[0].price,
+          // card_id: this.chooeseGoods.cardList[0].id, // 服务卡id
+          // price: this.chooeseGoods.cardList[0].is_edit ? this.chooeseGoods.cardList[0].edit_price : this.chooeseGoods.cardList[0].price,
           remarks: this.jiezhangDialog.remarks,
+          order_sn: this.fuwuCardFixBugSn,
         }
         await postNowPayServiceCards(requestData).then(async res => {
           if (res.code === '200') {
@@ -3080,7 +3097,7 @@ export default {
           this.jiezhangDialog.closedPayWay = [8]
         }
         if (this.chooeseGoods.cardList.length) {
-          this.jiezhangDialog.closedPayWay = [1,2,4,5,6,7,8,9,10,11,15,99]
+          this.jiezhangDialog.closedPayWay = [1,2,4,5,6,7,8,9,10,11,13,15,99]
         }
         // 余额不足，不能使用会员卡支付
         if (parseFloat(this.jiezhangDialog.memberVip.money) < parseFloat(this.jiezhangDialog.modifyMoney)){

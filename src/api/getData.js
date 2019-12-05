@@ -673,3 +673,12 @@ export const postCheckOrderAddGoodList2 = (data = null) => {
 export const postEditNickName = (data = null) => {
   return Vue.prototype.$post('/Index/edit', data)
 }
+
+/**
+ * 修复服务卡下单会出现多次扣款bug，需要在以前提交订单前
+ * @param data
+ * @returns {Promise}
+ */
+export const postCreateOrderFuwuCardFixBug = (data = null) => {
+  return Vue.prototype.$post('/ticket/buySubmit', data)
+}
