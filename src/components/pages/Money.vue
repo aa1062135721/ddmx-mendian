@@ -39,6 +39,7 @@
               <el-button @click="chongzhiDialog.isShow = true" class="caozuo-button">充值</el-button>
               <el-button @click="huiyuanDialog.isShow = true" class="caozuo-button">会员</el-button>
               <el-button @click="goukaDialogShow" class="caozuo-button">购卡</el-button>
+              <el-button @click="fuwukaHexiaoDialog.isShow = true" class="caozuo-button">核销</el-button>
             </div>
           </div>
           <div style="max-width: 636px;width:33.13%;overflow: hidden;">
@@ -829,6 +830,142 @@
           </el-table>
         </div>
       </el-dialog>
+      <!-- 服务卡核销 -->
+      <el-dialog class="huiyuanchaxun-tanchuan" title="服务卡核销" :visible.sync="fuwukaHexiaoDialog.isShow" width="960px" :center="true">
+        <div class="content">
+          <div class="clear-both header">
+            <div class="float-left left">
+              <div class="search-btns">
+                <el-button type="primary" plain @click="fuwukaHexiaoDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
+                <el-input style="width:392px;" @keyup.native="fuwukaHexiaoDialogSearchMemberVip" v-model="fuwukaHexiaoDialog.mobile" placeholder="请输入您需要查询的会员手机号码"  maxlength="11"></el-input>
+                <el-button  type="primary"  @click="fuwukaHexiaoDialogSearchMemberVip">搜索</el-button>
+              </div>
+              <div class="user-info el-table--border">
+                <table class="el-table el-table__body" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td colspan="3">手机号：{{ fuwukaHexiaoDialog.huiyuanInfo.mobile }}</td>
+                    <td colspan="2">
+                      姓名：<span class="font-blue">{{ fuwukaHexiaoDialog.huiyuanInfo.nickname }}</span>
+                      <el-tag
+                        v-show="huiyuanDialog.huiyuanInfo.mobile"
+                        size="mini"
+                        type="danger"
+                        @click="editNickName(huiyuanDialog.huiyuanInfo)"
+                        effect="dark">
+                        编辑
+                      </el-tag>
+                    </td>
+                    <td colspan="2">会员等级：{{ fuwukaHexiaoDialog.huiyuanInfo.level_name }}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="5">
+                      <span v-if="fuwukaHexiaoDialog.huiyuanInfo.id && limitedPriceDialog.responseData.allprice">限时余额：￥{{limitedPriceDialog.responseData.allprice}} <el-tag size="mini" type="danger" style="cursor: pointer;color: #F83D3D;background: #fff;border: 1px solid #F83D3D;" @click="getLimitedPrice(fuwukaHexiaoDialog.huiyuanInfo.id);limitedPriceDialog.isShow = true">查看</el-tag><br></span>
+                      累计充值：￥ {{ fuwukaHexiaoDialog.huiyuanInfo.amount || '0.00' }} &nbsp;
+                      余额：<span class="font-red">￥ {{ fuwukaHexiaoDialog.huiyuanInfo.money || '0.00'}}</span>&nbsp;
+                    </td>
+                    <td colspan="2">加入时间：<br>{{ fuwukaHexiaoDialog.huiyuanInfo.regtime }}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div class="float-right right">
+              <v-keyboard-without-point @getNumber="fuwukaHexiaoDialogGetCode"></v-keyboard-without-point>
+            </div>
+          </div>
+          <!-- 服务卡 -->
+          <el-table :data="fuwukaHexiaoDialog.fuwukaList" height="300" border style="width: 100%">
+            <el-table-column type="index" label="序号" width="55"></el-table-column>
+            <el-table-column prop="id" label="ID"></el-table-column>
+            <el-table-column prop="card_name" label="服务卡名称" width="100"></el-table-column>
+            <el-table-column prop="real_price" label="购买金额"></el-table-column>
+            <el-table-column prop="type_card" label="类型"></el-table-column>
+            <el-table-column prop="create_time" label="购买时间" width="100"></el-table-column>
+            <el-table-column prop="start_time" label="激活时间" width="100"></el-table-column>
+            <el-table-column prop="end_time" label="过期时间" width="100"></el-table-column>
+            <el-table-column  label="状态">
+              <template slot-scope="scope">
+                <span v-if="scope.row.status === 0">未激活</span>
+                <span v-if="scope.row.status === 1">使用中</span>
+                <span v-if="scope.row.status === 2">使用完</span>
+                <span v-if="scope.row.status === 3">已过期</span>
+                <span v-if="scope.row.status === 4">已退卡</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <!-- 状态 0未激活  1待使用 2为已使用 3为已过期 4 已退卡-->
+<!--                <el-button v-if="scope.row.status === 0" type="text" size="mini" @click="huiyuanDialogActiveServiceCard(scope.row)">激活</el-button>-->
+                <el-button v-if="scope.row.status === 1" type="text" size="mini" @click="fuwukaHexiaoDialogUseServiceCardList(scope.row)">耗卡</el-button>
+                <el-button v-if=" [1,2,3,4].indexOf(scope.row.status) !== -1" type="text" size="mini" @click="fuwukaHexiaoDialogServiceCardUseRecords(scope.row)">使用记录</el-button>
+<!--                <el-button v-if="scope.row.status === 4" type="text" size="mini" @click="huiyuanDialogServiceCardReturnCardsDetails(scope.row)">退卡详情</el-button>-->
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="footer" style="margin-top: 10px;text-align: right;">
+            <el-pagination
+              background
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="huiyuanDialogPageSizeChange"
+              :page-sizes="[5, 10, 20, 30]"
+              :page-size="fuwukaHexiaoDialog.limit"
+              @current-change="huiyuanDialogOnePageCurrentChange"
+              :current-page.sync="fuwukaHexiaoDialog.page"
+              :total="fuwukaHexiaoDialog.count">
+            </el-pagination>
+          </div>
+        </div>
+      </el-dialog>
+      <!-- 会员查询-耗卡  -->
+      <el-dialog title="核销耗卡" :visible.sync="fuwukaHexiaoDialog.haokaDialog.isShow" width="648px" :center="true">
+        <div>
+          <el-table :data="fuwukaHexiaoDialog.haokaDialog.tableData" border style="height: 240px;">
+            <el-table-column prop="sname" label="服务项目"></el-table-column>
+            <el-table-column prop="num" label="次数"></el-table-column>
+            <el-table-column prop="s_num" label="剩余次数"></el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <span v-if="scope.row.type === '立即使用'" style="color: blue;" @click="fuwukaHexiaoDialogUseServiceCard(scope.row)">{{scope.row.type}}</span>
+                <span v-else-if="scope.row.type === '不可用'" class="font-red">{{scope.row.type}}</span>
+                <span v-else>{{scope.row.type}}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </el-dialog>
+      <!--服务卡核销-耗卡-选择服务人员-->
+      <el-dialog title="是否确定使用" :visible.sync="fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.isShow" width="500px">
+        <el-form label-width="120px">
+          <el-form-item label="请选择服务人员">
+            <el-select v-model="fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.waiter_id" placeholder="请选择服务人员" @focus="getWaiterList()">
+              <el-option v-for="item in waiterList" :label="item.name" :key="item.id" :value="item.id">
+                <span style="float: left" class="font-blue">{{ item.name }}</span>
+                <span style="float: right;color: #ccc;" >({{ item.type }})</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="请输入核销码">
+            <el-input
+              placeholder="请输入核销码"
+              v-model="fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.code">
+            </el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.isShow = false">取 消</el-button>
+          <el-button type="primary" @click="fuwukaHexiaoDialogUseServiceCardToGo">确 定</el-button>
+        </span>
+      </el-dialog>
+      <!-- 服务卡核销-使用记录  -->
+      <el-dialog title="使用记录" :visible.sync="fuwukaHexiaoDialog.shiyongjiluDialog.isShow" width="648px" :center="true">
+        <div>
+          <el-table :data="fuwukaHexiaoDialog.shiyongjiluDialog.tableData" border height="300">
+            <el-table-column type="index" label="序号"></el-table-column>
+            <el-table-column prop="service_name" label="服务项目"></el-table-column>
+            <el-table-column prop="time" label="使用时间"></el-table-column>
+            <el-table-column prop="waiter" label="服务人员"></el-table-column>
+          </el-table>
+        </div>
+      </el-dialog>
     </div>
 </template>
 
@@ -1176,6 +1313,38 @@ export default {
       }
       ,
       fuwuCardFixBugSn: '',
+
+      // 服务卡核销
+      fuwukaHexiaoDialog: {
+        isShow: false, // 是否显示会员查询对话框
+        mobile: '', // 要查询的会员手机号码
+        // 会员信息
+        huiyuanInfo: {},
+        count:0,
+        page:1,
+        limit:5,
+        // 服务卡购买记录
+        fuwukaList: [],
+        // 使用记录弹窗
+        shiyongjiluDialog: {
+          isShow: false,
+          tableData: []
+        },
+        // 耗卡弹窗
+        haokaDialog: {
+          isShow: false,
+          tableData: [
+            // {sname: '艾灸', num: '不限制', id: 1, s_num: '不限制', status: 1, year_num: 100, start_year: 1562230469, end_year: 1593852844, r_year: 100, month_num: 0, start_month: 0, end_month: 0, r_month: 0, day_num: 0, start_day: 0, end_day: 0, r_day: 0, type: '不可用'},
+          ],
+          // 耗卡时候需要选择服务人员
+          choosesWaiterDialog:{
+            isShow: false,
+            service_id: '',
+            waiter_id: '',
+            code: '', // 核销码
+          }
+        },
+      },
     }
   },
   components: {
@@ -2641,6 +2810,129 @@ export default {
         }
       }).catch(() => {
       });
+    },
+
+    // 服务卡核销功能
+    fuwukaHexiaoDialogGetCode (code) {
+      if (this.fuwukaHexiaoDialog.mobile.length < 11) {
+        this.fuwukaHexiaoDialog.mobile += `${code}`
+      }
+    },
+    fuwukaHexiaoDialogSearchMemberVip () {
+      if (this.fuwukaHexiaoDialog.mobile.length === 11) {
+        if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.fuwukaHexiaoDialog.mobile)) {
+          this.$message.closeAll()
+          this.$message({
+            message: '请输入正确的手机号',
+            type: 'error'
+          })
+          return
+        }
+        this.fuwukaHexiaoDialog.huiyuanInfo = {}
+        this.fuwukaHexiaoDialog.fuwukaList = []
+        let requestData = {mobile: this.fuwukaHexiaoDialog.mobile}
+        postSearchVip(requestData).then(res => {
+          if (res.data.id) {
+            this.getLimitedPrice(res.data.id)
+            this.fuwukaHexiaoDialog.huiyuanInfo = res.data
+            this.fuwukaHexiaoDialogSearchServiceCardList()
+          } else {
+            this.fuwukaHexiaoDialog.huiyuanInfo = {}
+            this.fuwukaHexiaoDialog.fuwukaList = []
+            this.$message.closeAll()
+            this.$message({
+              message: '没有查询到会员信息',
+              type: 'error'
+            })
+          }
+        })
+      } else {
+        this.fuwukaHexiaoDialog.huiyuanInfo = {}
+        this.fuwukaHexiaoDialog.fuwukaList = []
+      }
+    },
+    fuwukaHexiaoDialogSearchServiceCardList () {
+      if (this.fuwukaHexiaoDialog.huiyuanInfo.id) {
+        let requestData = {
+          member_id: this.fuwukaHexiaoDialog.huiyuanInfo.id,
+          page: this.fuwukaHexiaoDialog.page,
+          limit: this.fuwukaHexiaoDialog.limit,
+          is_online: 1,
+        }
+        postMemberServiceCards(requestData).then(res => {
+          this.fuwukaHexiaoDialog.count = res.total
+          if (res.data.length) {
+            this.fuwukaHexiaoDialog.fuwukaList = res.data
+          } else {
+            this.fuwukaHexiaoDialog.fuwukaList = []
+          }
+        })
+      } else {
+        this.$message.closeAll()
+        this.$message({
+          message: '请输入要查询会员的手机号码后再查看Ta购买的服务卡',
+          type: 'error'
+        })
+      }
+    },
+    async fuwukaHexiaoDialogUseServiceCardList (card) {
+      let requestData = {
+        ticket_id: card.id
+      }
+      await postMemberServiceCardsUseList(requestData).then(res => {
+        if (res.data.length) {
+          this.fuwukaHexiaoDialog.haokaDialog.tableData = res.data
+        }
+      })
+      this.fuwukaHexiaoDialog.haokaDialog.isShow = true
+    },
+    fuwukaHexiaoDialogUseServiceCard (card) {
+      this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.service_id = card.id
+      this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.isShow = true
+    },
+    async fuwukaHexiaoDialogUseServiceCardToGo(){
+      let requestData = {
+        member_id:this.fuwukaHexiaoDialog.huiyuanInfo.id,
+        service_id:this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.service_id,
+        waiter_id:this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.waiter_id,
+        code:this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.code,
+      }
+      if (requestData.waiter_id && requestData.code){
+        await postMemberServiceCardsUseListTicket(requestData).then(res => {
+          if (res.code === '200'){
+            this.$message({
+              message: '耗卡成功',
+              type: 'success'
+            })
+            this.fuwukaHexiaoDialog.haokaDialog.isShow = false
+            this.fuwukaHexiaoDialogSearchServiceCardList()
+          }
+        })
+      } else {
+        this.$message.closeAll()
+        this.$message({
+          message: '请输入核销码或选择服务人员',
+          type: 'error'
+        })
+        return
+      }
+      this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.waiter_id = ''
+      this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.code = ''
+      this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.service_id = ''
+      this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.isShow = false
+    },
+    fuwukaHexiaoDialogServiceCardUseRecords (card) {
+      this.fuwukaHexiaoDialog.shiyongjiluDialog.tableData = []
+      let requestData = {
+        member_id:this.fuwukaHexiaoDialog.huiyuanInfo.id,
+        ticket_id: card.id
+      }
+      postMemberServiceCardsUseRecords(requestData).then(res => {
+        if (res.data.length) {
+          this.fuwukaHexiaoDialog.shiyongjiluDialog.tableData = res.data
+        }
+      })
+      this.fuwukaHexiaoDialog.shiyongjiluDialog.isShow = true
     },
 
     // 激活服务卡
