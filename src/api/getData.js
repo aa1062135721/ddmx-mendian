@@ -682,3 +682,24 @@ export const postEditNickName = (data = null) => {
 export const postCreateOrderFuwuCardFixBug = (data = null) => {
   return Vue.prototype.$post('/ticket/buySubmit', data)
 }
+
+/**
+ * 会员的限时余额过期列表
+ */
+export const postTimeMoneyExpireList = (data = null) => {
+  return Vue.prototype.$post('/order/expireList', data)
+}
+
+/**
+ * 会员的限时余额过期详情
+ */
+export const postTimeMoneyExpireDetails = (data = null) => {
+  return Vue.prototype.$post('/order/expireInfo', data)
+}
+
+/**
+ * 新增会员时判断会员是否为公司门店
+ */
+export const postGetMemberShop = (data = null) => {
+  return Vue.prototype.$post('/index/getMemberShop', data)
+}

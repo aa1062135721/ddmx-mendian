@@ -195,11 +195,12 @@
               <el-table-column prop="pay_way" label="付款方式"></el-table-column>
               <el-table-column prop="overtime" label="交易时间"></el-table-column>
               <el-table-column prop="waiter" label="服务人员"></el-table-column>
-<!--              <el-table-column label="服务人员">-->
-<!--                <template slot-scope="scope">-->
-<!--                  <el-button type="text" size="small" @click="getWaiterInfo(scope.row.waiter_id)">{{scope.row.waiter}}</el-button>-->
-<!--                </template>-->
-<!--              </el-table-column>-->
+              <el-table-column label="充值来源">
+                <template slot-scope="scope">
+                  <span v-show="scope.row.is_online === 0">门店充值</span>
+                  <span type="text" size="small" v-show="scope.row.is_online === 1">商场充值</span>
+                </template>
+              </el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
                   <el-button size="mini" type="text" @click="showOrderDetails(scope.row.id)">订单详情</el-button>
@@ -328,7 +329,99 @@
             </el-pagination>
           </div>
         </el-tab-pane>
+        <el-tab-pane label="限时余额过期" name="4">
+          <div class="search-condition">
+            <div class="select" style="width:368px;height:48px;">
+              <el-input
+                v-model="requestData4.sn"
+                placeholder="请输入需查询的订单号"
+                clearable>
+              </el-input>
+            </div>
+            <div class="select" style="width:368px;height:48px;">
+              <el-input
+                v-model="requestData4.member"
+                placeholder="请输入需查询的会员昵称"
+                clearable>
+              </el-input>
+            </div>
+            <div class="select" style="width:368px;height:48px;">
+              <el-input
+                v-model="requestData4.mobile"
+                placeholder="请输入需查询的会员手机号"
+                clearable>
+              </el-input>
+            </div>
+          </div>
+          <div class="search-btns">
+            <span class="span">筛选</span>
+            <el-button-group class="btns">
+              <el-button class="btn" @click="chooseTime(1)" :class="{'active' : requestData.timeBtnValue === 1}">今日</el-button>
+              <el-button class="btn" @click="chooseTime(2)" :class="{'active' : requestData.timeBtnValue === 2}">昨日</el-button>
+              <el-button class="btn" @click="chooseTime(3)" :class="{'active' : requestData.timeBtnValue === 3}">本周</el-button>
+            </el-button-group>
+            <el-date-picker
+              @focus="chooseTimeDIY"
+              v-model="requestData.date"
+              type="daterange"
+              range-separator="至"
+              value-format="yyyy-MM-dd"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
+            <div class="select" style="margin-left: 20px">
+              <el-button type="primary" @click="requestData.page = 1;getOrdersList()">搜索</el-button>
+            </div>
+          </div>
+          <div class="serch-table">
+            <el-table :data="responseData4.data" border style="width: 100%;" height="565">
+              <el-table-column prop="sn" label="订单号"></el-table-column>
+              <el-table-column label="会员账号">
+                <template slot-scope="scope">
+                  <el-button type="text" size="small" @click="getMemberInfo(scope.row.member_id)">{{scope.row.mobile}}</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column prop="mobile" label="手机号码"></el-table-column>
+              <el-table-column prop="price" label="过期金额"></el-table-column>
+              <el-table-column prop="pay_way" label="付款方式"></el-table-column>
+              <el-table-column prop="craete_time" label="结算时间"></el-table-column>
+              <el-table-column prop="remarks" label="备注"></el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope">
+                  <el-button size="mini" @click="timeMoneyDetails(scope.row.id)" type="text">查看详情</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <div class="footer">
+            <el-pagination
+              background
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="pageSizeChange"
+              :page-sizes="[10, 20, 30, 40]"
+              :page-size="requestData.limit"
+              @current-change="responseDataOnePageCurrentChange"
+              :current-page.sync="requestData.page"
+              :total="responseData4.count">
+            </el-pagination>
+          </div>
+        </el-tab-pane>
       </el-tabs>
+      <!-- 限时余额过期--详情-->
+      <el-dialog class="order-details-dialog" title="充值订单详情" :visible.sync="responseDataDetailsDialog4.isShow" width="500px" :center="true">
+        <div style="max-height: 400px;overflow-y: auto;">
+          <div v-for="item in responseDataDetailsDialog4.responseData.list">
+            <div class="title">限时余额流水记录</div>
+            <div class="content clear-both">
+              <div class="float-left">记录标题：{{item.title}}</div>
+              <div class="float-right">记录金额：{{item.money}}</div>
+            </div>
+            <div class="content clear-both">
+              <div class="float-left">记录时间：{{item.create_time}}</div>
+            </div>
+          </div>
+        </div>
+      </el-dialog>
 
       <!-- 会员详情-->
       <el-dialog class="order-manage-page-member-info" title="会员详情" :visible.sync="memberInfoDialog.isShow" width="280px" :center="true">
@@ -628,7 +721,7 @@
 </template>
 
 <script>
-import { postOrderList, postWaiter, postOrderWaiter, postMemberInfo, postOrderDetails, postOrderDetailsGoods, postReturnServiceCardOrder, postReturnServiceCardOrderConfirm, postServiceCardOrderList, postOrderDetailsReturnGoods, postOrderReturnGoodsList, postOrderReturnConfirm, postServiceCardReturnDetail, } from '../../api/getData'
+import { postOrderList, postWaiter, postOrderWaiter, postMemberInfo, postOrderDetails, postOrderDetailsGoods, postReturnServiceCardOrder, postReturnServiceCardOrderConfirm, postServiceCardOrderList, postOrderDetailsReturnGoods, postOrderReturnGoodsList, postOrderReturnConfirm, postServiceCardReturnDetail, postTimeMoneyExpireList, postTimeMoneyExpireDetails, } from '../../api/getData'
 import { changeTime, getWeekStartDateAndEndDateRange } from '../../utils'
 
 export default {
@@ -1001,6 +1094,32 @@ export default {
           type_text: "次卡"
         }
       },
+
+      /**
+       * 限时余额过期
+       */
+      requestData4:{
+        sn: '', // 单号
+        member:  '', // 会员昵称
+        mobile:  '', // 会员手机号
+      },
+      responseData4:{
+        count:0,
+        data: []
+      },
+      responseDataDetailsDialog4:{
+        isShow:false,
+        responseData:{
+          expireInfo:{
+            expire_time: '',
+            money: 0,
+            status: '',
+          },
+          list:[],
+        },
+      },
+
+
     }
   },
   methods: {
@@ -1077,6 +1196,9 @@ export default {
         case '3':
           this.getOrderList()
           break;
+        case '4':
+          this.getTimeMoneyList()
+          break;
       }
     },
     // 1=今日，2=昨日，3=本周
@@ -1126,6 +1248,10 @@ export default {
       this.requestData.search = ''
       this.requestData.waiter_id = ''
       this.requestData.pay_way = ''
+
+      this.requestData4.sn = ''
+      this.requestData4.mobile = ''
+      this.requestData4.member = ''
       this.getOrdersList()
     },
 
@@ -1386,6 +1512,35 @@ export default {
         if (res.code === '200') {
           this.returnDetailDialog2.responseData = res.data
           this.returnDetailDialog2.isShow = true
+        }
+      })
+    },
+
+    /**
+     * 限时余额过期
+     */
+    // 列表
+    async getTimeMoneyList () {
+      let requestData = {
+        start_time:this.requestData.date.length ? this.requestData.date[0] : this.requestData.startTime,
+        end_time:this.requestData.date.length ? this.requestData.date[1] : this.requestData.endTime,
+        page:this.requestData.page,
+        limit:this.requestData.limit,
+        sn: this.requestData4.sn,
+        member: this.requestData4.member,
+        mobile: this.requestData4.mobile,
+      }
+      postTimeMoneyExpireList(requestData).then(res => {
+        this.responseData4.count = res.count
+        this.responseData4.data = res.data.length ? res.data : []
+      })
+    },
+    // 详情
+    async timeMoneyDetails(id){
+      postTimeMoneyExpireDetails({id}).then(res => {
+        if (res.code == '200'){
+          this.responseDataDetailsDialog4.responseData = res.data
+          this.responseDataDetailsDialog4.isShow = true
         }
       })
     },

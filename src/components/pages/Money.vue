@@ -671,13 +671,13 @@
         <div class="clear-both" style="height: 290px;">
           <div class="float-left left" style="width: 50%;">
               <div style="margin-bottom: 48px;">
-                <el-input @keyup.enter.native="huiyuanDialogAddMemberVip" v-model="huiyuanDialog.addHuiyuanDialog.mobile" placeholder="请输入会员手机号码" maxlength="11"></el-input>
+                <el-input @keyup.enter.native="huiyuanDialogAddMemberShop" v-model="huiyuanDialog.addHuiyuanDialog.mobile" placeholder="请输入会员手机号码" maxlength="11"></el-input>
               </div>
               <div style="margin-bottom: 48px;color:red;">
                 如果该手机号在微信商城里是会员，新增会员操作会将微信商场会员转入到本门店下。
               </div>
               <div>
-                <el-input @keyup.enter.native="huiyuanDialogAddMemberVip" v-model="huiyuanDialog.addHuiyuanDialog.nickname"  placeholder="请输入会员昵称"></el-input>
+                <el-input @keyup.enter.native="huiyuanDialogAddMemberShop" v-model="huiyuanDialog.addHuiyuanDialog.nickname"  placeholder="请输入会员昵称"></el-input>
               </div>
           </div>
           <div class="float-right right" style="width: 45%;">
@@ -982,6 +982,7 @@ import { postServiceCardReturnDetail, postServiceCategory, postMemberLevelInfo, 
   postActivationExpireMoney,
   postEditNickName,
   postCreateOrderFuwuCardFixBug,
+  postGetMemberShop,
 } from '../../api/getData'
 import { mapState } from 'vuex' //  这儿需要用到vuex里的数据
 
@@ -1310,8 +1311,8 @@ export default {
         },
         // 禁止一次结账，出现两次一样的订单，单击两次，结账两次
         canSave: true,
-      }
-      ,
+      },
+      // 购买服务卡的时候，结算前先把数据拿去请求得到订单号，最后提交的时候再把这个订单号提交上去
       fuwuCardFixBugSn: '',
 
       // 服务卡核销
@@ -2645,10 +2646,29 @@ export default {
     },
     huiyuanDialogAddMemberGetCode (code) {
       if (code === 'ok') {
-        this.huiyuanDialogAddMemberVip()
+        this.huiyuanDialogAddMemberShop()
       } else {
         this.huiyuanDialog.addHuiyuanDialog.mobile += `${code}`
       }
+    },
+    async huiyuanDialogAddMemberShop(){
+      await postGetMemberShop({mobile: this.huiyuanDialog.addHuiyuanDialog.mobile}).then(async res => {
+        if(res.code == '200'){
+          if(res.data.type === 1){
+            await this.$confirm(`【${res.data.data.nickname}】在公司总部，此操作会将他从公司总部添加到本门店`, '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(async () => {
+              this.huiyuanDialogAddMemberVip()
+            }).catch(() => {
+              this.huiyuanDialog.addHuiyuanDialog.mobile = ''
+            })
+          } else {
+            this.huiyuanDialogAddMemberVip()
+          }
+        }
+      })
     },
     async huiyuanDialogAddMemberVip () {
       let requestData = {
