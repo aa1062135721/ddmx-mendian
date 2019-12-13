@@ -272,7 +272,7 @@
           <div class="float-left left">
             <div class="one">
               <el-button style="width: 30%;" type="primary" plain @click="chongzhiDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
-              <el-input style="width: 65%;" v-model="chongzhiDialog.mobile" @input.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')"  placeholder="请输入会员手机号" clearable maxlength="11"></el-input>
+              <el-input style="width: 65%;" v-model="chongzhiDialog.mobile" @keydown.enter.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')"  placeholder="请输入会员昵称或者手机号" clearable maxlength="11"></el-input>
             </div>
             <div class="two">
               <ul>
@@ -505,7 +505,7 @@
             <div class="float-left left">
               <div class="search">
                 <el-button style="width: 30%;" type="primary" plain @click="xuanzehuiyuanDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
-                <el-input style="width: 65%;" @keyup.native="searchMember()" @keyup.enter.native="searchMember()" v-model="xuanzehuiyuanDialog.mobile" placeholder="请输入会员手机号" maxlength="11"></el-input>
+                <el-input style="width: 65%;" @keyup.enter.native="searchMember()" v-model="xuanzehuiyuanDialog.mobile" placeholder="请输入会员昵称或手机号" maxlength="11"></el-input>
               </div>
               <div class="content">
                 <ul>
@@ -553,7 +553,7 @@
             <div class="float-left left">
               <div class="search-btns">
                 <el-button type="primary" plain @click="huiyuanDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
-                <el-input style="width:392px;" @keyup.native="huiyuanDialogSearchMemberVip" v-model="huiyuanDialog.mobile" placeholder="请输入您需要查询的会员手机号码"  maxlength="11"></el-input>
+                <el-input style="width:392px;" @keyup.enter.native="huiyuanDialogSearchMemberVip" v-model="huiyuanDialog.mobile" placeholder="请输入您需要查询的会员昵称或手机号码"  maxlength="11"></el-input>
                 <el-button  type="primary"  @click="huiyuanDialogSearchMemberVip">搜索</el-button>
               </div>
               <div class="user-info el-table--border">
@@ -837,7 +837,7 @@
             <div class="float-left left">
               <div class="search-btns">
                 <el-button type="primary" plain @click="fuwukaHexiaoDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
-                <el-input style="width:392px;" @keyup.native="fuwukaHexiaoDialogSearchMemberVip" v-model="fuwukaHexiaoDialog.mobile" placeholder="请输入您需要查询的会员手机号码"  maxlength="11"></el-input>
+                <el-input style="width:392px;" @keyup.enter.native="fuwukaHexiaoDialogSearchMemberVip" v-model="fuwukaHexiaoDialog.mobile" placeholder="请输入您需要查询的会员昵称或手机号码"  maxlength="11"></el-input>
                 <el-button  type="primary"  @click="fuwukaHexiaoDialogSearchMemberVip">搜索</el-button>
               </div>
               <div class="user-info el-table--border">
@@ -963,6 +963,26 @@
             <el-table-column prop="service_name" label="服务项目"></el-table-column>
             <el-table-column prop="time" label="使用时间"></el-table-column>
             <el-table-column prop="waiter" label="服务人员"></el-table-column>
+          </el-table>
+        </div>
+      </el-dialog>
+      <!--  会员搜索 弹出会员搜索结果框 供操作员选择    -->
+      <el-dialog title="请选择会员" :visible.sync="findMemberDialog.isShow" width="500px">
+        <div>
+          <el-table :data="findMemberDialog.memberList" border height="300">
+            <el-table-column type="index" label="序号" width="80"></el-table-column>
+            <el-table-column prop="nickname" label="姓名"></el-table-column>
+            <el-table-column prop="mobile" label="手机号码"></el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button
+                  @click.native.prevent="findAndChoosesMember(scope.$index)"
+                  type="text"
+                  size="small">
+                  选择
+                </el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
       </el-dialog>
@@ -1346,6 +1366,18 @@ export default {
           }
         },
       },
+
+      /**
+       * 调用查询会员接口，参数为:手机号或会员昵称
+       * 如果查询结果 只有一个会员，则直接展示出来查询会员结果过
+       * 如果查询结果 没有会员，则提示没有找到该会员
+       * 如果查询结果 有多个会员，则弹出一个选择框，操作人员选择查询结果中的一个会员即可
+       **/
+      findMemberDialog:{
+        isShow: false,
+        who: 0, // 哪个弹框调用的，1会员充值 2会员查询 3服务卡核销 4选择会员
+        memberList: [],
+      }
     }
   },
   components: {
@@ -2254,70 +2286,14 @@ export default {
 
     // 选择会员
     searchMember(){
-      if (this.xuanzehuiyuanDialog.mobile.length === 11) {
-        if (/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.xuanzehuiyuanDialog.mobile)) {
-          let requestData = {mobile: this.xuanzehuiyuanDialog.mobile}
-          postSearchVip(requestData).then(res => {
-            if (res.data.id) {
-              this.getLimitedPrice(res.data.id)
-              this.xuanzehuiyuanDialog.memberVip = res.data
-            } else {
-              this.$message.closeAll()
-              this.$message({
-                message: '没有查询到该会员的信息',
-                type: 'error'
-              })
-              this.xuanzehuiyuanDialog.memberVip = {}
-            }
-          }).catch(err => {
-            console.log(err)
-          })
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '请输入正确的手机号',
-            type: 'error'
-          })
-          this.xuanzehuiyuanDialog.memberVip = {}
-        }
-      }
+      let requestData = {mobile: this.xuanzehuiyuanDialog.mobile}
+      this.findMember(4, requestData)
     },
     clickChoosesMemberByKeyboard (code) {
       if (code === 'ok') {
-        if (this.xuanzehuiyuanDialog.mobile.length === 11) {
-          if (/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.xuanzehuiyuanDialog.mobile)) {
-            let requestData = {mobile: this.xuanzehuiyuanDialog.mobile}
-            postSearchVip(requestData).then(res => {
-              if (res.data.id) {
-                this.getLimitedPrice(res.data.id)
-                this.jiezhangDialog.memberVip = res.data
-                this.xuanzehuiyuanDialog.isShow = false
-                this.choosesGoodsShowMemberPrice()
-              } else {
-                this.$message.closeAll()
-                this.$message({
-                  message: '没有查询到该会员的信息',
-                  type: 'error'
-                })
-                this.xuanzehuiyuanDialog.memberVip = {}
-                this.jiezhangDialog.memberVip = {}
-              }
-            }).catch(err => {
-              console.log(err)
-            })
-          } else {
-            this.$message.closeAll()
-            this.$message({
-              message: '请输入正确的手机号',
-              type: 'error'
-            })
-            this.xuanzehuiyuanDialog.memberVip = {}
-            this.jiezhangDialog.memberVip = {}
-          }
-        } else {
-          this.xuanzehuiyuanDialog.memberVip = {}
-          this.jiezhangDialog.memberVip = {}
-        }
+        this.jiezhangDialog.memberVip = this.xuanzehuiyuanDialog.memberVip
+        this.xuanzehuiyuanDialog.isShow = false
+        this.choosesGoodsShowMemberPrice()
       } else {
         if (this.xuanzehuiyuanDialog.mobile.length < 11) { this.xuanzehuiyuanDialog.mobile += code }
       }
@@ -2326,7 +2302,7 @@ export default {
     xuanzehuiyuanDialogSeeServiceCard(){
       this.xuanzehuiyuanDialog.isShow = false
       this.huiyuanDialog.isShow = true
-      this.huiyuanDialog.mobile = this.xuanzehuiyuanDialog.mobile
+      this.huiyuanDialog.mobile = this.xuanzehuiyuanDialog.memberVip.mobile
       this.huiyuanDialogSearchMemberVip()
     },
     // 选择会员后时，如果购物车里有服务商品，或服务卡，就要显示他的会员价 刷新接口
@@ -2454,33 +2430,10 @@ export default {
         this.chongzhiDialog.payMoney += `${code}`
       }
     },
+    //充值弹框 输入手机号或者昵称查询会员
     chongzhiDialogSearchMemberVip () {
-      if (this.chongzhiDialog.mobile.length !== 11) {
-        return
-      }
-      if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
-        this.$message.closeAll()
-        this.$message({
-          message: '请输入正确的手机号',
-          type: 'error'
-        })
-        return
-      }
       let requestData = {mobile: this.chongzhiDialog.mobile}
-      postSearchVip(requestData).then(res => {
-        if (res.data.id) {
-          this.chongzhiDialog.huiyuanInfo = res.data
-        } else {
-          this.$message.closeAll()
-          this.$message({
-            message: '没有查询到该会员的信息',
-            type: 'error'
-          })
-          this.chongzhiDialog.huiyuanInfo = {}
-        }
-      }).catch(err => {
-        console.log(err)
-      })
+      this.findMember(1, requestData)
     },
     //选择支付方式
     chongzhiDialogPayTypeChange(way){
@@ -2609,40 +2562,8 @@ export default {
       }
     },
     huiyuanDialogSearchMemberVip () {
-      if (this.huiyuanDialog.mobile.length === 11) {
-        if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.huiyuanDialog.mobile)) {
-          this.$message.closeAll()
-          this.$message({
-            message: '请输入正确的手机号',
-            type: 'error'
-          })
-          return
-        }
-        this.huiyuanDialog.huiyuanInfo = {}
-        this.huiyuanDialog.fuwukaList = []
-        this.huiyuanDialog.chongzhijiluList = []
-        let requestData = {mobile: this.huiyuanDialog.mobile}
-        postSearchVip(requestData).then(res => {
-          if (res.data.id) {
-            this.getLimitedPrice(res.data.id)
-            this.huiyuanDialog.huiyuanInfo = res.data
-            this.huiyuanDialogChoosesWho()
-          } else {
-            this.huiyuanDialog.huiyuanInfo = {}
-            this.huiyuanDialog.fuwukaList = []
-            this.huiyuanDialog.chongzhijiluList = []
-            this.$message.closeAll()
-            this.$message({
-              message: '没有查询到会员信息',
-              type: 'error'
-            })
-          }
-        })
-      } else {
-        this.huiyuanDialog.huiyuanInfo = {}
-        this.huiyuanDialog.fuwukaList = []
-        this.huiyuanDialog.chongzhijiluList = []
-      }
+      let requestData = {mobile: this.huiyuanDialog.mobile}
+      this.findMember(2, requestData)
     },
     huiyuanDialogAddMemberGetCode (code) {
       if (code === 'ok') {
@@ -2839,37 +2760,8 @@ export default {
       }
     },
     fuwukaHexiaoDialogSearchMemberVip () {
-      if (this.fuwukaHexiaoDialog.mobile.length === 11) {
-        if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.fuwukaHexiaoDialog.mobile)) {
-          this.$message.closeAll()
-          this.$message({
-            message: '请输入正确的手机号',
-            type: 'error'
-          })
-          return
-        }
-        this.fuwukaHexiaoDialog.huiyuanInfo = {}
-        this.fuwukaHexiaoDialog.fuwukaList = []
-        let requestData = {mobile: this.fuwukaHexiaoDialog.mobile}
-        postSearchVip(requestData).then(res => {
-          if (res.data.id) {
-            this.getLimitedPrice(res.data.id)
-            this.fuwukaHexiaoDialog.huiyuanInfo = res.data
-            this.fuwukaHexiaoDialogSearchServiceCardList()
-          } else {
-            this.fuwukaHexiaoDialog.huiyuanInfo = {}
-            this.fuwukaHexiaoDialog.fuwukaList = []
-            this.$message.closeAll()
-            this.$message({
-              message: '没有查询到会员信息',
-              type: 'error'
-            })
-          }
-        })
-      } else {
-        this.fuwukaHexiaoDialog.huiyuanInfo = {}
-        this.fuwukaHexiaoDialog.fuwukaList = []
-      }
+      let requestData = {mobile: this.fuwukaHexiaoDialog.mobile}
+      this.findMember(3, requestData)
     },
     fuwukaHexiaoDialogSearchServiceCardList () {
       if (this.fuwukaHexiaoDialog.huiyuanInfo.id) {
@@ -3492,7 +3384,67 @@ export default {
       this.jiezhangDialog.chooesePayWay = ''
       this.goukaDialog.cardsList = []
       this.$forceUpdate()
-    }
+    },
+
+    /**
+     * 会员充值（弹框）
+     * 会员查询（弹框）
+     * 服务卡核销（弹框）
+     * 选择会员 （弹框）
+     *
+     * 调用查询会员接口，参数为:手机号或会员昵称
+     * 如果查询结果 只有一个会员，则直接展示出来查询会员结果过
+     * 如果查询结果 没有会员，则提示没有找到该会员
+     * 如果查询结果 有多个会员，则弹出一个选择框，操作人员选择查询结果中的一个会员即可
+     */
+    async findMember(who, requestData){
+      this.findMemberDialog.who = who
+      await postSearchVip(requestData).then(res => {
+        if (res.code === '200' && res.data.length) {
+            this.findMemberDialog.memberList = res.data
+            if (res.data.length === 1){
+              this.findAndChoosesMember()
+            } else {
+              this.findMemberDialog.isShow = true
+            }
+        } else {
+          this.$message({
+            message: '没有查询到会员信息',
+            type: 'error'
+          })
+        }
+      }).catch(() => {
+        this.$message({
+          message: '服务器繁忙',
+          type: 'error'
+        })
+      })
+    },
+    findAndChoosesMember(index = 0){ // 查询出来的会员列表，选择一个
+        switch (this.findMemberDialog.who) {
+          case 0:
+            break
+          case 1: // 会员充值弹框
+            this.chongzhiDialog.huiyuanInfo = this.findMemberDialog.memberList[index]
+            break
+          case 2: // 会员查询弹框
+            this.getLimitedPrice(this.findMemberDialog.memberList[index].id)
+            this.huiyuanDialog.huiyuanInfo = this.findMemberDialog.memberList[index]
+            this.huiyuanDialogChoosesWho()
+            break
+          case 3: //服务卡核销
+            this.getLimitedPrice(this.findMemberDialog.memberList[index].id)
+            this.fuwukaHexiaoDialog.huiyuanInfo = this.findMemberDialog.memberList[index]
+            this.fuwukaHexiaoDialogSearchServiceCardList()
+            break
+          case 4: // 选择会员
+            this.getLimitedPrice(this.findMemberDialog.memberList[index].id)
+            this.xuanzehuiyuanDialog.memberVip = this.findMemberDialog.memberList[index]
+            break
+        }
+        this.findMemberDialog.isShow = false
+    },
+
   },
   computed: {
     ...mapState(['userInfo']),
@@ -3507,9 +3459,31 @@ export default {
       },
       deep:true
     },
+    "xuanzehuiyuanDialog.mobile":{
+      handler:function(newVal,oldVal){
+        if (newVal === '') {
+          this.xuanzehuiyuanDialog.memberVip = {}
+        }
+      },
+      deep:true
+    },
     "chongzhiDialog.isShow":{
       handler:function(newVal,oldVal){
         if (newVal === false) {
+          this.chongzhiDialog.mobile = ''
+          this.chongzhiDialog.huiyuanInfo = {}
+          this.chongzhiDialog.chooeseWho = 'mobile'
+          this.chongzhiDialog.payType = ''
+          this.chongzhiDialog.payMoney = ''
+          this.chongzhiDialog.nowWaiter = ''
+          this.chongzhiDialog.auth_code = ''
+        }
+      },
+      deep:true
+    },
+    "chongzhiDialog.mobile":{
+      handler:function(newVal,oldVal){
+        if (newVal === '') {
           this.chongzhiDialog.mobile = ''
           this.chongzhiDialog.huiyuanInfo = {}
           this.chongzhiDialog.chooeseWho = 'mobile'
@@ -3535,6 +3509,16 @@ export default {
       },
       deep:true
     },
+    "huiyuanDialog.mobile":{
+      handler:function(newVal,oldVal){
+        if (newVal === '') {
+          this.huiyuanDialog.huiyuanInfo = {}
+          this.huiyuanDialog.fuwukaList = []
+          this.huiyuanDialog.chongzhijiluList = []
+        }
+      },
+      deep:true
+    },
     "huiyuanDialog.addHuiyuanDialog.isShow":{
       handler:function(newVal,oldVal){
         if (newVal === false) {
@@ -3544,714 +3528,55 @@ export default {
       },
       deep:true
     },
+    "findMemberDialog.isShow":{
+      handler:function(newVal,oldVal){
+        if (newVal === false) {
+          this.findMemberDialog.memberList = []
+          this.findMemberDialog.who = 0
+        }
+      },
+      deep:true
+    },
+    "fuwukaHexiaoDialog.isShow":{
+      handler:function(newVal, oldVal){
+        if (newVal === false) {
+          this.fuwukaHexiaoDialog.mobile = ''
+          this.fuwukaHexiaoDialog.page = 1
+          this.fuwukaHexiaoDialog.count = 0
+          this.fuwukaHexiaoDialog.huiyuanInfo = {}
+          this.fuwukaHexiaoDialog.fuwukaList = []
+          this.fuwukaHexiaoDialog.shiyongjiluDialog.tableData = []
+          this.fuwukaHexiaoDialog.haokaDialog.tableData = []
+          this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.code = ''
+          this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.waiter_id = ''
+          this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.service_id = ''
+        }
+      },
+      deep:true
+    },
+    "fuwukaHexiaoDialog.mobile":{
+      handler:function(newVal, oldVal){
+        if (newVal === '') {
+          this.fuwukaHexiaoDialog.mobile = ''
+          this.fuwukaHexiaoDialog.page = 1
+          this.fuwukaHexiaoDialog.count = 0
+          this.fuwukaHexiaoDialog.huiyuanInfo = {}
+          this.fuwukaHexiaoDialog.fuwukaList = []
+          this.fuwukaHexiaoDialog.shiyongjiluDialog.tableData = []
+          this.fuwukaHexiaoDialog.haokaDialog.tableData = []
+          this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.code = ''
+          this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.waiter_id = ''
+          this.fuwukaHexiaoDialog.haokaDialog.choosesWaiterDialog.service_id = ''
+        }
+      },
+      deep:true
+    },
   }
 }
 </script>
 
 <style lang="less" scoped>
-  .bg{
-    height: 100%;
-    width: 100%;
-  }
-  .get-money-content{
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap;
-    justify-content: space-around;
-    overflow:hidden;
-    padding: 20px 20px 0 20px;
-  }
-  .all-goods{
-    height: calc(100vh - 110px);
-    width: 100%;
-    display: flex;
-    flex-direction:column;
-    .goods-type{
-      height: 54px;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      flex-wrap: nowrap;
-      justify-content: flex-start;
-      .my-div{
-        width: 150px;
-        height:54px;
-        position: relative;
-        margin-right: 20px;
-        .fenlei-button{
-          left: 0;
-          top: 0;
-          position: absolute;
-          font-size:20px;
-          height:54px;
-          width: 140px;
-          border: 0;
-          background:#6BD2F4;
-          border-radius:10px;
-          border-bottom-right-radius:0;
-          color:rgba(26,26,26,1);
-          border: 1px solid transparent;  //自定义边框
-          outline: none;    //消除默认点击蓝色边框效果
-        }
-        .fenlei-button-active{
-          background:rgba(245,86,86,1);
-          color:rgba(255,255,255,1);
-        }
-        .after{
-          position: absolute;
-          right: 0;
-          bottom: 0;
-          content: '';
-          width: 0;
-          height: 0;
-          border-top: 8px solid transparent;
-          border-bottom: 0 solid transparent;
-          border-left: 10px solid #6BD2F4;
-        }
-        .after-active{
-          border-left: 10px solid rgba(245,86,86,1);
-        }
-      }
-      .page-fenlei-button{
-        width:58px;
-        height:54px;
-        background:rgba(107,210,244,1);
-        border-radius:4px;
-        border: 0;color:rgba(125,125,125,1);
-      }
-    }
-    .flex-goods{
-      flex: 1;
-      overflow: hidden;
-      display: flex;
-      align-items: flex-start;
-      flex-wrap:wrap;
-      align-items:flex-start;
-      justify-content: space-between;
-      align-content:flex-start;
-      &:after {
-        content: "";
-        width:326px;
-      }
-      .goods{
-        margin: 0 0 16px 0;
-        &:nth-child(3n) {
-          margin-right: 0;
-        }
-        &:nth-child(13) {
-          margin-bottom: 0;
-        }
-        &:nth-child(14) {
-          margin-bottom: 0;
-        }
-        &:nth-child(15) {
-          margin-bottom: 0;
-        }
-      }
-    }
-    .page-buttons{
-      margin-top: 17px;
-      text-align: center;
-      width: 100%;
-      height: 42px;
-    }
-  }
-  .caozuo-buttons{
-    overflow: hidden;
-    /*height: calc(100vh - 110px);*/
-    height: 700px;
-    /*border: 1px solid red;*/
-    width: 100%;
-    display: flex;
-    align-items: center;
-    flex-wrap:nowrap;
-    justify-content:space-between;
-    flex-direction:column;
-    padding-bottom: 10px;
-    .caozuo-button{
-      height: 60px!important;
-      width: 100%;
-      background:rgba(245,245,245,1)!important;
-      border: 0!important;
-      border-radius:10px!important;
-      font-size:24px!important;
-      font-family:SourceHanSansCN-Regular;
-      font-weight:400!important;
-      color:rgba(26,26,26,1)!important;
-      margin-left: 0;
-      &:last-child{
-        margin-bottom: 0;
-      }
-    }
-    .caozuo-button:active{
-      color: #fff!important;
-      background:rgba(245,86,86,1)!important;
-    }
-
-  }
-  .jiesuan-goods{
-    overflow: hidden;
-    height: calc(100vh - 110px);
-    width: 100%;
-    display: flex;
-    flex-direction:column;
-    .search{
-      display: flex;
-      background: none;
-      border-radius:10px;
-      margin-bottom: 28px;
-      .goods-search{
-        font-size:16px;
-        font-family:SourceHanSansCN-Regular;
-        font-weight:400;
-        color:rgba(26,26,26,1);
-        border-radius:10px;
-        input{
-          text-align: center!important;
-        }
-      }
-    }
-    .pay-goods-box{
-      width: 100%;
-      height:482px;
-      overflow: auto;
-      overflow: hidden;
-      margin-bottom: 28px;
-      background:rgba(255,255,255,1);
-      border-radius:10px;
-      overflow-y: auto!important;
-      ul{
-        width: calc(100% - 22px);
-        list-style-type: none;
-        overflow: hidden;
-        padding: 11px 0 11px 20px;
-        height: auto;
-        width: auto;
-        border-bottom:1px solid #ccc;
-        li{
-          width: calc(100% - 22px);
-          height: 20px;
-          margin-bottom: 14px;
-        }
-        .title{
-          font-size:16px;
-          font-family:SourceHanSansCN-Regular;
-          font-weight:400;
-          color:rgba(26,26,26,1);
-          line-height:20px;
-          .red{
-            color:rgba(248,61,61,1);
-            font-size: 18px;
-          }
-          .danjia{
-            margin-right: 10px;
-          }
-          .yuanjia{
-            color: #808080;
-            margin-right: 10px;
-            text-decoration:line-through;
-          }
-          .huiyuanjia{
-            margin-right: 10px;
-            color: #2ECAF1;
-          }
-        }
-        .code{
-          font-size:14px;
-          color:rgba(128,128,128,1);
-        }
-        li:last-child{
-          margin-bottom: 0;
-        }
-      }
-      .active{
-        background:rgba(190,231,246,1);
-      }
-    }
-    .queren-xinxi{
-      width: calc(100% - 30px);
-      height:260px;
-      background:rgba(255,255,255,1);
-      border:1px solid rgba(229,229,229,1);
-      border-radius:10px;
-      padding: 15px;
-      overflow: hidden;
-      ul{
-        list-style-type: none;
-        width: 100%;
-        li{
-          clear: both;
-          min-height: 20px;
-          font-size:16px;
-          width: 100%;
-          font-family:SourceHanSansCN-Regular;
-          font-weight:400;
-          color:rgba(128,128,128,1);
-          line-height:20px;
-          margin-bottom: 16px;
-          &:last-child {
-            margin-bottom: 15px;
-            font-size:22px;
-            font-weight:400;
-            color:rgba(248,61,61,1);
-            line-height:22px;
-          }
-        }
-      }
-      .buttons{
-        display: flex;
-        justify-content: space-around;
-        text-align: center;
-        .my-btn{
-          width:45%;
-          height:44px;
-          line-height: 44px;
-          font-size: 24px;
-          border-radius:4px;
-          font-weight: 400;
-          overflow: hidden;
-        }
-        .my-btn-active{
-          width:45%;
-          height:44px;
-          line-height: 44px;
-          border-radius:4px;
-          font-size: 24px;
-          font-weight: 400;
-          overflow: hidden;
-        }
-      }
-    }
-  }
-
-  /*改价,改数量，弹出窗口样式*/
-  .gaijia-tanchuan{
-    .gaijia-input{
-      margin-bottom: 10px;
-    }
-    /deep/ .el-button{
-      padding: 0;
-    }
-    .gaijia-queding-btn{
-      width:80px;
-      height:290px;
-      background:rgba(9,183,240,1);
-      border-radius:10px;
-      border: 0;
-      font-size:24px;
-      font-family:SourceHanSansCN-Regular;
-      font-weight:400;
-      color:rgba(239,239,239,1);
-    }
-  }
-  /*充值弹窗样式*/
-  .chongzhi-tanchuan{
-    border-radius:10px;
-    .both{
-      width: 715px;
-      height: 400px;
-      .left{
-        width: 394px;
-        height: 400px;
-        display: flex;
-        flex-direction:column;
-        justify-content:space-between;
-        .one{
-          display: flex;justify-content: space-between;
-        }
-        .two{
-          width:368px;
-          height:122px;
-          border:1px solid rgba(210,210,210,1);
-          border-radius:8px;
-          padding: 27px 12px;
-          ul{
-            list-style-type: none;
-            width: 100%;
-            li{
-              clear: both;
-              min-height: 20px;
-              font-size:16px;
-              width: 100%;
-              font-family:SourceHanSansCN-Regular;
-              font-weight:400;
-              color:rgba(128,128,128,1);
-              line-height:20px;
-              margin-bottom: 16px;
-            }
-          }
-        }
-        .three{
-          .el-radio-group{
-            width: 100%;
-            display: flex;
-            flex-wrap: nowrap;
-            flex-direction:row;
-            justify-content:space-between;
-          }
-        }
-      }
-      .right{
-        height: 368px;
-        width: 292px;
-        display: flex;
-        flex-direction:column;
-        justify-content:space-between;
-        .queding-chongzhi{
-          width:292px;
-          height:62px;
-          font-size: 24px;
-          font-weight: 400;
-          border-radius:10px;
-        }
-      }
-    }
-
-  }
-  /*会员等级说明弹框样式*/
-  .huiyuandengjishuoming-tanchuan{
-    .content{
-      width: 432px;
-      display: flex;
-      flex-direction:row;
-      flex-wrap: wrap;
-      justify-content:space-between;
-      span{
-        width:200px;
-        height:40px;
-        line-height: 20px;
-        font-size:16px;
-        margin-bottom: 18px;
-        margin-left: 8px;
-        margin-right: 8px;
-        font-family:SourceHanSansCN-Regular;
-        font-weight:400;
-        color:rgba(128,128,128,1);
-        &:nth-child(2n){
-          text-align: right;
-        }
-      }
-    }
-  }
-  /*结账弹框样式*/
-  .jiezhang-tanchuan{
-    .box{
-      height: 416px;
-      .my-left{
-        width: 320px;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        ul{
-          list-style-type: none;
-          border-radius:8px;
-          li{
-            clear: both;
-            min-height: 30px;
-            font-size:16px;
-            width: 100%;
-            font-family:SourceHanSansCN-Regular;
-            font-weight:400;
-            color:rgba(128,128,128,1);
-            line-height:20px;
-            margin-bottom: 16px;
-            &:first-child{
-              color: #000;
-            }
-            /deep/ .el-form-item__label{
-              color:rgba(128,128,128,1);
-              font-size:16px;
-            }
-          }
-        }
-        .div {
-          height: 44px;
-          button{
-            width:148px;
-            height:44px;
-            background:rgba(255,255,255,1);
-            color: #2ECAF1;
-            font-size:20px;
-            border:1px solid rgba(46,202,241,1);
-            border-radius:4px;
-            outline: none;    //消除默认点击蓝色边框效果
-          }
-          .active{
-            border:none;
-            background:rgba(45,194,243,1);
-            color:rgba(255,255,255,1);
-          }
-        }
-      }
-      .my-right{
-        width: 370px;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        .div{
-          width: 100%;
-          height:56px;
-          margin-bottom: 16px;
-          display: flex;
-          justify-content: space-between;
-          .span-btn{
-            &:hover{
-              cursor:pointer;
-            }
-            position: relative;
-            width:176px;
-            height:56px;
-            background:rgba(255,255,255,1);
-            border:1px solid rgba(210,210,210,1);
-            border-radius:5px;
-            font-size:20px;
-            font-family:SourceHanSansCN-Regular;
-            font-weight:400;
-            line-height: 56px;
-            overflow: hidden;
-            color:rgba(26,26,26,1);
-            .icon-img{
-              height: 30px;
-              width: 30px;
-              position: absolute;
-              top: 13px;
-              left: 26px;
-            }
-            .icon-active{
-              height: 40px;
-              width: 40px;
-              position: absolute;
-              top: 0;
-              right: 0;
-            }
-            span{
-              line-height: 56px;
-              position: absolute;
-              top: 0px;
-              left: 68px;
-            }
-          }
-          .active{
-            background:#BEE7F6;
-            border: 1px solid red;
-          }
-          .closed{
-            background:#D2D2D2;
-            color: #606266;
-            &:hover{
-              cursor: auto;
-            }
-            .icon-img{
-              -webkit-filter: grayscale(100%);
-              -moz-filter: grayscale(100%);
-              -ms-filter: grayscale(100%);
-              -o-filter: grayscale(100%);
-              filter: grayscale(100%);
-              filter: gray;
-            }
-          }
-          &:last-child{
-            margin-bottom: 0;
-          }
-        }
-      }
-    }
-  }
-  /*选择会员弹框样式*/
-  .xuanzehuiyuan-tanchuan{
-    .div{
-      width:100%;
-      height:300px;
-      .left{
-        width: 50%;
-        .search{
-          display: flex;justify-content: space-between;
-          margin-bottom: 20px;
-        }
-        .content{
-          height:160px;
-          padding: 34px 20px;
-          background:rgba(255,255,255,1);
-          border:1px solid rgba(210,210,210,1);
-          border-radius:8px;
-          ul{
-            list-style-type: none;
-            li{
-              clear:both;
-              min-height: 20px;
-              font-size:16px;
-              width: 100%;
-              font-family:SourceHanSansCN-Regular;
-              font-weight:400;
-              color:rgba(128,128,128,1);
-              line-height:20px;
-              margin-bottom: 16px;
-              button{
-                &:active{
-                  background: #2DC2F3;color: #fff;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  /*会员查询弹框样式*/
-  .huiyuanchaxun-tanchuan{
-    .content{
-      .header{
-        margin-bottom: 8px;
-        height: 290px;
-        .left{
-          .search-btns{
-            width: 584px;display: flex;justify-content: space-between;margin-bottom: 50px;
-          }
-          .user-info{
-            margin-bottom: 50px;
-            width: 584px;
-            text-align: center;
-            td{
-              height: 32px;
-              text-align: center;
-              color: #000000;
-            }
-          }
-          .tab-btns{
-            button{
-             background:#6BD2F4;color: #000;
-            }
-            .active{
-              background:#F55656;color: #ffffff;
-            }
-          }
-        }
-      }
-      .my-table{
-        .el-table__body tr{
-          height:24px!important;
-          td{
-            padding: 0!important;
-          }
-        }
-      }
-    }
-
-  }
-  /*购卡项目弹窗*/
-  .goukaxiangmu-tanchuan{
-      /deep/ .el-dialog{
-      /deep/ .el-dialog__body{
-          padding: 0!important;
-         /deep/ .el-tabs{
-            /deep/ .el-tabs__header {
-              margin: 0;
-              /deep/ .el-tabs__nav-wrap{
-                &:after{
-                  height: 0;
-                  background: none;
-                }
-                /deep/ .el-tabs__nav-scroll{
-                  text-align: center;
-                  /deep/ .el-tabs__nav{
-                    /*margin: auto;*/
-                    float: none;
-                    /*white-space: nowrap;*/
-                    /*display: flex;*/
-                    /*flex-direction: row;*/
-                    /*justify-content: space-around;*/
-                    .el-tabs__active-bar{
-                      height: 0;
-                      width: 0;
-                      background: none;
-                    }
-                    .el-tabs__item{
-                      padding: 0 80px;
-                      font-size: 24px;
-                      &:first-child{
-                        padding-left: 0;
-                      }
-                      &:nth-child(2){
-                        padding-left: 0;
-                      }
-                      &:last-child{
-                        padding-right: 0;
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            /deep/ .el-tabs__content{
-              height: 450px;
-              overflow: hidden;
-              overflow-y: auto;
-              padding: 32px 18px 0 18px;
-              background: #F2F2F2;
-              /deep/ .el-tab-pane{
-                display: flex;
-                flex-direction:row;
-                flex-wrap:wrap;
-                justify-content:space-between;
-                .card-botton{
-                  margin-bottom: 28px;
-                }
-              }
-            }
-         }
-      }
-    }
-      .search{
-        padding: 15px 25px;
-        width: cale(100% - 50px);
-      }
-      .footer{
-        width: 100%;
-        text-align: center;
-        .btn{
-          width:168px;
-          height:44px;
-          background:rgba(255,255,255,1);
-          border:1px solid rgba(46,202,241,1);
-          border-radius:4px;
-          color: #2ECAF1;
-          font-size:20px;
-          font-family:SourceHanSansCN-Regular;
-          font-weight:400;
-        }
-        .active{
-          color: #ffffff;
-          background: #2DC2F3;
-        }
-      }
-  }
-  /*结账成功弹框*/
-  .jiezhang-chenggong-tanchuan{
-    .box{
-      width:100%;
-      border-radius:10px;
-      text-align: center;
-      img{
-        margin: auto;
-        width:83px;
-        height:104px;
-      }
-      .txt{
-        width:100%;
-        height:30px;
-        line-height: 30px;
-        font-size:30px;
-        margin-top: 35px;
-        margin-bottom: 64px;
-        font-family:SourceHanSansCN-Regular;
-        font-weight:400;
-        color:rgba(26,26,26,1);
-        text-align: center;
-      }
-    }
-  }
+@import "../../assets/style/money.less";
 </style>
 
 <style scoped>
