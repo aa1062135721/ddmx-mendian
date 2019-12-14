@@ -504,7 +504,7 @@
           <div>
             <div class="title">商品信息</div>
             <div>
-              <el-table :data="orderDetailsDialog1.responseGoodList" border height="400" style="width: 100%;">
+              <el-table :data="orderDetailsDialog1.responseGoodList" border max-height="250" style="width: 100%;">
                 <el-table-column prop="title" label="商品名称" width="180"></el-table-column>
                 <el-table-column prop="num" label="数量" width="180"></el-table-column>
                 <el-table-column prop="cost_price" label="成本价"></el-table-column>
@@ -516,7 +516,7 @@
           <div v-if="orderDetailsDialog1.responseReturnGoodList.length">
             <div class="title">退单信息</div>
             <div>
-              <el-table :data="orderDetailsDialog1.responseReturnGoodList" border height="400" style="width: 100%;">
+              <el-table :data="orderDetailsDialog1.responseReturnGoodList" border max-height="250" style="width: 100%;">
                 <el-table-column prop="r_sn" label="退货订单号"></el-table-column>
                 <el-table-column prop="r_number" label="退货数量"></el-table-column>
                 <el-table-column prop="r_amount" label="退货总金额"></el-table-column>

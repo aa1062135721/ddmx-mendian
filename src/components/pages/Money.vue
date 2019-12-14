@@ -271,8 +271,9 @@
         <div class="clear-both both">
           <div class="float-left left">
             <div class="one">
-              <el-button style="width: 30%;" type="primary" plain @click="chongzhiDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
-              <el-input style="width: 65%;" v-model="chongzhiDialog.mobile" @keydown.enter.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')"  placeholder="请输入会员昵称或者手机号" clearable maxlength="11"></el-input>
+              <el-button type="primary" plain @click="chongzhiDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
+              <el-input style="width: 50%;" v-model="chongzhiDialog.mobile" @keydown.enter.native="chongzhiDialogSearchMemberVip" @focus="chongzhiDialogInputFocus('mobile')"  placeholder="会员昵称/手机号" clearable maxlength="11"></el-input>
+              <el-button type="primary"  @click="chongzhiDialogSearchMemberVip">搜索</el-button>
             </div>
             <div class="two">
               <ul>
@@ -504,8 +505,8 @@
         <div class="clear-both div">
             <div class="float-left left">
               <div class="search">
-                <el-button style="width: 30%;" type="primary" plain @click="xuanzehuiyuanDialog.isShow = false;huiyuanDialog.addHuiyuanDialog.isShow = true;">新增会员</el-button>
-                <el-input style="width: 65%;" @keyup.enter.native="searchMember()" v-model="xuanzehuiyuanDialog.mobile" placeholder="请输入会员昵称或手机号" maxlength="11"></el-input>
+                <el-input style="width: 75%;" @keyup.enter.native="searchMember()" v-model="xuanzehuiyuanDialog.mobile" placeholder="会员昵称/手机号" maxlength="11"></el-input>
+                <el-button type="primary"  @click="searchMember">搜索</el-button>
               </div>
               <div class="content">
                 <ul>
@@ -3408,16 +3409,15 @@ export default {
               this.findMemberDialog.isShow = true
             }
         } else {
-          this.$message({
-            message: '没有查询到会员信息',
-            type: 'error'
-          })
+          if (res.code === '200' && res.data.length === 0){
+            this.$message({
+              message: '没有查询到会员信息',
+              type: 'error'
+            })
+          }
         }
-      }).catch(() => {
-        this.$message({
-          message: '服务器繁忙',
-          type: 'error'
-        })
+      }).catch((err) => {
+        console.log(err)
       })
     },
     findAndChoosesMember(index = 0){ // 查询出来的会员列表，选择一个

@@ -155,7 +155,7 @@
               <el-button @click="transferSlipPageData.chooseGoodsDialog.isShow = true"  type="primary" plain>选择商品</el-button>
             </div>
             <div style="margin-top: 15px;">
-              <el-table :data="transferSlipPageData.addDialog.list" border style="width: 100%;">
+              <el-table :data="transferSlipPageData.addDialog.list" max-height="450" border style="width: 100%;">
                 <el-table-column type="index" label="序号"></el-table-column>
                 <el-table-column prop="title" label="商品名称"></el-table-column>
                 <el-table-column prop="bar_code" label="条形码"></el-table-column>
@@ -350,7 +350,7 @@
               </el-steps>
             </div>
             <div style="margin-top: 30px;">
-              <el-table :data="transferSlipPageData.detailsDialog.responseGoodList" border style="width: 100%;">
+              <el-table :data="transferSlipPageData.detailsDialog.responseGoodList" max-height="400" border style="width: 100%;">
                 <el-table-column type="index" label="序号"></el-table-column>
                 <el-table-column prop="item" label="商品名称"></el-table-column>
                 <el-table-column prop="bar_code" label="条形码"></el-table-column>
