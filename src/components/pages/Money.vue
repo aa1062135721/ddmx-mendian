@@ -2446,14 +2446,6 @@ export default {
       }
     },
     async chongzhiDialogBtnOk () {
-      if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.chongzhiDialog.mobile)) {
-        this.$message.closeAll()
-        this.$message({
-          message: '请输入正确的手机号',
-          type: 'error'
-        })
-        return
-      }
       if (!this.chongzhiDialog.huiyuanInfo.id) {
         this.$message.closeAll()
         this.$message({
