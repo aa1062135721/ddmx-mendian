@@ -991,6 +991,7 @@
 </template>
 
 <script>
+let timeout = null // 确认结账防抖
 import vHead from '../common/Header.vue'
 import vGood from '../common/Good.vue'
 import vKeyboard from '../common/Keyboard.vue'
@@ -3131,7 +3132,17 @@ export default {
       }
     },
     //确认结账
-    async jiezhangDialogClickOk () {
+    _debounce(fn, wait = 300) { // 防抖
+      if(timeout !== null) {
+        clearTimeout(timeout)
+        timeout = null
+      }
+      timeout = setTimeout(fn, wait)
+    },
+    jiezhangDialogClickOk(){
+      this._debounce(this.jiezhangDialogClickOk1, 1000)
+    },
+    async jiezhangDialogClickOk1 () {
       if(!this.jiezhangDialog.canSave){
         return
       }
