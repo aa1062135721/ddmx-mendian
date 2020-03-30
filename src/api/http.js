@@ -8,9 +8,10 @@
 import axios from 'axios'
 import Vue from 'vue'
 import router from '../router/index'
-import { getCookie, removeCookie } from '../utils'
 import store from '../store/store' // vuex
+import { Loading } from 'element-ui';
 
+let loading;// 全局加载的时候有一个loading效果
 // 状态码错误信息
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -33,35 +34,20 @@ const codeMessage = {
 axios.defaults.timeout = 10000
 if (process.env.NODE_ENV === 'development') {
   axios.defaults.baseURL = '/api/'  // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
+  // axios.defaults.baseURL = 'https://ddxm661.com/index'  // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
 } else {
   axios.defaults.baseURL = 'https://www.ddxm661.com/index' // 正式服务器环境
-}
-/**
- * 决绝同一个接口，相同参数，相同请求方法 ……  发送多次请求
- * @type {Array}
- */
-let pending = [] // 声明一个数组用于存储每个请求的取消函数和axios标识
-let cancelToken = axios.CancelToken
-let removePending = (config) => {
-  for (let p in pending) {
-    if ((pending[p].u) === (config.url + JSON.stringify(config.data) + '&' + config.method)) { // 当当前请求在数组中存在时执行函数体
-      pending[p].f('操作频繁,请稍后再试 ^_^') // 执行取消操作
-      pending.splice(p, 1)
-    }
-  }
 }
 
 // http request 拦截器
 axios.interceptors.request.use(
   config => {
-    removePending(config) // 在一个axios发送前执行一下取消操作
-    // eslint-disable-next-line new-cap
-    config.cancelToken = new cancelToken((c) => {
-      // 这里的axios标识我是用请求地址&请求方式拼接的字符串，当然你可以选择其他的一些方式
-      pending.push({ u: config.url + JSON.stringify(config.data) + '&' + config.method, f: c })
-    })
-
-    // const token = getCookie('token')  // 从cookie中取出 token，所有接口都带上token
+    loading = Loading.service({
+      lock: true,
+      text: 'Loading',
+      spinner: 'el-icon-loading',
+      background: 'rgba(0, 0, 0, 0.7)'
+    });
     const token = store.state.token  // 从vuex中取出 token，所有接口都带上token
     if (config.data && config.data.form) {
       config.headers = {
@@ -87,11 +73,9 @@ axios.interceptors.request.use(
 // http reponse 拦截器
 axios.interceptors.response.use(
   response => {
-    removePending(response.config) // 在一个axios响应后再执行一下取消操作，把已经完成的请求从pending中移除
-
+    loading.close();
     Vue.prototype.$message.closeAll()
     if (response.data.code === '-2' || response.data.code === -2 || response.data.code === '-1' || response.data.code === -1) {
-      removeCookie('token')
       store.commit('setUserInfo')
       store.commit('setToken')
       router.push('/login')
@@ -105,6 +89,7 @@ axios.interceptors.response.use(
     return response
   },
   error => {
+    loading.close();
     const status = error.response.status
     const errortext = codeMessage[status] || error.response.msg
     // 提示错误信息
@@ -114,12 +99,10 @@ axios.interceptors.response.use(
     })
     // 部分错误状态处理
     if (status === 401) {
-      removeCookie('token')
       store.commit('setUserInfo')
       store.commit('setToken')
       router.push('/login')
     } else if (status === 403) {
-      removeCookie('token')
       store.commit('setUserInfo')
       store.commit('setToken')
       router.push('/login')

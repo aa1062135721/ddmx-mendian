@@ -703,3 +703,10 @@ export const postTimeMoneyExpireDetails = (data = null) => {
 export const postGetMemberShop = (data = null) => {
   return Vue.prototype.$post('/index/getMemberShop', data)
 }
+
+/**
+ * 服务卡延期
+ */
+export const postTicketDelay = (data = null) => {
+  return Vue.prototype.$post('/ticket/ticketDelay', data)
+}

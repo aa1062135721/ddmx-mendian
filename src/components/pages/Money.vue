@@ -621,6 +621,7 @@
                   <el-button v-if="scope.row.status === 1" type="text" size="mini" @click="huiyuanDialogUseServiceCardList(scope.row)">耗卡</el-button>
                   <el-button v-if=" [1,2,3,4].indexOf(scope.row.status) !== -1" type="text" size="mini" @click="huiyuanDialogServiceCardUseRecords(scope.row)">使用记录</el-button>
                   <el-button v-if="scope.row.status === 4" type="text" size="mini" @click="huiyuanDialogServiceCardReturnCardsDetails(scope.row)">退卡详情</el-button>
+                  <el-button v-if="[1,2,3].indexOf(scope.row.status) !== -1" type="text" size="mini" @click="huiyuanDialogFuwkaDelay(scope.row.id)">延期服务卡</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -780,6 +781,18 @@
               <el-input type="textarea" v-model="huiyuanDialog.tuikaDialog.responseData.remarks" :disabled="true"></el-input>
             </div>
           </div>
+        </div>
+      </el-dialog>
+      <!-- 会员查询-- 服务卡选项卡 -- 服务卡延期操作 -->
+      <el-dialog title="服务卡延期" :visible.sync="huiyuanDialog.fuwukaYanqiDialog.isShow" width="500px" :center="true">
+        <div style="text-align: center;">
+          <el-date-picker
+            v-model="huiyuanDialog.fuwukaYanqiDialog.requestData.expire_time"
+            type="date"
+            value-format="yyyy-MM-dd"
+            placeholder="过期时间">
+          </el-date-picker>
+          <el-button type="primary" @click="huiyuanDialogFuwkaDelayOk">确定延期</el-button>
         </div>
       </el-dialog>
       <!-- 点击购卡按钮弹窗-购卡项目 -->
@@ -1005,6 +1018,7 @@ import { postServiceCardReturnDetail, postServiceCategory, postMemberLevelInfo, 
   postEditNickName,
   postCreateOrderFuwuCardFixBug,
   postGetMemberShop,
+  postTicketDelay,
 } from '../../api/getData'
 import { mapState } from 'vuex' //  这儿需要用到vuex里的数据
 
@@ -1209,6 +1223,14 @@ export default {
             // {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了', reg: '无'},
             // {name: '水育', time: '2018-09-20 14:12:20', who: '店长', money: 11.2, why: '不想用了', reg: '无'}
           ]
+        },
+        // 服务卡延期对话框
+        fuwukaYanqiDialog: {
+          isShow: false,
+          requestData: {
+            id: '',
+            expire_time: '',
+          }
         },
       },
       // 单击充值按钮后的弹窗所需要的数据
@@ -2839,6 +2861,26 @@ export default {
         }
       })
       this.fuwukaHexiaoDialog.shiyongjiluDialog.isShow = true
+    },
+
+    // 服务卡延期弹框显示
+    huiyuanDialogFuwkaDelay(id){
+      this.huiyuanDialog.fuwukaYanqiDialog.requestData.id = id;
+      this.huiyuanDialog.fuwukaYanqiDialog.isShow = true;
+    },
+    huiyuanDialogFuwkaDelayOk(){
+      if (!this.huiyuanDialog.fuwukaYanqiDialog.requestData.expire_time){
+        this.$message.error('请选择过期时间');
+        return;
+      }
+      postTicketDelay(this.huiyuanDialog.fuwukaYanqiDialog.requestData).then(res=> {
+        if (res.code === 200) {
+          this.huiyuanDialogSearchServiceCardList();
+          this.huiyuanDialog.fuwukaYanqiDialog.isShow = false;
+          this.huiyuanDialog.fuwukaYanqiDialog.requestData.expire_time = '';
+          this.$message.success('延期成功');
+        }
+      })
     },
 
     // 激活服务卡
