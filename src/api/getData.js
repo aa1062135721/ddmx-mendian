@@ -15,7 +15,20 @@ export const postLoginGetCode = (data = null) => {
 export const postLoginByCode = (data = null) => {
   return Vue.prototype.$post('/login/userLogin', data)
 }
-
+/**
+ * 登录接口 根据手机号和密码登录
+ * @returns {Promise|*}
+ */
+export const postLoginGetPwd = (data = null) => {
+  return Vue.prototype.$post('/login/doLogin', data)
+}
+/**
+ * 登录后，修改密码
+ * @returns {Promise|*}
+ */
+export const changePassword = (data = null) => {
+  return Vue.prototype.$post('/user/edit', data)
+}
 /**
  * 登录接口
  * @returns {Promise|*}
@@ -57,6 +70,7 @@ export const postServiceCategory = (data = null) => {
  */
 export const postGoods = (data = null) => {
   return Vue.prototype.$post('/index/itemList', data)
+  // return Vue.prototype.$post('/index/itemList', data)
 }
 
 /**

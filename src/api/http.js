@@ -11,7 +11,7 @@ import router from '../router/index'
 import store from '../store/store' // vuex
 import { Loading } from 'element-ui';
 
-let loading;// 全局加载的时候有一个loading效果
+let loading// 全局加载的时候有一个loading效果
 // 状态码错误信息
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -37,6 +37,7 @@ if (process.env.NODE_ENV === 'development') {
   // axios.defaults.baseURL = 'https://ddxm661.com/index'  // 配置了代理跨域 项目根目录中，config/index.js  proxyTable
 } else {
   axios.defaults.baseURL = 'https://www.ddxm661.com/index' // 正式服务器环境
+  // axios.defaults.baseURL = 'https://ddxm661.com/index' // 测试服务器环境
 }
 
 // http request 拦截器
