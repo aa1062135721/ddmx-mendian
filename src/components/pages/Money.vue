@@ -2909,6 +2909,8 @@ export default {
       await postMemberServiceCardsUseList(requestData).then(res => {
         if (res.data.length) {
           this.huiyuanDialog.haokaDialog.tableData = res.data
+        }else{
+          this.huiyuanDialog.haokaDialog.tableData = []
         }
       })
       this.huiyuanDialog.haokaDialog.isShow = true
